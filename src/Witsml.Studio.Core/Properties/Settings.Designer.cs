@@ -40,5 +40,14 @@ namespace PDS.Witsml.Studio.Core.Properties {
                 return ((string)(this["ConnectionBaseFileName"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ConnectionList.json")]
+        public string ConnectionListBaseFileName {
+            get {
+                return ((string)(this["ConnectionListBaseFileName"]));
+            }
+        }
     }
 }
