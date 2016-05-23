@@ -742,7 +742,14 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             }
             else
             {
-                xml = XDocument.Parse(xml).ToString();
+                try
+                {
+                    xml = XDocument.Parse(xml).ToString();
+                }
+                catch (Exception ex)
+                {
+                    _log.WarnFormat("Error parsing SOAP message:{0}{1}{0}{0}{2}", Environment.NewLine, xml, ex);
+                }
             }
 
             OutputSoapMessages(type, action, xml);
