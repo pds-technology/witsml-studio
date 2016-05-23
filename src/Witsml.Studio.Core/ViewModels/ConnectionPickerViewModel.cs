@@ -131,12 +131,22 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             }
         }
 
+        /// <summary>
+        /// Edits the connection using the Connection dialog.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="e">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
         public void EditConnection(Connection connection, MouseButtonEventArgs e)
         {
             e.Handled = true;
             ShowConnectionDialog(connection);
         }
 
+        /// <summary>
+        /// Deletes the connection using the Connection dialog.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="e">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
         public void DeleteConnection(Connection connection, MouseButtonEventArgs e)
         {
             e.Handled = true;
@@ -152,6 +162,10 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             }
         }
 
+        /// <summary>
+        /// Called when an attached view's Loaded event fires.
+        /// </summary>
+        /// <param name="view"></param>
         protected override void OnViewLoaded(object view)
         {
             if (Connections.Any()) return;

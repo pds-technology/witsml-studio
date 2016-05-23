@@ -17,7 +17,6 @@
 //-----------------------------------------------------------------------
 
 using System.Windows;
-using System.Windows.Controls;
 
 namespace PDS.Witsml.Studio.Core.Views
 {
@@ -26,6 +25,9 @@ namespace PDS.Witsml.Studio.Core.Views
     /// </summary>
     public partial class ShellView : Window
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ShellView"/> class.
+        /// </summary>
         public ShellView()
         {
             InitializeComponent();

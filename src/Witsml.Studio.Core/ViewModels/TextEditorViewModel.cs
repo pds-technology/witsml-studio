@@ -25,14 +25,20 @@ using PDS.Witsml.Studio.Core.Runtime;
 
 namespace PDS.Witsml.Studio.Core.ViewModels
 {
+    /// <summary>
+    /// Manages the behavior of the text editor control.
+    /// </summary>
+    /// <seealso cref="Caliburn.Micro.Screen" />
     public class TextEditorViewModel : Screen
     {
         private TextEditor _textEditor;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TextEditorViewModel"/> class.
+        /// Initializes a new instance of the <see cref="TextEditorViewModel" /> class.
         /// </summary>
         /// <param name="runtime">The runtime service.</param>
+        /// <param name="language">The language.</param>
+        /// <param name="isReadOnly">if set to <c>true</c> the control is read only.</param>
         public TextEditorViewModel(IRuntimeService runtime, string language = null, bool isReadOnly = false)
         {
             Runtime = runtime;
@@ -306,6 +312,10 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             Runtime.Invoke(() => Document.Text = string.Empty);
         }
 
+        /// <summary>
+        /// Refreshes the context menu.
+        /// </summary>
+        /// <param name="control">The control.</param>
         public void RefreshContextMenu(TextEditor control)
         {
             _textEditor = control;

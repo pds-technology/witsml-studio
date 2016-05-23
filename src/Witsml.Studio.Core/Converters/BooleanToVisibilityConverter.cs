@@ -23,15 +23,12 @@ using System.Windows.Data;
 
 namespace PDS.Witsml.Studio.Core.Converters
 {
+    /// <summary>
+    /// Converts a boolean value to a <see cref="Visibility"/> emumeration value.
+    /// </summary>
+    /// <seealso cref="System.Windows.Data.IValueConverter" />
     public class BooleanToVisibilityConverter : IValueConverter
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BooleanToVisibilityConverter"/> class.
-        /// </summary>
-        public BooleanToVisibilityConverter()
-        {
-        }
-
         /// <summary>Converts a bool value to a <see cref="T:System.Windows.Visibility" /> enumeration value for Visibility.</summary>
         /// <param name="value">The boolean value tested to convert.</param>
         /// <param name="targetType">This parameter is not used.</param>

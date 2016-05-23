@@ -27,7 +27,7 @@ namespace PDS.Witsml.Studio.Core.Behaviors
     /// <summary>
     /// Manages the behavior of the context menu for a dropdown button control.
     /// </summary>
-    /// <seealso cref="System.Windows.Interactivity.Behavior{System.Windows.Controls.Button}" />
+    /// <seealso cref="Behavior{Button}" />
     public class DropDownButtonBehavior : Behavior<Button>
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(DropDownButtonBehavior));
@@ -46,7 +46,7 @@ namespace PDS.Witsml.Studio.Core.Behaviors
             _log.DebugFormat("Attached to '{0}' button.", AssociatedObject.Name);
 
             base.OnAttached();
-            AssociatedObject.AddHandler(Button.ClickEvent, new RoutedEventHandler(AssociatedObject_Click), true);
+            AssociatedObject.AddHandler(ButtonBase.ClickEvent, new RoutedEventHandler(AssociatedObject_Click), true);
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace PDS.Witsml.Studio.Core.Behaviors
         protected override void OnDetaching()
         {
             base.OnDetaching();
-            AssociatedObject.RemoveHandler(Button.ClickEvent, new RoutedEventHandler(AssociatedObject_Click));
+            AssociatedObject.RemoveHandler(ButtonBase.ClickEvent, new RoutedEventHandler(AssociatedObject_Click));
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace PDS.Witsml.Studio.Core.Behaviors
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.Windows.RoutedEventArgs"/> instance containing the event data.</param>
-        void AssociatedObject_Click(object sender, System.Windows.RoutedEventArgs e)
+        void AssociatedObject_Click(object sender, RoutedEventArgs e)
         {
             Button source = sender as Button;
             if (source != null && source.ContextMenu != null)

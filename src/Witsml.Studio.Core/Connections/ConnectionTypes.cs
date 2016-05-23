@@ -23,7 +23,9 @@ namespace PDS.Witsml.Studio.Core.Connections
     /// </summary>
     public enum ConnectionTypes
     {
+        /// <summary>An ETP connection type</summary>
         Etp,
+        /// <summary>A WITSML connection type</summary>
         Witsml
     }
 }

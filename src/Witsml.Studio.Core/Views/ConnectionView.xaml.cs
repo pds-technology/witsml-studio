@@ -25,6 +25,9 @@ namespace PDS.Witsml.Studio.Core.Views
     /// </summary>
     public partial class ConnectionView : Window
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConnectionView"/> class.
+        /// </summary>
         public ConnectionView()
         {
             InitializeComponent();

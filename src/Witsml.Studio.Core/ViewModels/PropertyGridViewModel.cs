@@ -23,6 +23,10 @@ using PDS.Witsml.Studio.Core.Runtime;
 
 namespace PDS.Witsml.Studio.Core.ViewModels
 {
+    /// <summary>
+    /// Manages the behavior of the property grid control.
+    /// </summary>
+    /// <seealso cref="Caliburn.Micro.Screen" />
     public class PropertyGridViewModel : Screen
     {
         /// <summary>

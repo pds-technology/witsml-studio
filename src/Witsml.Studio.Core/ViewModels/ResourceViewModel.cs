@@ -29,11 +29,13 @@ namespace PDS.Witsml.Studio.Core.ViewModels
     /// <seealso cref="Caliburn.Micro.PropertyChangedBase" />
     public class ResourceViewModel : PropertyChangedBase
     {
-        private static readonly ResourceViewModel Placeholder = new ResourceViewModel(new Resource() { Name = "loading..." })
+        /// <summary>The placeholder resource.</summary>
+        public static readonly ResourceViewModel Placeholder = new ResourceViewModel(new Resource() { Name = "loading..." })
         {
             _isPlaceholder = true
         };
 
+        /// <summary>The no data resource.</summary>
         public static readonly ResourceViewModel NoData = new ResourceViewModel(new Resource() { Name = "(no data)" })
         {
             _isPlaceholder = true
