@@ -23,6 +23,7 @@ using Energistics.Datatypes;
 using PDS.Framework;
 using PDS.Witsml.Data.Channels;
 using PDS.Witsml.Studio.Core.Runtime;
+using Xceed.Wpf.DataGrid;
 using Witsml131 = Energistics.DataAccess.WITSML131;
 using Witsml141 = Energistics.DataAccess.WITSML141;
 
@@ -35,6 +36,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
     public class DataGridViewModel : Screen
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(DataGridViewModel));
+        private DataGridControl _control;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataGridViewModel"/> class.
@@ -63,6 +65,15 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         /// <value>The URI.</value>
         public EtpUri Uri { get; private set; }
+
+        /// <summary>
+        /// Called when the data grid control is loaded.
+        /// </summary>
+        /// <param name="control">The control.</param>
+        public void OnDataGridLoaded(DataGridControl control)
+        {
+            _control = control;
+        }
 
         /// <summary>
         /// Sets the current object.
@@ -144,6 +155,14 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 DataTable.PrimaryKey = new[] { DataTable.Columns[0] };
                 DataTable.AcceptChanges();
                 DataTable.EndLoadData();
+
+                if (DataTable.Columns.Count > 1 && _control != null)
+                {
+                    // Use DateTimeOffset formatting for Time logs
+                    _control.Columns[0].CellContentStringFormat = 
+                        DataTable.Columns[0].DataType.IsNumeric() ? null : "{0:o}";
+                }
+
                 NotifyOfPropertyChange(() => DataTable);
             }
             catch (Exception ex)

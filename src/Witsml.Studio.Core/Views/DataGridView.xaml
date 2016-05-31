@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid"
+             xmlns:cal="http://www.caliburnproject.org"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="600">
     
     <UserControl.Resources>
@@ -12,7 +13,8 @@
     
     <Grid>
         <xcdg:DataGridControl AutoCreateColumns="True" AutoRemoveColumnsAndDetailConfigurations="True" CellEditorDisplayConditions="None"
-                              ItemsSource="{Binding Source={StaticResource GridData}}">
+                              ItemsSource="{Binding Source={StaticResource GridData}}"
+                              cal:Message.Attach="[Event Loaded] = [Action OnDataGridLoaded($source)]">
             <xcdg:DataGridControl.View>
                 <xcdg:TableflowView UseDefaultHeadersFooters="False" RowFadeInAnimationDuration="0" ScrollingAnimationDuration="0">
                     <xcdg:TableflowView.FixedHeaders>
