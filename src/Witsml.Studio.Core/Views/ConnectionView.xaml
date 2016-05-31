@@ -46,8 +46,8 @@
 
         <Button x:Name="TestConnection" Grid.Row="6" Grid.Column="0" Margin="5" Width="80" HorizontalContentAlignment="Stretch" IsEnabled="{Binding EditItem.Uri, Converter={StaticResource NullToBooleanConverter}}">
             <Grid>
-                <Image Margin="5,0,0,0" Source="/Images/StatusInvalid_16x.png" Visibility="{Binding IsTestFailure, Converter={StaticResource BooleanToVisibilityConverter}}" HorizontalAlignment="Left" Height="16" Width="16" />
-                <Image Margin="5,0,0,0" Source="/Images/StatusOK_16x.png" Visibility="{Binding IsTestSuccess, Converter={StaticResource BooleanToVisibilityConverter}}" HorizontalAlignment="Left" Height="16" Width="16" />
+                <Image Margin="5,0,0,0" Source="pack://siteoforigin:,,,/Images/StatusInvalid_16x.png" Visibility="{Binding IsTestFailure, Converter={StaticResource BooleanToVisibilityConverter}}" HorizontalAlignment="Left" Height="16" Width="16" />
+                <Image Margin="5,0,0,0" Source="pack://siteoforigin:,,,/Images/StatusOK_16x.png" Visibility="{Binding IsTestSuccess, Converter={StaticResource BooleanToVisibilityConverter}}" HorizontalAlignment="Left" Height="16" Width="16" VerticalAlignment="Bottom" />
                 <TextBlock Text="Test" HorizontalAlignment="Center" />
             </Grid>
         </Button>
