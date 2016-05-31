@@ -234,7 +234,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>powershell.exe -file "$(SolutionDir)\External\InsertCopyright.ps1" -target $(ProjectDir) -productname "PDS.Witsml.Studio"</PreBuildEvent>
+    <PreBuildEvent>powershell.exe -file "$(SolutionDir)\External\InsertCopyright.ps1" -target $(ProjectDir) -productname "PDS.Witsml.Studio"
+if "$(ConfigurationName)" == "Debug" "$(SolutionDir)External\CopyCoreLibrariesForDebug.bat" "$(TargetDir)"</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
