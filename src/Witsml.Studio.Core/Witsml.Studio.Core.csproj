@@ -241,8 +241,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Images\StatusInvalid_16x.png" />
-    <Content Include="Images\StatusOK_16x.png" />
+    <Content Include="Images\StatusInvalid_16x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\StatusOK_16x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\WitsmlStudio.ico" />
   </ItemGroup>
   <ItemGroup>
