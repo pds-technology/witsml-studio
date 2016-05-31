@@ -17,7 +17,7 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,6 +25,7 @@ using System.Windows;
 using System.Windows.Controls;
 using AutoMapper;
 using Caliburn.Micro;
+using log4net.Appender;
 using Newtonsoft.Json;
 using PDS.Framework;
 using PDS.Witsml.Studio.Core.Connections;
@@ -375,6 +376,22 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             }
 
             CanTestConnection = true;
+        }
+
+        /// <summary>
+        /// Opens the log file.
+        /// </summary>
+        public void OpenLogFile()
+        {
+            if (_log.Logger.Repository.GetAppenders().Length == 0)
+                return;
+
+            var appender = _log.Logger.Repository.GetAppenders()[0] as FileAppender;
+            if (appender == null)
+                return;
+
+            var path = appender.File;
+            Process.Start(@"notepad.exe", path);
         }
     }
 }
