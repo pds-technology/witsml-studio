@@ -25,7 +25,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
     /// Manages the behavior for the Templates view UI elements.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    public class TemplatesViewModel : Screen
+    public sealed class TemplatesViewModel : Screen
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(TemplatesViewModel));
 

@@ -30,7 +30,7 @@ using PDS.Witsml.Studio.Core.ViewModels;
 
 namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels
 {
-    public class MainViewModel : Conductor<IScreen>.Collection.OneActive, IPluginViewModel
+    public sealed class MainViewModel : Conductor<IScreen>.Collection.OneActive, IPluginViewModel
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MainViewModel"/> class.

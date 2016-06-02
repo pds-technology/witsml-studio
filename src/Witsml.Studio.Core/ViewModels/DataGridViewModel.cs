@@ -33,11 +33,12 @@ namespace PDS.Witsml.Studio.Core.ViewModels
     /// Manages the loading of data displayed in the data grid control.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    public class DataGridViewModel : Screen
+    public class DataGridViewModel : Screen, IDisposable
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(DataGridViewModel));
+        private readonly DataTable _dataTable;
         private DataGridControl _control;
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="DataGridViewModel"/> class.
         /// </summary>
@@ -45,7 +46,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         public DataGridViewModel(IRuntimeService runtime)
         {
             Runtime = runtime;
-            DataTable = new DataTable();
+            _dataTable = new DataTable();
         }
 
         /// <summary>
@@ -58,7 +59,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// Gets the data table.
         /// </summary>
         /// <value>The data table.</value>
-        public DataTable DataTable { get; }
+        public DataTable DataTable => _dataTable;
 
         /// <summary>
         /// Gets the URI for the current data obejct.
@@ -170,5 +171,49 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 _log.WarnFormat("Error displaying growing object data: {0}", ex);
             }
         }
+
+        #region IDisposable Support
+        private bool _disposedValue; // To detect redundant calls
+
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    // NOTE: dispose managed state (managed objects).
+
+                    if (_dataTable != null)
+                        _dataTable.Dispose();
+                }
+
+                // NOTE: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // NOTE: set large fields to null.
+
+                _disposedValue = true;
+            }
+        }
+
+        // NOTE: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~MainViewModel() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // NOTE: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

@@ -32,9 +32,9 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
     /// Manages the behavior of the tree view user interface elements.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    public class HierarchyViewModel : Screen, ISessionAware
+    public sealed class HierarchyViewModel : Screen, ISessionAware
     {
-        private static readonly string[] DescribeObjectTypes = new[]
+        private static readonly string[] _describeObjectTypes = new[]
         {
             ObjectTypes.Wellbore, ObjectTypes.Log, ObjectTypes.ChannelSet, ObjectTypes.Channel
         };
@@ -147,7 +147,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 if (CanExecute && resource != null && resource.Level > 0)
                 {
                     var uri = new EtpUri(resource.Resource.Uri);
-                    return DescribeObjectTypes.Contains(uri.ObjectType);
+                    return _describeObjectTypes.Contains(uri.ObjectType);
                 }
 
                 return false;

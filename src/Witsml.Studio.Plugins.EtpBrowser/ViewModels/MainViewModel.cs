@@ -42,10 +42,10 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Conductor{IScreen}.Collection.OneActive" />
     /// <seealso cref="PDS.Witsml.Studio.Core.ViewModels.IPluginViewModel" />
-    public sealed class MainViewModel : Conductor<IScreen>.Collection.OneActive, IPluginViewModel
+    public sealed class MainViewModel : Conductor<IScreen>.Collection.OneActive, IPluginViewModel, IDisposable
     {
-        private static readonly string PluginDisplayName = Settings.Default.PluginDisplayName;
-        private static readonly string PluginVersion = typeof(MainViewModel).GetAssemblyVersion();
+        private static readonly string _pluginDisplayName = Settings.Default.PluginDisplayName;
+        private static readonly string _pluginVersion = typeof(MainViewModel).GetAssemblyVersion();
         private EtpClient _client;
 
         /// <summary>
@@ -56,12 +56,12 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         public MainViewModel(IRuntimeService runtime)
         {
             Runtime = runtime;
-            DisplayName = PluginDisplayName;
+            DisplayName = _pluginDisplayName;
             Resources = new BindableCollection<ResourceViewModel>();
             Model = new EtpSettings()
             {
-                ApplicationName = PluginDisplayName,
-                ApplicationVersion = PluginVersion
+                ApplicationName = _pluginDisplayName,
+                ApplicationVersion = _pluginVersion
             };
 
             Details = new TextEditorViewModel(runtime, "JavaScript", true);
@@ -425,5 +425,49 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 message,
                 Environment.NewLine));
         }
+
+        #region IDisposable Support
+        private bool _disposedValue; // To detect redundant calls
+
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    // NOTE: dispose managed state (managed objects).
+
+                    if (_client != null)
+                        _client.Dispose();
+                }
+
+                // NOTE: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // NOTE: set large fields to null.
+
+                _disposedValue = true;
+            }
+        }
+
+        // NOTE: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~MainViewModel() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // NOTE: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

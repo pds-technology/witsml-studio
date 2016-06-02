@@ -39,7 +39,7 @@ using PDS.Witsml.Studio.Core.ViewModels;
 
 namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Simulation
 {
-    public class ChannelsViewModel : Screen
+    public sealed class ChannelsViewModel : Screen
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(ChannelsViewModel));
 
@@ -67,7 +67,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Simulation
             get { return ((SimulationViewModel)Parent).Model; }
         }
 
-        public IRuntimeService Runtime { get; private set; }
+        public IRuntimeService Runtime { get; }
 
         /// <summary>
         /// Gets the WITSML connection picker view model.

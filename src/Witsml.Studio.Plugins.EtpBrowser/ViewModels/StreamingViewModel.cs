@@ -39,7 +39,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
     /// Manages the behavior of the Streaming user interface elements.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    public class StreamingViewModel : Screen, ISessionAware
+    public sealed class StreamingViewModel : Screen, ISessionAware
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="StreamingViewModel"/> class.

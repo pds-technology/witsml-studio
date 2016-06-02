@@ -30,7 +30,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
     /// Manages the behavior of the settings view.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    public class SettingsViewModel : Screen
+    public sealed class SettingsViewModel : Screen
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SettingsViewModel" /> class.

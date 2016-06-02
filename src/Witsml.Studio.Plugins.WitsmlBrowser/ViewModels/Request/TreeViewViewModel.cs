@@ -28,7 +28,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
     /// Manages the behavior for the TreeView view UI elements.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    public class TreeViewViewModel : Screen, IConnectionAware
+    public sealed class TreeViewViewModel : Screen, IConnectionAware
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(TreeViewViewModel));
 

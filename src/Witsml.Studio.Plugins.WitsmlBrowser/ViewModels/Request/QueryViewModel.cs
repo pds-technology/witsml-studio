@@ -16,7 +16,6 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
 using System.Windows;
 using Caliburn.Micro;
 using ICSharpCode.AvalonEdit.Document;
@@ -29,14 +28,15 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
     /// Manages the behavior for the query view UI elements.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    public class QueryViewModel : Screen
+    public sealed class QueryViewModel : Screen
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(QueryViewModel));
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="QueryViewModel"/> class.
+        /// Initializes a new instance of the <see cref="QueryViewModel" /> class.
         /// </summary>
         /// <param name="runtime">The runtime.</param>
+        /// <param name="xmlQuery">The XML query.</param>
         public QueryViewModel(IRuntimeService runtime, TextDocument xmlQuery)
         {
             _log.Debug("Creating view model instance");
@@ -48,6 +48,12 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
                 Document = xmlQuery
             };
         }
+
+        /// <summary>
+        /// Gets the runtime service.
+        /// </summary>
+        /// <value>The runtime.</value>
+        public IRuntimeService Runtime { get; }
 
         /// <summary>
         /// Gets the Parent <see cref="T:Caliburn.Micro.IConductor" /> for this view model
@@ -63,7 +69,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
         /// <value>The main view model.</value>
         public MainViewModel MainViewModel
         {
-            get { return (MainViewModel)Parent.Parent; }
+            get { return Parent.Parent; }
         }
 
         /// <summary>
@@ -74,12 +80,6 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
         {
             get { return Parent.Model; }
         }
-
-        /// <summary>
-        /// Gets the runtime service.
-        /// </summary>
-        /// <value>The runtime.</value>
-        public IRuntimeService Runtime { get; private set; }
 
         private TextEditorViewModel _xmlQuery;
 

@@ -29,7 +29,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
     /// <summary>
     /// Manages the main application user interface
     /// </summary>
-    public class ShellViewModel : Conductor<IScreen>.Collection.OneActive, IShellViewModel
+    public sealed class ShellViewModel : Conductor<IScreen>.Collection.OneActive, IShellViewModel
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(ShellViewModel));
 

@@ -23,7 +23,7 @@ using Energistics.DataAccess.WITSML141.ReferenceData;
 
 namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Simulation
 {
-    public class GeneralViewModel : Screen
+    public sealed class GeneralViewModel : Screen
     {
         public GeneralViewModel()
         {

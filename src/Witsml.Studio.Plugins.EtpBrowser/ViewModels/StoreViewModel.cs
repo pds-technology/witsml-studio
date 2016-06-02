@@ -36,7 +36,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
     /// Manages the behavior of the Store user interface elements.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    public class StoreViewModel : Screen, ISessionAware
+    public sealed class StoreViewModel : Screen, ISessionAware
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="StoreViewModel"/> class.
