@@ -16,4 +16,4 @@ Write-Host "Saving GlobalAssemblyInfo.cs to $FilePath"
 $Content | Out-File -FilePath $FilePath
 
 Write-Host ""
-Write-Host $Content.Substring($Content.IndexOf("using"))
+Write-Host $Content
