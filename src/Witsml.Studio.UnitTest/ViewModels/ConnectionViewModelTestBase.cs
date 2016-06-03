@@ -31,6 +31,9 @@ namespace PDS.Witsml.Studio.Core.ViewModels
     [TestClass]
     public class ConnectionViewModelTestBase
     {
+        private static string _validWitsmlUri = "http://localhost/Witsml.Web/WitsmlStore.svc";
+        private static string _validEtpUri = "ws://localhost/witsml.web/api/etp";
+
         protected static readonly string PersistedDataFolderName = Settings.Default.PersistedDataFolderName;
         protected static readonly string ConnectionBaseFileName = Settings.Default.ConnectionBaseFileName;
 
@@ -42,6 +45,8 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         protected Connection _witsmlConnection;
         protected Connection _etpConnection;
 
+        public TestContext TestContext { get; set; }
+
         /// <summary>
         /// Sets up the environment for each test.  
         /// ConnectionViewModels and Connections are created 
@@ -51,20 +56,26 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         [TestInitialize]
         public void TestSetUp()
         {
+            if (TestContext.Properties.Contains("WitsmlStoreUrl"))
+                _validWitsmlUri = TestContext.Properties["WitsmlStoreUrl"].ToString();
+
+            if (TestContext.Properties.Contains("EtpServerUrl"))
+                _validEtpUri = TestContext.Properties["EtpServerUrl"].ToString();
+
             _bootstrapper = new BootstrapperHarness();
             _runtime = new TestRuntimeService(_bootstrapper.Container);
 
             _witsmlConnection = new Connection()
             {
                 Name = "Witsml",
-                Uri = "http://localhost/Witsml.Web/WitsmlStore.svc",
+                Uri = _validWitsmlUri,
                 Username = "WitsmlUser"
             };
 
             _etpConnection = new Connection()
             {
                 Name = "Etp",
-                Uri = "ws://localhost/witsml.web/api/etp",
+                Uri = _validEtpUri,
                 Username = "EtpUser"
             };
 

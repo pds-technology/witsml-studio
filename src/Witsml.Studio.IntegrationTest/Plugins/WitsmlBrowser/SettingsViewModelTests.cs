@@ -28,10 +28,13 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser
     [TestClass]
     public class SettingsViewModelTests
     {
-        const string _validWitsmlUri = "http://localhost/Witsml.Web/WitsmlStore.svc";
+        private static string _validWitsmlUri = "http://localhost/Witsml.Web/WitsmlStore.svc";
+
         private BootstrapperHarness _bootstrapper;
         private TestRuntimeService _runtime;
         private SettingsViewModel _settingsViewModel;
+
+        public TestContext TestContext { get; set; }
 
         [TestInitialize]
         public void TestSetUp()
@@ -40,6 +43,9 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser
             _runtime = new TestRuntimeService(_bootstrapper.Container);
             _runtime.Shell = new ShellViewModel(_runtime);
             _settingsViewModel = new SettingsViewModel(_runtime);
+
+            if (TestContext.Properties.Contains("WitsmlStoreUrl"))
+                _validWitsmlUri = TestContext.Properties["WitsmlStoreUrl"].ToString();
         }
 
         [TestMethod]

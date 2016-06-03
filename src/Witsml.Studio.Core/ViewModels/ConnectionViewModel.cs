@@ -37,11 +37,11 @@ namespace PDS.Witsml.Studio.Core.ViewModels
     /// <summary>
     /// Manages the data entry for connection details.
     /// </summary>
-    public class ConnectionViewModel : Screen
+    public sealed class ConnectionViewModel : Screen
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(ConnectionViewModel));
-        private static readonly string PersistedDataFolderName = Settings.Default.PersistedDataFolderName;
-        private static readonly string ConnectionBaseFileName = Settings.Default.ConnectionBaseFileName;
+        private static readonly string _persistedDataFolderName = Settings.Default.PersistedDataFolderName;
+        private static readonly string _connectionBaseFileName = Settings.Default.ConnectionBaseFileName;
         private PasswordBox _passwordControl;
 
         /// <summary>
@@ -313,9 +313,9 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         {
             return string.Format("{0}/{1}/{2}{3}", 
                 Environment.CurrentDirectory, 
-                PersistedDataFolderName, 
+                _persistedDataFolderName, 
                 ConnectionType, 
-                ConnectionBaseFileName);
+                _connectionBaseFileName);
         }
 
         /// <summary>
@@ -351,7 +351,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         private void EnsureDataFolder()
         {
-            var dataFolder = string.Format("{0}/{1}", Environment.CurrentDirectory, PersistedDataFolderName);
+            var dataFolder = string.Format("{0}/{1}", Environment.CurrentDirectory, _persistedDataFolderName);
             if (!Directory.Exists(dataFolder))
             {
                 Directory.CreateDirectory(dataFolder);

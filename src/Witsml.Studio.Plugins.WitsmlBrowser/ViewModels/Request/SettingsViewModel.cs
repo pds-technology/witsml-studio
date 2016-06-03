@@ -148,7 +148,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
         {
             proxy.Url = connection.Uri;
 
-            if (!string.IsNullOrWhiteSpace(Model.Connection.Username))
+            if (!string.IsNullOrWhiteSpace(connection.Username))
             {
                 proxy.Username = connection.Username;
                 proxy.SetSecurePassword(connection.SecurePassword);
@@ -157,7 +157,9 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
             var supportedVersions = proxy.GetVersion();
             _log.DebugFormat("Supported versions '{0}' found on WITSML server with uri '{1}'", supportedVersions, connection.Uri);
 
-            var parent = Parent.Parent;
+            var parent = Parent?.Parent;
+            if (parent == null) return supportedVersions;
+
             parent.OutputResults(null, supportedVersions, 0);
             parent.OutputMessages(Functions.GetVersion, null, null, supportedVersions, null, 0);
 

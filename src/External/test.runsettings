@@ -3,6 +3,7 @@
 
   <!-- Parameters used by tests at runtime -->
   <TestRunParameters>
+    <Parameter name="EtpServerUrl" value="ws://localhost/Witsml.Web/api/etp" />
     <Parameter name="WitsmlStoreUrl" value="http://localhost/Witsml.Web/api/soap" />
     <Parameter name="WitsmlStoreUsername" value="" />
     <Parameter name="WitsmlStorePassword" value="" />

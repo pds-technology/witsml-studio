@@ -24,12 +24,20 @@ namespace PDS.Witsml.Studio.Core.Connections
     [TestClass]
     public class ConnectionTestTests
     {
-        const string _validWitsmlUri = "http://localhost/Witsml.Web/WitsmlStore.svc";
-        const string _validEtpUri = "ws://localhost/witsml.web/api/etp";
+        private static string _validWitsmlUri = "http://localhost/Witsml.Web/WitsmlStore.svc";
+        private static string _validEtpUri = "ws://localhost/witsml.web/api/etp";
+
+        public TestContext TestContext { get; set; }
 
         [TestMethod]
         public async Task TestValidWitsmlConnectionTestEndpoint()
         {
+            if (TestContext.Properties.Contains("WitsmlStoreUrl"))
+                _validWitsmlUri = TestContext.Properties["WitsmlStoreUrl"].ToString();
+
+            if (TestContext.Properties.Contains("EtpServerUrl"))
+                _validEtpUri = TestContext.Properties["EtpServerUrl"].ToString();
+
             var witsmlConnectionTest = new WitsmlConnectionTest();
             var result = await witsmlConnectionTest.CanConnect(new Connection() { Uri = _validWitsmlUri });
 

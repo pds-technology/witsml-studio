@@ -30,9 +30,9 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser
     [TestClass]
     public class WitsmlBrowserViewModelTests
     {
-        const string _validWitsmlUri = "http://localhost/Witsml.Web/WitsmlStore.svc";
+        private static string _validWitsmlUri = "http://localhost/Witsml.Web/WitsmlStore.svc";
 
-        private static string _addWellTemplate =
+        private static readonly string _addWellTemplate =
                 "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" + Environment.NewLine +
                 "<wells version=\"1.4.1.1\" xmlns=\"http://www.witsml.org/schemas/1series\" >" + Environment.NewLine +
                 "<well uid=\"{0}\">" + Environment.NewLine +
@@ -41,7 +41,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser
                 "</well>" + Environment.NewLine +
                 "</wells>";
 
-        private static string _getWellTemplate =
+        private static readonly string _getWellTemplate =
             "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" + Environment.NewLine +
             "<wells version=\"1.4.1.1\" xmlns=\"http://www.witsml.org/schemas/1series\" >" + Environment.NewLine +
             "<well uid=\"{0}\" />" + Environment.NewLine +
@@ -50,12 +50,17 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser
         private BootstrapperHarness _bootstrapper;
         private TestRuntimeService _runtime;
 
+        public TestContext TestContext { get; set; }
+
         [TestInitialize]
         public void TestSetUp()
         {
             _bootstrapper = new BootstrapperHarness();
             _runtime = new TestRuntimeService(_bootstrapper.Container);
             _runtime.Shell = new ShellViewModel(_runtime);
+
+            if (TestContext.Properties.Contains("WitsmlStoreUrl"))
+                _validWitsmlUri = TestContext.Properties["WitsmlStoreUrl"].ToString();
         }
 
         [TestMethod]
@@ -101,21 +106,27 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser
                 _addWellTemplate,
                 expectedUid,
                 DateTime.Now.ToString("yyyyMMdd-HHmmss"));
-            var result = await vm.SubmitQuery(Functions.AddToStore, xmlIn);
+
+            await vm.SubmitQuery(Functions.AddToStore, xmlIn);
 
             // Retrieve the same well from the store
             xmlIn = string.Format(_getWellTemplate, expectedUid);
-            result = await vm.SubmitQuery(Functions.GetFromStore, xmlIn);
 
-            string xmlOut = result.XmlOut;
+            var result = await vm.SubmitQuery(Functions.GetFromStore, xmlIn);
+            var xmlOut = result.XmlOut;
 
             // The same uid should be returned as the results.
             Assert.IsNotNull(xmlOut);
 
             var wellList = EnergisticsConverter.XmlToObject<WellList>(xmlOut);
+
             Assert.IsNotNull(wellList);
             Assert.AreEqual(1, wellList.Items.Count);
-            Assert.AreEqual(expectedUid, (wellList.Items[0] as Well).Uid);
+
+            var well = wellList.Items[0] as Well;
+
+            Assert.IsNotNull(well);
+            Assert.AreEqual(expectedUid, well.Uid);
         }
 
         [TestMethod]
