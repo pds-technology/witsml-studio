@@ -20,9 +20,10 @@ using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
-using Caliburn.Micro;
-using PDS.Witsml.Studio.Core.Runtime;
 using System.Windows;
+using Caliburn.Micro;
+using PDS.Framework;
+using PDS.Witsml.Studio.Core.Runtime;
 
 namespace PDS.Witsml.Studio.Core.ViewModels
 {
@@ -109,7 +110,8 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         public void About()
         {
-            Runtime.ShowInfo("WITSML Studio v0.1");
+            var version = GetType().GetAssemblyVersion();
+            Runtime.ShowInfo("WITSML Studio v" + version);
         }
 
         /// <summary>
