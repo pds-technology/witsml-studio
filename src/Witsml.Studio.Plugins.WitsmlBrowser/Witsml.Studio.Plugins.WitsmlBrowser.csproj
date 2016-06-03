@@ -162,6 +162,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\External\GlobalAssemblyInfo.cs">
+      <Link>GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Models\WitsmlResult.cs" />
     <Compile Include="Models\WitsmlSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

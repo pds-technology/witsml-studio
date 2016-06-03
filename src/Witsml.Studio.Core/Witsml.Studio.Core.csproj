@@ -172,6 +172,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\External\GlobalAssemblyInfo.cs">
+      <Link>GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Behaviors\DropDownButtonBehavior.cs" />
     <Compile Include="Connections\Connection.cs" />
     <Compile Include="Connections\ConnectionExtensions.cs" />

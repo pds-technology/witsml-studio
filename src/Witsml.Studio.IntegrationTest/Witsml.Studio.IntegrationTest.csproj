@@ -139,6 +139,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="..\External\GlobalAssemblyInfo.cs">
+      <Link>GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="AssemblyInitializer.cs" />
     <Compile Include="Connections\ConnectionTestTests.cs" />
     <Compile Include="Plugins\WitsmlBrowser\SettingsViewModelTests.cs" />

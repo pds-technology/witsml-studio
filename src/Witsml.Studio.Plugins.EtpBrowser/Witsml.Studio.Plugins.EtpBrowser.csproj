@@ -161,6 +161,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\External\GlobalAssemblyInfo.cs">
+      <Link>GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="DefaultContext.cs" />
     <Compile Include="ExpressionVisitor.cs" />
     <Compile Include="Models\EtpSettings.cs" />

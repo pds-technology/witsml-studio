@@ -79,6 +79,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\External\GlobalAssemblyInfo.cs">
+      <Link>GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Models\DataProperty.cs" />
     <Compile Include="Models\FamilyVersionObjectCollection.cs" />
     <Compile Include="Models\DataObject.cs" />

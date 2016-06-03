@@ -136,6 +136,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="..\External\GlobalAssemblyInfo.cs">
+      <Link>GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="BootstrapperHarness.cs" />
     <Compile Include="BootstrapperTests.cs" />
     <Compile Include="ViewModels\ConnectionViewModelTestBase.cs" />
