@@ -110,7 +110,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         public void About()
         {
-            var version = GetType().GetAssemblyVersion();
+            var version = Application.Current.GetType().GetAssemblyVersion();
             Runtime.ShowInfo("WITSML Studio v" + version);
         }
 

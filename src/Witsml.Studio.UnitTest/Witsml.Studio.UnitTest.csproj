@@ -81,11 +81,11 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="PDS.Framework, Version=2016.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\PDS.Framework.2016.1.20160602.1\lib\net46\PDS.Framework.dll</HintPath>
+      <HintPath>..\packages\PDS.Framework.2016.1.20160604.1\lib\net46\PDS.Framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PDS.Witsml, Version=2016.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\PDS.Witsml.2016.1.20160602.1-BUILD55\lib\net46\PDS.Witsml.dll</HintPath>
+      <HintPath>..\packages\PDS.Witsml.2016.1.20160604.1-BUILD55\lib\net46\PDS.Witsml.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
