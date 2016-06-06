@@ -22,7 +22,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using Caliburn.Micro;
-using PDS.Framework;
 using PDS.Witsml.Studio.Core.Runtime;
 
 namespace PDS.Witsml.Studio.Core.ViewModels
@@ -110,8 +109,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         public void About()
         {
-            var version = Application.Current.GetType().GetAssemblyVersion();
-            Runtime.ShowInfo("WITSML Studio v" + version);
+            Runtime.ShowDialog(new AboutViewModel(Runtime));
         }
 
         /// <summary>

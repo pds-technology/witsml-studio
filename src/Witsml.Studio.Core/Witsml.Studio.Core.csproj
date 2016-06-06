@@ -203,6 +203,7 @@
     <Compile Include="Runtime\DesktopRuntimeService.cs" />
     <Compile Include="Runtime\IRuntimeService.cs" />
     <Compile Include="Runtime\Win32WindowHandle.cs" />
+    <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\ConnectionPickerViewModel.cs" />
     <Compile Include="ViewModels\ConnectionViewModel.cs" />
     <Compile Include="ViewModels\DataGridViewModel.cs" />
@@ -214,6 +215,9 @@
     <Compile Include="ViewModels\TextEditorViewModel.cs" />
     <Compile Include="ViewModels\ViewModelExtensions.cs" />
     <Compile Include="ViewModels\WitsmlTreeViewModel.cs" />
+    <Compile Include="Views\AboutView.xaml.cs">
+      <DependentUpon>AboutView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ConnectionPickerView.xaml.cs">
       <DependentUpon>ConnectionPickerView.xaml</DependentUpon>
     </Compile>
@@ -249,15 +253,16 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Images\StatusInvalid_16x.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\StatusOK_16x.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Resource Include="Images\StatusInvalid_16x.png" />
+    <Resource Include="Images\StatusOK_16x.png" />
     <Content Include="Images\WitsmlStudio.ico" />
+    <Resource Include="Images\WitsmlStudio.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\AboutView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ConnectionPickerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
