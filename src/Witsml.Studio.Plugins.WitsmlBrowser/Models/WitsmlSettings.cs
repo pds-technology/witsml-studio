@@ -250,6 +250,13 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.Models
         }
 
         private bool _retrievePartialResults;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to retrieve partial results automatically.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if to retrieve partial resultsautomatically; otherwise, <c>false</c>.
+        /// </value>
         public bool RetrievePartialResults
         {
             get { return _retrievePartialResults; }
@@ -259,6 +266,27 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.Models
                 {
                     _retrievePartialResults = value;
                     NotifyOfPropertyChange(() => RetrievePartialResults);
+                }
+            }
+        }
+
+        private bool _keepGridData;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to keep grid data when querying partial results.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if to keep grid data when querying partial results; otherwise, <c>false</c>.
+        /// </value>
+        public bool KeepGridData
+        {
+            get { return _keepGridData; }
+            set
+            {
+                if (_keepGridData != value)
+                {
+                    _keepGridData = value;
+                    NotifyOfPropertyChange(() => KeepGridData);
                 }
             }
         }
