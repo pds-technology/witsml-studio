@@ -43,8 +43,7 @@
                     <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Name}" VerticalAlignment="Center" />
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="URL:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                    <TextBox Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Uri, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"
-                             cal:Message.Attach="[Event TextChanged] = [Action OnUrlChanged($this.Text)]"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Uri, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
 
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="User Name:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
                     <TextBox Grid.Row="3" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Username}" VerticalAlignment="Center" />
@@ -77,8 +76,7 @@
                     <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Name}" VerticalAlignment="Center" />
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="URL:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                    <TextBox Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Uri, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"
-                             cal:Message.Attach="[Event TextChanged] = [Action OnUrlChanged($this.Text)]"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Uri, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
 
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Client ID:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
                     <TextBox Grid.Row="3" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.ClientId}" VerticalAlignment="Center" />

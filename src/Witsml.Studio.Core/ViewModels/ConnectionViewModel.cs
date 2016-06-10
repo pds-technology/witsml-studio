@@ -246,12 +246,12 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         }
 
         /// <summary>
-        /// Called when the URL has changed, to trim leading and trailing white space.
+        /// Called when the URL has changed, to trim leading white space.
         /// </summary>
         /// <param name="uri">The URI.</param>
         public void OnUrlChanged(string uri)
         {
-            EditItem.Uri = uri.Trim();
+            EditItem.Uri = uri.TrimStart();
         }
 
         /// <summary>
