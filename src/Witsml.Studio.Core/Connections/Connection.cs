@@ -36,6 +36,33 @@ namespace PDS.Witsml.Studio.Core.Connections
             AutoMapper.Mapper.Initialize(x => x.CreateMap<Connection, Connection>());
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Connection"/> class.
+        /// </summary>
+        public Connection()
+        {
+            RedirectPort = 9005;
+        }
+
+        private AuthenticationTypes _authenticationType;
+        /// <summary>
+        /// Gets or sets the authentication type.
+        /// </summary>
+        /// <value>The authentication type.</value>
+        [DataMember]
+        public AuthenticationTypes AuthenticationType
+        {
+            get { return _authenticationType; }
+            set
+            {
+                if (_authenticationType != value)
+                {
+                    _authenticationType = value;
+                    NotifyOfPropertyChange(() => AuthenticationType);
+                }
+            }
+        }
+
         private string _name;
         /// <summary>
         /// Gets or sets the name of the connection
@@ -68,6 +95,43 @@ namespace PDS.Witsml.Studio.Core.Connections
                 {
                     _uri = value;
                     NotifyOfPropertyChange(() => Uri);
+                }
+            }
+        }
+
+        private string _clientId;
+        /// <summary>
+        /// Gets or sets the client ID
+        /// </summary>
+        [DataMember]
+        public string ClientId
+        {
+            get { return _clientId; }
+            set
+            {
+                if (!string.Equals(_clientId, value))
+                {
+                    _clientId = value;
+                    NotifyOfPropertyChange(() => ClientId);
+                }
+            }
+        }
+
+        private int _redirectPort;
+        /// <summary>
+        /// Gets or sets the redirect port.
+        /// </summary>
+        /// <value>The redirect port.</value>
+        [DataMember]
+        public int RedirectPort
+        {
+            get { return _redirectPort; }
+            set
+            {
+                if (_redirectPort != value)
+                {
+                    _redirectPort = value;
+                    NotifyOfPropertyChange(() => RedirectPort);
                 }
             }
         }

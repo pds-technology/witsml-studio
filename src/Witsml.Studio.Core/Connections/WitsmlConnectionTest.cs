@@ -39,6 +39,17 @@ namespace PDS.Witsml.Studio.Core.Connections
         /// <returns>The boolean result from the asynchronous operation.</returns>
         public async Task<bool> CanConnect(Connection connection)
         {
+            if (connection.AuthenticationType == AuthenticationTypes.OpenId)
+            {
+                _log.Error("OpenID Authentication not supported.");
+                return await Task.FromResult(false);
+            }
+
+            return await CanConnectUsingBasic(connection);
+        }
+
+        private async Task<bool> CanConnectUsingBasic(Connection connection)
+        {
             try
             {
                 var proxy = new WITSMLWebServiceConnection(connection.Uri, WMLSVersion.WITSML141);
@@ -49,14 +60,14 @@ namespace PDS.Witsml.Studio.Core.Connections
                     proxy.SetSecurePassword(connection.SecurePassword);
                 }
 
-                var versions = proxy.GetVersion();
+                proxy.GetVersion();
 
                 _log.Debug("Witsml connection test passed");
                 return await Task.FromResult(true);
             }
             catch (Exception ex)
             {
-                _log.Debug("Witsml connection test failed: {0}", ex);
+                _log.Error("Witsml connection test failed: {0}", ex);
                 return await Task.FromResult(false);
             }
         }

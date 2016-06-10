@@ -16,14 +16,22 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Navigation;
+using Authorization = Energistics.Security.Authorization;
 using Energistics;
 using Energistics.Protocol.ChannelStreaming;
 using Energistics.Protocol.Discovery;
 using Energistics.Protocol.Store;
-using Energistics.Security;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using PDS.Framework;
+using PDS.Witsml.Studio.Core.Runtime;
 
 namespace PDS.Witsml.Studio.Core.Connections
 {
@@ -37,17 +45,114 @@ namespace PDS.Witsml.Studio.Core.Connections
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(EtpConnectionTest));
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="WitsmlConnectionTest"/> class.
+        /// </summary>
+        /// <param name="runtime">The runtime service.</param>
+        [ImportingConstructor]
+        public EtpConnectionTest(IRuntimeService runtime)
+        {
+            Runtime = runtime;
+        }
+
+        /// <summary>
+        /// Gets the runtime service.
+        /// </summary>
+        /// <value>The runtime service.</value>
+        public IRuntimeService Runtime { get; }
+
+        /// <summary>
         /// Determines whether this Connection instance can connect to the specified connection Uri.
         /// </summary>
         /// <param name="connection">The connection instanace being tested.</param>
         /// <returns>The boolean result from the asynchronous operation.</returns>
         public async Task<bool> CanConnect(Connection connection)
         {
+            if (connection.AuthenticationType == AuthenticationTypes.OpenId)
+                return await CanConnectUsingOpenId(connection);
+
+            return await CanConnectUsingBasic(connection);
+        }
+
+        private async Task<bool> CanConnectUsingBasic(Connection connection)
+        {
+            var headers = Authorization.Basic(connection.Username, connection.Password);
+            return await CanConnect(connection, headers);
+        }
+
+        private async Task<bool> CanConnectUsingOpenId(Connection connection)
+        {
+            try
+            {
+                using (var source = new CancellationTokenSource())
+                {
+                    var discoveryUrl = new Uri(new Uri(connection.Uri), "/" + OpenIdProviderMetadataNames.Discovery);
+                    var config = await OpenIdConnectConfigurationRetriever.GetAsync(discoveryUrl.ToString(), source.Token);
+                    var result = false;
+                    var closed = false;
+
+                    var authEndpoint = config.AuthorizationEndpoint +
+                                       "?scope=email%20profile" +
+                                       "&response_type=code" +
+                                       "&redirect_uri=http://localhost:" + connection.RedirectPort +
+                                       "&client_id=" + WebUtility.UrlEncode(connection.ClientId);
+
+                    await Runtime.InvokeAsync(() =>
+                    {
+                        var window = new NavigationWindow()
+                        {
+                            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                            Owner = Application.Current?.MainWindow,
+                            Title = "Authenticate",
+                            ShowsNavigationUI = false,
+                            Source = new Uri(authEndpoint),
+                            Width = 500,
+                            Height = 400
+                        };
+
+                        var listener = new HttpListener();
+                        listener.Prefixes.Add($"http://*:{ connection.RedirectPort }/");
+                        listener.Start();
+
+                        listener.BeginGetContext(x =>
+                        {
+                            if (!listener.IsListening || closed) return;
+
+                            var context = listener.EndGetContext(x);
+                            var code = context.Request.QueryString["code"];
+
+                            Runtime.Invoke(() =>
+                            {
+                                result = !string.IsNullOrWhiteSpace(code);
+                                window.Close();
+                            });
+                        }, null);
+
+                        window.Closed += (s, e) =>
+                        {
+                            closed = true;
+                            listener?.Stop();
+                        };
+
+                        window.ShowDialog();
+                    });
+
+                    _log.DebugFormat("OpenID connection test {0}", result ? "passed" : "failed");
+                    return await Task.FromResult(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.Error("OpenID connection test failed", ex);
+                return await Task.FromResult(false);
+            }
+        }
+
+        private async Task<bool> CanConnect(Connection connection, IDictionary<string, string> headers)
+        {
             try
             {
                 var applicationName = GetType().Assembly.FullName;
                 var applicationVersion = GetType().GetAssemblyVersion();
-                var headers = Authorization.Basic(connection.Username, connection.Password);
 
                 using (var client = new EtpClient(connection.Uri, applicationName, applicationVersion, headers))
                 {
@@ -65,14 +170,14 @@ namespace PDS.Witsml.Studio.Core.Connections
                     }
 
                     var result = !string.IsNullOrWhiteSpace(client.SessionId);
-                    _log.DebugFormat("Etp connection test {0}", result ? "passed" : "failed");
+                    _log.DebugFormat("ETP connection test {0}", result ? "passed" : "failed");
 
                     return result;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                _log.Debug("Etp connection test failed");
+                _log.Error("ETP connection test failed", ex);
                 return false;
             }
         }

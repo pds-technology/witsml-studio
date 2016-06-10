@@ -77,6 +77,11 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// <value>The list of connection names.</value>
         public string[] ConnectionNames { get; set; }
 
+        /// <summary>
+        /// Gets or sets the connection details for a connection
+        /// </summary>
+        public Connection DataItem { get; set; }
+
         private Connection _editItem;
 
         /// <summary>
@@ -94,14 +99,34 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 {
                     _editItem = value;
                     NotifyOfPropertyChange(() => EditItem);
+
+                    if (EditItem != null)
+                        AuthenticationType = (int)EditItem.AuthenticationType;
                 }
             }
         }
 
+        private int _authenticationType;
+
         /// <summary>
-        /// Gets or sets the connection details for a connection
+        /// Gets or sets the authentication type.
         /// </summary>
-        public Connection DataItem { get; set; }
+        /// <value>The authentication type.</value>
+        public int AuthenticationType
+        {
+            get { return _authenticationType; }
+            set
+            {
+                if (_authenticationType != value)
+                {
+                    _authenticationType = value;
+                    NotifyOfPropertyChange(() => AuthenticationType);
+
+                    if (EditItem != null)
+                        EditItem.AuthenticationType = (AuthenticationTypes)value;
+                }
+            }
+        }
 
         private bool _canTestConnection;
 

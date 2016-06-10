@@ -18,6 +18,8 @@
 
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PDS.Framework;
+using PDS.Witsml.Studio.Core.Runtime;
 
 namespace PDS.Witsml.Studio.Core.Connections
 {
@@ -26,8 +28,15 @@ namespace PDS.Witsml.Studio.Core.Connections
     {
         private static string _validWitsmlUri = "http://localhost/Witsml.Web/WitsmlStore.svc";
         private static string _validEtpUri = "ws://localhost/witsml.web/api/etp";
+        private IRuntimeService _runtime;
 
         public TestContext TestContext { get; set; }
+
+        [TestInitialize]
+        public void TestSetup()
+        {
+            _runtime = new TestRuntimeService(ContainerFactory.Create());
+        }
 
         [TestMethod]
         public async Task TestValidWitsmlConnectionTestEndpoint()
@@ -56,7 +65,7 @@ namespace PDS.Witsml.Studio.Core.Connections
         [TestMethod]
         public async Task TestValidEtpConnectionTestEndpoint()
         {
-            var etpConnectionTest = new EtpConnectionTest();
+            var etpConnectionTest = new EtpConnectionTest(_runtime);
             var result = await etpConnectionTest.CanConnect(new Connection() { Uri = _validEtpUri });
 
             Assert.IsTrue(result);
@@ -65,7 +74,7 @@ namespace PDS.Witsml.Studio.Core.Connections
         [TestMethod]
         public async Task TestInvalidEtpConnectionTestEndpoint()
         {
-            var etpConnectionTest = new EtpConnectionTest();
+            var etpConnectionTest = new EtpConnectionTest(_runtime);
             var result = await etpConnectionTest.CanConnect(new Connection() { Uri = _validEtpUri + "x" });
 
             Assert.IsFalse(result);
@@ -75,7 +84,7 @@ namespace PDS.Witsml.Studio.Core.Connections
         [TestMethod]
         public async Task TestInvalidEtpConnectionBadFormat()
         {
-            var etpConnectionTest = new EtpConnectionTest();
+            var etpConnectionTest = new EtpConnectionTest(_runtime);
             var result = await etpConnectionTest.CanConnect(new Connection() { Uri = "xxxxxxxx" });
 
             Assert.IsFalse(result);
