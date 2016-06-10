@@ -82,15 +82,20 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// <param name="objectType">The object type.</param>
         /// <param name="dataObject">The data object.</param>
         /// <param name="retrievePartialResults">True if to automatically request partial results.</param>
-        public void SetCurrentObject(string objectType, object dataObject, bool retrievePartialResults)
+        /// <param name="keepGridData">True if not clearing data when querying partial results</param>
+        public void SetCurrentObject(string objectType, object dataObject, bool retrievePartialResults, bool keepGridData)
         {
-            if (!ObjectTypes.IsGrowingDataObject(objectType)) return;
+            if (!ObjectTypes.IsGrowingDataObject(objectType))
+            {
+                ClearDataTable();
+                return;             
+            }
 
             var log131 = dataObject as Witsml131.Log;
-            if (log131 != null) SetLogData(log131, retrievePartialResults);
+            if (log131 != null) SetLogData(log131, retrievePartialResults, keepGridData);
 
             var log141 = dataObject as Witsml141.Log;
-            if (log141 != null) SetLogData(log141, retrievePartialResults);
+            if (log141 != null) SetLogData(log141, retrievePartialResults, keepGridData);
         }
 
         /// <summary>
@@ -98,9 +103,10 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         /// <param name="log">The log.</param>
         /// <param name="retrievePartialResults">True if to automatically request partial results.</param>
-        private void SetLogData(Witsml131.Log log, bool retrievePartialResults)
+        /// <param name="keepGridData">True if not clearing data when querying partial results</param>
+        private void SetLogData(Witsml131.Log log, bool retrievePartialResults, bool keepGridData)
         {
-            ClearDataTable(log.GetUri(), retrievePartialResults);
+            ClearDataTable(log.GetUri(), retrievePartialResults, keepGridData);
             Runtime.InvokeAsync(() => SetChannelData(log.GetReader()));
         }
 
@@ -109,9 +115,10 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         /// <param name="log">The log.</param>
         /// <param name="retrievePartialResults">True if to automatically request partial results.</param>
-        private void SetLogData(Witsml141.Log log, bool retrievePartialResults)
+        /// <param name="keepGridData">True if not clearing data when querying partial results</param>
+        private void SetLogData(Witsml141.Log log, bool retrievePartialResults, bool keepGridData)
         {
-            ClearDataTable(log.GetUri(), retrievePartialResults);
+            ClearDataTable(log.GetUri(), retrievePartialResults, keepGridData);
             Runtime.InvokeAsync(() => log.GetReaders().ForEach(SetChannelData));
         }
 
@@ -120,26 +127,32 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         /// <param name="uri">The URI.</param>
         /// <param name="retrievePartialResults">True if to automatically request partial results.</param>
-        private void ClearDataTable(EtpUri uri, bool retrievePartialResults)
+        /// <param name="keepGridData">True if not clearing data when querying partial results</param>
+        private void ClearDataTable(EtpUri uri, bool retrievePartialResults, bool keepGridData)
         {
-            if (uri == Uri && retrievePartialResults)
+            if (uri == Uri && retrievePartialResults && keepGridData)
                 return;
 
             try
             {
                 Uri = uri;
-                DataTable.BeginLoadData();
-                DataTable.PrimaryKey = new DataColumn[0];
-                DataTable.Clear();
-                DataTable.Rows.Clear();
-                DataTable.Columns.Clear();
-                DataTable.AcceptChanges();
-                DataTable.EndLoadData();
+                ClearDataTable();
             }
             catch (Exception ex)
             {
                 _log.WarnFormat("Error clearing growing object data: {0}", ex);
             }
+        }
+
+        private void ClearDataTable()
+        {
+            DataTable.BeginLoadData();
+            DataTable.PrimaryKey = new DataColumn[0];
+            DataTable.Clear();
+            DataTable.Rows.Clear();
+            DataTable.Columns.Clear();
+            DataTable.AcceptChanges();
+            DataTable.EndLoadData();
         }
 
         /// <summary>
