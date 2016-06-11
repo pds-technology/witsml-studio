@@ -119,6 +119,14 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
         }
 
         /// <summary>
+        /// Gets the base message from the server.
+        /// </summary>
+        public void GetBaseMessage()
+        {
+            Parent.Parent.GetBaseMessage();
+        }
+
+        /// <summary>
         /// Selects the output path.
         /// </summary>
         public void SelectOutputPath()

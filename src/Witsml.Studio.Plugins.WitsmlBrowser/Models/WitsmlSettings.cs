@@ -312,6 +312,27 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.Models
             }
         }
 
+        private short? _errorCode;
+
+        /// <summary>
+        /// Gets or sets the error code.
+        /// </summary>
+        /// <value>
+        /// The error code.
+        /// </value>
+        public short? ErrorCode
+        {
+            get { return _errorCode; }
+            set
+            {
+                if (_errorCode != value)
+                {
+                    _errorCode = value;
+                    NotifyOfPropertyChange(() => ErrorCode);
+                }
+            }
+        }
+
         private bool _cascadedDelete;
 
         /// <summary>

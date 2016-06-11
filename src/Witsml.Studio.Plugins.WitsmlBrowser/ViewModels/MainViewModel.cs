@@ -303,6 +303,14 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         }
 
         /// <summary>
+        /// Submits a query to get the base message.
+        /// </summary>
+        public void GetBaseMessage()
+        {
+            SubmitQuery(Functions.GetBaseMsg);
+        }
+
+        /// <summary>
         /// Submits the query to the WITSML server for the given function type and input XML.
         /// </summary>
         /// <param name="functionType">Type of the function to execute.</param>
@@ -334,6 +342,11 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                             optionsIn = new OptionsIn.DataVersion(Model.WitsmlVersion);
                             returnCode = wmls.WMLS_GetCap(optionsIn, out xmlOut, out suppMsgOut);
                             ProcessCapServer(xmlOut);
+                            break;
+                        case Functions.GetBaseMsg:
+                            returnCode = Model.ErrorCode.GetValueOrDefault();
+                            optionsIn = returnCode.ToString();
+                            suppMsgOut = wmls.WMLS_GetBaseMsg(returnCode);
                             break;
                         case Functions.AddToStore:
                             returnCode = wmls.WMLS_AddToStore(objectType, xmlIn, null, null, out suppMsgOut);
