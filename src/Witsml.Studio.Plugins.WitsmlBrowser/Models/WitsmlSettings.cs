@@ -207,6 +207,27 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.Models
             }
         }
 
+        private string _extraOptionsIn;
+
+        /// <summary>
+        /// Gets or sets the extra options in.
+        /// </summary>
+        /// <value>
+        /// The extra options in.
+        /// </value>
+        public string ExtraOptionsIn
+        {
+            get { return _extraOptionsIn; }
+            set
+            {
+                if (_extraOptionsIn != value)
+                {
+                    _extraOptionsIn = value;
+                    NotifyOfPropertyChange(() => ExtraOptionsIn);
+                }
+            }
+        }
+
         private int? _maxDataRows;
 
         /// <summary>

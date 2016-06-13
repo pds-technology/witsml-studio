@@ -341,6 +341,14 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                     break;
             }
 
+            if (!string.IsNullOrWhiteSpace(Model.ExtraOptionsIn))
+            {
+                if (string.IsNullOrWhiteSpace(optionsIn))
+                    optionsIn = Model.ExtraOptionsIn;
+                else
+                    optionsIn += ";" + Model.ExtraOptionsIn;
+            }
+
             return optionsIn;
         }
 
