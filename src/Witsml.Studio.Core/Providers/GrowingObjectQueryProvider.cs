@@ -65,6 +65,7 @@ namespace PDS.Witsml.Studio.Core.Providers
                     return queryDoc.ToString();
                 }
 
+                resultLog = resultDoc.Root.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
                 var endDateTimeIndex = resultLog = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endDateTimeIndex");
                 if (endDateTimeIndex != null)
                 {

@@ -41,14 +41,15 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
     /// <summary>
     /// Manages the behavior of the main user interface for the Witsml Browser plug-in.
     /// </summary>
+    /// <seealso cref="Caliburn.Micro.Conductor{Caliburn.Micro.IScreen}.Collection.AllActive" />
+    /// <seealso cref="PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.IConnectionAware" />
+    /// <seealso cref="PDS.Witsml.Studio.Core.Providers.ISoapMessageHandler" />
     /// <seealso cref="Caliburn.Micro.Conductor{IScreen}.Collection.AllActive" />
     /// <seealso cref="PDS.Witsml.Studio.Core.ViewModels.IPluginViewModel" />
     public sealed class MainViewModel : Conductor<IScreen>.Collection.AllActive, IPluginViewModel, IConnectionAware, ISoapMessageHandler
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(MainViewModel));
         public const string QueryTemplateText = "Templates";
-
-        private List<string> _xmls = new List<string>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainViewModel"/> class.
@@ -276,15 +277,19 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// The results of a query are displayed in the Results and Messages tabs.
         /// </summary>
         /// <param name="functionType">Type of the function.</param>
-        public void SubmitQuery(Functions functionType)
+        /// <param name="isPartialQuery">if set to <c>true</c> [is partial query].</param>
+        public void SubmitQuery(Functions functionType, bool isPartialQuery = false)
         {
             // Trim query text before submitting request
             string xmlIn = XmlQuery.Text = XmlQuery.Text.Trim();
 
             _log.DebugFormat("Query submitted for function '{0}'", functionType);
 
-            // Clear any previous query results
-            QueryResults.Text = string.Empty;
+            // Clear any previous query results if this is not a partial query
+            if (!isPartialQuery)
+            {
+                QueryResults.Text = string.Empty;
+            }
 
             // Options In 
             var optionsIn = GetOptionsIn(functionType);
@@ -296,7 +301,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             {
                 // Call internal SubmitQuery method with references to all inputs and outputs.
                 var result = await SubmitQuery(functionType, xmlIn, optionsIn);
-                await Runtime.InvokeAsync(() => ShowSubmitResult(functionType, result));
+                await Runtime.InvokeAsync(() => ShowSubmitResult(functionType, result, isPartialQuery));
             });
         }
 
@@ -451,7 +456,8 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// </summary>
         /// <param name="functionType">Type of the function.</param>
         /// <param name="result">The WITSML Store API method result.</param>
-        internal void ShowSubmitResult(Functions functionType, WitsmlResult result)
+        /// <param name="isPartialQuery">if set to <c>true</c> [is partial query].</param>
+        internal void ShowSubmitResult(Functions functionType, WitsmlResult result, bool isPartialQuery = false)
         {
             var xmlOut = functionType == Functions.GetFromStore
                 ? ProcessQueryResult(result.XmlOut, result.OptionsIn)
@@ -462,9 +468,9 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 GetLogStringText(result.MessageOut),
                 GetLogStringText(result.OptionsIn),
                 Environment.NewLine);
-           
+
             // Output query results to the Results tab
-            OutputResults(xmlOut, result.MessageOut, result.ReturnCode);
+            OutputResults(xmlOut, result.MessageOut, result.ReturnCode, isPartialQuery);
 
             // Don't display query contents when GetCap is executed.
             var xmlIn = functionType == Functions.GetCap ? string.Empty : XmlQuery.Text;
@@ -478,11 +484,15 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 if (result.ReturnCode > 0)
                     ShowObjectProperties(result);
 
+                // If there is only a partial success and the user has selected to retrieve parital results...
                 if (result.ReturnCode > 1 && Model.RetrievePartialResults)
                 {
+                    //... update the query
                     var provider = new GrowingObjectQueryProvider();
                     XmlQuery.Text = provider.UpdateDataQuery(result.ObjectType, XmlQuery.Text, xmlOut);
-                    SubmitQuery(Functions.GetFromStore);
+
+                    //... and Submit a Query for the next set of data.
+                    SubmitQuery(Functions.GetFromStore, true);
                 }
             }
         }
@@ -660,7 +670,8 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// <param name="xmlOut">The XML out.</param>
         /// <param name="suppMsgOut">The supplemental message out.</param>
         /// <param name="returnCode">The return code.</param>
-        internal void OutputResults(string xmlOut, string suppMsgOut, short returnCode)
+        /// <param name="isPartialQuery">if set to <c>true</c> [is partial query].</param>
+        internal void OutputResults(string xmlOut, string suppMsgOut, short returnCode, bool isPartialQuery = false)
         {
             var text = string.IsNullOrEmpty(xmlOut)
                     ? (returnCode < 0
@@ -668,14 +679,13 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                         : suppMsgOut)
                     : xmlOut;
 
-            _xmls.Add(text);
-
-            if (returnCode <= 1 || !Model.RetrievePartialResults)
+            if (isPartialQuery && QueryResults.TextLength > 0)
             {
-                var separator = string.Format("{0}{0}<!-- Partial Result -->{0}{0}", Environment.NewLine);
-                QueryResults.Text = string.Join(separator, _xmls);
-                _xmls.Clear();
+                QueryResults.Insert(QueryResults.TextLength, 
+                    string.Format("{0}{0}<!-- Partial Result -->{0}{0}", Environment.NewLine));
             }
+
+            QueryResults.Insert(QueryResults.TextLength, text);
         }
 
         /// <summary>
