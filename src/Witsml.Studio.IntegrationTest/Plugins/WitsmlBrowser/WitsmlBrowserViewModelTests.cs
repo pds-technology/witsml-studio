@@ -82,7 +82,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser
             vm.Model.ReturnElementType = OptionsIn.ReturnElements.All;
 
             // Submit the query
-            var result = await vm.SubmitQuery(Functions.AddToStore, xmlIn);
+            var result = await vm.SubmitQuery(Functions.AddToStore, xmlIn, vm.GetOptionsIn(Functions.AddToStore));
             var suppMsgOut = result.MessageOut;
 
             // The same uid should be returned as the results.
@@ -107,12 +107,12 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser
                 expectedUid,
                 DateTime.Now.ToString("yyyyMMdd-HHmmss"));
 
-            await vm.SubmitQuery(Functions.AddToStore, xmlIn);
+            await vm.SubmitQuery(Functions.AddToStore, xmlIn, vm.GetOptionsIn(Functions.AddToStore));
 
             // Retrieve the same well from the store
             xmlIn = string.Format(_getWellTemplate, expectedUid);
 
-            var result = await vm.SubmitQuery(Functions.GetFromStore, xmlIn);
+            var result = await vm.SubmitQuery(Functions.GetFromStore, xmlIn, vm.GetOptionsIn(Functions.GetFromStore));
             var xmlOut = result.XmlOut;
 
             // The same uid should be returned as the results.
@@ -137,7 +137,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser
             vm.Proxy.Url = vm.Model.Connection.Uri;
             vm.Model.WitsmlVersion = OptionsIn.DataVersion.Version141.Value;
 
-            var result = await vm.SubmitQuery(Functions.GetCap, string.Empty);
+            var result = await vm.SubmitQuery(Functions.GetCap, string.Empty, vm.GetOptionsIn(Functions.GetCap));
 
             // Test that the xmlOut is a Capserver List
             var capServerList = EnergisticsConverter.XmlToObject<CapServers>(result.XmlOut);

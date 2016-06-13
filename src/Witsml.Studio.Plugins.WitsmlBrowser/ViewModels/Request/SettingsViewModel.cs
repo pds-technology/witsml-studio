@@ -162,14 +162,18 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
                 proxy.SetSecurePassword(connection.SecurePassword);
             }
 
+            var parent = Parent?.Parent;
+
+            // Output Request for GetVersion
+            parent?.OutputRequestMessages(Functions.GetVersion, null, parent?.GetOptionsIn(Functions.GetVersion));
+
             var supportedVersions = proxy.GetVersion();
             _log.DebugFormat("Supported versions '{0}' found on WITSML server with uri '{1}'", supportedVersions, connection.Uri);
 
-            var parent = Parent?.Parent;
             if (parent == null) return supportedVersions;
 
             parent.OutputResults(null, supportedVersions, 0);
-            parent.OutputMessages(Functions.GetVersion, null, null, supportedVersions, null, 0);
+            parent.OutputMessages(null, supportedVersions, 0);
 
             return supportedVersions;
         }
