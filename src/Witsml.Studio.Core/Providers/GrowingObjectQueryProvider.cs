@@ -37,45 +37,48 @@ namespace PDS.Witsml.Studio.Core.Providers
         {
             var queryDoc = WitsmlParser.Parse(queryIn);
             var resultDoc = WitsmlParser.Parse(xmlOut);
-            var ns = queryDoc.Root.GetDefaultNamespace();
 
-            var queryLog = queryDoc.Root.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
-            var resultLog = resultDoc.Root.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
-
-            if (queryLog != null && resultLog != null)
+            if (queryDoc.Root != null && resultDoc.Root != null)
             {
-                var endIndex = resultLog = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endIndex");
-                if (endIndex != null)
+                var ns = queryDoc.Root.GetDefaultNamespace();
+
+                var queryLog = queryDoc.Root.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
+                var resultLog = resultDoc.Root.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
+
+                if (queryLog != null && resultLog != null)
                 {
-                    var startIndex = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "startIndex");
-                    if (startIndex != null)
+                    var endIndex = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endIndex");
+                    if (endIndex != null)
                     {
-                        startIndex.Value = endIndex.Value;
-                    }
-                    else
-                    {
-                        var startIndexElement = new XElement(ns + "startIndex", endIndex.Value);
-                        foreach (var attribute in endIndex.Attributes())
+                        var startIndex = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "startIndex");
+                        if (startIndex != null)
                         {
-                            startIndexElement.SetAttributeValue(attribute.Name, attribute.Value);
+                            startIndex.Value = endIndex.Value;
                         }
-                        queryLog.Add(startIndexElement);
+                        else
+                        {
+                            var startIndexElement = new XElement(ns + "startIndex", endIndex.Value);
+                            foreach (var attribute in endIndex.Attributes())
+                            {
+                                startIndexElement.SetAttributeValue(attribute.Name, attribute.Value);
+                            }
+                            queryLog.Add(startIndexElement);
+                        }
+
+                        return queryDoc.ToString();
                     }
 
-                    return queryDoc.ToString();
-                }
+                    var endDateTimeIndex = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endDateTimeIndex");
+                    if (endDateTimeIndex != null)
+                    {
+                        var startDateTimeIndex = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "startDateTimeIndex");
+                        if (startDateTimeIndex != null)
+                            startDateTimeIndex.Value = endDateTimeIndex.Value;
+                        else
+                            queryLog.Add(new XElement(ns + "startDateTimeIndex", endDateTimeIndex.Value));
 
-                resultLog = resultDoc.Root.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
-                var endDateTimeIndex = resultLog = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endDateTimeIndex");
-                if (endDateTimeIndex != null)
-                {
-                    var startDateTimeIndex = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "startDateTimeIndex");
-                    if (startDateTimeIndex != null)
-                        startDateTimeIndex.Value = endDateTimeIndex.Value;
-                    else
-                        queryLog.Add(new XElement(ns + "startDateTimeIndex", endDateTimeIndex.Value));
-
-                    return queryDoc.ToString();
+                        return queryDoc.ToString();
+                    }
                 }
             }
 

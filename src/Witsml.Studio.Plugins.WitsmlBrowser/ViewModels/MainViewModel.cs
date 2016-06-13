@@ -41,7 +41,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
     /// <summary>
     /// Manages the behavior of the main user interface for the Witsml Browser plug-in.
     /// </summary>
-    /// <seealso cref="Caliburn.Micro.Conductor{Caliburn.Micro.IScreen}.Collection.AllActive" />
+    /// <seealso cref="Caliburn.Micro.Conductor{IScreen}.Collection.AllActive" />
     /// <seealso cref="PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.IConnectionAware" />
     /// <seealso cref="PDS.Witsml.Studio.Core.Providers.ISoapMessageHandler" />
     /// <seealso cref="Caliburn.Micro.Conductor{IScreen}.Collection.AllActive" />
@@ -472,9 +472,6 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             // Output query results to the Results tab
             OutputResults(xmlOut, result.MessageOut, result.ReturnCode, isPartialQuery);
 
-            // Don't display query contents when GetCap is executed.
-            var xmlIn = functionType == Functions.GetCap ? string.Empty : XmlQuery.Text;
-
             // Append these results to the Messages tab
             OutputMessages(xmlOut, result.MessageOut, result.ReturnCode);
 
@@ -491,8 +488,12 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                     var provider = new GrowingObjectQueryProvider();
                     XmlQuery.Text = provider.UpdateDataQuery(result.ObjectType, XmlQuery.Text, xmlOut);
 
-                    //... and Submit a Query for the next set of data.
-                    SubmitQuery(Functions.GetFromStore, true);
+                    // Submit the query if one was returned.
+                    if (!string.IsNullOrEmpty((XmlQuery.Text)))
+                    {
+                        //... and Submit a Query for the next set of data.
+                        SubmitQuery(Functions.GetFromStore, true);
+                    }
                 }
             }
         }
