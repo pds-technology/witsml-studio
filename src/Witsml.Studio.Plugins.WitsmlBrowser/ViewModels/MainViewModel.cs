@@ -286,10 +286,16 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             // Clear any previous query results
             QueryResults.Text = string.Empty;
 
+            // Options In 
+            var optionsIn = GetOptionsIn(functionType);
+
+            // Output Request
+            OutputRequestMessages(functionType, functionType == Functions.GetCap ? string.Empty : xmlIn, optionsIn);
+
             Task.Run(async () =>
             {
                 // Call internal SubmitQuery method with references to all inputs and outputs.
-                var result = await SubmitQuery(functionType, xmlIn);
+                var result = await SubmitQuery(functionType, xmlIn, optionsIn);
                 await Runtime.InvokeAsync(() => ShowSubmitResult(functionType, result));
             });
         }
@@ -303,17 +309,45 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         }
 
         /// <summary>
+        /// Gets the options in for the given functionType
+        /// </summary>
+        /// <param name="functionType">Type of the function.</param>
+        /// <returns>The OptionsIn</returns>
+        internal string GetOptionsIn(Functions functionType)
+        {
+            string optionsIn;
+
+            switch (functionType)
+            {
+                case Functions.GetCap:
+                    optionsIn = new OptionsIn.DataVersion(Model.WitsmlVersion);
+                    break;
+                case Functions.DeleteFromStore:
+                    optionsIn = Model.CascadedDelete ? OptionsIn.CascadedDelete.True : null;
+                    break;
+                case Functions.GetFromStore:
+                    optionsIn = GetGetFromStoreOptionsIn();
+                    break;
+                default:
+                    optionsIn = null;
+                    break;
+            }
+
+            return optionsIn;
+        }
+
+        /// <summary>
         /// Submits the query to the WITSML server for the given function type and input XML.
         /// </summary>
         /// <param name="functionType">Type of the function to execute.</param>
         /// <param name="xmlIn">The XML in.</param>
+        /// <param name="optionsIn">The options in.</param>
         /// <returns>
         /// A tuple of four result values in the following order: xmlOut, suppMsgOut, optionsIn and returnCode.
         /// </returns>
-        internal async Task<WitsmlResult> SubmitQuery(Functions functionType, string xmlIn)
+        internal async Task<WitsmlResult> SubmitQuery(Functions functionType, string xmlIn, string optionsIn)
         {
             string xmlOut = null;
-            string optionsIn = null;
             short returnCode = 0;
 
             // Compute the object type of the incoming xml.
@@ -330,8 +364,6 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                     switch (functionType)
                     {
                         case Functions.GetCap:
-                            // Set options in for the selected WitsmlVersion.
-                            optionsIn = new OptionsIn.DataVersion(Model.WitsmlVersion);
                             returnCode = wmls.WMLS_GetCap(optionsIn, out xmlOut, out suppMsgOut);
                             ProcessCapServer(xmlOut);
                             break;
@@ -342,11 +374,9 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                             returnCode = wmls.WMLS_UpdateInStore(objectType, xmlIn, null, null, out suppMsgOut);
                             break;
                         case Functions.DeleteFromStore:
-                            optionsIn = Model.CascadedDelete ? OptionsIn.CascadedDelete.True : null;
                             returnCode = wmls.WMLS_DeleteFromStore(objectType, xmlIn, optionsIn, null, out suppMsgOut);
                             break;
                         default:
-                            optionsIn = GetGetFromStoreOptionsIn();
                             returnCode = wmls.WMLS_GetFromStore(objectType, xmlIn, optionsIn, null, out xmlOut, out suppMsgOut);
                             break;
                     }
@@ -425,7 +455,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             var xmlIn = functionType == Functions.GetCap ? string.Empty : XmlQuery.Text;
 
             // Append these results to the Messages tab
-            OutputMessages(functionType, xmlIn, xmlOut, result.MessageOut, result.OptionsIn, result.ReturnCode);
+            OutputMessages(xmlOut, result.MessageOut, result.ReturnCode);
 
             // Show data object on the Properties tab
             if (functionType == Functions.GetFromStore && result.ReturnCode > 0)
@@ -468,7 +498,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 var message = string.Format("{0}{2}{2}{1}", ex.Message, ex.GetBaseException().Message, Environment.NewLine);
 
                 OutputResults(string.Empty, message, (short)ex.ErrorCode);
-                OutputMessages(Functions.GetFromStore, string.Empty, string.Empty, message, string.Empty, (short) ex.ErrorCode);
+                OutputMessages(string.Empty, message, (short) ex.ErrorCode);
             }
         }
 
@@ -636,40 +666,54 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// <summary>
         /// Appends results of a query to the Messages tab.
         /// </summary>
-        /// <param name="functionType">Type of the function.</param>
-        /// <param name="queryText">The query text.</param>
         /// <param name="xmlOut">The XML output text.</param>
         /// <param name="suppMsgOut">The supplemental message out.</param>
-        /// <param name="optionsIn">The OptionsIn settings to the server.</param>
         /// <param name="returnCode">The return code.</param>
-        internal void OutputMessages(Functions functionType, string queryText, string xmlOut, string suppMsgOut, string optionsIn, short returnCode)
+        internal void OutputMessages(string xmlOut, string suppMsgOut, short returnCode)
         {
             var now = DateTime.Now.ToString("G");
 
             Messages.Insert(
                 Messages.TextLength,
                 string.Format(
-                    "<!---------- Request : {0} ----------{9}" +
-                    "   Function    : {1}{9}" +
-                    "   OptionsIn   : {2}{9}" +
-                    "   XmlIn       : {3}{9}" +
-                    "-->{9}" +
-                    "{4}{9}{9}" +
-                    "<!---------- Response : {0} ----------{9}" +
-                    "   Return Code : {5}{9}" +
-                    "   SuppMsgOut  : {6}{9}" +
-                    "   XmlOut      : {7}{9}" +
-                    "-->{9}" +
-                    "{8}{9}{9}",
+                    "<!---------- Response : {0} ----------{5}" +
+                    "   Return Code : {1}{5}" +
+                    "   SuppMsgOut  : {2}{5}" +
+                    "   XmlOut      : {3}{5}" +
+                    "-->{5}" +
+                    "{4}{5}{5}",
+                    now,
+                    returnCode,
+                    string.IsNullOrEmpty(suppMsgOut) ? "None" : suppMsgOut,
+                    string.IsNullOrEmpty(xmlOut) ? "None" : string.Empty,
+                    string.IsNullOrEmpty(xmlOut) ? string.Empty : xmlOut,
+                    Environment.NewLine));
+        }
+
+        /// <summary>
+        /// Appends requests of a query to the Messages tab.
+        /// </summary>
+        /// <param name="functionType">Type of the function.</param>
+        /// <param name="queryText">The query text.</param>
+        /// <param name="optionsIn">The options in.</param>
+        internal void OutputRequestMessages(Functions functionType, string queryText, string optionsIn)
+        {
+            var now = DateTime.Now.ToString("G");
+
+            Messages.Insert(
+                Messages.TextLength,
+                string.Format(
+                    "<!---------- Request : {0} ----------{5}" +
+                    "   Function    : {1}{5}" +
+                    "   OptionsIn   : {2}{5}" +
+                    "   XmlIn       : {3}{5}" +
+                    "-->{5}" +
+                    "{4}{5}{5}",
                     now,
                     functionType,
                     string.IsNullOrEmpty(optionsIn) ? "None" : optionsIn,
                     string.IsNullOrEmpty(queryText) ? "None" : string.Empty,
                     string.IsNullOrEmpty(queryText) ? string.Empty : queryText,
-                    returnCode,
-                    string.IsNullOrEmpty(suppMsgOut) ? "None" : suppMsgOut,
-                    string.IsNullOrEmpty(xmlOut) ? "None" : string.Empty,
-                    string.IsNullOrEmpty(xmlOut) ? string.Empty : xmlOut,
                     Environment.NewLine));
         }
 
