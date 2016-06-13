@@ -686,7 +686,10 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                     string.Format("{0}{0}<!-- Partial Result -->{0}{0}", Environment.NewLine));
             }
 
-            QueryResults.Insert(QueryResults.TextLength, text);
+            if (!string.IsNullOrEmpty(text))
+            {
+                QueryResults.Insert(QueryResults.TextLength, text);
+            }
         }
 
         /// <summary>
