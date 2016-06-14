@@ -27,6 +27,10 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.Models
     /// <seealso cref="Caliburn.Micro.PropertyChangedBase" />
     public class WitsmlSettings : PropertyChangedBase
     {
+        private OptionsIn.ReturnElements _previousReturnElementType;
+        private bool? _previousRequestPrivateGroupOnly;
+        private bool? _previousRetrievePartialResults;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="WitsmlSettings"/> class.
         /// </summary>
@@ -75,7 +79,9 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.Models
                 if (_returnElementType != value)
                 {
                     _returnElementType = value;
+                    OnReturnElementTypeChanged();
                     NotifyOfPropertyChange(() => ReturnElementType);
+                    NotifyOfPropertyChange(() => IsReturnElementsAll);
                 }
             }
         }
@@ -415,6 +421,14 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.Models
         public bool IsDeleteFromStore => StoreFunction == Functions.DeleteFromStore;
 
         /// <summary>
+        /// Gets a value indicating whether ReturnElementType equals All.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if ReturnElementType equals All; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsReturnElementsAll => OptionsIn.ReturnElements.All.Equals(ReturnElementType?.Value);
+
+        /// <summary>
         /// Clones this instance.
         /// </summary>
         /// <returns>A new <see cref="WitsmlSettings"/> instance.</returns>
@@ -424,15 +438,42 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.Models
         }
 
         /// <summary>
+        /// Called when ReturnElementType has changed.
+        /// </summary>
+        private void OnReturnElementTypeChanged()
+        {
+            if (IsReturnElementsAll)
+            {
+                RetrievePartialResults = _previousRetrievePartialResults.GetValueOrDefault();
+                _previousRetrievePartialResults = null;
+            }
+            else
+            {
+                _previousRetrievePartialResults = RetrievePartialResults;
+                RetrievePartialResults = false;
+            }
+        }
+
+        /// <summary>
         /// Called when RequestObjectSelectionCapability has changed.
         /// </summary>
         private void OnRequestObjectSelectionCapabilityChanged()
         {
-            ReturnElementType = IsRequestObjectSelectionCapability ? null : OptionsIn.ReturnElements.All;
-
-            if (IsRequestObjectSelectionCapability && IsRequestPrivateGroupOnly)
+            if (IsRequestObjectSelectionCapability)
             {
+                _previousReturnElementType = ReturnElementType;
+                _previousRequestPrivateGroupOnly = IsRequestPrivateGroupOnly;
+
+                ReturnElementType = null;
                 IsRequestPrivateGroupOnly = false;
+            }
+            else
+            {
+                ReturnElementType = _previousReturnElementType ?? OptionsIn.ReturnElements.All;
+                IsRequestPrivateGroupOnly = _previousRequestPrivateGroupOnly.GetValueOrDefault();
+
+                _previousReturnElementType = null;
+                _previousRequestPrivateGroupOnly = null;
             }
         }
     }
