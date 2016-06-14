@@ -172,6 +172,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
 
             if (parent == null) return supportedVersions;
 
+            parent.QueryResults.Text = string.Empty;
             parent.OutputResults(null, supportedVersions, 0);
             parent.OutputMessages(null, supportedVersions, 0);
 
