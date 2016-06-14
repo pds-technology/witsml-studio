@@ -18,67 +18,109 @@
 
 using System.Linq;
 using System.Xml.Linq;
+using PDS.Framework;
 
 namespace PDS.Witsml.Studio.Core.Providers
 {
     /// <summary>
     /// Manages updates to growing object queries for partial results.
     /// </summary>
-    public class GrowingObjectQueryProvider
+    public class GrowingObjectQueryProvider<TContext>
     {
         /// <summary>
-        /// Updates the data query.
+        /// Initializes a new instance of the <see cref="GrowingObjectQueryProvider{TContext}" /> class.
         /// </summary>
-        /// <param name="objectType">Type of the object.</param>
+        /// <param name="context">The query context.</param>
+        /// <param name="objectType">The data object type.</param>
         /// <param name="queryIn">The query in.</param>
-        /// <param name="xmlOut">The XML out.</param>
-        /// <returns></returns>
-        public string UpdateDataQuery(string objectType, string queryIn, string xmlOut)
+        public GrowingObjectQueryProvider(TContext context, string objectType, string queryIn)
         {
-            var queryDoc = WitsmlParser.Parse(queryIn);
+            Context = context;
+            ObjectType = objectType;
+            QueryIn = queryIn;
+        }
+
+        /// <summary>
+        /// Gets the type of the object.
+        /// </summary>
+        /// <value>The type of the object.</value>
+        public string ObjectType { get; }
+
+        /// <summary>
+        /// Gets the query in.
+        /// </summary>
+        /// <value>The query in.</value>
+        public string QueryIn { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the query context.
+        /// </summary>
+        /// <value>The query context.</value>
+        public TContext Context { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the operation is cancelled.
+        /// </summary>
+        /// <value><c>true</c> if the operation is cancelled; otherwise, <c>false</c>.</value>
+        public bool IsCancelled { get; set; }
+
+        /// <summary>
+        /// Updates the growing data object query.
+        /// </summary>
+        /// <param name="xmlOut">The XML out.</param>
+        /// <returns>The updated growing data object query.</returns>
+        public string UpdateDataQuery(string xmlOut)
+        {
+            var queryDoc = WitsmlParser.Parse(QueryIn);
             var resultDoc = WitsmlParser.Parse(xmlOut);
 
-            if (queryDoc.Root != null && resultDoc.Root != null)
+            if (ObjectTypes.Log.EqualsIgnoreCase(ObjectType))
+                return UpdateLogDataQuery(queryDoc, resultDoc);
+
+            return string.Empty;
+        }
+
+        private string UpdateLogDataQuery(XDocument queryDoc, XDocument resultDoc)
+        {
+            var ns = queryDoc.Root?.GetDefaultNamespace();
+            var queryLog = queryDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
+            var resultLog = resultDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
+
+            if (queryLog != null && resultLog != null)
             {
-                var ns = queryDoc.Root.GetDefaultNamespace();
-
-                var queryLog = queryDoc.Root.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
-                var resultLog = resultDoc.Root.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
-
-                if (queryLog != null && resultLog != null)
+                var endIndex = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endIndex");
+                if (endIndex != null)
                 {
-                    var endIndex = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endIndex");
-                    if (endIndex != null)
+                    var startIndex = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "startIndex");
+                    if (startIndex != null)
                     {
-                        var startIndex = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "startIndex");
-                        if (startIndex != null)
+                        startIndex.Value = endIndex.Value;
+                    }
+                    else
+                    {
+                        var startIndexElement = new XElement(ns + "startIndex", endIndex.Value);
+                        foreach (var attribute in endIndex.Attributes())
                         {
-                            startIndex.Value = endIndex.Value;
+                            startIndexElement.SetAttributeValue(attribute.Name, attribute.Value);
                         }
-                        else
-                        {
-                            var startIndexElement = new XElement(ns + "startIndex", endIndex.Value);
-                            foreach (var attribute in endIndex.Attributes())
-                            {
-                                startIndexElement.SetAttributeValue(attribute.Name, attribute.Value);
-                            }
-                            queryLog.Add(startIndexElement);
-                        }
-
-                        return queryDoc.ToString();
+                        queryLog.Add(startIndexElement);
                     }
 
-                    var endDateTimeIndex = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endDateTimeIndex");
-                    if (endDateTimeIndex != null)
-                    {
-                        var startDateTimeIndex = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "startDateTimeIndex");
-                        if (startDateTimeIndex != null)
-                            startDateTimeIndex.Value = endDateTimeIndex.Value;
-                        else
-                            queryLog.Add(new XElement(ns + "startDateTimeIndex", endDateTimeIndex.Value));
+                    QueryIn = queryDoc.ToString();
+                    return QueryIn;
+                }
 
-                        return queryDoc.ToString();
-                    }
+                var endDateTimeIndex = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endDateTimeIndex");
+                if (endDateTimeIndex != null)
+                {
+                    var startDateTimeIndex = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "startDateTimeIndex");
+                    if (startDateTimeIndex != null)
+                        startDateTimeIndex.Value = endDateTimeIndex.Value;
+                    else
+                        queryLog.Add(new XElement(ns + "startDateTimeIndex", endDateTimeIndex.Value));
+
+                    QueryIn = queryDoc.ToString();
+                    return QueryIn;
                 }
             }
 

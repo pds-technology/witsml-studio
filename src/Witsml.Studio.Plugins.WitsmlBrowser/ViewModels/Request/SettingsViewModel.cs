@@ -147,6 +147,15 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
         }
 
         /// <summary>
+        /// Cancels the automatic query after partial success.
+        /// </summary>
+        public void CancelAutoQuery()
+        {
+            if (Parent?.Parent?.AutoQueryProvider != null)
+                Parent.Parent.AutoQueryProvider.IsCancelled =  true;
+        }
+
+        /// <summary>
         /// Gets the supported versions from the server.
         /// </summary>
         /// <param name="proxy">The proxy.</param>

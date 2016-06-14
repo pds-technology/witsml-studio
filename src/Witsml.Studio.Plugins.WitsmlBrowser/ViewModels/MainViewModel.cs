@@ -154,6 +154,27 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             }
         }
 
+        private GrowingObjectQueryProvider<WitsmlSettings> _autoQueryProvider;
+
+        /// <summary>
+        /// Gets or sets the auto query provider.
+        /// </summary>
+        /// <value>
+        /// The auto query provider.
+        /// </value>
+        public GrowingObjectQueryProvider<WitsmlSettings> AutoQueryProvider
+        {
+            get { return _autoQueryProvider; }
+            set
+            {
+                if (!ReferenceEquals(_autoQueryProvider, value))
+                {
+                    _autoQueryProvider = value;
+                    NotifyOfPropertyChange(() => AutoQueryProvider);
+                }
+            }
+        }
+
         /// <summary>
         /// Gets or sets the reference to the request view model.
         /// </summary>
@@ -492,9 +513,20 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 // If there is only a partial success and the user has selected to retrieve parital results...
                 if (result.ReturnCode > 1 && Model.RetrievePartialResults)
                 {
+                    // Check if the auto-query operation has been cancelled by the user
+                    if (AutoQueryProvider != null && AutoQueryProvider.IsCancelled)
+                    {
+                        AutoQueryProvider = null;
+                        return;
+                    }
+
+                    if (AutoQueryProvider == null)
+                    {
+                        AutoQueryProvider = new GrowingObjectQueryProvider<WitsmlSettings>(Model.Clone(), result.ObjectType, XmlQuery.Text);
+                    }
+
                     //... update the query
-                    var provider = new GrowingObjectQueryProvider();
-                    XmlQuery.Text = provider.UpdateDataQuery(result.ObjectType, XmlQuery.Text, xmlOut);
+                    XmlQuery.Text = AutoQueryProvider.UpdateDataQuery(xmlOut);
 
                     // Submit the query if one was returned.
                     if (!string.IsNullOrEmpty((XmlQuery.Text)))

@@ -415,6 +415,15 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.Models
         public bool IsDeleteFromStore => StoreFunction == Functions.DeleteFromStore;
 
         /// <summary>
+        /// Clones this instance.
+        /// </summary>
+        /// <returns>A new <see cref="WitsmlSettings"/> instance.</returns>
+        public WitsmlSettings Clone()
+        {
+            return (WitsmlSettings) MemberwiseClone();
+        }
+
+        /// <summary>
         /// Called when RequestObjectSelectionCapability has changed.
         /// </summary>
         private void OnRequestObjectSelectionCapabilityChanged()
