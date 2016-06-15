@@ -13,7 +13,7 @@
     
     <Grid>
         <xcdg:DataGridControl AutoCreateColumns="True" AutoRemoveColumnsAndDetailConfigurations="True" CellEditorDisplayConditions="None"
-                              ItemsSource="{Binding Source={StaticResource GridData}}"
+                              ItemsSource="{Binding Source={StaticResource GridData}}" ReadOnly="True"
                               cal:Message.Attach="[Event Loaded] = [Action OnDataGridLoaded($source)]">
             <xcdg:DataGridControl.View>
                 <xcdg:TableflowView UseDefaultHeadersFooters="False" RowFadeInAnimationDuration="0" ScrollingAnimationDuration="0">

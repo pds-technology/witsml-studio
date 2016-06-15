@@ -275,6 +275,11 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             }
         }
 
+        public WitsmlSettings GetModel()
+        {
+            return AutoQueryProvider?.Context ?? Model;
+        }
+
         /// <summary>
         /// Called when the selected WITSML version has changed.
         /// </summary>
@@ -309,6 +314,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             // Clear any previous query results if this is not a partial query
             if (!isPartialQuery)
             {
+                AutoQueryProvider = null;
                 QueryResults.Text = string.Empty;
             }
 
@@ -522,7 +528,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
 
                     if (AutoQueryProvider == null)
                     {
-                        AutoQueryProvider = new GrowingObjectQueryProvider<WitsmlSettings>(Model.Clone(), result.ObjectType, XmlQuery.Text);
+                        AutoQueryProvider = new GrowingObjectQueryProvider<WitsmlSettings>(GetModel(), result.ObjectType, XmlQuery.Text);
                     }
 
                     //... update the query
@@ -531,6 +537,10 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                     // Submit the query if one was returned.
                     if (!string.IsNullOrEmpty((XmlQuery.Text)))
                     {
+                        // Change return elements to requested
+                        AutoQueryProvider.Context.ReturnElementType = OptionsIn.ReturnElements.Requested;
+                        AutoQueryProvider.Context.RetrievePartialResults = true;
+
                         //... and Submit a Query for the next set of data.
                         SubmitQuery(Functions.GetFromStore, true);
                     }
@@ -874,17 +884,22 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// <returns></returns>
         private string GetGetFromStoreOptionsIn()
         {
-            var optionsIn = new List<string>();
+            var model = GetModel();
+            var optionsIn = new List<string>
+            {
+                model.ReturnElementType ?? string.Empty,
+                model.IsRequestObjectSelectionCapability
+                    ? OptionsIn.RequestObjectSelectionCapability.True
+                    : string.Empty,
+                model.IsRequestPrivateGroupOnly ? OptionsIn.RequestPrivateGroupOnly.True : string.Empty
+            };
 
-            optionsIn.Add(Model.ReturnElementType ?? string.Empty);
-            optionsIn.Add(Model.IsRequestObjectSelectionCapability ? OptionsIn.RequestObjectSelectionCapability.True : string.Empty);
-            optionsIn.Add(Model.IsRequestPrivateGroupOnly ? OptionsIn.RequestPrivateGroupOnly.True : string.Empty);
 
-            if (Model.MaxDataRows.HasValue && Model.MaxDataRows.Value > 0)
-                optionsIn.Add(new OptionsIn.MaxReturnNodes(Model.MaxDataRows.Value));
+            if (model.MaxDataRows.HasValue && model.MaxDataRows.Value > 0)
+                optionsIn.Add(new OptionsIn.MaxReturnNodes(model.MaxDataRows.Value));
 
-            if (Model.RequestLatestValues.HasValue && Model.RequestLatestValues.Value > 0)
-                optionsIn.Add(new OptionsIn.RequestLatestValues(Model.RequestLatestValues.Value));
+            if (model.RequestLatestValues.HasValue && model.RequestLatestValues.Value > 0)
+                optionsIn.Add(new OptionsIn.RequestLatestValues(model.RequestLatestValues.Value));
 
             return string.Join(";", optionsIn.Where(o => !string.IsNullOrEmpty(o)));
         }

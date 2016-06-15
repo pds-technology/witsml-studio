@@ -16,6 +16,7 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using PDS.Framework;
@@ -86,11 +87,28 @@ namespace PDS.Witsml.Studio.Core.Providers
             var queryLog = queryDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
             var resultLog = resultDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
 
+            var fields = new List<string> {"logData"};
+
             if (queryLog != null && resultLog != null)
             {
+                var queryLogData = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "logData");
+                var resultLogData = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "logData");
+                if (queryLogData == null && resultLogData != null)
+                {
+                    resultLogData?.Elements().Where(e => e.Name.LocalName == "data").Remove();
+                    queryLog.Add(resultLogData);                  
+                } 
+
                 var endIndex = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endIndex");
                 if (endIndex != null)
                 {
+                    fields.Add("startIndex");
+                    fields.Add("endIndex");
+
+                    var queryEnd = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endIndex");
+                    if (queryEnd == null)
+                        queryLog.AddFirst(new XElement(ns + "endIndex"));
+
                     var startIndex = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "startIndex");
                     if (startIndex != null)
                     {
@@ -103,9 +121,11 @@ namespace PDS.Witsml.Studio.Core.Providers
                         {
                             startIndexElement.SetAttributeValue(attribute.Name, attribute.Value);
                         }
-                        queryLog.Add(startIndexElement);
+                        queryLog.AddFirst(startIndexElement);
                     }
 
+                    endIndex.Value = string.Empty;
+                    queryLog?.Elements().Where(e => !fields.Contains(e.Name.LocalName)).Remove();
                     QueryIn = queryDoc.ToString();
                     return QueryIn;
                 }
@@ -113,12 +133,21 @@ namespace PDS.Witsml.Studio.Core.Providers
                 var endDateTimeIndex = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endDateTimeIndex");
                 if (endDateTimeIndex != null)
                 {
+                    fields.Add("startDateTimeIndex");
+                    fields.Add("endDateTimeIndex");
+
+                    var queryEnd = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endDateTimeIndex");
+                    if (queryEnd == null)
+                        queryLog.AddFirst(new XElement(ns + "endDateTimeIndex"));
+
                     var startDateTimeIndex = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "startDateTimeIndex");
                     if (startDateTimeIndex != null)
                         startDateTimeIndex.Value = endDateTimeIndex.Value;
                     else
-                        queryLog.Add(new XElement(ns + "startDateTimeIndex", endDateTimeIndex.Value));
+                        queryLog.AddFirst(new XElement(ns + "startDateTimeIndex", endDateTimeIndex.Value));
 
+                    endDateTimeIndex.Value = string.Empty;
+                    queryLog?.Elements().Where(e => !fields.Contains(e.Name.LocalName)).Remove();
                     QueryIn = queryDoc.ToString();
                     return QueryIn;
                 }

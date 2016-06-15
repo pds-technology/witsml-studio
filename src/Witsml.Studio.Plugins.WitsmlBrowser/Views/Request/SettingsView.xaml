@@ -114,8 +114,8 @@
                 </StackPanel>
 
                 <StackPanel Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="2" Margin="5,0" Orientation="Horizontal">
-                    <CheckBox Content="Cascaded Delete" VerticalAlignment="Center" IsChecked="{Binding Model.CascadedDelete}" IsEnabled="{Binding Model.IsDeleteFromStore}" />
-                    <CheckBox Content="Keep Grid Data" Margin="80,0,0,0" VerticalAlignment="Center" IsChecked="{Binding Model.KeepGridData}" IsEnabled="{Binding Model.IsGetFromStore}" />
+                    <CheckBox Content="Keep Grid Data" VerticalAlignment="Center" IsChecked="{Binding Model.KeepGridData}" IsEnabled="{Binding Model.IsGetFromStore}" />
+                    <CheckBox Content="Cascaded Delete" Margin="20,0,0,0" VerticalAlignment="Center" IsChecked="{Binding Model.CascadedDelete}" IsEnabled="{Binding Model.IsDeleteFromStore}" />
                 </StackPanel>
             </Grid>
 
