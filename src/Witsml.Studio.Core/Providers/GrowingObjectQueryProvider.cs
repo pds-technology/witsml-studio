@@ -87,17 +87,24 @@ namespace PDS.Witsml.Studio.Core.Providers
             var queryLog = queryDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
             var resultLog = resultDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
 
-            var fields = new List<string> {"logData"};
+            var fields = new List<string> {"indexType", "direction", "logData"};
 
             if (queryLog != null && resultLog != null)
             {
                 var queryLogData = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "logData");
                 var resultLogData = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "logData");
+
                 if (queryLogData == null && resultLogData != null)
                 {
                     resultLogData?.Elements().Where(e => e.Name.LocalName == "data").Remove();
                     queryLog.Add(resultLogData);                  
-                } 
+                }
+
+                fields.ForEach(x =>
+                {
+                    if (queryLog.Elements().All(e => e.Name.LocalName != x))
+                        queryLog.Add(new XElement(ns + x));
+                });
 
                 var endIndex = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endIndex");
                 if (endIndex != null)
