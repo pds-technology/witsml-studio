@@ -61,7 +61,7 @@
                     <RowDefinition Height="{Binding Source={StaticResource CheckBoxRowHeight}}" />
                     <RowDefinition Height="{Binding Source={StaticResource TextBoxRowHeight}}" />
                     <RowDefinition Height="{Binding Source={StaticResource TextBoxRowHeight}}" />
-                    <RowDefinition Height="{Binding Source={StaticResource TextBoxRowHeight}}" />
+                    <RowDefinition Height="{Binding Source={StaticResource CheckBoxRowHeight}}" />
                     <RowDefinition Height="{Binding Source={StaticResource CheckBoxRowHeight}}" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
