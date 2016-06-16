@@ -129,5 +129,14 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
         {
             MessageBox.Show("Open coming soon");
         }
+
+        /// <summary>
+        /// Cancels the automatic query after partial success.
+        /// </summary>
+        public void CancelAutoQuery()
+        {
+            if (Parent?.Parent?.AutoQueryProvider != null)
+                Parent.Parent.AutoQueryProvider.IsCancelled = true;
+        }
     }
 }

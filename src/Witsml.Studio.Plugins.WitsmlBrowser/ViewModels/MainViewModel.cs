@@ -516,6 +516,9 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 if (result.ReturnCode > 0)
                     ShowObjectProperties(result);
 
+                if (result.ReturnCode == 1)
+                    AutoQueryProvider = null;
+
                 // If there is only a partial success and the user has selected to retrieve parital results...
                 if (result.ReturnCode > 1 && Model.RetrievePartialResults)
                 {
