@@ -130,7 +130,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// <param name="keepGridData">True if not clearing data when querying partial results</param>
         private void ClearDataTable(EtpUri uri, bool retrievePartialResults, bool keepGridData)
         {
-            if (uri == Uri && retrievePartialResults && keepGridData)
+            if (uri == Uri && keepGridData)
                 return;
 
             try
