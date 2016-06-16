@@ -12,7 +12,7 @@
 
     <UserControl.Resources>
         <conv:NullToBooleanConverter x:Key="NullToBooleanConverter" />
-        <conv:BooleanInverseConverter x:Key="BooleanInverseConverter" />
+        <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
     </UserControl.Resources>
     
     <Grid>
@@ -30,7 +30,7 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0" Orientation="Horizontal">
-                <ComboBox Width="120" Margin="5,5,0,5" VerticalContentAlignment="Center" ToolTip="API Function" IsEditable="False" 
+                <ComboBox Width="120" Margin="5,5,0,5" VerticalContentAlignment="Center" ToolTip="API Function" IsEditable="False"
                           ItemsSource="{Binding Parent.StoreFunctions}"
                           SelectedItem="{Binding Model.StoreFunction}" />
 
@@ -38,8 +38,12 @@
                           ItemsSource="{Binding Parent.ReturnElements}"
                           SelectedItem="{Binding Model.ReturnElementType, Mode=TwoWay}"
                           IsEnabled="{Binding Model.IsGetFromStore}" />
+                <Grid>
+                    <Button x:Name="SubmitQuery" Content="Execute" Width="70" Margin="5,5,0,5" />
+                    <Button x:Name="CancelAutoQuery" Content="Cancel" Margin="5,5,0,5" Width="70"
+                            Visibility="{Binding Parent.Parent.AutoQueryProvider, Converter={StaticResource NullToVisibilityConverter}}" />
+                </Grid>
 
-                <Button x:Name="SubmitQuery" Content="Execute" Width="70" Margin="5,5,0,5" />
             </StackPanel>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
