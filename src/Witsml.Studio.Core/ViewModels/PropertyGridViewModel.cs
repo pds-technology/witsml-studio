@@ -99,6 +99,10 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             {
                 ObjectData?.SetCurrentObject(objectType, CurrentObject, retrievePartialResults, keepGridData);
             }
+            else
+            {
+                ObjectData?.ClearDataTable();
+            }
         }
     }
 }

@@ -144,7 +144,10 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             }
         }
 
-        private void ClearDataTable()
+        /// <summary>
+        /// Clears the data table.
+        /// </summary>
+        public void ClearDataTable()
         {
             DataTable.BeginLoadData();
             DataTable.PrimaryKey = new DataColumn[0];
