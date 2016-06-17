@@ -315,7 +315,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             if (!isPartialQuery)
             {
                 AutoQueryProvider = null;
-                QueryResults.Text = string.Empty;
+                ClearQueryResults();
             }
 
             // Options In 
@@ -330,6 +330,15 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 var result = await SubmitQuery(functionType, xmlIn, optionsIn);
                 await Runtime.InvokeAsync(() => ShowSubmitResult(functionType, result, isPartialQuery));
             });
+        }
+
+
+        /// <summary>
+        /// Clears the query results.
+        /// </summary>
+        public void ClearQueryResults()
+        {
+            QueryResults.Text = string.Empty;
         }
 
         /// <summary>

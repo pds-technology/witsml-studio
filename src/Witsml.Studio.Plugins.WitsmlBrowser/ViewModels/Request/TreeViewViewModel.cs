@@ -108,7 +108,8 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
             });
         }
 
-        private void LogResponse(Functions function, string xmlIn, string optionsIn, string xmlOut, short returnCode, string suppMsgOut)
+        private void LogResponse(Functions function, string xmlIn, string optionsIn, string xmlOut, short returnCode,
+            string suppMsgOut)
         {
             var result = new WitsmlResult(
                 objectType: ObjectTypes.GetObjectType(xmlIn),
@@ -119,7 +120,11 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
                 messageOut: suppMsgOut,
                 returnCode: returnCode);
 
-            Runtime.InvokeAsync(() => Parent.Parent.ShowSubmitResult(function, result));
+            Runtime.InvokeAsync(() =>
+            {
+                Parent.Parent.ClearQueryResults();
+                Parent.Parent.ShowSubmitResult(function, result);
+            });
         }
     }
 }
