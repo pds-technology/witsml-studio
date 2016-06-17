@@ -44,7 +44,7 @@ namespace PDS.Witsml.Studio
         /// Test that all Bootstrapper assemblieses can be loaded.
         /// </summary>
         [TestMethod]
-        public void Bootstrapper_can_load_assemblies()
+        public void Bootstrapper_CallSelectAssemblies_Can_Load_Assemblies()
         {
             var thisAssembly = _bootstrapper.CallSelectAssemblies()
                 .FirstOrDefault(a => a == GetType().Assembly);
@@ -56,7 +56,7 @@ namespace PDS.Witsml.Studio
         /// Test that an IWindowManager instance was registered.
         /// </summary>
         [TestMethod]
-        public void Bootstrapper_registered_window_manager()
+        public void Bootstrapper_CallGetInstance_Registered_Window_Manager()
         {
             // Get instance of IWindowManager from bootstrapper's GetInstance
             var windownManager = _bootstrapper.CallGetInstance(typeof(IWindowManager));
@@ -68,7 +68,7 @@ namespace PDS.Witsml.Studio
         /// Test that an IEventAggregator instance was registered.
         /// </summary>
         [TestMethod]
-        public void Bootstrapper_registered_event_aggregator()
+        public void Bootstrapper_CallGetInstance_Registered_Event_Aggregator()
         {
             // Get instance of IEventAggregator from bootstrapper's GetInstance
             var eventAggregator = _bootstrapper.CallGetInstance(typeof(IEventAggregator));
@@ -80,7 +80,7 @@ namespace PDS.Witsml.Studio
         /// Test that an IShellViewModel instance was registered.
         /// </summary>
         [TestMethod]
-        public void Bootstrapper_can_resolve_shell_view_model()
+        public void Bootstrapper_CallGetInstance_Can_Resolve_Shell_View_Model()
         {
             // Get instance of IShellViewModel from bootstrapper's GetInstance
             var eventAggregator = _bootstrapper.CallGetInstance(typeof(IShellViewModel));

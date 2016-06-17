@@ -20,7 +20,7 @@ using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PDS.Witsml.Studio.Core.Connections;
 
-namespace PDS.Witsml.Studio.Core.ViewModels
+namespace PDS.Witsml.Studio.ViewModels
 {
     /// <summary>
     /// Unit tests for the ConnectionViewModel
@@ -32,7 +32,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// Tests the connection filename for each type of connection has the correct prefix.
         /// </summary>
         [TestMethod]
-        public void Connection_filename_has_correct_prefix()
+        public void ConnectionViewModel_Filename_Has_Correct_Prefix()
         {
             // Test Witsml filename
             var filename = Path.GetFileName(_witsmlConnectionVm.GetConnectionFilename());
@@ -48,7 +48,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// ConnectionType prefix and the base file name.
         /// </summary>
         [TestMethod]
-        public void Connection_filename_is_correct()
+        public void ConnectionViewModel_Filename_Is_Correct()
         {
             var witsmlFilename = string.Format("{0}{1}", ConnectionTypes.Witsml, ConnectionBaseFileName);
             var etpFilename = string.Format("{0}{1}", ConnectionTypes.Etp, ConnectionBaseFileName);
@@ -66,7 +66,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// Tests that a null connection is returned when no connection file is persisted.
         /// </summary>
         [TestMethod]
-        public void Connection_is_null_when_no_connection_file_persisted()
+        public void ConnectionViewModel_OpenConnectionFile_Is_Null_When_No_Connection_File_Persisted()
         {
             Assert.IsNull(_witsmlConnectionVm.OpenConnectionFile());
             Assert.IsNull(_etpConnectionVm.OpenConnectionFile());
@@ -76,7 +76,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// Tests the equivalence of a connection before and after file persistence.
         /// </summary>
         [TestMethod]
-        public void Connection_file_is_persisted()
+        public void ConnectionViewModel_Connection_File_Is_Persisted()
         {
             _witsmlConnectionVm.SaveConnectionFile(_witsmlConnection);
             _etpConnectionVm.SaveConnectionFile(_etpConnection);
@@ -89,7 +89,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         }
 
         [TestMethod]
-        public void ConnectionViewModel_editItem_is_defaulted_with_no_dataItem()
+        public void ConnectionViewModel_EditItem_Is_Defaulted_With_No_DataItem()
         {
             var emptyConnection = new Connection();
             _witsmlConnectionVm.InitializeEditItem();
@@ -98,7 +98,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         }
 
         [TestMethod]
-        public void ConnectionViewModel_editItem_is_initialized_with_dataItem()
+        public void ConnectionViewModel_EditItem_Is_Initialized_With_DataItem()
         {
             _witsmlConnectionVm.DataItem = _witsmlConnection;
             _witsmlConnectionVm.InitializeEditItem();
@@ -107,7 +107,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         }
 
         [TestMethod]
-        public void ConnectionViewModel_editItem_is_initialized_with_persisted_connection()
+        public void ConnectionViewModel_EditItem_Is_Initialized_With_Persisted_Connection()
         {
             _witsmlConnectionVm.SaveConnectionFile(_witsmlConnection);
             _witsmlConnectionVm.InitializeEditItem();
@@ -116,7 +116,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         }
 
         [TestMethod]
-        public void ConnectionViewModel_dataItem_not_set_on_cancel()
+        public void ConnectionViewModel_DataItem_Not_Set_On_Cancel()
         {
             var newName = "xxx";
 

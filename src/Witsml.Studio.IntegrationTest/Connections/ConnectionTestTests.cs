@@ -19,9 +19,10 @@
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PDS.Framework;
+using PDS.Witsml.Studio.Core.Connections;
 using PDS.Witsml.Studio.Core.Runtime;
 
-namespace PDS.Witsml.Studio.Core.Connections
+namespace PDS.Witsml.Studio.Connections
 {
     [TestClass]
     public class ConnectionTestTests
@@ -39,7 +40,7 @@ namespace PDS.Witsml.Studio.Core.Connections
         }
 
         [TestMethod]
-        public async Task TestValidWitsmlConnectionTestEndpoint()
+        public async Task WitsmlConnectionTest_CanConnect_Valid_Endpoint()
         {
             if (TestContext.Properties.Contains("WitsmlStoreUrl"))
                 _validWitsmlUri = TestContext.Properties["WitsmlStoreUrl"].ToString();
@@ -54,7 +55,7 @@ namespace PDS.Witsml.Studio.Core.Connections
         }
 
         [TestMethod]
-        public async Task TestInvalidWitsmlConnectionTestEndpoint()
+        public async Task WitsmlConnectionTest_CanConnect_Invalid_Endpoint()
         {
             var witsmlConnectionTest = new WitsmlConnectionTest();
             var result = await witsmlConnectionTest.CanConnect(new Connection() { Uri = _validWitsmlUri + "x" });
@@ -63,7 +64,7 @@ namespace PDS.Witsml.Studio.Core.Connections
         }
 
         [TestMethod]
-        public async Task TestValidEtpConnectionTestEndpoint()
+        public async Task EtpConnectionTest_CanConnect_Valid_Endpoint()
         {
             var etpConnectionTest = new EtpConnectionTest(_runtime);
             var result = await etpConnectionTest.CanConnect(new Connection() { Uri = _validEtpUri });
@@ -72,7 +73,7 @@ namespace PDS.Witsml.Studio.Core.Connections
         }
 
         [TestMethod]
-        public async Task TestInvalidEtpConnectionTestEndpoint()
+        public async Task EtpConnectionTest_CanConnect_Invalid_Endpoint()
         {
             var etpConnectionTest = new EtpConnectionTest(_runtime);
             var result = await etpConnectionTest.CanConnect(new Connection() { Uri = _validEtpUri + "x" });
@@ -80,9 +81,8 @@ namespace PDS.Witsml.Studio.Core.Connections
             Assert.IsFalse(result);
         }
 
-
         [TestMethod]
-        public async Task TestInvalidEtpConnectionBadFormat()
+        public async Task EtpConnectionTest_CanConnect_Invalid_BadFormat()
         {
             var etpConnectionTest = new EtpConnectionTest(_runtime);
             var result = await etpConnectionTest.CanConnect(new Connection() { Uri = "xxxxxxxx" });
@@ -91,7 +91,7 @@ namespace PDS.Witsml.Studio.Core.Connections
         }
 
         [TestMethod]
-        public async Task TestInvalidWitsmlConnectionBadFormat()
+        public async Task WitsmlConnectionTest_CanConnect_Invalid_BadFormat()
         {
             var witsmlConnectionTest = new WitsmlConnectionTest();
             var result = await witsmlConnectionTest.CanConnect(new Connection() { Uri = "xxxxxxxx" });

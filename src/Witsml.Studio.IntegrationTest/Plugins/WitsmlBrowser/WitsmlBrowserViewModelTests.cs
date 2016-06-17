@@ -64,7 +64,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser
         }
 
         [TestMethod]
-        public async Task Can_submitQuery_addToStore_for_well()
+        public async Task MainViewModel_SubmitQuery_Can_AddToStore_For_Well()
         {
             // The expected result
             var expectedUid = Guid.NewGuid().ToString();
@@ -90,7 +90,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser
         }
 
         [TestMethod]
-        public async Task Can_submitQuery_getFromStore_for_well()
+        public async Task MainViewModel_SubmitQuery_Can_GetFromStore_For_Well()
         {
             // The expected result
             var expectedUid = Guid.NewGuid().ToString();
@@ -130,7 +130,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser
         }
 
         [TestMethod]
-        public async Task Can_submitQuery_getCap()
+        public async Task MainViewModel_SubmitQuery_Can_GetCap()
         {
             var vm = new MainViewModel(_runtime);
             vm.Model.Connection = new Core.Connections.Connection() { Uri = _validWitsmlUri };

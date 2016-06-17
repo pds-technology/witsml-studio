@@ -40,7 +40,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser
         }
 
         [TestMethod]
-        public void Can_load_mainViewModel_screens()
+        public void MainViewModel_LoadScreens_Can_Load_MainViewModel_Screens()
         {
             _mainViewModel.LoadScreens();
             
@@ -48,7 +48,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser
         }
 
         [TestMethod]
-        public void Can_get_witsml_version_enum()
+        public void MainViewModel_GetWitsmlVersionEnum_Can_Get_Witsml_Version_Enum()
         {
             // Test version 131
             Assert.AreEqual(WMLSVersion.WITSML131, _mainViewModel.GetWitsmlVersionEnum(OptionsIn.DataVersion.Version131.Value));
@@ -61,13 +61,13 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser
         }
 
         [TestMethod]
-        public void Can_create_proxy()
+        public void MainViewModel_CreateProxy_Can_Create_Proxy()
         {
             Assert.IsNotNull(_mainViewModel.CreateProxy());
         }
 
         [TestMethod]
-        public void Can_load_requestViewModel_screens()
+        public void RequestViewModel_LoadScreens_Can_Load_RequestViewModel_Screens()
         {
             var mainViewModel = new MainViewModel(_runtime);
             var requestViewModel = new RequestViewModel(_runtime);

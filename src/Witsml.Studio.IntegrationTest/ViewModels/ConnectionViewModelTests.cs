@@ -18,13 +18,13 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PDS.Witsml.Studio.Core.ViewModels
+namespace PDS.Witsml.Studio.ViewModels
 {
     [TestClass]
     public class ConnectionViewModelTests : ConnectionViewModelTestBase
     {
         [TestMethod]
-        public void Can_accept_connection_changes_with_dataItem()
+        public void ConnectionViewModel_Witsml_Can_Accept_Connection_Changes_With_DataItem()
         {
             var newName = "xxx";
 

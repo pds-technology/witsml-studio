@@ -49,7 +49,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser
         }
 
         [TestMethod]
-        public void Can_get_supported_versions()
+        public void SettingsViewModel_GetVersions_Can_Get_Supported_Versions()
         {
             WITSMLWebServiceConnection proxy = new WITSMLWebServiceConnection(_validWitsmlUri, WMLSVersion.WITSML141);
             Connection connection = new Connection() { Uri = _validWitsmlUri };
