@@ -414,8 +414,11 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             try
             {
                 // Compute the object type of the incoming xml.
-                var document = WitsmlParser.Parse(xmlIn);
-                objectType = ObjectTypes.GetObjectTypeFromGroup(document.Root);
+                if (!string.IsNullOrWhiteSpace(xmlIn))
+                {
+                    var document = WitsmlParser.Parse(xmlIn);
+                    objectType = ObjectTypes.GetObjectTypeFromGroup(document.Root);
+                }
 
                 using (var client = Proxy.CreateClientProxy())
                 {
