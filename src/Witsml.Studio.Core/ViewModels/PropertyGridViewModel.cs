@@ -82,7 +82,8 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         public void SetCurrentObject(string objectType, string xml, string version, bool retrievePartialResults, bool keepGridData)
         {
             var dataType = ObjectTypes.GetObjectGroupType(objectType, version);
-            var dataObject = WitsmlParser.Parse(dataType, xml);
+            var document = WitsmlParser.Parse(xml);
+            var dataObject = WitsmlParser.Parse(dataType, document.Root);
             var collection = dataObject as IEnergisticsCollection;
 
             TypeDecorationManager.Register(dataType);

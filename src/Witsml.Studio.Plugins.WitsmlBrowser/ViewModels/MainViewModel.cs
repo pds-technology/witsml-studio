@@ -407,14 +407,16 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// </returns>
         internal async Task<WitsmlResult> SubmitQuery(Functions functionType, string xmlIn, string optionsIn)
         {
+            string objectType = null;
             string xmlOut = null;
             short returnCode = 0;
 
-            // Compute the object type of the incoming xml.
-            var objectType = ObjectTypes.GetObjectTypeFromGroup(xmlIn);
-
             try
             {
+                // Compute the object type of the incoming xml.
+                var document = WitsmlParser.Parse(xmlIn);
+                objectType = ObjectTypes.GetObjectTypeFromGroup(document.Root);
+
                 using (var client = Proxy.CreateClientProxy())
                 {
                     var wmls = (IWitsmlClient)client;
