@@ -79,7 +79,8 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// <param name="version">The WITSML version.</param>
         /// <param name="retrievePartialResults">True if to automatically request partial results.</param>
         /// <param name="keepGridData">True if not clearing data when querying partial results</param>
-        public void SetCurrentObject(string objectType, string xml, string version, bool retrievePartialResults, bool keepGridData)
+        /// <param name="retrieveObjectSelection">if set to <c>true</c> the retrieve object selection setting is selected.</param>
+        public void SetCurrentObject(string objectType, string xml, string version, bool retrievePartialResults, bool keepGridData, bool retrieveObjectSelection)
         {
             var dataType = ObjectTypes.GetObjectGroupType(objectType, version);
             var document = WitsmlParser.Parse(xml);
@@ -98,7 +99,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
 
             if (collection == null || collection.Items.Count == 1)
             {
-                ObjectData?.SetCurrentObject(objectType, CurrentObject, retrievePartialResults, keepGridData);
+                ObjectData?.SetCurrentObject(objectType, CurrentObject, retrievePartialResults, keepGridData, retrieveObjectSelection);
             }
             else
             {

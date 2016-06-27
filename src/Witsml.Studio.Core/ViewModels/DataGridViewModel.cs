@@ -83,9 +83,10 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// <param name="dataObject">The data object.</param>
         /// <param name="retrievePartialResults">True if to automatically request partial results.</param>
         /// <param name="keepGridData">True if not clearing data when querying partial results</param>
-        public void SetCurrentObject(string objectType, object dataObject, bool retrievePartialResults, bool keepGridData)
+        /// <param name="retrieveObjectSelection">if set to <c>true</c> the retrieve object selection setting is selected.</param>
+        public void SetCurrentObject(string objectType, object dataObject, bool retrievePartialResults, bool keepGridData, bool retrieveObjectSelection)
         {
-            if (!ObjectTypes.IsGrowingDataObject(objectType))
+            if (!ObjectTypes.IsGrowingDataObject(objectType) || retrieveObjectSelection)
             {
                 ClearDataTable();
                 return;             
