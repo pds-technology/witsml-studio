@@ -71,7 +71,7 @@ namespace PDS.Witsml.Studio.Core.Behaviors
             Button source = sender as Button;
             if (source != null && source.ContextMenu != null)
             {
-                // Only open the ContextMenu when it is not already open. If it is already open,
+                // Only open the ContextMenu when it is not already open.  If it is already open,
                 // when the button is pressed the ContextMenu will lose focus and automatically close.
                 if (!_isContextMenuOpen)
                 {
