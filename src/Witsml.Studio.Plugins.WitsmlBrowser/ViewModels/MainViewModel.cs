@@ -410,11 +410,12 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             string objectType = null;
             string xmlOut = null;
             short returnCode = 0;
+            var clientControlledFunctions = new List<Functions>() {Functions.GetCap, Functions.GetBaseMsg};
 
             try
             {
                 // Compute the object type of the incoming xml.
-                if (!string.IsNullOrWhiteSpace(xmlIn))
+                if (!clientControlledFunctions.Contains(functionType) && !string.IsNullOrWhiteSpace(xmlIn))
                 {
                     var document = WitsmlParser.Parse(xmlIn);
                     objectType = ObjectTypes.GetObjectTypeFromGroup(document.Root);
