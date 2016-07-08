@@ -37,7 +37,7 @@
                 <ComboBox Width="140" Margin="5,5,0,5" DisplayMemberPath="Value" VerticalContentAlignment="Center" ToolTip="Return Elements" IsEditable="False"
                           ItemsSource="{Binding Parent.ReturnElements}"
                           SelectedItem="{Binding Model.ReturnElementType, Mode=TwoWay}"
-                          IsEnabled="{Binding Model.IsGetFromStore}" />
+                          IsEnabled="{Binding Model.EnableReturnElements}" />
                 <Grid>
                     <Button x:Name="SubmitQuery" Content="Execute" Width="70" Margin="5,5,0,5" />
                     <Button x:Name="CancelAutoQuery" Content="Cancel" Margin="5,5,0,5" Width="70"

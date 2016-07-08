@@ -79,7 +79,7 @@
                     <ComboBox VerticalContentAlignment="Center" DisplayMemberPath="Value"
                               ItemsSource="{Binding Parent.ReturnElements}"
                               SelectedItem="{Binding Model.ReturnElementType, Mode=TwoWay}"
-                              IsEnabled="{Binding Model.IsRequestObjectSelectionCapability, Converter={StaticResource BooleanInverseConverter}}" />
+                              IsEnabled="{Binding Model.EnableReturnElements}" />
                 </Grid>
 
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Options In:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />

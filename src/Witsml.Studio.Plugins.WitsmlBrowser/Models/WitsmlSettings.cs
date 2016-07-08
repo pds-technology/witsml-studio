@@ -104,6 +104,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.Models
                     _isRequestObjectSelectionCapability = value;
                     OnRequestObjectSelectionCapabilityChanged();
                     NotifyOfPropertyChange(() => IsRequestObjectSelectionCapability);
+                    NotifyOfPropertyChange(() => EnableReturnElements);
                 }
             }
         }
@@ -400,9 +401,12 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.Models
                     NotifyOfPropertyChange(() => StoreFunction);
                     NotifyOfPropertyChange(() => IsGetFromStore);
                     NotifyOfPropertyChange(() => IsDeleteFromStore);
+                    NotifyOfPropertyChange(() => EnableReturnElements);
                 }
             }
         }
+
+        public bool EnableReturnElements => IsGetFromStore && !IsRequestObjectSelectionCapability;
 
         /// <summary>
         /// Gets a value indicating whether StoreFunction equals GetFromStore.
@@ -426,7 +430,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.Models
         /// <value>
         /// <c>true</c> if ReturnElementType equals All; otherwise, <c>false</c>.
         /// </value>
-        public bool IsReturnElementsAll => OptionsIn.ReturnElements.All.Equals(ReturnElementType?.Value);
+        public bool IsReturnElementsAll => OptionsIn.ReturnElements.All.Equals(ReturnElementType?.Value);     
 
         /// <summary>
         /// Clones this instance.
