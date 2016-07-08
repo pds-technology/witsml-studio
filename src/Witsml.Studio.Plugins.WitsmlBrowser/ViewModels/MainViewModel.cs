@@ -514,9 +514,20 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// <param name="isPartialQuery">if set to <c>true</c> [is partial query].</param>
         internal void ShowSubmitResult(Functions functionType, WitsmlResult result, bool isPartialQuery = false)
         {
-            var xmlOut = functionType == Functions.GetFromStore
-                ? ProcessQueryResult(result.XmlOut, result.OptionsIn)
-                : result.XmlOut;
+            var xmlOut = result.XmlOut;
+
+            if (functionType == Functions.GetFromStore)
+            {
+                xmlOut = ProcessQueryResult(result.XmlOut, result.OptionsIn);
+            }
+            else if (functionType == Functions.UpdateInStore || functionType == Functions.DeleteFromStore)
+            {
+                var now = DateTime.Now.ToString("G");
+                xmlOut = GetMessageText(now, xmlOut, result.MessageOut, result.ReturnCode);
+            }
+            //xmlOut = functionType == Functions.GetFromStore
+            //    ? ProcessQueryResult(result.XmlOut, result.OptionsIn)
+            //    : result.XmlOut;
 
             _log.DebugFormat("Query returned with{3}{3}xmlOut: {0}{3}{3}suppMsgOut: {1}{3}{3}optionsIn: {2}{3}{3}",
                 GetLogStringText(xmlOut),
@@ -782,19 +793,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
 
             Messages.Insert(
                 Messages.TextLength,
-                string.Format(
-                    "<!---------- Response : {0} ----------{5}" +
-                    "   Return Code : {1}{5}" +
-                    "   SuppMsgOut  : {2}{5}" +
-                    "   XmlOut      : {3}{5}" +
-                    "-->{5}" +
-                    "{4}{5}{5}",
-                    now,
-                    returnCode,
-                    string.IsNullOrEmpty(suppMsgOut) ? "None" : suppMsgOut,
-                    string.IsNullOrEmpty(xmlOut) ? "None" : string.Empty,
-                    string.IsNullOrEmpty(xmlOut) ? string.Empty : xmlOut,
-                    Environment.NewLine));
+                GetMessageText(now, xmlOut, suppMsgOut, returnCode));
         }
 
         /// <summary>
@@ -941,6 +940,23 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         private string GetLogStringText(string logString)
         {
             return string.IsNullOrEmpty(logString) ? "<None>" : logString;
+        }
+
+        private string GetMessageText(string now, string xmlOut, string suppMsgOut, short returnCode)
+        {
+            return string.Format(
+                "<!---------- Response : {0} ----------{5}" +
+                "   Return Code : {1}{5}" +
+                "   SuppMsgOut  : {2}{5}" +
+                "   XmlOut      : {3}{5}" +
+                "-->{5}" +
+                "{4}{5}{5}",
+                now,
+                returnCode,
+                string.IsNullOrEmpty(suppMsgOut) ? "None" : suppMsgOut,
+                string.IsNullOrEmpty(xmlOut) ? "None" : string.Empty,
+                string.IsNullOrEmpty(xmlOut) ? string.Empty : xmlOut,
+                Environment.NewLine);
         }
     }
 }
