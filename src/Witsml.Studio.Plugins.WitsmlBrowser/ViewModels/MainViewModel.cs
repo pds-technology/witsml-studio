@@ -314,21 +314,25 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             // Clear any previous query results if this is not a partial query
             if (!isPartialQuery)
             {
-                AutoQueryProvider = null;
                 ClearQueryResults();
             }
 
             // Options In 
-            var optionsIn = GetOptionsIn(functionType);
+            var optionsIn = GetOptionsIn(functionType, isPartialQuery);
 
             // Output Request
             OutputRequestMessages(functionType, functionType == Functions.GetCap ? string.Empty : xmlIn, optionsIn);
-
+    
+            Runtime.ShowBusy();        
             Task.Run(async () =>
             {
                 // Call internal SubmitQuery method with references to all inputs and outputs.
                 var result = await SubmitQuery(functionType, xmlIn, optionsIn);
-                await Runtime.InvokeAsync(() => ShowSubmitResult(functionType, result, isPartialQuery));
+                await Runtime.InvokeAsync(() =>
+                {
+                    ShowSubmitResult(functionType, result, isPartialQuery);
+                    Runtime.ShowBusy(false);
+                });
             });
         }
 
@@ -353,8 +357,9 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// Gets the options in for the given functionType
         /// </summary>
         /// <param name="functionType">Type of the function.</param>
+        /// <param name="isPartialQuery">if set to <c>true</c> [is partial query].</param>
         /// <returns>The OptionsIn</returns>
-        internal string GetOptionsIn(Functions functionType)
+        internal string GetOptionsIn(Functions functionType, bool isPartialQuery = false)
         {
             string optionsIn;
 
@@ -370,7 +375,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                     optionsIn = Model.CascadedDelete ? OptionsIn.CascadedDelete.True : null;
                     break;
                 case Functions.GetFromStore:
-                    optionsIn = GetGetFromStoreOptionsIn();
+                    optionsIn = GetGetFromStoreOptionsIn(isPartialQuery);
                     break;
                 default:
                     optionsIn = null;
@@ -534,34 +539,39 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 if (result.ReturnCode == 1)
                     AutoQueryProvider = null;
 
+                var model = GetModel();
+
                 // If there is only a partial success and the user has selected to retrieve parital results...
-                if (result.ReturnCode > 1 && Model.RetrievePartialResults)
+                if (result.ReturnCode <= 1 || !model.RetrievePartialResults)
+                    return;
+
+                // Check if the auto-query operation has been cancelled by the user
+                if (AutoQueryProvider != null && AutoQueryProvider.IsCancelled)
                 {
-                    // Check if the auto-query operation has been cancelled by the user
-                    if (AutoQueryProvider != null && AutoQueryProvider.IsCancelled)
-                    {
-                        AutoQueryProvider = null;
-                        return;
-                    }
+                    AutoQueryProvider = null;
+                    return;
+                }
 
-                    if (AutoQueryProvider == null)
-                    {
-                        AutoQueryProvider = new GrowingObjectQueryProvider<WitsmlSettings>(GetModel(), result.ObjectType, XmlQuery.Text);
-                    }
+                if (AutoQueryProvider == null)
+                {
+                    AutoQueryProvider = new GrowingObjectQueryProvider<WitsmlSettings>(model, result.ObjectType, XmlQuery.Text);
+                }
 
-                    //... update the query
-                    XmlQuery.Text = AutoQueryProvider.UpdateDataQuery(xmlOut);
+                //... update the query
+                XmlQuery.Text = AutoQueryProvider.UpdateDataQuery(xmlOut);
 
-                    // Submit the query if one was returned.
-                    if (!string.IsNullOrEmpty((XmlQuery.Text)))
-                    {
-                        // Change return elements to requested
-                        AutoQueryProvider.Context.ReturnElementType = OptionsIn.ReturnElements.Requested;
-                        AutoQueryProvider.Context.RetrievePartialResults = true;
+                // Submit the query if one was returned.
+                if (!string.IsNullOrEmpty((XmlQuery.Text)))
+                {
+                    // Change return elements to requested
+                    AutoQueryProvider.Context.RetrievePartialResults = true;
 
-                        //... and Submit a Query for the next set of data.
-                        SubmitQuery(Functions.GetFromStore, true);
-                    }
+                    //... and Submit a Query for the next set of data.
+                    SubmitQuery(Functions.GetFromStore, true);
+                }
+                else
+                {
+                    AutoQueryProvider = null;
                 }
             }
         }
@@ -899,13 +909,14 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// <summary>
         /// Gets the GetFromStore OptionsIn.
         /// </summary>
+        /// <param name="isPartialQuery">if set to <c>true</c> [is partial query].</param>
         /// <returns></returns>
-        private string GetGetFromStoreOptionsIn()
+        private string GetGetFromStoreOptionsIn(bool isPartialQuery)
         {
             var model = GetModel();
             var optionsIn = new List<string>
             {
-                model.ReturnElementType ?? string.Empty,
+                isPartialQuery? OptionsIn.ReturnElements.DataOnly: model.ReturnElementType ?? string.Empty,
                 model.IsRequestObjectSelectionCapability
                     ? OptionsIn.RequestObjectSelectionCapability.True
                     : string.Empty,

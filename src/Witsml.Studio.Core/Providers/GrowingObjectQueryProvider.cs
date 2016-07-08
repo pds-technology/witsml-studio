@@ -83,84 +83,75 @@ namespace PDS.Witsml.Studio.Core.Providers
 
         private string UpdateLogDataQuery(XDocument queryDoc, XDocument resultDoc)
         {
+            XElement queryEnd;
+
             var ns = queryDoc.Root?.GetDefaultNamespace();
             var queryLog = queryDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
             var resultLog = resultDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
 
-            var fields = new List<string> {"indexType", "direction", "logData"};
+            var fields = new List<string> {"indexType", "direction"};
 
-            if (queryLog != null && resultLog != null)
+            if (queryLog == null || resultLog == null)
+                return string.Empty;
+
+            fields.ForEach(x =>
             {
-                var queryLogData = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "logData");
-                var resultLogData = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "logData");
+                if (queryLog.Elements().All(e => e.Name.LocalName != x))
+                    queryLog.Add(new XElement(ns + x));
+            });
 
-                if (queryLogData == null && resultLogData != null)
+            var endIndex = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endIndex");
+            if (endIndex != null)
+            {
+                fields.Add("startIndex");
+                fields.Add("endIndex");
+
+                queryEnd = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endIndex");
+                if (queryEnd == null)
+                    queryLog.AddFirst(new XElement(ns + "endIndex"));
+
+                var startIndex = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "startIndex");
+                if (startIndex != null)
                 {
-                    resultLogData?.Elements().Where(e => e.Name.LocalName == "data").Remove();
-                    queryLog.Add(resultLogData);                  
+                    startIndex.Value = endIndex.Value;
                 }
-
-                fields.ForEach(x =>
+                else
                 {
-                    if (queryLog.Elements().All(e => e.Name.LocalName != x))
-                        queryLog.Add(new XElement(ns + x));
-                });
-
-                var endIndex = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endIndex");
-                if (endIndex != null)
-                {
-                    fields.Add("startIndex");
-                    fields.Add("endIndex");
-
-                    var queryEnd = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endIndex");
-                    if (queryEnd == null)
-                        queryLog.AddFirst(new XElement(ns + "endIndex"));
-
-                    var startIndex = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "startIndex");
-                    if (startIndex != null)
+                    var startIndexElement = new XElement(ns + "startIndex", endIndex.Value);
+                    foreach (var attribute in endIndex.Attributes())
                     {
-                        startIndex.Value = endIndex.Value;
+                        startIndexElement.SetAttributeValue(attribute.Name, attribute.Value);
                     }
-                    else
-                    {
-                        var startIndexElement = new XElement(ns + "startIndex", endIndex.Value);
-                        foreach (var attribute in endIndex.Attributes())
-                        {
-                            startIndexElement.SetAttributeValue(attribute.Name, attribute.Value);
-                        }
-                        queryLog.AddFirst(startIndexElement);
-                    }
-
-                    endIndex.Value = string.Empty;
-                    queryLog?.Elements().Where(e => !fields.Contains(e.Name.LocalName)).Remove();
-                    QueryIn = queryDoc.ToString();
-                    return QueryIn;
+                    queryLog.AddFirst(startIndexElement);
                 }
 
-                var endDateTimeIndex = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endDateTimeIndex");
-                if (endDateTimeIndex != null)
-                {
-                    fields.Add("startDateTimeIndex");
-                    fields.Add("endDateTimeIndex");
-
-                    var queryEnd = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endDateTimeIndex");
-                    if (queryEnd == null)
-                        queryLog.AddFirst(new XElement(ns + "endDateTimeIndex"));
-
-                    var startDateTimeIndex = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "startDateTimeIndex");
-                    if (startDateTimeIndex != null)
-                        startDateTimeIndex.Value = endDateTimeIndex.Value;
-                    else
-                        queryLog.AddFirst(new XElement(ns + "startDateTimeIndex", endDateTimeIndex.Value));
-
-                    endDateTimeIndex.Value = string.Empty;
-                    queryLog?.Elements().Where(e => !fields.Contains(e.Name.LocalName)).Remove();
-                    QueryIn = queryDoc.ToString();
-                    return QueryIn;
-                }
+                endIndex.Value = string.Empty;
+                queryLog.Elements().Where(e => !fields.Contains(e.Name.LocalName)).Remove();
+                QueryIn = queryDoc.ToString();
+                return QueryIn;
             }
 
-            return string.Empty;
+            var endDateTimeIndex = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endDateTimeIndex");
+            if (endDateTimeIndex == null)
+                return string.Empty;
+
+            fields.Add("startDateTimeIndex");
+            fields.Add("endDateTimeIndex");
+
+            queryEnd = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endDateTimeIndex");
+            if (queryEnd == null)
+                queryLog.AddFirst(new XElement(ns + "endDateTimeIndex"));
+
+            var startDateTimeIndex = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "startDateTimeIndex");
+            if (startDateTimeIndex != null)
+                startDateTimeIndex.Value = endDateTimeIndex.Value;
+            else
+                queryLog.AddFirst(new XElement(ns + "startDateTimeIndex", endDateTimeIndex.Value));
+
+            endDateTimeIndex.Value = string.Empty;
+            queryLog.Elements().Where(e => !fields.Contains(e.Name.LocalName)).Remove();
+            QueryIn = queryDoc.ToString();
+            return QueryIn;
         }
     }
 }
