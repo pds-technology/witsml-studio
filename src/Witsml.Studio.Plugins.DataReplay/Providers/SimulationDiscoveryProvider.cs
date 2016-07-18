@@ -84,7 +84,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.Providers
                         channel.ChannelUri,
                         contentType: EtpContentTypes.Witsml141.For("logCurveInfo"),
                         resourceType: ResourceTypes.DataObject,
-                        name: channel.Mnemonic,
+                        name: channel.ChannelName,
                         count: 0));
                 }
             }

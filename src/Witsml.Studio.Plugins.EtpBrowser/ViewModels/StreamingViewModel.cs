@@ -455,7 +455,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 
         private void LogChannelMetadata(IList<ChannelMetadataRecord> channels)
         {
-            var headers = string.Join("\", \"", channels.Select(x => x.Mnemonic));
+            var headers = string.Join("\", \"", channels.Select(x => x.ChannelName));
             var units = string.Join("\", \"", channels.Select(x => x.Uom));
 
             Parent.Details.Append(string.Format(
@@ -476,7 +476,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 
                     Parent.Details.Append(string.Format(
                         "[ \"{0}\", {1}, {2} ],{3}",
-                        valueChannel?.Mnemonic,
+                        valueChannel?.ChannelName,
                         dataItems[i].Value.Item,
                         dataItems[i + 1].Value.Item,
                         Environment.NewLine));
@@ -489,7 +489,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                     var valueChannel = Channels.FirstOrDefault(c => c.ChannelId == x.ChannelId);
 
                     return string.Format("[ \"{0}\", {1}, {2} ] // Channel ID: {3}",
-                        valueChannel?.Mnemonic,
+                        valueChannel?.ChannelName,
                         x.Indexes.FirstOrDefault(),
                         x.Value.Item,
                         x.ChannelId);

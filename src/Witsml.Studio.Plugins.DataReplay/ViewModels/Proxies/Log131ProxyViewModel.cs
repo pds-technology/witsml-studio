@@ -79,7 +79,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
                     index = log.EndIndex.Value;
 
                 log.Direction = LogIndexDirection.increasing;
-                log.IndexCurve = new IndexCurve(model.Channels.Select(x => x.Mnemonic).FirstOrDefault());
+                log.IndexCurve = new IndexCurve(model.Channels.Select(x => x.ChannelName).FirstOrDefault());
                 log.LogCurveInfo = model.Channels.Select(ToLogCurveInfo).ToList();
 
                 index = generator.GenerateLogData(log, startIndex: index, interval: 0.1);
@@ -97,7 +97,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
         {
             return new LogCurveInfo()
             {
-                Mnemonic = channel.Mnemonic,
+                Mnemonic = channel.ChannelName,
                 Unit = channel.Uom,
                 CurveDescription = channel.Description,
                 TypeLogData = LogDataType.@double,

@@ -171,14 +171,14 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
 
         private ChannelMetadataRecord ToChannelMetadataRecord(ChannelMetadataRecord record, IndexMetadataRecord indexMetadata)
         {
-            var uri = GetChannelUri(record.Mnemonic);
+            var uri = GetChannelUri(record.ChannelName);
 
             var channel = new ChannelMetadataRecord()
             {
                 ChannelUri = uri,
                 ContentType = uri.ContentType,
                 ChannelId = record.ChannelId,
-                Mnemonic = record.Mnemonic,
+                ChannelName = record.ChannelName,
                 Uom = record.Uom,
                 MeasureClass = record.MeasureClass,
                 DataType = record.DataType,
@@ -186,7 +186,6 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
                 Uuid = record.Uuid,
                 Status = record.Status,
                 Source = record.Source,
-                ChannelAxes = new ChannelAxis[0],
                 Indexes = new IndexMetadataRecord[]
                 {
                     indexMetadata
@@ -201,8 +200,8 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
         {
             return new IndexMetadataRecord()
             {
-                Uri = GetChannelUri(record.Mnemonic),
-                Mnemonic = record.Mnemonic,
+                Uri = GetChannelUri(record.ChannelName),
+                Mnemonic = record.ChannelName,
                 Description = record.Description,
                 Uom = record.Uom,
                 Scale = scale,
