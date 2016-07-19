@@ -515,6 +515,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         internal void ShowSubmitResult(Functions functionType, WitsmlResult result, bool isPartialQuery = false)
         {
             var xmlOut = result.XmlOut;
+            string messageText = null;
 
             if (functionType == Functions.GetFromStore)
             {
@@ -523,23 +524,20 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             else if (functionType == Functions.UpdateInStore || functionType == Functions.DeleteFromStore)
             {
                 var now = DateTime.Now.ToString("G");
-                xmlOut = GetMessageText(now, xmlOut, result.MessageOut, result.ReturnCode);
+                messageText = GetMessageText(now, xmlOut, result.MessageOut, result.ReturnCode);
             }
-            //xmlOut = functionType == Functions.GetFromStore
-            //    ? ProcessQueryResult(result.XmlOut, result.OptionsIn)
-            //    : result.XmlOut;
 
             _log.DebugFormat("Query returned with{3}{3}xmlOut: {0}{3}{3}suppMsgOut: {1}{3}{3}optionsIn: {2}{3}{3}",
-                GetLogStringText(xmlOut),
+                GetLogStringText(messageText ?? xmlOut),
                 GetLogStringText(result.MessageOut),
                 GetLogStringText(result.OptionsIn),
                 Environment.NewLine);
 
             // Output query results to the Results tab
-            OutputResults(xmlOut, result.MessageOut, result.ReturnCode, isPartialQuery);
+            OutputResults(messageText ?? xmlOut, result.MessageOut, result.ReturnCode, isPartialQuery);
 
             // Append these results to the Messages tab
-            OutputMessages(xmlOut, result.MessageOut, result.ReturnCode);
+            OutputMessages(xmlOut, result.MessageOut, result.ReturnCode, messageText);
 
             // Show data object on the Properties tab
             if (functionType == Functions.GetFromStore && result.ReturnCode > 0)
@@ -787,13 +785,14 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// <param name="xmlOut">The XML output text.</param>
         /// <param name="suppMsgOut">The supplemental message out.</param>
         /// <param name="returnCode">The return code.</param>
-        internal void OutputMessages(string xmlOut, string suppMsgOut, short returnCode)
+        /// <param name="messageText">The current message text.</param>
+        internal void OutputMessages(string xmlOut, string suppMsgOut, short returnCode, string messageText = null)
         {
             var now = DateTime.Now.ToString("G");
 
             Messages.Insert(
                 Messages.TextLength,
-                GetMessageText(now, xmlOut, suppMsgOut, returnCode));
+                messageText ?? GetMessageText(now, xmlOut, suppMsgOut, returnCode));
         }
 
         /// <summary>
