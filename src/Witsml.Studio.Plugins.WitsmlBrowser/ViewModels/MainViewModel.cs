@@ -311,12 +311,6 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
 
             _log.DebugFormat("Query submitted for function '{0}'", functionType);
 
-            // Clear any previous query results if this is not a partial query
-            if (!isPartialQuery)
-            {
-                ClearQueryResults();
-            }
-
             // Options In 
             var optionsIn = GetOptionsIn(functionType, isPartialQuery);
 
@@ -330,6 +324,11 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 var result = await SubmitQuery(functionType, xmlIn, optionsIn);
                 await Runtime.InvokeAsync(() =>
                 {
+                    // Clear any previous query results if this is not a partial query
+                    if (!isPartialQuery)
+                    {
+                        ClearQueryResults();
+                    }
                     ShowSubmitResult(functionType, result, isPartialQuery);
                     Runtime.ShowBusy(false);
                 });
