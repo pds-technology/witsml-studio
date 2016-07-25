@@ -49,6 +49,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
     public sealed class MainViewModel : Conductor<IScreen>.Collection.AllActive, IPluginViewModel, IConnectionAware, ISoapMessageHandler
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(MainViewModel));
+        private const string TimestampFormat = "yyyy-MM-dd HH:mm:ss.ffff";
         public const string QueryTemplateText = "Templates";
 
         /// <summary>
@@ -522,7 +523,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             }
             else if (functionType == Functions.UpdateInStore || functionType == Functions.DeleteFromStore)
             {
-                var now = DateTime.Now.ToString("G");
+                var now = DateTime.Now.ToString(TimestampFormat);
                 messageText = GetMessageText(now, xmlOut, result.MessageOut, result.ReturnCode);
             }
 
@@ -787,7 +788,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// <param name="messageText">The current message text.</param>
         internal void OutputMessages(string xmlOut, string suppMsgOut, short returnCode, string messageText = null)
         {
-            var now = DateTime.Now.ToString("G");
+            var now = DateTime.Now.ToString(TimestampFormat);
 
             Messages.Insert(
                 Messages.TextLength,
@@ -802,7 +803,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// <param name="optionsIn">The options in.</param>
         internal void OutputRequestMessages(Functions functionType, string queryText, string optionsIn)
         {
-            var now = DateTime.Now.ToString("G");
+            var now = DateTime.Now.ToString(TimestampFormat);
 
             Messages.Insert(
                 Messages.TextLength,
@@ -829,7 +830,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// <param name="message">The SOAP message.</param>
         internal void OutputSoapMessages(string type, string action, string message)
         {
-            var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff");
+            var now = DateTime.Now.ToString(TimestampFormat);
 
             SoapMessages.Insert(
                 SoapMessages.TextLength,
