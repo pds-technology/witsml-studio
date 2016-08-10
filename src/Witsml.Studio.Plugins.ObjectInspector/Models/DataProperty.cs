@@ -96,7 +96,9 @@ namespace PDS.Witsml.Studio.Plugins.ObjectInspector.Models
             if (type?.GetCustomAttribute<XmlTypeAttribute>() == null)
                 return new List<DataProperty>();
 
-            var properties = type.GetProperties().Where(IsDataProperty);
+            // Avoid recursive references
+            var properties = type.GetProperties().Where(IsDataProperty)
+                .Where(t => t.PropertyType != type);
 
             return properties.Select(p => new DataProperty(p, parentXmlPath)).ToList();
         }

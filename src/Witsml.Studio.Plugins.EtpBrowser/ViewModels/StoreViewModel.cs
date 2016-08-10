@@ -26,10 +26,8 @@ using Energistics.Datatypes;
 using Energistics.Datatypes.Object;
 using Energistics.Protocol.Core;
 using Energistics.Protocol.Store;
-using PDS.Witsml.Studio.Plugins.EtpBrowser.Models;
 using PDS.Witsml.Studio.Core.Runtime;
 using PDS.Witsml.Studio.Core.ViewModels;
-using EtpSettings = PDS.Witsml.Studio.Plugins.EtpBrowser.Models.EtpSettings;
 
 namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 {
@@ -60,7 +58,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// Gets the model.
         /// </summary>
         /// <value>The model.</value>
-        public EtpSettings Model
+        public Models.EtpSettings Model
         {
             get { return Parent.Model; }
         }

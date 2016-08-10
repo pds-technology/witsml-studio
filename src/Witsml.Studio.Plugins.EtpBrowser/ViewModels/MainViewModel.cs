@@ -30,11 +30,9 @@ using Energistics.Protocol.Discovery;
 using Energistics.Protocol.Store;
 using Energistics.Security;
 using PDS.Framework;
-using PDS.Witsml.Studio.Plugins.EtpBrowser.Models;
 using PDS.Witsml.Studio.Plugins.EtpBrowser.Properties;
 using PDS.Witsml.Studio.Core.Runtime;
 using PDS.Witsml.Studio.Core.ViewModels;
-using EtpSettings = PDS.Witsml.Studio.Plugins.EtpBrowser.Models.EtpSettings;
 
 namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 {
@@ -59,7 +57,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             Runtime = runtime;
             DisplayName = _pluginDisplayName;
             Resources = new BindableCollection<ResourceViewModel>();
-            Model = new EtpSettings()
+            Model = new Models.EtpSettings()
             {
                 ApplicationName = _pluginDisplayName,
                 ApplicationVersion = _pluginVersion
@@ -99,7 +97,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// Gets the model.
         /// </summary>
         /// <value>The model.</value>
-        public EtpSettings Model { get; private set; }
+        public Models.EtpSettings Model { get; private set; }
 
         /// <summary>
         /// Gets the resources to display in the tree view.

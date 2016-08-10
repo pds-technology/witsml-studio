@@ -23,9 +23,7 @@ using Caliburn.Micro;
 using Energistics.Common;
 using Energistics.Datatypes;
 using Energistics.Protocol.Core;
-using PDS.Witsml.Studio.Plugins.EtpBrowser.Models;
 using PDS.Witsml.Studio.Core.Runtime;
-using EtpSettings = PDS.Witsml.Studio.Plugins.EtpBrowser.Models.EtpSettings;
 
 namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 {
@@ -37,7 +35,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
     {
         private static readonly string[] _describeObjectTypes = new[]
         {
-            ObjectTypes.Wellbore, ObjectTypes.Log, ObjectTypes.ChannelSet, ObjectTypes.Channel
+            ObjectTypes.Wellbore, ObjectTypes.Log, ObjectTypes.LogCurveInfo, ObjectTypes.ChannelSet, ObjectTypes.Channel
         };
 
         /// <summary>
@@ -61,7 +59,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// Gets the model.
         /// </summary>
         /// <value>The model.</value>
-        public EtpSettings Model
+        public Models.EtpSettings Model
         {
             get { return Parent.Model; }
         }
