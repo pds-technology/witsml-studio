@@ -276,7 +276,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 var dataObjects = Context.GetWellboreObjects(etpUri.ObjectType, etpUri);
 
                 await LoadDataItems(dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri(),
-                    ObjectTypes.IsGrowingDataObject(etpUri.ObjectType) ? -1 : 0);
+                    ObjectTypes.Log.EqualsIgnoreCase(etpUri.ObjectType) ? -1 : 0);
 
                 Runtime.ShowBusy(false);
             });
