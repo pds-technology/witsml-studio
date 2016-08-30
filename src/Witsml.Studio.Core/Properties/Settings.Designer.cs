@@ -49,5 +49,14 @@ namespace PDS.Witsml.Studio.Core.Properties {
                 return ((string)(this["ConnectionListBaseFileName"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PDS WITSML Studio")]
+        public string ApplicationTitle {
+            get {
+                return ((string)(this["ApplicationTitle"]));
+            }
+        }
     }
 }

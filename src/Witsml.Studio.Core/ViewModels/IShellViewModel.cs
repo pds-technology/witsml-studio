@@ -17,6 +17,7 @@
 //-----------------------------------------------------------------------
 
 using System.ComponentModel.Composition;
+using Caliburn.Micro;
 using PDS.Witsml.Studio.Core.Runtime;
 
 namespace PDS.Witsml.Studio.Core.ViewModels
@@ -48,5 +49,11 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         /// <param name="values">The values.</param>
         void SetBreadcrumb(params object[] values);
+
+        /// <summary>
+        /// Sets the application title.
+        /// </summary>
+        /// <param name="screen">The screen.</param>
+        void SetApplicationTitle(IScreen screen);
     }
 }

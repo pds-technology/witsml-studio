@@ -22,6 +22,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using Caliburn.Micro;
+using PDS.Witsml.Studio.Core.Properties;
 using PDS.Witsml.Studio.Core.Runtime;
 
 namespace PDS.Witsml.Studio.Core.ViewModels
@@ -32,6 +33,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
     public sealed class ShellViewModel : Conductor<IScreen>.Collection.OneActive, IShellViewModel
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(ShellViewModel));
+        private static readonly string _applicationTitle = Settings.Default.ApplicationTitle;
 
         /// <summary>
         /// Initializes an instance of the ShellViewModel
@@ -42,7 +44,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             _log.Debug("Loading Shell");
 
             Runtime = runtime;
-            DisplayName = "WITSML Studio";
+            DisplayName = _applicationTitle;
             StatusBarText = "Ready.";
         }
 
@@ -113,6 +115,38 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         }
 
         /// <summary>
+        /// Sets the application title.
+        /// </summary>
+        /// <param name="screen">The screen.</param>
+        public void SetApplicationTitle(IScreen screen)
+        {
+            var plugin = screen as IPluginViewModel;
+
+            if (string.IsNullOrWhiteSpace(plugin?.SubTitle))
+            {
+                SetApplicationTitle(screen.DisplayName);
+                SetBreadcrumb(screen.DisplayName);
+            }
+            else
+            {
+                SetApplicationTitle(screen.DisplayName);
+                //SetApplicationTitle($"{plugin.DisplayName} : {plugin.SubTitle}");
+                SetBreadcrumb(plugin.DisplayName, plugin.SubTitle);
+            }
+        }
+
+        /// <summary>
+        /// Sets the application title.
+        /// </summary>
+        /// <param name="title">The title.</param>
+        public void SetApplicationTitle(string title)
+        {
+            DisplayName = string.IsNullOrWhiteSpace(title)
+                ? _applicationTitle
+                : $"{_applicationTitle} : {title}";
+        }
+
+        /// <summary>
         /// Sets the breadcrumb text.
         /// </summary>
         /// <param name="values">The values.</param>
@@ -159,7 +193,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
 
             if (item != null && success)
             {
-                BreadcrumbText = item.DisplayName;
+                SetApplicationTitle(item);
             }
         }
     }

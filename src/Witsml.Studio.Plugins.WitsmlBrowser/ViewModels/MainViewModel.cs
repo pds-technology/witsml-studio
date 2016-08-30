@@ -97,22 +97,24 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// <summary>
         /// Gets the display order of the plug-in when loaded by the main application shell
         /// </summary>
-        public int DisplayOrder
-        {
-            get { return Settings.Default.PluginDisplayOrder; }
-        }
+        public int DisplayOrder => Settings.Default.PluginDisplayOrder;
+
+        /// <summary>
+        /// Gets the sub title to display in the main application title bar.
+        /// </summary>
+        public string SubTitle => Model?.Connection?.Name;
 
         /// <summary>
         /// Gets the runtime service.
         /// </summary>
         /// <value>The runtime.</value>
-        public IRuntimeService Runtime { get; private set; }
+        public IRuntimeService Runtime { get; }
 
         /// <summary>
         /// Gets the collection of supported data objects.
         /// </summary>
         /// <value>The collection of data objects.</value>
-        public BindableCollection<string> DataObjects { get; private set; }
+        public BindableCollection<string> DataObjects { get; }
 
         private string _dataObject;
 
@@ -296,6 +298,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 GetCapabilities();
             }
 
+            Runtime.Shell.SetApplicationTitle(this);
             RequestControl.OnWitsmlVersionChanged(version);
         }
 

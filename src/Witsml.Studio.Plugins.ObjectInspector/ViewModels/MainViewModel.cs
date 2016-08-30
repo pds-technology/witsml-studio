@@ -69,6 +69,11 @@ namespace PDS.Witsml.Studio.Plugins.ObjectInspector.ViewModels
         public int DisplayOrder => Settings.Default.PluginDisplayOrder;
 
         /// <summary>
+        /// Gets the sub title to display in the main application title bar.
+        /// </summary>
+        public string SubTitle => string.Empty;
+
+        /// <summary>
         /// Gets the runtime service.
         /// </summary>
         /// <value>The runtime.</value>

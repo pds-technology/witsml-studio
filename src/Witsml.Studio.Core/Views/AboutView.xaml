@@ -22,7 +22,7 @@
                 <Image Source="../Images/WitsmlStudio.png" HorizontalAlignment="Left" />
                 
                 <StackPanel Grid.Column="1" Orientation="Vertical" Margin="20">
-                    <TextBlock Text="WITSML Studio" FontSize="16" FontWeight="Bold" />
+                    <TextBlock Text="{Binding ApplicationTitle, Mode=OneTime}" FontSize="16" FontWeight="Bold" />
                     <TextBlock Margin="0,5">
                         <Run Text="Version: " />
                         <Run Text="{Binding ApplicationVersion, Mode=OneTime}" />

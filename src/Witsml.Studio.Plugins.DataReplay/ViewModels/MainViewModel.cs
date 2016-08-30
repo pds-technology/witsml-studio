@@ -46,10 +46,12 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels
         /// <summary>
         /// Gets the display order of the plug-in when loaded by the main application shell
         /// </summary>
-        public int DisplayOrder
-        {
-            get { return Settings.Default.PluginDisplayOrder; }
-        }
+        public int DisplayOrder => Settings.Default.PluginDisplayOrder;
+
+        /// <summary>
+        /// Gets the sub title to display in the main application title bar.
+        /// </summary>
+        public string SubTitle => string.Empty;
 
         /// <summary>
         /// Gets the runtime service.

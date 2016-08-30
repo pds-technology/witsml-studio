@@ -31,5 +31,10 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// Gets the display order of the plug-in when loaded by the main application shell
         /// </summary>
         int DisplayOrder { get; }
+
+        /// <summary>
+        /// Gets the sub title to display in the main application title bar.
+        /// </summary>
+        string SubTitle { get; }
     }
 }

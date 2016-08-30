@@ -73,46 +73,42 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Gets the display order of the plug-in when loaded by the main application shell
         /// </summary>
-        public int DisplayOrder
-        {
-            get { return Settings.Default.PluginDisplayOrder; }
-        }
+        public int DisplayOrder => Settings.Default.PluginDisplayOrder;
+
+        /// <summary>
+        /// Gets the sub title to display in the main application title bar.
+        /// </summary>
+        public string SubTitle => Model?.Connection?.Name;
 
         /// <summary>
         /// Gets the currently active <see cref="EtpClient"/> instance.
         /// </summary>
         /// <value>The ETP client instance.</value>
-        public EtpClient Client
-        {
-            get { return _client; }
-        }
+        public EtpClient Client => _client;
 
         /// <summary>
         /// Gets the runtime service.
         /// </summary>
         /// <value>The runtime.</value>
-        public IRuntimeService Runtime { get; private set; }
+        public IRuntimeService Runtime { get; }
 
         /// <summary>
         /// Gets the model.
         /// </summary>
         /// <value>The model.</value>
-        public Models.EtpSettings Model { get; private set; }
+        public Models.EtpSettings Model { get; }
 
         /// <summary>
         /// Gets the resources to display in the tree view.
         /// </summary>
         /// <value>The collection of resources.</value>
-        public BindableCollection<ResourceViewModel> Resources { get; private set; }
+        public BindableCollection<ResourceViewModel> Resources { get; }
 
         /// <summary>
         /// Gets the selected resource.
         /// </summary>
         /// <value>The selected resource.</value>
-        public ResourceViewModel SelectedResource
-        {
-            get { return Resources.FindSelected(); }
-        }
+        public ResourceViewModel SelectedResource => Resources.FindSelected();
 
         private TextEditorViewModel _details;
 
@@ -242,7 +238,14 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 
             Runtime.Invoke(() =>
             {
-                Runtime.Shell?.SetBreadcrumb(DisplayName, item.DisplayName);
+                if (string.IsNullOrWhiteSpace(SubTitle))
+                {
+                    Runtime.Shell?.SetBreadcrumb(DisplayName, item.DisplayName);
+                }
+                else
+                {
+                    Runtime.Shell?.SetBreadcrumb(DisplayName, SubTitle, item.DisplayName);
+                }
             });
         }
 
@@ -260,6 +263,8 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             {
                 InitEtpClient();
             }
+
+            Runtime.Shell.SetApplicationTitle(this);
         }
 
         /// <summary>

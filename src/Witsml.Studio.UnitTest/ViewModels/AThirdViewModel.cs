@@ -25,7 +25,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
     /// <seealso cref="PDS.Witsml.Studio.Core.ViewModels.IPluginViewModel" />
-    public class AThirdViewModel : Screen, IPluginViewModel
+    public sealed class AThirdViewModel : Screen, IPluginViewModel
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AThirdViewModel"/> class.
@@ -38,12 +38,11 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// <summary>
         /// Gets the display order of the plug-in when loaded by the main application shell
         /// </summary>
-        public int DisplayOrder
-        {
-            get
-            {
-                return 300;
-            }
-        }
+        public int DisplayOrder => 300;
+
+        /// <summary>
+        /// Gets the sub title to display in the main application title bar.
+        /// </summary>
+        public string SubTitle => DisplayName;
     }
 }

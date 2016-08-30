@@ -20,6 +20,7 @@ using System.IO;
 using System.Windows;
 using Caliburn.Micro;
 using PDS.Framework;
+using PDS.Witsml.Studio.Core.Properties;
 using PDS.Witsml.Studio.Core.Runtime;
 
 namespace PDS.Witsml.Studio.Core.ViewModels
@@ -30,6 +31,8 @@ namespace PDS.Witsml.Studio.Core.ViewModels
     /// <seealso cref="Caliburn.Micro.Screen" />
     public sealed class AboutViewModel : Screen
     {
+        private static readonly string _applicationTitle = Settings.Default.ApplicationTitle;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AboutViewModel" /> class.
         /// </summary>
@@ -39,6 +42,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             DisplayName = "About";
             Runtime = runtime;
             License = new TextEditorViewModel(Runtime, null, true);
+            ApplicationTitle = _applicationTitle;
             ApplicationVersion = Application.Current.GetType().GetAssemblyVersion();
         }
 
@@ -53,6 +57,12 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         /// <value>The license text editor control.</value>
         public TextEditorViewModel License { get; }
+
+        /// <summary>
+        /// Gets the application title.
+        /// </summary>
+        /// <value>The application versiontitle.</value>
+        public string ApplicationTitle { get; }
 
         /// <summary>
         /// Gets the application version.
