@@ -113,8 +113,10 @@ namespace PDS.Witsml.Studio.Core.Models
                             x.GetCustomAttribute<RecurringElementAttribute>() != null)
                 .ForEach(x =>
                 {
-                    var propertyType = x.GetCustomAttribute<RecurringElementAttribute>() != null
-                        ? x.PropertyType.GetGenericArguments().First()
+                    var args = x.PropertyType.GetGenericArguments();
+
+                    var propertyType = x.GetCustomAttribute<RecurringElementAttribute>() != null && args.Any()
+                        ? args.First()
                         : x.PropertyType;
 
                     Register(propertyType);
