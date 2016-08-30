@@ -167,8 +167,17 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
             // Output Request for GetVersion
             parent?.OutputRequestMessages(Functions.GetVersion, null, parent?.GetOptionsIn(Functions.GetVersion));
 
-            var supportedVersions = proxy.GetVersion();
-            _log.DebugFormat("Supported versions '{0}' found on WITSML server with uri '{1}'", supportedVersions, connection.Uri);
+            var supportedVersions = string.Empty;
+            try
+            {
+                supportedVersions = proxy.GetVersion();
+                _log.DebugFormat("Supported versions '{0}' found on WITSML server with uri '{1}'", supportedVersions, connection.Uri);
+            }
+            catch (Exception ex)
+            {
+                _log.WarnFormat("Exception getting versions on WITSML server with uri '{0}' : '{1}'", connection.Uri, ex.Message);
+            }
+            
 
             if (parent == null) return supportedVersions;
 
