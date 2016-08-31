@@ -178,6 +178,9 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         {
             if (Connection == SelectConnectionItem) return;
 
+            // If previous connection was disposed
+            if (previous == null) return;
+
             if (Connection == AddNewConnectionItem)
             {
                 _connection = previous;

@@ -51,6 +51,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(MainViewModel));
         private const string TimestampFormat = "yyyy-MM-dd HH:mm:ss.ffff";
         public const string QueryTemplateText = "Templates";
+        private static readonly string[] ExcludedDataObjects = { "capServers" };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainViewModel"/> class.
@@ -719,7 +720,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 });
 
             dataObjects.Sort();
-            DataObjects.AddRange(dataObjects);
+            DataObjects.AddRange(dataObjects.Except(ExcludedDataObjects).ToList());
         }
 
         /// <summary>
