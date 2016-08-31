@@ -18,10 +18,10 @@
 
         <Grid Grid.Column="1" Margin="5,0,0,0">
             <TabControl>
-                <TabItem Header="Details">
+                <TabItem Header="Results">
                     <ContentControl x:Name="Details" />
                 </TabItem>
-                <TabItem Header="Messages">
+                <TabItem Header="ETP Messages">
                     <ContentControl x:Name="Messages" />
                 </TabItem>
             </TabControl>
