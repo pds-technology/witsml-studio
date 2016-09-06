@@ -340,6 +340,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             handler.OnChannelData += OnChannelData;
 
             CanStart = true;
+            CanStopStreaming = false;
         }
 
         /// <summary>
