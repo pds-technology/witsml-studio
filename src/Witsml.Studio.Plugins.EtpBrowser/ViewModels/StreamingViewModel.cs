@@ -269,6 +269,9 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void StartStreaming()
         {
+            // Prepare ChannelStreamingInfos startIndexes
+            ChannelStreamingInfos.ForEach(x => x.StartIndex = new StreamingStartIndex { Item = GetStreamingStartValue() });
+
             Parent.Client.Handler<IChannelStreamingConsumer>()
                 .ChannelStreamingStart(ChannelStreamingInfos);
 
