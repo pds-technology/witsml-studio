@@ -24,7 +24,7 @@
             <RowDefinition Height="40" />
             <RowDefinition Height="40" />
             <RowDefinition Height="40" />
-            <RowDefinition Height="40" />
+            <RowDefinition Height="30" />
             <RowDefinition />
             <RowDefinition Height="40" />
             <RowDefinition Height="40" />
@@ -33,22 +33,22 @@
             <RowDefinition Height="40" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Column="0" Grid.Row="0" Text="Max Data Items:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
-        <xctk:IntegerUpDown Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Max Data Items:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
+        <xctk:IntegerUpDown Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
                             Value="{Binding Model.Streaming.MaxDataItems}" Minimum="0" Maximum="10000000" Increment="1000"/>
 
-        <TextBlock Grid.Column="0" Grid.Row="1" Text="Max Msg Rate:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
-        <xctk:IntegerUpDown Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Max Msg Rate:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
+        <xctk:IntegerUpDown Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
                             Value="{Binding Model.Streaming.MaxMessageRate}" Minimum="0" Maximum="600000" Increment="1000" />
 
-        <TextBlock Grid.Column="0" Grid.Row="2" Text="URI:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="URI:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
         <TextBox Text="{Binding Model.Streaming.Uri}" Grid.Column="1" Grid.Row="2" Margin="5" Padding="5" VerticalContentAlignment="Center" />
-        <Button x:Name="AddUri" Grid.Column="2" Grid.Row="2" Margin="5" Content="Add" Width="40" HorizontalAlignment="Right" 
+        <Button x:Name="AddUri" Grid.Row="2" Grid.Column="2" Margin="5" Content="Add" Width="40" HorizontalAlignment="Right" 
                 IsEnabled="{Binding IsSimpleStreamer, Converter={StaticResource BooleanInverseConverter}}" />
 
-        <TextBlock Grid.Column="0" Grid.Row="3" Text="URI List:" Margin="10,5,5,5" HorizontalAlignment="Left" VerticalAlignment="Center" />
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="URI List:" Margin="10,5,5,5" HorizontalAlignment="Left" VerticalAlignment="Bottom" />
         
-        <ListBox Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="3" Margin="5" ItemsSource="{Binding Model.Streaming.Uris}"
+        <ListBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" ItemsSource="{Binding Model.Streaming.Uris}"
                  cal:Message.Attach="[Event KeyUp] = [Action OnKeyUp($source, $eventArgs)]" />
 
         <StackPanel Grid.Row="5" Grid.ColumnSpan="4" Orientation="Horizontal" VerticalAlignment="Center">
@@ -58,33 +58,33 @@
             <RadioButton x:Name="DepthIndexButton" Content="Depth Index" Margin="20,0,0,0" cal:Message.Attach="SetStreamingType('DepthIndex')" />
         </StackPanel>
 
-        <TextBlock Grid.Column="0" Grid.Row="6" Text="Index Count:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center"
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="Index Count:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center"
                    Visibility="{Binding IsChecked, ElementName=IndexCountButton, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-        <xctk:IntegerUpDown Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
+        <xctk:IntegerUpDown Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
                             Visibility="{Binding IsChecked, ElementName=IndexCountButton, Converter={StaticResource BooleanToVisibilityConverter}}"
                             Value="{Binding Model.Streaming.IndexCount}" Minimum="1" Maximum="100000"/>
 
-        <TextBlock Grid.Column="0" Grid.Row="6" Text="Start Index:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center"
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="Start Index:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center"
                    Visibility="{Binding IsChecked, ElementName=DepthIndexButton, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-        <xctk:LongUpDown Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
+        <xctk:LongUpDown Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
                          Visibility="{Binding IsChecked, ElementName=DepthIndexButton, Converter={StaticResource BooleanToVisibilityConverter}}"
                          Value="{Binding Model.Streaming.StartIndex}" />
 
-        <TextBlock Grid.Column="0" Grid.Row="7" Text="End Index:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center"
+        <TextBlock Grid.Row="7" Grid.Column="0" Text="End Index:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center"
                    Visibility="{Binding IsChecked, ElementName=DepthIndexButton, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-        <xctk:LongUpDown Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
+        <xctk:LongUpDown Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
                          Visibility="{Binding IsChecked, ElementName=DepthIndexButton, Converter={StaticResource BooleanToVisibilityConverter}}"
                          Value="{Binding Model.Streaming.EndIndex}" />
 
-        <TextBlock Grid.Column="0" Grid.Row="6" Text="Start Time:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center"
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="Start Time:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center"
                    Visibility="{Binding IsChecked, ElementName=TimeIndexButton, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-        <xctk:DateTimePicker Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
+        <xctk:DateTimePicker Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
                              Visibility="{Binding IsChecked, ElementName=TimeIndexButton, Converter={StaticResource BooleanToVisibilityConverter}}"
                              Value="{Binding Model.Streaming.StartTime}" ShowButtonSpinner="False" />
 
-        <TextBlock Grid.Column="0" Grid.Row="7" Text="End Time:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center"
+        <TextBlock Grid.Row="7" Grid.Column="0" Text="End Time:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center"
                    Visibility="{Binding IsChecked, ElementName=TimeIndexButton, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-        <xctk:DateTimePicker Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
+        <xctk:DateTimePicker Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
                              Visibility="{Binding IsChecked, ElementName=TimeIndexButton, Converter={StaticResource BooleanToVisibilityConverter}}"
                              Value="{Binding Model.Streaming.EndTime}" ShowButtonSpinner="False" />
 
