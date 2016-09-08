@@ -81,10 +81,10 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         /// <param name="objectType">The object type.</param>
         /// <param name="dataObject">The data object.</param>
-        /// <param name="retrievePartialResults">True if to automatically request partial results.</param>
         /// <param name="keepGridData">True if not clearing data when querying partial results</param>
         /// <param name="retrieveObjectSelection">if set to <c>true</c> the retrieve object selection setting is selected.</param>
-        public void SetCurrentObject(string objectType, object dataObject, bool retrievePartialResults, bool keepGridData, bool retrieveObjectSelection)
+        /// <param name="errorHandler">The error handler.</param>
+        public void SetCurrentObject(string objectType, object dataObject, bool keepGridData, bool retrieveObjectSelection, Action<WitsmlException> errorHandler)
         {
             if (!ObjectTypes.IsGrowingDataObject(objectType) || retrieveObjectSelection)
             {
@@ -93,43 +93,64 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             }
 
             var log131 = dataObject as Witsml131.Log;
-            if (log131 != null) SetLogData(log131, retrievePartialResults, keepGridData);
+            if (log131 != null) SetLogData(log131, keepGridData, errorHandler);
 
             var log141 = dataObject as Witsml141.Log;
-            if (log141 != null) SetLogData(log141, retrievePartialResults, keepGridData);
+            if (log141 != null) SetLogData(log141, keepGridData, errorHandler);
         }
 
         /// <summary>
         /// Sets the log data.
         /// </summary>
         /// <param name="log">The log.</param>
-        /// <param name="retrievePartialResults">True if to automatically request partial results.</param>
         /// <param name="keepGridData">True if not clearing data when querying partial results</param>
-        private void SetLogData(Witsml131.Log log, bool retrievePartialResults, bool keepGridData)
+        /// <param name="errorHandler">The error handler.</param>
+        private void SetLogData(Witsml131.Log log, bool keepGridData, Action<WitsmlException> errorHandler)
         {
-            ClearDataTable(log.GetUri(), retrievePartialResults, keepGridData);
-            Runtime.InvokeAsync(() => SetChannelData(log.GetReader()));
+            ClearDataTable(log.GetUri(), keepGridData);
+            Runtime.InvokeAsync(() =>
+            {
+                try
+                {
+                    SetChannelData(log.GetReader());
+                }
+                catch (WitsmlException ex)
+                {
+                    _log.WarnFormat("Error setting log data: {0}", ex);
+                    errorHandler(ex);
+                }
+            });
         }
 
         /// <summary>
         /// Sets the log data.
         /// </summary>
         /// <param name="log">The log.</param>
-        /// <param name="retrievePartialResults">True if to automatically request partial results.</param>
         /// <param name="keepGridData">True if not clearing data when querying partial results</param>
-        private void SetLogData(Witsml141.Log log, bool retrievePartialResults, bool keepGridData)
+        /// <param name="errorHandler">The error handler.</param>
+        private void SetLogData(Witsml141.Log log, bool keepGridData, Action<WitsmlException> errorHandler)
         {
-            ClearDataTable(log.GetUri(), retrievePartialResults, keepGridData);
-            Runtime.InvokeAsync(() => log.GetReaders().ForEach(SetChannelData));
+            ClearDataTable(log.GetUri(), keepGridData);
+            Runtime.InvokeAsync(() =>
+            {
+                try
+                {
+                    log.GetReaders().ForEach(SetChannelData);
+                }
+                catch (WitsmlException ex)
+                {
+                    _log.WarnFormat("Error setting log data: {0}", ex);
+                    errorHandler(ex);
+                }
+            });
         }
 
         /// <summary>
         /// Clears the data table if the URI has changed.
         /// </summary>
         /// <param name="uri">The URI.</param>
-        /// <param name="retrievePartialResults">True if to automatically request partial results.</param>
         /// <param name="keepGridData">True if not clearing data when querying partial results</param>
-        private void ClearDataTable(EtpUri uri, bool retrievePartialResults, bool keepGridData)
+        private void ClearDataTable(EtpUri uri, bool keepGridData)
         {
             if (uri == Uri && keepGridData)
                 return;

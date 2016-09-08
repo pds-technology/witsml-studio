@@ -51,7 +51,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(MainViewModel));
         private const string TimestampFormat = "yyyy-MM-dd HH:mm:ss.ffff";
         public const string QueryTemplateText = "Templates";
-        private static readonly string[] ExcludedDataObjects = { "capServer" };
+        private static readonly string[] _excludedDataObjects = { "capServer" };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainViewModel"/> class.
@@ -605,17 +605,21 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// <param name="result">The WITSML query result.</param>
         private void ShowObjectProperties(WitsmlResult result)
         {
+            Action<WitsmlException> errorHandler = ex =>
+            {
+                var exception = ex.GetBaseException();
+                var message = exception == ex ? ex.Message : string.Format("{0}{2}{2}{1}", ex.Message, exception.Message, Environment.NewLine);
+                OutputMessages(string.Empty, string.Empty, 0, GetErrorText((short)ex.ErrorCode, message));
+            };
+
             try
             {
-                ResultControl.ObjectProperties.SetCurrentObject(result.ObjectType, result.XmlOut, Model.WitsmlVersion, Model.RetrievePartialResults, Model.KeepGridData, Model.IsRequestObjectSelectionCapability);
+                ResultControl.ObjectProperties.SetCurrentObject(result.ObjectType, result.XmlOut, Model.WitsmlVersion, Model.KeepGridData, Model.IsRequestObjectSelectionCapability, errorHandler);
             }
             catch (WitsmlException ex)
             {
-                _log.ErrorFormat("Error parsing query response: {0}{2}{2}{1}", result.XmlOut, ex, Environment.NewLine);
-                var message = string.Format("{0}{2}{2}{1}", ex.Message, ex.GetBaseException().Message, Environment.NewLine);
-
-                OutputResults(string.Empty, message, (short)ex.ErrorCode);
-                OutputMessages(string.Empty, message, (short) ex.ErrorCode);
+                _log.WarnFormat("Error parsing query response: {0}{2}{2}{1}", result.XmlOut, ex, Environment.NewLine);
+                errorHandler(ex);
             }
         }
 
@@ -720,7 +724,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 });
 
             dataObjects.Sort();
-            DataObjects.AddRange(dataObjects.Except(ExcludedDataObjects).ToList());
+            DataObjects.AddRange(dataObjects.Except(_excludedDataObjects).ToList());
         }
 
         /// <summary>
@@ -959,6 +963,20 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 string.IsNullOrEmpty(suppMsgOut) ? "None" : suppMsgOut,
                 string.IsNullOrEmpty(xmlOut) ? "None" : string.Empty,
                 string.IsNullOrEmpty(xmlOut) ? string.Empty : xmlOut,
+                Environment.NewLine);
+        }
+
+        private string GetErrorText(short returnCode, string message)
+        {
+            return string.Format(
+                "<!---------- Error : {0} ----------{3}" +
+                "   Return Code : {1}{3}" +
+                "   Message     : {2}{3}" +
+                "-->{3}" +
+                "{3}",
+                DateTime.Now.ToString(TimestampFormat),
+                returnCode,
+                string.IsNullOrEmpty(message) ? "None" : message,
                 Environment.NewLine);
         }
     }
