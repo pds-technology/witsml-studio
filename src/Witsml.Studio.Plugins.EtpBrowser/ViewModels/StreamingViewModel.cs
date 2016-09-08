@@ -415,7 +415,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 
             var startIndex = isTimeIndex
                 ? new DateTimeOffset(Model.Streaming.StartTime).ToUnixTimeMicroseconds()
-                : Model.Streaming.StartIndex;
+                : ((double)Model.Streaming.StartIndex).IndexToScale(GetScale());
 
             return startIndex;
         }
@@ -432,11 +432,19 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 
             var endIndex = isTimeIndex
                 ? new DateTimeOffset(Model.Streaming.EndTime.Value).ToUnixTimeMicroseconds()
-                : Model.Streaming.EndIndex;
+                : ((double)Model.Streaming.EndIndex).IndexToScale(GetScale());
 
             return endIndex;
         }
 
+        private int GetScale()
+        {
+            return Channels
+                .FirstOrDefault()?
+                .Indexes.FirstOrDefault()?
+                .Scale ?? 0; // Default to no scale of no index is found.;
+        }
+        
         private void UpdateCanRequestRange()
         {
             CanRequestRange = !IsSimpleStreamer && ChannelStreamingInfos.Any() &&
