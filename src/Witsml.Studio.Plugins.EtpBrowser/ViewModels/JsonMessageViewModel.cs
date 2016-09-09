@@ -59,7 +59,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             var recordType = typeof (ISpecificRecord);
 
             MessageTypes.AddRange(typeof (MessageHeader).Assembly.GetTypes()
-                .Where(x => recordType.IsAssignableFrom(x))
+                .Where(x => recordType.IsAssignableFrom(x) && HasProtocolProperty(x))
                 .OrderBy(x => x.Name)
                 .Select(x => new KeyValuePair<string, Type>(x.Name, x)));
 
@@ -263,6 +263,12 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 _currentHeader.MessageType = messageType;
                 OnHeaderChanged();
             }
+        }
+
+        private bool HasProtocolProperty(Type type)
+        {
+            var record = Activator.CreateInstance(type) as ISpecificRecord;
+            return !string.IsNullOrWhiteSpace(record?.Schema.GetProperty("protocol"));
         }
     }
 }
