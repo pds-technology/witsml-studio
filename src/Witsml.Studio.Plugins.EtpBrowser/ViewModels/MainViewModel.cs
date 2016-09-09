@@ -211,6 +211,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             Items.Add(new StreamingViewModel(Runtime));
             Items.Add(new HierarchyViewModel(Runtime));
             Items.Add(new StoreViewModel(Runtime));
+            Items.Add(new JsonMessageViewModel(Runtime));
         }
 
         /// <summary>
@@ -420,7 +421,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// Logs the client output.
         /// </summary>
         /// <param name="message">The message.</param>
-        private void LogClientOutput(string message)
+        internal void LogClientOutput(string message)
         {
             if (string.IsNullOrWhiteSpace(message)) return;
 

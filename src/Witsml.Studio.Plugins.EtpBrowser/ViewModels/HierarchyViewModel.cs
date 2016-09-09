@@ -101,6 +101,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 var resource = Parent.SelectedResource;
 
                 return CanExecute && resource != null && resource.Level > 0 && 
+                    !string.IsNullOrWhiteSpace(resource.Resource.Uri) &&
                     !string.IsNullOrWhiteSpace(new EtpUri(resource.Resource.Uri).ObjectId);
             }
         }
@@ -143,7 +144,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             {
                 var resource = Parent.SelectedResource;
 
-                if (CanExecute && resource != null && resource.Level > 0)
+                if (CanExecute && !string.IsNullOrWhiteSpace(resource?.Resource?.Uri))
                 {
                     var uri = new EtpUri(resource.Resource.Uri);
                     return _describeObjectTypes.Contains(uri.ObjectType);
@@ -193,7 +194,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// <param name="e">The <see cref="ProtocolEventArgs{OpenSession}" /> instance containing the event data.</param>
         public void OnSessionOpened(ProtocolEventArgs<OpenSession> e)
         {
-            if (!e.Message.SupportedProtocols.Any(x => x.Protocol == (int)Protocols.Discovery))
+            if (e.Message.SupportedProtocols.All(x => x.Protocol != (int)Protocols.Discovery))
                 return;
 
             Parent.GetResources(EtpUri.RootUri);

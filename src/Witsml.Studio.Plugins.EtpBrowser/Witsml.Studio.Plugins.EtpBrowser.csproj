@@ -183,12 +183,16 @@
     </Compile>
     <Compile Include="ViewModels\HierarchyViewModel.cs" />
     <Compile Include="ViewModels\ISessionAware.cs" />
+    <Compile Include="ViewModels\JsonMessageViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\StoreViewModel.cs" />
     <Compile Include="ViewModels\StreamingViewModel.cs" />
     <Compile Include="Views\HierarchyView.xaml.cs">
       <DependentUpon>HierarchyView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\JsonMessageView.xaml.cs">
+      <DependentUpon>JsonMessageView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
@@ -227,6 +231,10 @@
   <ItemGroup />
   <ItemGroup>
     <Page Include="Views\HierarchyView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\JsonMessageView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -46,7 +46,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         public StreamingViewModel(IRuntimeService runtime)
         {
             Runtime = runtime;
-            DisplayName = string.Format("{0:D} - {0}", Protocols.ChannelStreaming);
+            DisplayName = string.Format("{0:D} - Streaming", Protocols.ChannelStreaming);
             Channels = new List<ChannelMetadataRecord>();
             ChannelStreamingInfos = new List<ChannelStreamingInfo>();
         }

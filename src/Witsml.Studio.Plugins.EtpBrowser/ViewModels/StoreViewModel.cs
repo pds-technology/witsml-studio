@@ -74,7 +74,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             get { return _data; }
             set
             {
-                if (!string.Equals(_data, value))
+                if (!ReferenceEquals(_data, value))
                 {
                     _data = value;
                     NotifyOfPropertyChange(() => Data);
@@ -174,7 +174,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// <param name="e">The <see cref="ProtocolEventArgs{OpenSession}" /> instance containing the event data.</param>
         public void OnSessionOpened(ProtocolEventArgs<OpenSession> e)
         {
-            if (!e.Message.SupportedProtocols.Any(x => x.Protocol == (int)Protocols.Store))
+            if (e.Message.SupportedProtocols.All(x => x.Protocol != (int) Protocols.Store))
                 return;
 
             CanExecute = true;
