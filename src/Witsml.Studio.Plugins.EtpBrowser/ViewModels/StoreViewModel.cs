@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Xml.Linq;
 using Caliburn.Micro;
 using Energistics.Common;
 using Energistics.Datatypes;
@@ -108,6 +109,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         public void NewUuid()
         {
             Model.Store.Uuid = Guid.NewGuid().ToString();
+            UpdateInput();
         }
 
         /// <summary>
@@ -186,6 +188,36 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         public void OnSocketClosed()
         {
             CanExecute = false;
+        }
+
+        private void UpdateInput()
+        {
+            var input = Data.Document.Text;
+
+            if (string.IsNullOrEmpty(input))
+                return;
+
+            var doc = WitsmlParser.Parse(input);
+            var root = doc.Root;
+            var version = root?.Attribute("version")?.Value;
+            var element = root?.Elements().FirstOrDefault();
+            var objectType = element?.Name.LocalName;
+
+            if (string.IsNullOrEmpty(version) || string.IsNullOrEmpty(objectType))
+                return;
+
+            Model.Store.ContentType = new EtpContentType("witsml", version, objectType);
+
+            var uidAttribute = element.Attribute("uid");
+            if (uidAttribute != null)
+                uidAttribute.Value = Model.Store.Uuid;
+            else
+            {
+                uidAttribute = new XAttribute("uid", Model.Store.Uuid);
+                element.Add(uidAttribute);
+            }
+
+            Data.Document.Text = doc.ToString();
         }
     }
 }
