@@ -199,25 +199,52 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 
             var doc = WitsmlParser.Parse(input);
             var root = doc.Root;
-            var version = root?.Attribute("version")?.Value;
-            var element = root?.Elements().FirstOrDefault();
+
+            if (root == null)
+                return;
+
+            bool updated;
+
+            var version = root.Attribute("version");
+            if (version != null)
+            {
+                if (string.IsNullOrEmpty(version.Value))
+                    return;
+
+                updated = UpdateInput(root.Elements().FirstOrDefault(), version.Value, "uid");
+            }
+            else
+            {
+                var schemaVersion = root.Attribute("schemaVersion");
+                if (schemaVersion == null)
+                    return;
+
+                updated = UpdateInput(root, schemaVersion.Value, "uuid");
+            }
+
+            if (updated)
+                Data.Document.Text = doc.ToString();
+        }
+
+        private bool UpdateInput(XElement element, string version, string idField)
+        {
             var objectType = element?.Name.LocalName;
 
-            if (string.IsNullOrEmpty(version) || string.IsNullOrEmpty(objectType))
-                return;
+            if (string.IsNullOrEmpty(objectType))
+                return false;
 
             Model.Store.ContentType = new EtpContentType("witsml", version, objectType);
 
-            var uidAttribute = element.Attribute("uid");
-            if (uidAttribute != null)
-                uidAttribute.Value = Model.Store.Uuid;
+            var idAttribute = element.Attribute(idField);
+            if (idAttribute != null)
+                idAttribute.Value = Model.Store.Uuid;
             else
             {
-                uidAttribute = new XAttribute("uid", Model.Store.Uuid);
-                element.Add(uidAttribute);
+                idAttribute = new XAttribute(idField, Model.Store.Uuid);
+                element.Add(idAttribute);
             }
 
-            Data.Document.Text = doc.ToString();
+            return true;
         }
     }
 }
