@@ -47,7 +47,6 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
     {
         private static readonly string _pluginDisplayName = Settings.Default.PluginDisplayName;
         private static readonly string _pluginVersion = typeof(MainViewModel).GetAssemblyVersion();
-        private EtpClient _client;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainViewModel" /> class.
@@ -83,12 +82,6 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         public string SubTitle => Model?.Connection?.Name;
 
         /// <summary>
-        /// Gets the currently active <see cref="EtpClient"/> instance.
-        /// </summary>
-        /// <value>The ETP client instance.</value>
-        public EtpClient Client => _client;
-
-        /// <summary>
         /// Gets the runtime service.
         /// </summary>
         /// <value>The runtime.</value>
@@ -111,6 +104,25 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// </summary>
         /// <value>The selected resource.</value>
         public ResourceViewModel SelectedResource => Resources.FindSelected();
+
+        private EtpClient _client;
+
+        /// <summary>
+        /// Gets or sets the currently active <see cref="EtpClient"/> instance.
+        /// </summary>
+        /// <value>The ETP client instance.</value>
+        public EtpClient Client
+        {
+            get { return _client; }
+            set
+            {
+                if (ReferenceEquals(_client, value))
+                    return;
+
+                _client = value;
+                NotifyOfPropertyChange(() => Client);
+            }
+        }
 
         private TextEditorViewModel _details;
 
@@ -156,7 +168,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// <param name="uri">The URI.</param>
         public void GetResources(string uri)
         {
-            _client.Handler<IDiscoveryCustomer>()
+            Client.Handler<IDiscoveryCustomer>()
                 .GetResources(uri);
         }
 
@@ -177,7 +189,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// <param name="uri">The URI.</param>
         public void SendGetObject(string uri)
         {
-            _client.Handler<IStoreCustomer>()
+            Client.Handler<IStoreCustomer>()
                 .GetObject(uri);
         }
 
@@ -199,7 +211,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// <param name="uri">The URI.</param>
         public void SendDeleteObject(string uri)
         {
-            _client.Handler<IStoreCustomer>()
+            Client.Handler<IStoreCustomer>()
                 .DeleteObject(new[] { uri });
         }
 
@@ -280,14 +292,14 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 Runtime.Invoke(() => Runtime.Shell.StatusBarText = "Connecting...");
                 var headers = Authorization.Basic(Model.Connection.Username, Model.Connection.Password);
 
-                _client = new EtpClient(Model.Connection.Uri, Model.ApplicationName, Model.ApplicationVersion, headers);
+                Client = new EtpClient(Model.Connection.Uri, Model.ApplicationName, Model.ApplicationVersion, headers);
 
-                RegisterProtocolHandlers(_client);
+                RegisterProtocolHandlers(Client);
 
-                _client.Handler<ICoreClient>().OnOpenSession += OnOpenSession;
-                _client.SocketClosed += OnClientSocketClosed;
-                _client.Output = LogClientOutput;
-                _client.Open();
+                Client.Handler<ICoreClient>().OnOpenSession += OnOpenSession;
+                Client.SocketClosed += OnClientSocketClosed;
+                Client.Output = LogClientOutput;
+                Client.Open();
             }
             catch (Exception ex)
             {
@@ -301,11 +313,11 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// </summary>
         private void CloseEtpClient()
         {
-            if (_client == null) return;
+            if (Client == null) return;
 
-            _client.SocketClosed -= OnClientSocketClosed;
-            _client.Dispose();
-            _client = null;
+            Client.SocketClosed -= OnClientSocketClosed;
+            Client.Dispose();
+            Client = null;
         }
 
         /// <summary>
@@ -380,8 +392,8 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         {
             Details.SetText(string.Format(
                 "// Header:{3}{0}{3}{3}// Body:{3}{1}{3}{3}/* Data:{3}{2}{3}*/{3}",
-                _client.Serialize(e.Header, true),
-                _client.Serialize(e.Message, true),
+                Client.Serialize(e.Header, true),
+                Client.Serialize(e.Message, true),
                 e.Message.DataObject.GetXml(),
                 Environment.NewLine));
         }
@@ -395,8 +407,8 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         {
             Details.SetText(string.Format(
                 "// Header:{2}{0}{2}{2}// Body:{2}{1}{2}",
-                _client.Serialize(e.Header, true),
-                _client.Serialize(e.Message, true),
+                Client.Serialize(e.Header, true),
+                Client.Serialize(e.Message, true),
                 Environment.NewLine));
         }
 
@@ -410,9 +422,9 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         {
             Details.SetText(string.Format(
                 "// Header:{3}{0}{3}{3}// Body:{3}{1}{3}{3}// Context:{3}{2}{3}",
-                _client.Serialize(e.Header, true),
-                _client.Serialize(e.Message, true),
-                _client.Serialize(e.Context, true),
+                Client.Serialize(e.Header, true),
+                Client.Serialize(e.Message, true),
+                Client.Serialize(e.Context, true),
                 Environment.NewLine));
         }
 
@@ -501,24 +513,24 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             }
             if (Requesting(Protocols.Store, "store"))
             {
-                _client.Register<IStoreCustomer, StoreCustomerHandler>();
-                _client.Handler<IStoreCustomer>().OnObject += OnObject;
+                Client.Register<IStoreCustomer, StoreCustomerHandler>();
+                Client.Handler<IStoreCustomer>().OnObject += OnObject;
             }
             if (Requesting(Protocols.StoreNotification, "store"))
             {
-                _client.Register<IStoreNotificationCustomer, StoreNotificationCustomerHandler>();
+                Client.Register<IStoreNotificationCustomer, StoreNotificationCustomerHandler>();
             }
             if (Requesting(Protocols.GrowingObject, "store"))
             {
-                //_client.Register<IGrowingObjectCustomer, GorowingObjectCustomerHandler>();
+                //Client.Register<IGrowingObjectCustomer, GorowingObjectCustomerHandler>();
             }
             if (Requesting(Protocols.DataArray, "store"))
             {
-                //_client.Register<IDataArrayCustomer, DataArrayCustomerHandler>();
+                //Client.Register<IDataArrayCustomer, DataArrayCustomerHandler>();
             }
             if (Requesting(Protocols.WitsmlSoap, "store"))
             {
-                //_client.Register<IWitsmlSoapCustomer, WitsmlSoapCustomerHandler>();
+                //Client.Register<IWitsmlSoapCustomer, WitsmlSoapCustomerHandler>();
             }
         }
 
@@ -541,9 +553,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 if (disposing)
                 {
                     // NOTE: dispose managed state (managed objects).
-
-                    if (_client != null)
-                        _client.Dispose();
+                    Client?.Dispose();
                 }
 
                 // NOTE: free unmanaged resources (unmanaged objects) and override a finalizer below.
