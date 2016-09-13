@@ -186,7 +186,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 catch (Exception ex)
                 {
                     _log.Warn("Error sending message", ex);
-                    Parent.LogClientOutput($"Error sending message: {ex}");
+                    Parent.LogClientError("Error sending message:", ex);
                 }
             });
         }

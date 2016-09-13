@@ -36,6 +36,8 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
     /// <seealso cref="Caliburn.Micro.Screen" />
     public sealed class SettingsViewModel : Screen
     {
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(SettingsViewModel));
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SettingsViewModel" /> class.
         /// </summary>
@@ -127,12 +129,20 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             if (!Model.Connection.Uri.ToLowerInvariant().StartsWith("ws")) return;
             var url = $"http{Model.Connection.Uri.Substring(2)}/.well-known/etp-server-capabilities";
             var client = new JsonClient(Model.Connection.Username, Model.Connection.Password);
-            var capabilities = client.GetServerCapabilities(url);
 
-            Parent.Details.SetText(string.Format(
-                "// Server Capabilites:{1}{0}{1}",
-                Parent.Client.Serialize(capabilities, true),
-                Environment.NewLine));
+            try
+            {
+                var capabilities = client.GetServerCapabilities(url);
+
+                Parent.LogDetailMessage(
+                    "Server Capabilites:",
+                    Parent.Client.Serialize(capabilities, true));
+            }
+            catch (Exception ex)
+            {
+                _log.Warn("Error getting server capabilities", ex);
+                Parent.LogClientError("Error getting server capabilities:", ex);
+            }
         }
 
         private void OnConnectionChanged(Connection connection)

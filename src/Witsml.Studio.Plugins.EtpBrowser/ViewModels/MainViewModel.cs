@@ -417,17 +417,61 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
+        /// Logs the detail message.
+        /// </summary>
+        /// <param name="header">The header.</param>
+        /// <param name="message">The message.</param>
+        internal void LogDetailMessage(string header, string message = null)
+        {
+            Details.SetText(string.Concat(
+                header.StartsWith("{") ? string.Empty : "// ",
+                header,
+                Environment.NewLine));
+
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            Details.Append(string.Concat(
+                message.StartsWith("{") ? string.Empty : "// ",
+                message,
+                Environment.NewLine));
+        }
+
+        /// <summary>
         /// Logs the client output.
         /// </summary>
         /// <param name="message">The message.</param>
         internal void LogClientOutput(string message)
         {
+            LogClientOutput(message, false);
+        }
+
+        /// <summary>
+        /// Logs the client output.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="logDetails">if set to <c>true</c> logs the detail message.</param>
+        internal void LogClientOutput(string message, bool logDetails)
+        {
             if (string.IsNullOrWhiteSpace(message)) return;
+
+            if (logDetails)
+                LogDetailMessage(message);
 
             Messages.Append(string.Concat(
                 message.StartsWith("{") ? string.Empty : "// ",
                 message,
                 Environment.NewLine));
+        }
+
+        /// <summary>
+        /// Logs the client error.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="error">The error.</param>
+        internal void LogClientError(string message, Exception error)
+        {
+            LogClientOutput($"{message}\n/*\n{error}\n*/", true);
         }
 
         private void RegisterProtocolHandlers(EtpClient client)
