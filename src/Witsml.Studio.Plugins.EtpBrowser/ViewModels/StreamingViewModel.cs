@@ -351,6 +351,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void OnSocketClosed()
         {
+            if (!Parent.Client.CanHandle<IChannelStreamingConsumer>()) return;
             var handler = Parent.Client.Handler<IChannelStreamingConsumer>();
             handler.OnChannelMetadata -= OnChannelMetadata;
             handler.OnChannelData -= OnChannelData;

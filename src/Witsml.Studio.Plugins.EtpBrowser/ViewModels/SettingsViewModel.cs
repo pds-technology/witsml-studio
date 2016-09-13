@@ -16,8 +16,11 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System;
 using System.Linq;
 using Caliburn.Micro;
+using Energistics;
+using Energistics.Common;
 using Energistics.Datatypes;
 using Energistics.Protocol.Core;
 using PDS.Witsml.Studio.Core.Connections;
@@ -74,7 +77,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// Gets the model.
         /// </summary>
         /// <value>The model.</value>
-        public EtpSettings Model
+        public Models.EtpSettings Model
         {
             get { return Parent.Model; }
         }
@@ -114,6 +117,22 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         {
             Parent.Client.Handler<ICoreClient>()
                 .CloseSession();
+        }
+
+        /// <summary>
+        /// Retrieves the ETP Server's capabilities.
+        /// </summary>
+        public void ServerCapabilities()
+        {
+            if (!Model.Connection.Uri.ToLowerInvariant().StartsWith("ws")) return;
+            var url = $"http{Model.Connection.Uri.Substring(2)}/.well-known/etp-server-capabilities";
+            var client = new JsonClient(Model.Connection.Username, Model.Connection.Password);
+            var capabilities = client.GetServerCapabilities(url);
+
+            Parent.Details.SetText(string.Format(
+                "// Server Capabilites:{1}{0}{1}",
+                Parent.Client.Serialize(capabilities, true),
+                Environment.NewLine));
         }
 
         private void OnConnectionChanged(Connection connection)

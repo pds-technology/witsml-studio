@@ -23,6 +23,7 @@
             <RowDefinition Height="40" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="40" />
+            <RowDefinition Height="40" />
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Connection:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
@@ -50,6 +51,11 @@
                     IsEnabled="{Binding Model.Connection.Uri, Converter={StaticResource NullToBooleanConverter}}" />
 
             <Button x:Name="CloseSession" Content="Close Session" Margin="5,0,0,0" Width="100" 
+                    IsEnabled="{Binding Model.Connection.Uri, Converter={StaticResource NullToBooleanConverter}}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="ServerCapabilities" Content="Server Capabilities" Margin="5,0,0,0" Width="120"
                     IsEnabled="{Binding Model.Connection.Uri, Converter={StaticResource NullToBooleanConverter}}" />
         </StackPanel>
     </Grid>

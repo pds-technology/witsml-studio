@@ -330,6 +330,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         private void OnOpenSession(object sender, ProtocolEventArgs<OpenSession> e)
         {
             Runtime.Invoke(() => Runtime.Shell.StatusBarText = "Connected");
+            LogObjectDetails(e);
 
             // notify child view models
             Items.OfType<ISessionAware>()
