@@ -31,8 +31,8 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.Models
     [DataContract]
     public class EtpSettings : PropertyChangedBase
     {
-        private static readonly int DefaultMaxDataItems = Settings.Default.ChannelStreamingDefaultMaxDataItems;
-        private static readonly int DefaultMaxMessageRate = Settings.Default.ChannelStreamingDefaultMaxMessageRate;
+        private static readonly int _defaultMaxDataItems = Settings.Default.ChannelStreamingDefaultMaxDataItems;
+        private static readonly int _defaultMaxMessageRate = Settings.Default.ChannelStreamingDefaultMaxMessageRate;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EtpSettings"/> class.
@@ -42,14 +42,15 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.Models
             Connection = new Connection();
             Streaming = new StreamingSettings()
             {
-                MaxDataItems = DefaultMaxDataItems,
-                MaxMessageRate = DefaultMaxMessageRate,
+                MaxDataItems = _defaultMaxDataItems,
+                MaxMessageRate = _defaultMaxMessageRate,
                 StreamingType = "LatestValue",
                 StartTime = DateTime.Now,
                 StartIndex = 0,
                 IndexCount = 10
             };
             Store = new StoreSettings();
+            RequestedProtocols = new BindableCollection<EtpProtocolItem>();
         }
 
         private Connection _connection;
@@ -146,5 +147,11 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.Models
                 }
             }
         }
+
+        /// <summary>
+        /// Gets the collection of requested protocols.
+        /// </summary>
+        /// <value>The collection of requested protocols.</value>
+        public BindableCollection<EtpProtocolItem> RequestedProtocols { get; }
     }
 }

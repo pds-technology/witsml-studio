@@ -33,6 +33,8 @@ using PDS.Framework;
 using PDS.Witsml.Studio.Plugins.EtpBrowser.Properties;
 using PDS.Witsml.Studio.Core.Runtime;
 using PDS.Witsml.Studio.Core.ViewModels;
+using Energistics.Protocol.ChannelDataFrame;
+using Energistics.Protocol.StoreNotification;
 
 namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 {
@@ -271,7 +273,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Initializes the ETP client.
         /// </summary>
-        private void InitEtpClient()
+        public void InitEtpClient()
         {
             try
             {
@@ -279,14 +281,10 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 var headers = Authorization.Basic(Model.Connection.Username, Model.Connection.Password);
 
                 _client = new EtpClient(Model.Connection.Uri, Model.ApplicationName, Model.ApplicationVersion, headers);
-                _client.Register<IChannelStreamingConsumer, ChannelStreamingConsumerHandler>();
-                _client.Register<IDiscoveryCustomer, DiscoveryCustomerHandler>();
-                _client.Register<IStoreCustomer, StoreCustomerHandler>();
+
+                RegisterProtocolHandlers(_client);
 
                 _client.Handler<ICoreClient>().OnOpenSession += OnOpenSession;
-                _client.Handler<IDiscoveryCustomer>().OnGetResourcesResponse += OnGetResourcesResponse;
-                _client.Handler<IStoreCustomer>().OnObject += OnObject;
-
                 _client.SocketClosed += OnClientSocketClosed;
                 _client.Output = LogClientOutput;
                 _client.Open();
@@ -429,6 +427,59 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 message.StartsWith("{") ? string.Empty : "// ",
                 message,
                 Environment.NewLine));
+        }
+
+        private void RegisterProtocolHandlers(EtpClient client)
+        {
+            if (Requesting(Protocols.ChannelStreaming, "producer"))
+            {
+                client.Register<IChannelStreamingConsumer, ChannelStreamingConsumerHandler>();
+            }
+            if (Requesting(Protocols.ChannelStreaming, "consumer"))
+            {
+                client.Register<IChannelStreamingProducer, ChannelStreamingProducerHandler>();
+            }
+
+            if (Requesting(Protocols.ChannelDataFrame, "producer"))
+            {
+                client.Register<IChannelDataFrameConsumer, ChannelDataFrameConsumerHandler>();
+            }
+            if (Requesting(Protocols.ChannelDataFrame, "consumer"))
+            {
+                client.Register<IChannelDataFrameProducer, ChannelDataFrameProducerHandler>();
+            }
+
+            if (Requesting(Protocols.Discovery, "store"))
+            {
+                client.Register<IDiscoveryCustomer, DiscoveryCustomerHandler>();
+                client.Handler<IDiscoveryCustomer>().OnGetResourcesResponse += OnGetResourcesResponse;
+            }
+            if (Requesting(Protocols.Store, "store"))
+            {
+                _client.Register<IStoreCustomer, StoreCustomerHandler>();
+                _client.Handler<IStoreCustomer>().OnObject += OnObject;
+            }
+            if (Requesting(Protocols.StoreNotification, "store"))
+            {
+                _client.Register<IStoreNotificationCustomer, StoreNotificationCustomerHandler>();
+            }
+            if (Requesting(Protocols.GrowingObject, "store"))
+            {
+                //_client.Register<IGrowingObjectCustomer, GorowingObjectCustomerHandler>();
+            }
+            if (Requesting(Protocols.DataArray, "store"))
+            {
+                //_client.Register<IDataArrayCustomer, DataArrayCustomerHandler>();
+            }
+            if (Requesting(Protocols.WitsmlSoap, "store"))
+            {
+                //_client.Register<IWitsmlSoapCustomer, WitsmlSoapCustomerHandler>();
+            }
+        }
+
+        private bool Requesting(Protocols protocol, string role)
+        {
+            return Model.RequestedProtocols.Any(x => x.Protocol == (int) protocol && x.Role.EqualsIgnoreCase(role));
         }
 
         #region IDisposable Support

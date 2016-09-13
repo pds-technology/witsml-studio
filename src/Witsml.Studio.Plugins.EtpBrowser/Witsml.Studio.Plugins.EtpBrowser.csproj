@@ -165,6 +165,7 @@
     <Compile Include="..\External\GlobalAssemblyInfo.cs">
       <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Models\EtpProtocolItem.cs" />
     <Compile Include="Models\EtpSettings.cs" />
     <Compile Include="Models\StoreSettings.cs" />
     <Compile Include="Models\StreamingSettings.cs" />

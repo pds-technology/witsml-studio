@@ -16,12 +16,14 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System.Linq;
 using Caliburn.Micro;
 using Energistics.Datatypes;
 using Energistics.Protocol.Core;
 using PDS.Witsml.Studio.Core.Connections;
 using PDS.Witsml.Studio.Core.Runtime;
 using PDS.Witsml.Studio.Core.ViewModels;
+using PDS.Witsml.Studio.Plugins.EtpBrowser.Models;
 
 namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 {
@@ -39,9 +41,24 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         {
             Runtime = runtime;
             DisplayName =  string.Format("{0:D} - {0}", Protocols.Core);
+
             ConnectionPicker = new ConnectionPickerViewModel(runtime, ConnectionTypes.Etp)
             {
                 OnConnectionChanged = OnConnectionChanged
+            };
+
+            EtpProtocols = new BindableCollection<EtpProtocolItem>
+            {
+                new EtpProtocolItem(Protocols.ChannelStreaming, "consumer"),
+                new EtpProtocolItem(Protocols.ChannelStreaming, "producer"),
+                new EtpProtocolItem(Protocols.ChannelDataFrame, "consumer"),
+                new EtpProtocolItem(Protocols.ChannelDataFrame, "producer"),
+                new EtpProtocolItem(Protocols.Discovery, "store"),
+                new EtpProtocolItem(Protocols.Store, "store"),
+                new EtpProtocolItem(Protocols.StoreNotification, "store"),
+                new EtpProtocolItem(Protocols.GrowingObject, "store", false),
+                new EtpProtocolItem(Protocols.DataArray, "store", false),
+                new EtpProtocolItem(Protocols.WitsmlSoap, "store", false),
             };
         }
 
@@ -57,7 +74,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// Gets the model.
         /// </summary>
         /// <value>The model.</value>
-        public Models.EtpSettings Model
+        public EtpSettings Model
         {
             get { return Parent.Model; }
         }
@@ -75,10 +92,18 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         public ConnectionPickerViewModel ConnectionPicker { get; }
 
         /// <summary>
+        /// Gets the collection of all ETP protocols.
+        /// </summary>
+        /// <value>The collection of ETP protocols.</value>
+        public BindableCollection<EtpProtocolItem> EtpProtocols { get; }
+
+        /// <summary>
         /// Requests a new ETP session.
         /// </summary>
         public void RequestSession()
         {
+            Model.RequestedProtocols.Clear();
+            Model.RequestedProtocols.AddRange(EtpProtocols.Where(x => x.IsSelected));
             Parent.OnConnectionChanged();
         }
 
@@ -95,16 +120,12 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         {
             Model.Connection = connection;
 
-            //_log.DebugFormat("Selected connection changed: Name: {0}; Uri: {1}; Username: {2}",
-            //    Model.Connection.Name, Model.Connection.Uri, Model.Connection.Username);
-
-            // Make connection and get version
-            Runtime.ShowBusy();
-            Runtime.InvokeAsync(() =>
-            {
-                Runtime.ShowBusy(false);
-                RequestSession();
-            });
+            //Runtime.ShowBusy();
+            //Runtime.InvokeAsync(() =>
+            //{
+            //    Runtime.ShowBusy(false);
+            //    RequestSession();
+            //});
         }
     }
 }
