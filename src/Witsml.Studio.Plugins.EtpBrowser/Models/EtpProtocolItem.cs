@@ -16,6 +16,7 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System.Runtime.Serialization;
 using Caliburn.Micro;
 using Energistics.Datatypes;
 
@@ -25,6 +26,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.Models
     /// Defines the properties needed to allow selection of ETP Protocols.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.PropertyChangedBase" />
+    [DataContract]
     public class EtpProtocolItem : PropertyChangedBase
     {
         private bool _isSelected;
@@ -34,34 +36,40 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.Models
         /// </summary>
         /// <param name="protocol">The protocol.</param>
         /// <param name="role">The role.</param>
+        /// <param name="isSelected">if set to <c>true</c> the item is selected.</param>
         /// <param name="isEnabled">if set to <c>true</c> the item is enabled.</param>
-        public EtpProtocolItem(Protocols protocol, string role, bool isEnabled = true)
+        public EtpProtocolItem(Protocols protocol, string role, bool isSelected = false, bool isEnabled = true)
         {
             Protocol = (int) protocol;
             Name = protocol.ToString();
             Role = role;
+            IsSelected = isSelected;
             IsEnabled = isEnabled;
         }
 
         /// <summary>
-        /// Gets the protocol.
+        /// Gets or sets the protocol.
         /// </summary>
-        public int Protocol { get; }
+        [DataMember]
+        public int Protocol { get; set; }
 
         /// <summary>
-        /// Gets the name.
+        /// Gets or sets the name.
         /// </summary>
-        public string Name { get; }
+        [DataMember]
+        public string Name { get; set; }
 
         /// <summary>
-        /// Gets the role.
+        /// Gets or sets the role.
         /// </summary>
-        public string Role { get; }
+        [DataMember]
+        public string Role { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether this instance is enabled.
+        /// Gets or sets a value indicating whether this instance is enabled.
         /// </summary>
-        public bool IsEnabled { get; }
+        [DataMember]
+        public bool IsEnabled { get; set; }
 
         /// <summary>
         /// Gets the display name.
@@ -72,8 +80,9 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.Models
         /// Gets or sets a value indicating whether this instance is selected.
         /// </summary>
         /// <value>
-        /// <c>true</c> if this instance is selected; otherwise, <c>false</c>.
+        ///   <c>true</c> if this instance is selected; otherwise, <c>false</c>.
         /// </value>
+        [DataMember]
         public bool IsSelected
         {
             get { return _isSelected; }

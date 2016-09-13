@@ -53,15 +53,15 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             EtpProtocols = new BindableCollection<EtpProtocolItem>
             {
                 new EtpProtocolItem(Protocols.ChannelStreaming, "consumer"),
-                new EtpProtocolItem(Protocols.ChannelStreaming, "producer"),
+                new EtpProtocolItem(Protocols.ChannelStreaming, "producer", isSelected: true),
                 new EtpProtocolItem(Protocols.ChannelDataFrame, "consumer"),
                 new EtpProtocolItem(Protocols.ChannelDataFrame, "producer"),
-                new EtpProtocolItem(Protocols.Discovery, "store"),
-                new EtpProtocolItem(Protocols.Store, "store"),
+                new EtpProtocolItem(Protocols.Discovery, "store", isSelected: true),
+                new EtpProtocolItem(Protocols.Store, "store", isSelected: true),
                 new EtpProtocolItem(Protocols.StoreNotification, "store"),
-                new EtpProtocolItem(Protocols.GrowingObject, "store", false),
-                new EtpProtocolItem(Protocols.DataArray, "store", false),
-                new EtpProtocolItem(Protocols.WitsmlSoap, "store", false),
+                new EtpProtocolItem(Protocols.GrowingObject, "store", isEnabled: false),
+                new EtpProtocolItem(Protocols.DataArray, "store", isEnabled: false),
+                new EtpProtocolItem(Protocols.WitsmlSoap, "store", isEnabled: false),
             };
         }
 
