@@ -296,7 +296,9 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 
                 RegisterProtocolHandlers(Client);
 
-                Client.Handler<ICoreClient>().OnOpenSession += OnOpenSession;
+                RegisterEventHandlers(Client.Handler<ICoreClient>(),
+                    x => x.OnOpenSession += OnOpenSession);
+
                 Client.SocketClosed += OnClientSocketClosed;
                 Client.Output = LogClientOutput;
                 Client.Open();
@@ -347,6 +349,26 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             // notify child view models
             Items.OfType<ISessionAware>()
                 .ForEach(x => x.OnSessionOpened(e));
+        }
+
+        /// <summary>
+        /// Called when an Acknowledge message is received.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="ProtocolEventArgs{Acknowledge}"/> instance containing the event data.</param>
+        private void OnAcknowledge(object sender, ProtocolEventArgs<Acknowledge> e)
+        {
+            LogObjectDetails(e);
+        }
+
+        /// <summary>
+        /// Called when a ProtocolException message is received.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="ProtocolEventArgs{ProtocolException}"/> instance containing the event data.</param>
+        private void OnProtocolException(object sender, ProtocolEventArgs<ProtocolException> e)
+        {
+            LogObjectDetails(e);
         }
 
         /// <summary>
@@ -491,47 +513,65 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             if (Requesting(Protocols.ChannelStreaming, "producer"))
             {
                 client.Register<IChannelStreamingConsumer, ChannelStreamingConsumerHandler>();
+                RegisterEventHandlers(client.Handler<IChannelStreamingConsumer>());
             }
             if (Requesting(Protocols.ChannelStreaming, "consumer"))
             {
                 client.Register<IChannelStreamingProducer, ChannelStreamingProducerHandler>();
+                RegisterEventHandlers(client.Handler<IChannelStreamingProducer>());
             }
 
             if (Requesting(Protocols.ChannelDataFrame, "producer"))
             {
                 client.Register<IChannelDataFrameConsumer, ChannelDataFrameConsumerHandler>();
+                RegisterEventHandlers(client.Handler<IChannelDataFrameConsumer>());
             }
             if (Requesting(Protocols.ChannelDataFrame, "consumer"))
             {
                 client.Register<IChannelDataFrameProducer, ChannelDataFrameProducerHandler>();
+                RegisterEventHandlers(client.Handler<IChannelDataFrameProducer>());
             }
 
             if (Requesting(Protocols.Discovery, "store"))
             {
                 client.Register<IDiscoveryCustomer, DiscoveryCustomerHandler>();
-                client.Handler<IDiscoveryCustomer>().OnGetResourcesResponse += OnGetResourcesResponse;
+                RegisterEventHandlers(client.Handler<IDiscoveryCustomer>(),
+                    x => x.OnGetResourcesResponse += OnGetResourcesResponse);
             }
             if (Requesting(Protocols.Store, "store"))
             {
-                Client.Register<IStoreCustomer, StoreCustomerHandler>();
-                Client.Handler<IStoreCustomer>().OnObject += OnObject;
+                client.Register<IStoreCustomer, StoreCustomerHandler>();
+                RegisterEventHandlers(client.Handler<IStoreCustomer>(),
+                    x => x.OnObject += OnObject);
             }
             if (Requesting(Protocols.StoreNotification, "store"))
             {
-                Client.Register<IStoreNotificationCustomer, StoreNotificationCustomerHandler>();
+                client.Register<IStoreNotificationCustomer, StoreNotificationCustomerHandler>();
+                RegisterEventHandlers(client.Handler<IStoreNotificationCustomer>());
             }
             if (Requesting(Protocols.GrowingObject, "store"))
             {
-                //Client.Register<IGrowingObjectCustomer, GorowingObjectCustomerHandler>();
+                //client.Register<IGrowingObjectCustomer, GrowingObjectCustomerHandler>();
+                //RegisterEventHandlers(client.Handler<IGrowingObjectCustomer>());
             }
             if (Requesting(Protocols.DataArray, "store"))
             {
-                //Client.Register<IDataArrayCustomer, DataArrayCustomerHandler>();
+                //client.Register<IDataArrayCustomer, DataArrayCustomerHandler>();
+                //RegisterEventHandlers(client.Handler<IDataArrayCustomer>());
             }
             if (Requesting(Protocols.WitsmlSoap, "store"))
             {
-                //Client.Register<IWitsmlSoapCustomer, WitsmlSoapCustomerHandler>();
+                //client.Register<IWitsmlSoapCustomer, WitsmlSoapCustomerHandler>();
+                //RegisterEventHandlers(client.Handler<IWitsmlSoapCustomer>());
             }
+        }
+
+        private THandler RegisterEventHandlers<THandler>(THandler handler, params Action<THandler>[] actions) where THandler : IProtocolHandler
+        {
+            handler.OnAcknowledge += OnAcknowledge;
+            handler.OnProtocolException += OnProtocolException;
+            actions.ForEach(action => action(handler));
+            return handler;
         }
 
         private bool Requesting(Protocols protocol, string role)
