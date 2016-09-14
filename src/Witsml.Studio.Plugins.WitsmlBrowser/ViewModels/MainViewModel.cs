@@ -523,7 +523,6 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         internal void ShowSubmitResult(Functions functionType, WitsmlResult result, bool isPartialQuery = false)
         {
             var xmlOut = result.XmlOut;
-            string messageText = null;
 
             if (functionType == Functions.GetFromStore)
             {
@@ -531,21 +530,21 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             }
             else if (functionType == Functions.UpdateInStore || functionType == Functions.DeleteFromStore)
             {
-                var now = DateTime.Now.ToString(TimestampFormat);
-                messageText = GetMessageText(now, xmlOut, result.MessageOut, result.ReturnCode);
+                var description = ((ErrorCodes)result.ReturnCode).GetDescription();
+                result = new WitsmlResult(result.ObjectType, result.XmlIn, result.OptionsIn, result.CapClientIn, xmlOut, description, result.ReturnCode);
             }
 
             _log.DebugFormat("Query returned with{3}{3}xmlOut: {0}{3}{3}suppMsgOut: {1}{3}{3}optionsIn: {2}{3}{3}",
-                GetLogStringText(messageText ?? xmlOut),
+                GetLogStringText(xmlOut),
                 GetLogStringText(result.MessageOut),
                 GetLogStringText(result.OptionsIn),
                 Environment.NewLine);
 
             // Output query results to the Results tab
-            OutputResults(messageText ?? xmlOut, result.MessageOut, result.ReturnCode, isPartialQuery);
+            OutputResults(xmlOut, result.MessageOut, result.ReturnCode, isPartialQuery);
 
             // Append these results to the Messages tab
-            OutputMessages(xmlOut, result.MessageOut, result.ReturnCode, messageText);
+            OutputMessages(xmlOut, result.MessageOut, result.ReturnCode);
 
             // Show data object on the Properties tab
             if (functionType == Functions.GetFromStore && result.ReturnCode > 0)
