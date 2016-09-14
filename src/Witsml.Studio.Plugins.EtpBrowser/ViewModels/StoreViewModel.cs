@@ -23,10 +23,13 @@ using System.Runtime.Serialization;
 using System.Xml.Linq;
 using Caliburn.Micro;
 using Energistics.Common;
+using Energistics.DataAccess;
+using Energistics.DataAccess.WITSML200;
 using Energistics.Datatypes;
 using Energistics.Datatypes.Object;
 using Energistics.Protocol.Core;
 using Energistics.Protocol.Store;
+using ICSharpCode.AvalonEdit.Document;
 using PDS.Witsml.Studio.Core.Runtime;
 using PDS.Witsml.Studio.Core.ViewModels;
 
@@ -38,14 +41,24 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
     /// <seealso cref="Caliburn.Micro.Screen" />
     public sealed class StoreViewModel : Screen, ISessionAware
     {
+        private bool _autoUpdating;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="StoreViewModel"/> class.
         /// </summary>
         public StoreViewModel(IRuntimeService runtime)
         {
+            Runtime = runtime;
             DisplayName = string.Format("{0:D} - {0}", Protocols.Store);
             Data = new TextEditorViewModel(runtime, "XML");
+            Data.Document.Changed += OnDataObjectChanged;
         }
+
+        /// <summary>
+        /// Gets the runtime service.
+        /// </summary>
+        /// <value>The runtime.</value>
+        public IRuntimeService Runtime { get; }
 
         /// <summary>
         /// Gets or Sets the Parent <see cref="T:Caliburn.Micro.IConductor" />
@@ -194,57 +207,101 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         {
             var input = Data.Document.Text;
 
-            if (string.IsNullOrEmpty(input))
-                return;
+            if (string.IsNullOrWhiteSpace(input)) return;
 
             var doc = WitsmlParser.Parse(input);
             var root = doc.Root;
 
-            if (root == null)
-                return;
+            if (root == null) return;
 
-            bool updated;
-
+            var ns = root.GetDefaultNamespace();
             var version = root.Attribute("version");
+
             if (version != null)
             {
-                if (string.IsNullOrEmpty(version.Value))
-                    return;
+                if (string.IsNullOrWhiteSpace(version.Value)) return;
 
-                updated = UpdateInput(root.Elements().FirstOrDefault(), version.Value, "uid");
+                var dataObject = root.Elements().FirstOrDefault();
+                var nameElement = dataObject?.Element(ns + "name");
+
+                _autoUpdating = UpdateInput(dataObject, version.Value, "uid", nameElement);
             }
             else
             {
                 var schemaVersion = root.Attribute("schemaVersion");
-                if (schemaVersion == null)
-                    return;
+                if (string.IsNullOrWhiteSpace(schemaVersion?.Value)) return;
 
-                updated = UpdateInput(root, schemaVersion.Value, "uuid");
+                var nameElement = root
+                    .Elements()
+                    .Where(e => e.Name.LocalName == "Citation")
+                    .Elements()
+                    .FirstOrDefault(e => e.Name.LocalName == "Title");
+
+                _autoUpdating = UpdateInput(root, schemaVersion.Value, "uuid", nameElement);
             }
 
-            if (updated)
+            if (_autoUpdating)
+            {
                 Data.Document.Text = doc.ToString();
+                _autoUpdating = false;
+            }
         }
 
-        private bool UpdateInput(XElement element, string version, string idField)
+        private bool UpdateInput(XElement element, string version, string idField, XElement nameElement)
         {
             var objectType = element?.Name.LocalName;
 
-            if (string.IsNullOrEmpty(objectType))
-                return false;
+            if (string.IsNullOrEmpty(objectType)) return false;
 
-            Model.Store.ContentType = new EtpContentType("witsml", version, objectType);
+            Model.Store.ContentType = new EtpContentType(EtpContentTypes.Witsml141.Family, version, objectType);
 
             var idAttribute = element.Attribute(idField);
+
             if (idAttribute != null)
-                idAttribute.Value = Model.Store.Uuid;
-            else
+            {
+                if (string.IsNullOrWhiteSpace(Model.Store.Uuid))
+                    Model.Store.Uuid = idAttribute.Value;
+                else
+                    idAttribute.Value = Model.Store.Uuid;
+            }
+            else if (!string.IsNullOrWhiteSpace(Model.Store.Uuid))
             {
                 idAttribute = new XAttribute(idField, Model.Store.Uuid);
                 element.Add(idAttribute);
             }
 
+            if (!string.IsNullOrWhiteSpace(nameElement?.Value))
+            {
+                Model.Store.Name = nameElement.Value;
+            }
+
+            try
+            {
+                var type = ObjectTypes.GetObjectGroupType(objectType, version) ?? 
+                           ObjectTypes.GetObjectType(objectType, version);
+
+                var entity = WitsmlParser.Parse(type, element.Document?.Root, false);
+                var collection = entity as IEnergisticsCollection;
+
+                var uri = collection?.Items
+                    .OfType<IDataObject>()
+                    .Select(x => x.GetUri())
+                    .FirstOrDefault() ?? (entity as AbstractObject)?.GetUri();
+
+                Model.Store.Uri = uri;
+            }
+            catch
+            {
+                // ignore
+            }
+
             return true;
+        }
+
+        private void OnDataObjectChanged(object sender, DocumentChangeEventArgs e)
+        {
+            if (_autoUpdating) return;
+            Runtime.Invoke(UpdateInput);
         }
     }
 }
