@@ -56,6 +56,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         public MainViewModel(IRuntimeService runtime)
         {
             Runtime = runtime;
+            DisplayName = EtpSettings.EtpSubProtocolName;
             DisplayName = _pluginDisplayName;
             Resources = new BindableCollection<ResourceViewModel>();
             Model = new Models.EtpSettings()
