@@ -304,6 +304,30 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         }
 
         /// <summary>
+        /// Clears the query results.
+        /// </summary>
+        public void ClearQueryResults()
+        {
+            QueryResults.Text = string.Empty;
+        }
+
+        /// <summary>
+        /// Submits a query to get the server capabilities.
+        /// </summary>
+        public void GetCapabilities()
+        {
+            SubmitQuery(Functions.GetCap);
+        }
+
+        /// <summary>
+        /// Submits a query to get the base message.
+        /// </summary>
+        public void GetBaseMessage()
+        {
+            SubmitQuery(Functions.GetBaseMsg);
+        }
+
+        /// <summary>
         /// Submits an asynchronous query to the WITSML server for a given function type.
         /// The results of a query are displayed in the Results and Messages tabs.
         /// </summary>
@@ -321,8 +345,8 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
 
             // Output Request
             OutputRequestMessages(functionType, functionType == Functions.GetCap ? string.Empty : xmlIn, optionsIn);
-    
-            Runtime.ShowBusy();        
+
+            Runtime.ShowBusy();
             Task.Run(async () =>
             {
                 // Call internal SubmitQuery method with references to all inputs and outputs.
@@ -340,71 +364,6 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             });
         }
 
-
-        /// <summary>
-        /// Clears the query results.
-        /// </summary>
-        public void ClearQueryResults()
-        {
-            QueryResults.Text = string.Empty;
-        }
-
-        /// <summary>
-        /// Submits a query to get the server capabilities.
-        /// </summary>
-        public void GetCapabilities()
-        {
-            SubmitQuery(Functions.GetCap);
-        }
-
-        /// <summary>
-        /// Gets the options in for the given functionType
-        /// </summary>
-        /// <param name="functionType">Type of the function.</param>
-        /// <param name="isPartialQuery">if set to <c>true</c> [is partial query].</param>
-        /// <returns>The OptionsIn</returns>
-        internal string GetOptionsIn(Functions functionType, bool isPartialQuery = false)
-        {
-            string optionsIn;
-
-            switch (functionType)
-            {
-                case Functions.GetCap:
-                    optionsIn = new OptionsIn.DataVersion(Model.WitsmlVersion);
-                    break;
-                case Functions.GetBaseMsg:
-                    optionsIn = Model.ErrorCode.GetValueOrDefault().ToString();
-                    break;
-                case Functions.DeleteFromStore:
-                    optionsIn = Model.CascadedDelete ? OptionsIn.CascadedDelete.True : null;
-                    break;
-                case Functions.GetFromStore:
-                    optionsIn = GetGetFromStoreOptionsIn(isPartialQuery);
-                    break;
-                default:
-                    optionsIn = null;
-                    break;
-            }
-
-            if (!string.IsNullOrWhiteSpace(Model.ExtraOptionsIn))
-            {
-                if (string.IsNullOrWhiteSpace(optionsIn))
-                    optionsIn = Model.ExtraOptionsIn;
-                else
-                    optionsIn += ";" + Model.ExtraOptionsIn;
-            }
-
-            return optionsIn;
-        }
-
-        /// <summary>
-        /// Submits a query to get the base message.
-        /// </summary>
-        public void GetBaseMessage()
-        {
-            SubmitQuery(Functions.GetBaseMsg);
-        }
-
         /// <summary>
         /// Submits the query to the WITSML server for the given function type and input XML.
         /// </summary>
@@ -419,7 +378,12 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             string objectType = null;
             string xmlOut = null;
             short returnCode = 0;
-            var clientControlledFunctions = new List<Functions>() {Functions.GetCap, Functions.GetBaseMsg};
+
+            var clientControlledFunctions = new List<Functions>
+            {
+                Functions.GetCap,
+                Functions.GetBaseMsg
+            };
 
             try
             {
@@ -474,6 +438,46 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 // Return the error to the caller so message and call stack can be displayed to the user
                 return await Task.FromResult(new WitsmlResult(objectType, xmlIn, optionsIn, null, xmlOut, message, returnCode));
             }
+        }
+
+        /// <summary>
+        /// Gets the options in for the given functionType
+        /// </summary>
+        /// <param name="functionType">Type of the function.</param>
+        /// <param name="isPartialQuery">if set to <c>true</c> [is partial query].</param>
+        /// <returns>The OptionsIn</returns>
+        internal string GetOptionsIn(Functions functionType, bool isPartialQuery = false)
+        {
+            string optionsIn;
+
+            switch (functionType)
+            {
+                case Functions.GetCap:
+                    optionsIn = new OptionsIn.DataVersion(Model.WitsmlVersion);
+                    break;
+                case Functions.GetBaseMsg:
+                    optionsIn = Model.ErrorCode.GetValueOrDefault().ToString();
+                    break;
+                case Functions.DeleteFromStore:
+                    optionsIn = Model.CascadedDelete ? OptionsIn.CascadedDelete.True : null;
+                    break;
+                case Functions.GetFromStore:
+                    optionsIn = GetGetFromStoreOptionsIn(isPartialQuery);
+                    break;
+                default:
+                    optionsIn = null;
+                    break;
+            }
+
+            if (!string.IsNullOrWhiteSpace(Model.ExtraOptionsIn))
+            {
+                if (string.IsNullOrWhiteSpace(optionsIn))
+                    optionsIn = Model.ExtraOptionsIn;
+                else
+                    optionsIn += ";" + Model.ExtraOptionsIn;
+            }
+
+            return optionsIn;
         }
 
         /// <summary>
@@ -785,6 +789,32 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             {
                 QueryResults.Insert(QueryResults.TextLength, text);
             }
+        }
+
+        /// <summary>
+        /// Outputs the error to the Results and Messages tabs.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="error">The error.</param>
+        internal void OutputError(string message, Exception error = null)
+        {
+            var stackTrace = error?.StackTrace;
+            error = error?.GetBaseException();
+
+            QueryResults.Text = error == null
+                ? message
+                : string.Format("{0}{3}{3}Error Message: {1}{3}{3}Stack Trace:{3}{2}{3}",
+                    message,
+                    error.Message,
+                    stackTrace,
+                    Environment.NewLine);
+
+            OutputMessages(null, null, 0,
+                GetErrorText(0, string.Concat(
+                    message,
+                    Environment.NewLine,
+                    Environment.NewLine,
+                    error?.ToString().Replace("---> ", Environment.NewLine)).Trim()));
         }
 
         /// <summary>

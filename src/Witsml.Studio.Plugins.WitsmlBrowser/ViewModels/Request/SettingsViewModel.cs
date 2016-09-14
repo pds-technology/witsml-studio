@@ -107,7 +107,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
         /// </summary>
         public void GetVersions()
         {
-            GetVersions(Proxy, Model.Connection);
+            GetVersions(Proxy, Model.Connection, false);
         }
 
         /// <summary>
@@ -144,15 +144,16 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
             {
                 Model.OutputPath = dialog.SelectedPath;
             }
-        }      
+        }
 
         /// <summary>
         /// Gets the supported versions from the server.
         /// </summary>
         /// <param name="proxy">The proxy.</param>
         /// <param name="connection">The connection.</param>
+        /// <param name="throwOnError">if set to <c>true</c> throw on error.</param>
         /// <returns>The supported versions.</returns>
-        internal string GetVersions(WITSMLWebServiceConnection proxy, Connection connection)
+        internal string GetVersions(WITSMLWebServiceConnection proxy, Connection connection, bool throwOnError = true)
         {
             proxy.Url = connection.Uri;
 
@@ -163,11 +164,11 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
             }
 
             var parent = Parent?.Parent;
+            var supportedVersions = string.Empty;
 
             // Output Request for GetVersion
             parent?.OutputRequestMessages(Functions.GetVersion, null, parent?.GetOptionsIn(Functions.GetVersion));
 
-            var supportedVersions = string.Empty;
             try
             {
                 supportedVersions = proxy.GetVersion();
@@ -176,8 +177,13 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
             catch (Exception ex)
             {
                 _log.WarnFormat("Exception getting versions on WITSML server with uri '{0}' : '{1}'", connection.Uri, ex.Message);
+
+                if (throwOnError)
+                    throw;
+
+                parent?.OutputError("Error connecting to server.", ex);
+                return supportedVersions;
             }
-            
 
             if (parent == null) return supportedVersions;
 
@@ -224,6 +230,9 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
         private void GetWitsmlVersions()
         {
             _log.Debug("Selecting supported versions from WITSML server.");
+
+            var parent = Parent?.Parent;
+
             try
             {
                 WitsmlVersions.Clear();
@@ -236,9 +245,13 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
                 }
                 else
                 {
-                    var msg = "The Witsml server does not support any versions.";
-                    _log.Warn(msg);
-                    Runtime.ShowError(msg);
+                    var message = "The Witsml server does not support any versions.";
+
+                    // Log the warning.
+                    _log.Warn(message);
+                    
+                    // Show the user the warning
+                    parent?.OutputError(message);
                 }
             }
             catch (Exception ex)
@@ -248,8 +261,8 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
                 // Log the error
                 _log.Error(errorMessage, ex);
 
-                // Show the user the error in a dialog.
-                Runtime.ShowError(errorMessage, ex);
+                // Show the user the error.
+                parent?.OutputError(errorMessage, ex);
             }
         }
     }
