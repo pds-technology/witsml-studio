@@ -577,7 +577,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 XmlQuery.Text = AutoQueryProvider.UpdateDataQuery(xmlOut);
 
                 // Submit the query if one was returned.
-                if (!string.IsNullOrEmpty((XmlQuery.Text)))
+                if (!string.IsNullOrEmpty(XmlQuery.Text))
                 {
                     // Change return elements to requested
                     AutoQueryProvider.Context.RetrievePartialResults = true;
@@ -782,6 +782,10 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             {
                 QueryResults.Insert(QueryResults.TextLength, 
                     string.Format("{0}{0}<!-- Partial Result -->{0}{0}", Environment.NewLine));
+            }
+            else if (returnCode > 1)
+            {
+                QueryResults.Text = string.Format("<!-- {0} -->{1}{1}", ErrorCodes.ParialSuccess.GetDescription(), Environment.NewLine);
             }
 
             if (!string.IsNullOrEmpty(text))
