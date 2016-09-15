@@ -150,26 +150,38 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// <param name="xml">The XML string.</param>
         public void SendPutObject(string xml)
         {
-            var uri = new EtpUri(Model.Store.Uri);
-
-            var dataObject = new DataObject()
+            try
             {
-                Resource = new Resource()
+                var uri = new EtpUri(Model.Store.Uri);
+
+                if (!uri.IsValid)
                 {
-                    Uri = uri,
-                    Uuid = Model.Store.Uuid,
-                    Name = Model.Store.Name,
-                    HasChildren = -1,
-                    ContentType = uri.ContentType,
-                    ResourceType = ResourceTypes.DataObject.ToString(),
-                    CustomData = new Dictionary<string, string>()
+                    throw new ArgumentException($"Invalid URI: {Model.Store.Uri}");
                 }
-            };
 
-            dataObject.SetXml(xml);
+                var dataObject = new DataObject()
+                {
+                    Resource = new Resource()
+                    {
+                        Uri = uri,
+                        Uuid = Model.Store.Uuid,
+                        Name = Model.Store.Name,
+                        HasChildren = -1,
+                        ContentType = uri.ContentType,
+                        ResourceType = ResourceTypes.DataObject.ToString(),
+                        CustomData = new Dictionary<string, string>()
+                    }
+                };
 
-            Parent.Client.Handler<IStoreCustomer>()
-                .PutObject(dataObject);
+                dataObject.SetXml(xml);
+
+                Parent.Client.Handler<IStoreCustomer>()
+                    .PutObject(dataObject);
+            }
+            catch (Exception ex)
+            {
+                Parent.LogClientError("Error sending PutObject", ex);
+            }
         }
 
         /// <summary>
