@@ -41,6 +41,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
     /// <seealso cref="Caliburn.Micro.Screen" />
     public sealed class StoreViewModel : Screen, ISessionAware
     {
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof (StoreViewModel));
         private bool _autoUpdating;
 
         /// <summary>
@@ -215,15 +216,23 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             CanExecute = false;
         }
 
-        private void UpdateInput()
+        private void UpdateInput(bool isUserInput = false)
         {
             var input = Data.Document.Text;
-
             if (string.IsNullOrWhiteSpace(input)) return;
 
-            var doc = WitsmlParser.Parse(input);
-            var root = doc.Root;
+            XDocument doc;
+            try
+            {
+                doc = WitsmlParser.Parse(input);
+            }
+            catch (Exception ex)
+            {
+                _log.Warn("Error parsing data object XML", ex);
+                return;
+            }
 
+            var root = doc.Root;
             if (root == null) return;
 
             var ns = root.GetDefaultNamespace();
@@ -252,11 +261,12 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 _autoUpdating = UpdateInput(root, schemaVersion.Value, "uuid", nameElement);
             }
 
-            if (_autoUpdating)
+            if (_autoUpdating && !isUserInput)
             {
                 Data.Document.Text = doc.ToString();
-                _autoUpdating = false;
             }
+
+            _autoUpdating = false;
         }
 
         private bool UpdateInput(XElement element, string version, string idField, XElement nameElement)
@@ -313,7 +323,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         private void OnDataObjectChanged(object sender, DocumentChangeEventArgs e)
         {
             if (_autoUpdating) return;
-            Runtime.Invoke(UpdateInput);
+            Runtime.Invoke(() => UpdateInput(true));
         }
     }
 }
