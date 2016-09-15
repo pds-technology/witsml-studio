@@ -34,7 +34,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
     /// Manages the behavior of the settings view.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    public sealed class SettingsViewModel : Screen
+    public sealed class SettingsViewModel : Screen, ISessionAware
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(SettingsViewModel));
 
@@ -102,6 +102,48 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// <value>The collection of ETP protocols.</value>
         public BindableCollection<EtpProtocolItem> EtpProtocols { get; }
 
+        private bool _canRequestSession;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the Request Session button is enabled.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if Request Session is enabled; otherwise, <c>false</c>.
+        /// </value>
+        public bool CanRequestSession
+        {
+            get { return _canRequestSession; }
+            set
+            {
+                if (_canRequestSession == value)
+                    return;
+
+                _canRequestSession = value;
+                NotifyOfPropertyChange(() => CanRequestSession);
+            }
+        }
+
+        private bool _canCloseSession;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the Close Session button is enabled.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if Close Session is enabled; otherwise, <c>false</c>.
+        /// </value>
+        public bool CanCloseSession
+        {
+            get { return _canCloseSession; }
+            set
+            {
+                if (_canCloseSession == value)
+                    return;
+
+                _canCloseSession = value;
+                NotifyOfPropertyChange(() => CanCloseSession);
+            }
+        }
+
         /// <summary>
         /// Requests a new ETP session.
         /// </summary>
@@ -110,6 +152,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             Model.RequestedProtocols.Clear();
             Model.RequestedProtocols.AddRange(EtpProtocols.Where(x => x.IsSelected));
             Parent.OnConnectionChanged();
+            CanRequestSession = false;
         }
 
         /// <summary>
@@ -145,16 +188,23 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             }
         }
 
+        public void OnSessionOpened(ProtocolEventArgs<OpenSession> e)
+        {
+            CanRequestSession = false;
+            CanCloseSession = true;
+        }
+
+        public void OnSocketClosed()
+        {
+            CanRequestSession = true;
+            CanCloseSession = false;
+        }
+
         private void OnConnectionChanged(Connection connection)
         {
             Model.Connection = connection;
-
-            //Runtime.ShowBusy();
-            //Runtime.InvokeAsync(() =>
-            //{
-            //    Runtime.ShowBusy(false);
-            //    RequestSession();
-            //});
+            CanRequestSession = true;
+            CanCloseSession = false;
         }
     }
 }
