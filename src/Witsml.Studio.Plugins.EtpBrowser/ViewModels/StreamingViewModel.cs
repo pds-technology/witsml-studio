@@ -200,6 +200,10 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             }
         }
 
+        /// <summary>
+        /// Sets the type of channel streaming.
+        /// </summary>
+        /// <param name="type">The type.</param>
         public void SetStreamingType(string type)
         {
             Model.Streaming.StreamingType = type;
@@ -246,9 +250,9 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 .Start(Model.Streaming.MaxDataItems, Model.Streaming.MaxMessageRate);
 
             CanStart = false;
-            Channels.Clear();
-            ChannelStreamingInfos.Clear();
-            UpdateCanDescribe();
+            //Channels.Clear();
+            //ChannelStreamingInfos.Clear();
+            //UpdateCanDescribe();
             LogStartSession();
         }
 
@@ -257,8 +261,8 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void Describe()
         {
-            Channels.Clear();
-            ChannelStreamingInfos.Clear();
+            //Channels.Clear();
+            //ChannelStreamingInfos.Clear();
 
             Parent.Client.Handler<IChannelStreamingConsumer>()
                 .ChannelDescribe(Model.Streaming.Uris);
@@ -275,7 +279,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             Parent.Client.Handler<IChannelStreamingConsumer>()
                 .ChannelStreamingStart(ChannelStreamingInfos);
 
-            CanDescribe = false;
+            //CanDescribe = false;
             CanStartStreaming = false;
             CanStopStreaming = true;
             CanRequestRange = false;
@@ -296,7 +300,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             CanStartStreaming = true;
             CanStopStreaming = false;
             UpdateCanRequestRange();
-            UpdateCanDescribe();
+            //UpdateCanDescribe();
         }
 
         /// <summary>
@@ -314,7 +318,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             Parent.Client.Handler<IChannelStreamingConsumer>()
                 .ChannelRangeRequest(new[] { rangeInfo });
 
-            CanDescribe = false;
+            //CanDescribe = false;
             CanStartStreaming = false;
             CanStopStreaming = true;
             CanRequestRange = false;
@@ -344,6 +348,10 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 
             CanStart = true;
             CanStopStreaming = false;
+            UpdateCanDescribe();
+
+            Channels.Clear();
+            ChannelStreamingInfos.Clear();
         }
 
         /// <summary>
@@ -352,6 +360,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         public void OnSocketClosed()
         {
             if (!Parent.Client.CanHandle<IChannelStreamingConsumer>()) return;
+
             var handler = Parent.Client.Handler<IChannelStreamingConsumer>();
             handler.OnChannelMetadata -= OnChannelMetadata;
             handler.OnChannelData -= OnChannelData;
