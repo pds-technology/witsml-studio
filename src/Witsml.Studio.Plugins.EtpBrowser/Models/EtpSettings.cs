@@ -45,7 +45,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.Models
                 MaxDataItems = _defaultMaxDataItems,
                 MaxMessageRate = _defaultMaxMessageRate,
                 StreamingType = "LatestValue",
-                StartTime = DateTime.Now,
+                StartTime = DateTime.Now.ToUniversalTime(),
                 StartIndex = 0,
                 IndexCount = 10
             };
