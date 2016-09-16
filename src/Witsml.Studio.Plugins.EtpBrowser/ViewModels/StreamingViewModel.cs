@@ -381,6 +381,9 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             // add to channel metadata collection
             e.Message.Channels.ForEach(x =>
             {
+                if (Channels.Any(c => c.ChannelUri == x.ChannelUri))
+                    return;
+
                 Channels.Add(x);
                 ChannelStreamingInfos.Add(ToChannelStreamingInfo(x));
             });
