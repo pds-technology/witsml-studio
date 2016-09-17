@@ -1,0 +1,4 @@
+[submodule "submodules/witsml"]
+	path = submodules/witsml
+	url = ../witsml
+	branch = develop
