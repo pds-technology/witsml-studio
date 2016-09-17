@@ -142,7 +142,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\submodules\witsml\src\Framework\Framework.csproj">
+    <ProjectReference Include="..\..\ext\witsml\src\Framework\Framework.csproj">
       <Project>{fae228aa-4917-4b02-b239-0a24df883898}</Project>
       <Name>Framework</Name>
     </ProjectReference>
