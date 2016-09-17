@@ -55,10 +55,6 @@
       <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="PDS.Framework, Version=2016.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\PDS.Framework.2016.1.20160908.1\lib\net45\PDS.Framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -146,6 +142,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\submodules\witsml\src\Framework\Framework.csproj">
+      <Project>{fae228aa-4917-4b02-b239-0a24df883898}</Project>
+      <Name>Framework</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Witsml.Studio.Core\Witsml.Studio.Core.csproj">
       <Project>{5f8f5ac8-680a-4097-9cf2-ab5a97b3bfdf}</Project>
       <Name>Witsml.Studio.Core</Name>
@@ -157,8 +157,8 @@
     </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>powershell.exe -file "$(SolutionDir)\External\InsertCopyright.ps1" -target $(ProjectDir) -productname "PDS.Witsml.Studio"
-if "$(ConfigurationName)" == "Debug" "$(SolutionDir)External\CopyCoreLibrariesForDebug.bat" "$(TargetDir)"</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

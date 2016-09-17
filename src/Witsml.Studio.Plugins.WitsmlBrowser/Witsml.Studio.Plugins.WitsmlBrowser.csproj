@@ -65,16 +65,8 @@
       <HintPath>..\packages\ETP.1.4.1.0\lib\ETP.Messages.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="FluentValidationNA, Version=1.2.16.24816, Culture=neutral, PublicKeyToken=0950390b87309e14, processorArchitecture=MSIL">
-      <HintPath>..\packages\FluentValidationNA.1.2.16\lib\net40\FluentValidationNA.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="ICSharpCode.AvalonEdit, Version=5.0.1.0, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
       <HintPath>..\packages\AvalonEdit.5.0.2\lib\Net40\ICSharpCode.AvalonEdit.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="LinqExtender, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\LinqExtender.3.0.1\lib\LinqExtender.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
@@ -83,14 +75,6 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="PDS.Framework, Version=2016.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\PDS.Framework.2016.1.20160908.1\lib\net45\PDS.Framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="PDS.Witsml, Version=2016.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\PDS.Witsml.2016.1.20160908.1\lib\net45\PDS.Witsml.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SuperSocket.Common, Version=1.6.0.4, Culture=neutral, PublicKeyToken=6c80000676988ebb, processorArchitecture=MSIL">
@@ -112,10 +96,6 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Linq.Dynamic, Version=1.1.14.15853, Culture=neutral, PublicKeyToken=b72be0322d1b32a8, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Linq.Dynamic.Library.1.1.14\lib\net40\System.Linq.Dynamic.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -227,6 +207,14 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\submodules\witsml\src\Framework\Framework.csproj">
+      <Project>{fae228aa-4917-4b02-b239-0a24df883898}</Project>
+      <Name>Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\witsml\src\Witsml\Witsml.csproj">
+      <Project>{0ef1d73f-e7a0-40b0-803b-7ce4b6b27112}</Project>
+      <Name>Witsml</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Witsml.Studio.Core\Witsml.Studio.Core.csproj">
       <Project>{5f8f5ac8-680a-4097-9cf2-ab5a97b3bfdf}</Project>
       <Name>Witsml.Studio.Core</Name>
@@ -269,8 +257,8 @@
     </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>powershell.exe -file "$(SolutionDir)\External\InsertCopyright.ps1" -target $(ProjectDir) -productname "PDS.Witsml.Studio"
-if "$(ConfigurationName)" == "Debug" "$(SolutionDir)External\CopyCoreLibrariesForDebug.bat" "$(TargetDir)"</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

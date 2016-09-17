@@ -37,7 +37,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
     /// <seealso cref="PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels.ISessionAware" />
-    public class JsonMessageViewModel : Screen, ISessionAware
+    public sealed class JsonMessageViewModel : Screen, ISessionAware
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(JsonMessageViewModel));
         private MessageHeader _currentHeader;
