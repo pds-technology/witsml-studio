@@ -155,11 +155,6 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             {
                 var uri = new EtpUri(Model.Store.Uri);
 
-                if (!uri.IsValid)
-                {
-                    throw new ArgumentException($"Invalid URI: {Model.Store.Uri}");
-                }
-
                 var dataObject = new DataObject()
                 {
                     Resource = new Resource()
