@@ -75,13 +75,13 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         public IRuntimeService Runtime { get; }
 
         /// <summary>
-        /// Gets the collectino of channel metadata.
+        /// Gets the collection of channel metadata.
         /// </summary>
         /// <value>The channel metadata.</value>
         public IList<ChannelMetadataRecord> Channels { get; }
 
         /// <summary>
-        /// Gets the collectino of channel streaming information.
+        /// Gets the collection of channel streaming information.
         /// </summary>
         /// <value>The channel streaming information.</value>
         public IList<ChannelStreamingInfo> ChannelStreamingInfos { get; }
@@ -286,6 +286,17 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
+        /// Determines whether this instance is streaming.
+        /// </summary>
+        /// <returns>
+        ///   <c>true</c> if this instance is streaming; otherwise, <c>false</c>.
+        /// </returns>
+        private bool IsStreaming()
+        {
+            return !CanStartStreaming && CanStopStreaming;
+        }
+
+        /// <summary>
         /// Stops the streaming of channel data.
         /// </summary>
         public void StopStreaming()
@@ -391,11 +402,16 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             if (e.Header.MessageFlags != (int)MessageFlags.MultiPart)
             {
                 LogChannelMetadata(Channels);
-                CanStartStreaming = !IsSimpleStreamer;
-                CanStopStreaming = IsSimpleStreamer;
-                UpdateCanRequestRange();
+
+                if (!IsStreaming())
+                {
+                    CanStartStreaming = !IsSimpleStreamer;
+                    CanStopStreaming = IsSimpleStreamer;
+                    UpdateCanRequestRange();
+                }
             }
         }
+
 
         private void OnChannelData(object sender, ProtocolEventArgs<ChannelData> e)
         {
@@ -460,7 +476,9 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         
         private void UpdateCanRequestRange()
         {
-            CanRequestRange = !IsSimpleStreamer && ChannelStreamingInfos.Any() &&
+            CanRequestRange = CanStartStreaming && 
+                !IsSimpleStreamer && 
+                ChannelStreamingInfos.Any() &&
                 ("TimeIndex".EqualsIgnoreCase(Model.Streaming.StreamingType) ||
                 "DepthIndex".EqualsIgnoreCase(Model.Streaming.StreamingType));
         }
