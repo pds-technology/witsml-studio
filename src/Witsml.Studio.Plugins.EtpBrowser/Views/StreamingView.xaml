@@ -52,7 +52,7 @@
                  cal:Message.Attach="[Event KeyUp] = [Action OnKeyUp($source, $eventArgs)]" />
 
         <StackPanel Grid.Row="5" Grid.ColumnSpan="4" Orientation="Horizontal" VerticalAlignment="Center">
-            <RadioButton x:Name="LatestValueButton" Content="Latest Value" IsChecked="True" Margin="20,0,0,0" cal:Message.Attach="SetStreamingType('LastetValue')" />
+            <RadioButton x:Name="LatestValueButton" Content="Latest Value" IsChecked="True" Margin="20,0,0,0" cal:Message.Attach="SetStreamingType('LatestValue')" />
             <RadioButton x:Name="IndexCountButton" Content="Index Count" Margin="20,0,0,0" cal:Message.Attach="SetStreamingType('IndexCount')" />
             <RadioButton x:Name="TimeIndexButton" Content="Time Index" Margin="20,0,0,0" cal:Message.Attach="SetStreamingType('TimeIndex')" />
             <RadioButton x:Name="DepthIndexButton" Content="Depth Index" Margin="20,0,0,0" cal:Message.Attach="SetStreamingType('DepthIndex')" />
