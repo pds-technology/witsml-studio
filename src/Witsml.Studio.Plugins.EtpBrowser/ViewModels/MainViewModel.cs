@@ -34,6 +34,8 @@ using PDS.Witsml.Studio.Plugins.EtpBrowser.Properties;
 using PDS.Witsml.Studio.Core.Runtime;
 using PDS.Witsml.Studio.Core.ViewModels;
 using Energistics.Protocol.ChannelDataFrame;
+using Energistics.Protocol.DataArray;
+using Energistics.Protocol.GrowingObject;
 using Energistics.Protocol.StoreNotification;
 
 namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
@@ -552,13 +554,13 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             }
             if (Requesting(Protocols.GrowingObject, "store"))
             {
-                //client.Register<IGrowingObjectCustomer, GrowingObjectCustomerHandler>();
-                //RegisterEventHandlers(client.Handler<IGrowingObjectCustomer>());
+                client.Register<IGrowingObjectCustomer, GrowingObjectCustomerHandler>();
+                RegisterEventHandlers(client.Handler<IGrowingObjectCustomer>());
             }
             if (Requesting(Protocols.DataArray, "store"))
             {
-                //client.Register<IDataArrayCustomer, DataArrayCustomerHandler>();
-                //RegisterEventHandlers(client.Handler<IDataArrayCustomer>());
+                client.Register<IDataArrayCustomer, DataArrayCustomerHandler>();
+                RegisterEventHandlers(client.Handler<IDataArrayCustomer>());
             }
             if (Requesting(Protocols.WitsmlSoap, "store"))
             {

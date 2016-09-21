@@ -61,8 +61,8 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 new EtpProtocolItem(Protocols.Discovery, "store", isSelected: true),
                 new EtpProtocolItem(Protocols.Store, "store", isSelected: true),
                 new EtpProtocolItem(Protocols.StoreNotification, "store"),
-                new EtpProtocolItem(Protocols.GrowingObject, "store", isEnabled: false),
-                new EtpProtocolItem(Protocols.DataArray, "store", isEnabled: false),
+                new EtpProtocolItem(Protocols.GrowingObject, "store"),
+                new EtpProtocolItem(Protocols.DataArray, "store"),
                 new EtpProtocolItem(Protocols.WitsmlSoap, "store", isEnabled: false),
             };
         }
