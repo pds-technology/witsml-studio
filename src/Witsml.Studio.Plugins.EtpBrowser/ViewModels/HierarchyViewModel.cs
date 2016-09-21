@@ -33,9 +33,10 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
     /// <seealso cref="Caliburn.Micro.Screen" />
     public sealed class HierarchyViewModel : Screen, ISessionAware
     {
-        private static readonly string[] _describeObjectTypes = new[]
+        private static readonly string[] _describeObjectTypes =
         {
-            ObjectTypes.Wellbore, ObjectTypes.Log, ObjectTypes.LogCurveInfo, ObjectTypes.ChannelSet, ObjectTypes.Channel
+            ObjectTypes.Well, ObjectTypes.Wellbore, ObjectTypes.Log, ObjectTypes.LogCurveInfo,
+            ObjectTypes.ChannelSet, ObjectTypes.Channel, ObjectTypes.Message
         };
 
         /// <summary>
@@ -147,7 +148,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 if (CanExecute && !string.IsNullOrWhiteSpace(resource?.Resource?.Uri))
                 {
                     var uri = new EtpUri(resource.Resource.Uri);
-                    return _describeObjectTypes.Contains(uri.ObjectType);
+                    return uri.IsBaseUri || _describeObjectTypes.Contains(uri.ObjectType);
                 }
 
                 return false;
