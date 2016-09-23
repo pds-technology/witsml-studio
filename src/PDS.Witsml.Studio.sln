@@ -25,6 +25,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{CF77C0B8-2A9F-412E-9DD0-EDD2EF262F20}"
 	ProjectSection(SolutionItems) = preProject
 		External\GlobalAssemblyInfo.cs = External\GlobalAssemblyInfo.cs
+		External\index.htm = External\index.htm
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PDS.Witsml", "PDS.Witsml", "{2B7ADB7E-EF7C-4FBD-ADFB-CA0EF611F82C}"
