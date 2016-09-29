@@ -58,5 +58,14 @@ namespace PDS.Witsml.Studio.Core.Properties {
                 return ((string)(this["ApplicationTitle"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://witsml.pds.technology/docs/user-guide/")]
+        public string OnlineHelpUrl {
+            get {
+                return ((string)(this["OnlineHelpUrl"]));
+            }
+        }
     }
 }

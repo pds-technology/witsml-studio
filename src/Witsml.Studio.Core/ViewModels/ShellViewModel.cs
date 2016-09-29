@@ -34,6 +34,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(ShellViewModel));
         private static readonly string _applicationTitle = Settings.Default.ApplicationTitle;
+        private static readonly string _onlineHelpUrl = Settings.Default.OnlineHelpUrl;
 
         /// <summary>
         /// Initializes an instance of the ShellViewModel
@@ -112,6 +113,14 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         public void About()
         {
             Runtime.ShowDialog(new AboutViewModel(Runtime));
+        }
+
+        /// <summary>
+        /// Opens the online help content.
+        /// </summary>
+        public void OpenHelp()
+        {
+            Process.Start(_onlineHelpUrl);
         }
 
         /// <summary>
