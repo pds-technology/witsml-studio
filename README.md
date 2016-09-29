@@ -1,32 +1,33 @@
-# You've added your first ReadMe file!
-A README.md file is intended to quickly orient readers to what your project can do.  New to Markdown? [Learn more](http://go.microsoft.com/fwlink/p/?LinkId=524306&clcid=0x409)
+## WITSML Studio
+The "PDS.Witsml.Studio" solution builds PDS WITSML Studio, a Windows desktop application written in C# and WPF using plug-in technology that can connect to any WITSML server via SOAP or ETP. It contains the following projects: 
 
-## Edit this ReadMe and commit your change to a topic branch
-In Git, branches are cheap.  You should use them whenever you're making changes to your repository.  Edit this file by clicking on the edit icon.
+##### PDS.Witsml.Studio
+Provides the main application user interface for PDS WITSML Studio.
 
-Then make some changes to this ReadMe file.
+##### PDS.Witsml.Core
+A collection of reusable components and plug-in framework.
 
-> Make some **edits** to _this_ blockquote
+##### PDS.Witsml.Studio.IntegrationTest
+Contains integration tests for the WITSML Browser plug-in and core functionality.
 
-When you are done, click the dropdown arrow next to the save button - that will allow you to commit your changes to a new branch.
+##### PDS.Witsml.Studio.DataReplay
+Data Producer plug-in that simulates streaming data in and out of a WITSML server.
 
-## Create a pull request to contribute your changes back into master
-Pull requests are the way to move changes from a topic branch back into the master branch.
+##### PDS.Witsml.Studio.EtpBrowser
+ETP Browser plug-in to communicate with a WITSML server via ETP protocol.
 
-Click on the **Pull Requests** page in the **CODE** hub, then click "New Pull Request" to create a new pull request from your topic branch to the master branch.
+##### PDS.Witsml.Studio.ObjectInspector
+Object Inspector plug-in that displays WITSML data objects with corresponding Energistics schema information.
 
-When you are done adding details, click "Create Pull request". Once a pull request is sent, reviewers can see your changes, recommend modifications, or even push follow-up commits.
+##### PDS.Witsml.Studio.WitsmlBrowser
+WITSML Browser plug-in to communicate with a WITSML server via SOAP.
 
-First time creating a pull request?  [Learn more](http://go.microsoft.com/fwlink/?LinkId=533211&clcid=0x409)
+##### PDS.Witsml.Studio.UnitTest
+Unit tests for the WITSML Browser and core functionality.
 
-### Congratulations! You've completed the grand tour of the CODE hub!
+---
 
-# Next steps
+### Copyright and License
+Copyright &copy; 2016 Petrotechnical Data Systems
 
-If you haven't done so yet:
-* [Install Visual Studio](http://go.microsoft.com/fwlink/?LinkId=309297&clcid=0x409&slcid=0x409)
-* [Install Git](http://git-scm.com/downloads)
-
-Then clone this repo to your local machine to get started with your own project.
-
-Happy coding!
+Released under the Apache License, Version 2.0
