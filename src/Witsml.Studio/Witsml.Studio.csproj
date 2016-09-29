@@ -27,7 +27,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <InstallUrl>http://localhost/Witsml.Web/Studio/</InstallUrl>
-    <SupportUrl>https://witsml.pds.nl/blog/support/</SupportUrl>
+    <SupportUrl>https://witsml.pds.technology/docs/support/</SupportUrl>
     <ProductName>PDS.Witsml.Studio</ProductName>
     <PublisherName>Petrotechnical Data Systems</PublisherName>
     <SuiteName>PDS.Witsml</SuiteName>
