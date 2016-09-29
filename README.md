@@ -3,25 +3,32 @@ The "PDS.Witsml.Studio" solution builds PDS WITSML Studio, a Windows desktop app
 
 ##### PDS.Witsml.Studio
 Provides the main application user interface for PDS WITSML Studio.
-
+<br />
+<br />
 ##### PDS.Witsml.Core
 A collection of reusable components and plug-in framework.
-
+<br />
+<br />
 ##### PDS.Witsml.Studio.IntegrationTest
 Contains integration tests for the WITSML Browser plug-in and core functionality.
-
+<br />
+<br />
 ##### PDS.Witsml.Studio.DataReplay
 Data Producer plug-in that simulates streaming data in and out of a WITSML server.
-
+<br />
+<br />
 ##### PDS.Witsml.Studio.EtpBrowser
 ETP Browser plug-in to communicate with a WITSML server via ETP protocol.
-
+<br />
+<br />
 ##### PDS.Witsml.Studio.ObjectInspector
 Object Inspector plug-in that displays WITSML data objects with corresponding Energistics schema information.
-
+<br />
+<br />
 ##### PDS.Witsml.Studio.WitsmlBrowser
 WITSML Browser plug-in to communicate with a WITSML server via SOAP.
-
+<br />
+<br />
 ##### PDS.Witsml.Studio.UnitTest
 Unit tests for the WITSML Browser and core functionality.
 
