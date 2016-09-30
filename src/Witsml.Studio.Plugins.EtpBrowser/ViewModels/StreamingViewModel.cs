@@ -485,7 +485,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 
         private void UpdateCanDescribe()
         {
-            CanDescribe = !IsSimpleStreamer && Model.Streaming.Uris.Any();
+            CanDescribe = !IsSimpleStreamer && CanStart && Model.Streaming.Uris.Any();
         }
 
         private void LogStartSession()
