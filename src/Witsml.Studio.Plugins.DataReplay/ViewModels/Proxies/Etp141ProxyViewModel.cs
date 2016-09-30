@@ -189,7 +189,8 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
                 Indexes = new IndexMetadataRecord[]
                 {
                     indexMetadata
-                }
+                },
+                CustomData = new Dictionary<string, DataValue>()
             };
 
             Channels.Add(channel);
