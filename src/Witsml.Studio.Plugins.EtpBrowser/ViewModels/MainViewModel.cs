@@ -381,6 +381,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// <param name="e">The <see cref="ProtocolEventArgs{GetResourcesResponse, String}"/> instance containing the event data.</param>
         private void OnGetResourcesResponse(object sender, ProtocolEventArgs<GetResourcesResponse, string> e)
         {
+
             var viewModel = ResourceViewModel.NoData;
 
             // Handle case when "No Data" Acknowledge message was received
@@ -391,6 +392,10 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             }
 
             LogObjectDetails(e);
+
+            //  Handle when message is received from JSON Message tab
+            if (e.Context == null)
+                return;
 
             if (EtpUri.IsRoot(e.Context))
             {
