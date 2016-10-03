@@ -23,6 +23,7 @@ using Caliburn.Micro;
 using Energistics.Common;
 using Energistics.Datatypes;
 using Energistics.Protocol.Core;
+using PDS.Framework;
 using PDS.Witsml.Studio.Core.Runtime;
 
 namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
@@ -148,7 +149,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 if (CanExecute && !string.IsNullOrWhiteSpace(resource?.Resource?.Uri))
                 {
                     var uri = new EtpUri(resource.Resource.Uri);
-                    return uri.IsBaseUri || _describeObjectTypes.Contains(uri.ObjectType);
+                    return uri.IsBaseUri || _describeObjectTypes.ContainsIgnoreCase(uri.ObjectType);
                 }
 
                 return false;
