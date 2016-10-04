@@ -1,4 +1,12 @@
 ## WITSML Studio
+
+**Quick Links:**&nbsp;
+[Blog](https://witsml.pds.technology/blog) |
+[Getting Started](https://witsml.pds.technology/docs/getting-started) |
+[Documentation](https://witsml.pds.technology/docs/documentation) |
+[Downloads](https://witsml.pds.technology/docs/downloads) |
+[Support](https://witsml.pds.technology/docs/support)
+
 The "PDS.Witsml.Studio" solution builds PDS WITSML Studio, a Windows desktop application written in C# and WPF using plug-in technology that can connect to any WITSML server via SOAP or ETP. It contains the following projects: 
 
 ##### PDS.Witsml.Studio
