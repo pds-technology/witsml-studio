@@ -13,6 +13,7 @@ The following Energistics © products were used in the creation of this work:
  - PRODML™ Web Service Specifications, Version 2.1.0.1
  - RESQML™ Data Schema Specifications, Version 1.1 
  - Standards DevKit
+ - ETP DevKit
  
 Energistics®, WITSML™, PRODML™, RESQML™ and their logos are trademarks or registered
 trademarks of Energistics Consortium, Inc.  All rights in the Energistics Trasfer Protocol
@@ -38,7 +39,7 @@ includes information security software using or performing cryptographic functio
 symmetric and/or asymmetric algorithms.
 
 The PDS.Witsml.Studio's source code is published here:
-  https://github.com/petrotechnicaldatasystems
+  https://github.com/pds-technology
 
 The PDS.Witsml.Studio is published here:
   https://witsml.pds.technology/downloads
