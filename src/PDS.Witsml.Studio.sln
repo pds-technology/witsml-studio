@@ -26,6 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{CF
 	ProjectSection(SolutionItems) = preProject
 		External\GlobalAssemblyInfo.cs = External\GlobalAssemblyInfo.cs
 		External\index.htm = External\index.htm
+		..\NOTICE.txt = ..\NOTICE.txt
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
