@@ -174,7 +174,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Resource Include="WitsmlStudio.ico" />
-    <None Include="PetrotechnicalDataSystems.pfx" />
+    <None Include="PetrotechnicalDataSystems.pfx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Samples\SmartSensorTimeSimulation1311.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
