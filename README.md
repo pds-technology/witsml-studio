@@ -7,6 +7,8 @@
 [Downloads](https://witsml.pds.technology/docs/downloads) |
 [Support](https://witsml.pds.technology/docs/support)
 
+> **Note:** Be sure to perform a recursive clone of the repository to retrieve the `witsml` submodule.
+
 The "PDS.Witsml.Studio" solution builds PDS WITSML Studio, a Windows desktop application written in C# and WPF using plug-in technology that can connect to any WITSML server via SOAP or ETP. It contains the following projects: 
 
 ##### PDS.Witsml.Studio
