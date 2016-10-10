@@ -173,10 +173,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="Samples\SmartSensorTimeSimulation20.json" />
     <Resource Include="WitsmlStudio.ico" />
     <None Include="PetrotechnicalDataSystems.pfx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Samples\SmartSensorDepthSimulation20.json" />
     <None Include="Samples\SmartSensorTimeSimulation1311.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
