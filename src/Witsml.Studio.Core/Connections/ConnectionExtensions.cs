@@ -17,6 +17,7 @@
 //-----------------------------------------------------------------------
 
 using Energistics.DataAccess;
+using System.Net;
 
 namespace PDS.Witsml.Studio.Core.Connections
 {
@@ -44,6 +45,19 @@ namespace PDS.Witsml.Studio.Core.Connections
             }
 
             return proxy;
+        }
+
+        /// <summary>
+        /// Sets the server certificate validation.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        public static void SetServerCertificateValidation(this Connection connection)
+        {
+            if (connection.IgnoreInvalidCertificates)
+                ServicePointManager.ServerCertificateValidationCallback +=
+                    (sender, certificate, chain, sslPolicyErrors) => true;
+            else
+                ServicePointManager.ServerCertificateValidationCallback = null;
         }
     }
 }

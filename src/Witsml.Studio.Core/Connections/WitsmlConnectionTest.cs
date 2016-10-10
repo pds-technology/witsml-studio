@@ -18,7 +18,6 @@
 
 using System;
 using System.ComponentModel.Composition;
-using System.Net;
 using System.Threading.Tasks;
 using Energistics.DataAccess;
 
@@ -60,8 +59,8 @@ namespace PDS.Witsml.Studio.Core.Connections
                     proxy.Username = connection.Username;
                     proxy.SetSecurePassword(connection.SecurePassword);
                 }
-                if(connection.IgnoreInvalidCertificates)
-                    ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => { return true; };
+
+                connection.SetServerCertificateValidation();
 
                 proxy.GetVersion();
 
