@@ -6,7 +6,7 @@
         xmlns:cal="http://www.caliburnproject.org"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:conv="clr-namespace:PDS.Witsml.Studio.Core.Converters"
-        mc:Ignorable="d" Height="328.776" Width="600"
+        mc:Ignorable="d" Height="330" Width="600"
         MinHeight="300"
         MinWidth="600">
 
