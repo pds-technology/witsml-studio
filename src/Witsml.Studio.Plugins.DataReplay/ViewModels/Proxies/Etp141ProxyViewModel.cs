@@ -152,7 +152,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
                 .Append(ObjectTypes.Well, Model.WellUid)
                 .Append(ObjectTypes.Wellbore, Model.WellboreUid)
                 .Append(ObjectTypes.Log, Model.LogUid)
-                .Append(ObjectTypes.Channel, mnemonic);
+                .Append(ObjectTypes.LogCurveInfo, mnemonic);
         }
 
         private static ChannelStreamingInfo ToChannelStreamingInfo(ChannelMetadataRecord record)

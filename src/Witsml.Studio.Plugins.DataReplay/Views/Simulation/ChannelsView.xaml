@@ -33,7 +33,7 @@
                 <xcdg:Column FieldName="Uuid" Title="Uuid" Width="250" ReadOnly="True" />
                 <xcdg:Column FieldName="ChannelId" Title="ChannelId" Width="80" ReadOnly="True" />
                 <xcdg:Column FieldName="Description" Title="Description" MinWidth="150" ReadOnly="True" />
-                <xcdg:Column FieldName="Mnemonic" Title="Mnemonic" Width="100" ReadOnly="True" />
+                <xcdg:Column FieldName="ChannelName" Title="Mnemonic" Width="100" ReadOnly="True" />
                 <xcdg:Column FieldName="DataType" Title="DataType" Width="100" ReadOnly="True" />
                 <xcdg:Column FieldName="Uom" Title="Uom" Width="60" ReadOnly="True" />
                 <!--<xcdg:Column FieldName="ChannelUri" Title="ChannelUri" MinWidth="150" ReadOnly="True" />-->
