@@ -169,7 +169,7 @@ namespace PDS.Witsml.Studio.Core.Connections
         private bool _ignoreInvalidCertificates;
 
         /// <summary>
-        /// Gets or sets a value indicating whether to ignoring invalid certificates.
+        /// Gets or sets a value indicating whether to ignore invalid certificates.
         /// </summary>
         /// <value>
         /// <c>true</c> if ignoring invalid certificates; otherwise, <c>false</c>.
