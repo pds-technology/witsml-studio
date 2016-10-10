@@ -191,6 +191,27 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             }
         }
 
+        private bool _ignoreInvalidCertificates;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to ignoring invalid certificates.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if ignoring invalid certificates; otherwise, <c>false</c>.
+        /// </value>
+        public bool IgnoreInvalidCertificates
+        {
+            get { return _ignoreInvalidCertificates; }
+            set
+            {
+                if (_ignoreInvalidCertificates != value)
+                {
+                    _ignoreInvalidCertificates = value;
+                    NotifyOfPropertyChange(() => IgnoreInvalidCertificates);
+                }
+            }
+        }
+
         /// <summary>
         /// Executes a connection test and reports the result to the user.
         /// </summary>

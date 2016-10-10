@@ -28,7 +28,7 @@ namespace PDS.Witsml.Studio.Core.Connections
         /// <summary>
         /// Determines whether this Connection instance can connect to the specified connection Uri.
         /// </summary>
-        /// <param name="connection">The connection instanace being tested.</param>
+        /// <param name="connection">The connection instance being tested.</param>
         /// <returns>The boolean result from the asynchronous operation.</returns>
         Task<bool> CanConnect(Connection connection);
     }

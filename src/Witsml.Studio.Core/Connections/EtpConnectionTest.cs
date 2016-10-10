@@ -153,6 +153,8 @@ namespace PDS.Witsml.Studio.Core.Connections
             {
                 var applicationName = GetType().Assembly.FullName;
                 var applicationVersion = GetType().GetAssemblyVersion();
+                if(connection.IgnoreInvalidCertificates)
+                    ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => { return true; };
 
                 using (var client = new EtpClient(connection.Uri, applicationName, applicationVersion, headers))
                 {

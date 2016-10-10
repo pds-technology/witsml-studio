@@ -164,5 +164,28 @@ namespace PDS.Witsml.Studio.Core.Connections
         /// Gets or sets the SecureString password to authenticate the connection.
         /// </summary>
         public SecureString SecurePassword { get; set; }
+
+
+        private bool _ignoreInvalidCertificates;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to ignoring invalid certificates.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if ignoring invalid certificates; otherwise, <c>false</c>.
+        /// </value>
+        [DataMember]
+        public bool IgnoreInvalidCertificates
+        {
+            get { return _ignoreInvalidCertificates; }
+            set
+            {
+                if (_ignoreInvalidCertificates != value)
+                {
+                    _ignoreInvalidCertificates = value;
+                    NotifyOfPropertyChange(() => IgnoreInvalidCertificates);
+                }
+            }
+        }
     }
 }
