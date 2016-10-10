@@ -203,6 +203,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         private void OnConnectionChanged(Connection connection)
         {
             Model.Connection = connection;
+            Model.Connection.SetServerCertificateValidation();
             CanRequestSession = true;
             CanCloseSession = false;
         }

@@ -236,6 +236,9 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
             try
             {
                 WitsmlVersions.Clear();
+
+                Model.Connection.SetServerCertificateValidation();
+
                 var versions = GetVersions(Proxy, Model.Connection);
 
                 if (!string.IsNullOrEmpty(versions))
