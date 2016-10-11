@@ -53,8 +53,7 @@
                     <PasswordBox Grid.Row="4" Grid.Column="1" Margin="5" Padding="5" PasswordChar="*" VerticalAlignment="Center"
                                  cal:Message.Attach="[Event Loaded] = [Action OnPasswordLoaded($source)]; [Event PasswordChanged] = [Action OnPasswordChanged($source)]" />
 
-                    <TextBlock Grid.ColumnSpan="2" Grid.Row="5" Grid.Column="0" Text="Ignore Invalid Certificates:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Left" />
-                    <CheckBox Grid.Row="5" Grid.Column="1" Margin="63.2,12.2,1.4,11.8" IsChecked="{Binding EditItem.IgnoreInvalidCertificates}" VerticalAlignment="Center" />
+                    <CheckBox  Content="Ignore Invalid Certificates" Margin="5" Grid.Row="5" Grid.Column="1" IsChecked="{Binding EditItem.IgnoreInvalidCertificates}" VerticalAlignment="Center" />
                 </Grid>
             </TabItem>
 
