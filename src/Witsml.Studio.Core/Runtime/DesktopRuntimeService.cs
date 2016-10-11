@@ -24,6 +24,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Caliburn.Micro;
 using PDS.Framework;
+using PDS.Witsml.Studio.Core.Properties;
 using PDS.Witsml.Studio.Core.ViewModels;
 
 namespace PDS.Witsml.Studio.Core.Runtime
@@ -34,6 +35,8 @@ namespace PDS.Witsml.Studio.Core.Runtime
     /// <seealso cref="PDS.Witsml.Studio.Core.Runtime.IRuntimeService" />
     public class DesktopRuntimeService : IRuntimeService
     {
+        private static readonly string _persistedDataFolderName = Settings.Default.PersistedDataFolderName;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DesktopRuntimeService"/> class.
         /// </summary>
@@ -41,6 +44,9 @@ namespace PDS.Witsml.Studio.Core.Runtime
         public DesktopRuntimeService(IContainer container)
         {
             Container = container;
+
+            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            DataFolderPath = $"{appDataPath}\\PDS.Witsml.Studio\\{_persistedDataFolderName}";
         }
 
         /// <summary>
@@ -65,6 +71,12 @@ namespace PDS.Witsml.Studio.Core.Runtime
         {
             get { return Container.Resolve<IWindowManager>(); }
         }
+
+        /// <summary>
+        /// Gets the data folder path.
+        /// </summary>
+        /// <value>The data folder path.</value>
+        public string DataFolderPath { get; }
 
         /// <summary>
         /// Invokes the specified action on the UI thread.

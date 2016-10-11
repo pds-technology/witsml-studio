@@ -100,6 +100,14 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         }
 
         /// <summary>
+        /// Opens the current working directory.
+        /// </summary>
+        public void OpenDataDirectory()
+        {
+            Process.Start("explorer.exe", Runtime.DataFolderPath);
+        }
+
+        /// <summary>
         /// Exits the application.
         /// </summary>
         public void Exit()

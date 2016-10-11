@@ -36,10 +36,9 @@ namespace PDS.Witsml.Studio.Core.ViewModels
     /// <seealso cref="Caliburn.Micro.Screen" />
     public class ConnectionPickerViewModel : Screen
     {
-        private static readonly Connection SelectConnectionItem = new Connection { Name = "Select Connection..." };
-        private static readonly Connection AddNewConnectionItem = new Connection { Name = "(Add New Connection...)" };
-        private static readonly string PersistedDataFolderName = Settings.Default.PersistedDataFolderName;
-        private static readonly string ConnectionListBaseFileName = Settings.Default.ConnectionListBaseFileName;
+        private static readonly Connection _selectConnectionItem = new Connection { Name = "Select Connection..." };
+        private static readonly Connection _addNewConnectionItem = new Connection { Name = "(Add New Connection...)" };
+        private static readonly string _connectionListBaseFileName = Settings.Default.ConnectionListBaseFileName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConnectionPickerViewModel" /> class.
@@ -154,7 +153,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             if (Runtime.ShowConfirm($"Are you sure you want to delete the connection?\nName: { connection.Name }"))
             {
                 var selected = connection == Connection
-                    ? SelectConnectionItem
+                    ? _selectConnectionItem
                     : Connection;
 
                 Connections.Remove(connection);
@@ -171,17 +170,17 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             if (Connections.Any()) return;
 
             var connections = LoadConnectionsFromFile();
-            InsertConnections(connections, SelectConnectionItem);
+            InsertConnections(connections, _selectConnectionItem);
         }
 
         private void OnSelectedConnectionChanged(Connection previous)
         {
-            if (Connection == SelectConnectionItem) return;
+            if (Connection == _selectConnectionItem) return;
 
             // If previous connection was disposed
             if (previous == null) return;
 
-            if (Connection == AddNewConnectionItem)
+            if (Connection == _addNewConnectionItem)
             {
                 _connection = previous;
                 NotifyOfPropertyChange(() => Connection);
@@ -211,9 +210,9 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             }
 
             Connections.Clear();
-            Connections.Add(SelectConnectionItem);
+            Connections.Add(_selectConnectionItem);
             Connections.AddRange(list);
-            Connections.Add(AddNewConnectionItem);
+            Connections.Add(_addNewConnectionItem);
             Connection = selected;
         }
 
@@ -255,11 +254,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// <returns>The path and file name for the connection list file with format "[data-folder]/[connection-type]ConnectionList.json".</returns>
         internal string GetConnectionFileName()
         {
-            return string.Format("{0}/{1}/{2}{3}",
-                Environment.CurrentDirectory,
-                PersistedDataFolderName,
-                ConnectionType,
-                ConnectionListBaseFileName);
+            return $"{Runtime.DataFolderPath}\\{ConnectionType}{_connectionListBaseFileName}";
         }
 
         /// <summary>
@@ -267,7 +262,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         private void EnsureDataFolder()
         {
-            var directory = new DirectoryInfo(PersistedDataFolderName);
+            var directory = new DirectoryInfo(Runtime.DataFolderPath);
             Directory.CreateDirectory(directory.FullName);
         }
     }

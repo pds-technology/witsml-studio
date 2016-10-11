@@ -16,7 +16,6 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
-using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -40,7 +39,6 @@ namespace PDS.Witsml.Studio.Core.ViewModels
     public sealed class ConnectionViewModel : Screen
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(ConnectionViewModel));
-        private static readonly string _persistedDataFolderName = Settings.Default.PersistedDataFolderName;
         private static readonly string _connectionBaseFileName = Settings.Default.ConnectionBaseFileName;
         private PasswordBox _passwordControl;
 
@@ -357,11 +355,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// <returns>The path and filename for the connection file with format "[data-folder]/[connection-type]ConnectionData.json".</returns>
         internal string GetConnectionFilename()
         {
-            return string.Format("{0}/{1}/{2}{3}", 
-                Environment.CurrentDirectory, 
-                _persistedDataFolderName, 
-                ConnectionType, 
-                _connectionBaseFileName);
+            return $"{Runtime.DataFolderPath}\\{ConnectionType}{_connectionBaseFileName}";
         }
 
         /// <summary>
@@ -397,7 +391,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         private void EnsureDataFolder()
         {
-            var dataFolder = string.Format("{0}/{1}", Environment.CurrentDirectory, _persistedDataFolderName);
+            var dataFolder = Runtime.DataFolderPath;
             if (!Directory.Exists(dataFolder))
             {
                 Directory.CreateDirectory(dataFolder);

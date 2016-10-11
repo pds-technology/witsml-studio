@@ -35,7 +35,6 @@ namespace PDS.Witsml.Studio.ViewModels
         private static string _validWitsmlUri = "http://localhost/Witsml.Web/WitsmlStore.svc";
         private static string _validEtpUri = "ws://localhost/witsml.web/api/etp";
 
-        protected static readonly string PersistedDataFolderName = Settings.Default.PersistedDataFolderName;
         protected static readonly string ConnectionBaseFileName = Settings.Default.ConnectionBaseFileName;
 
         protected BootstrapperHarness _bootstrapper;
@@ -86,9 +85,9 @@ namespace PDS.Witsml.Studio.ViewModels
             DeletePersistenceFolder();
         }
 
-        protected static void DeletePersistenceFolder()
+        protected void DeletePersistenceFolder()
         {
-            var path = string.Format("{0}/{1}", Environment.CurrentDirectory, PersistedDataFolderName);
+            var path = _runtime.DataFolderPath;
 
             // Delete the Persistence Folder
             if (Directory.Exists(path))

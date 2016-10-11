@@ -49,6 +49,12 @@ namespace PDS.Witsml.Studio.Core.Runtime
         IWindowManager WindowManager { get; }
 
         /// <summary>
+        /// Gets the data folder path.
+        /// </summary>
+        /// <value>The data folder path.</value>
+        string DataFolderPath { get; }
+
+        /// <summary>
         /// Shows the busy indicator cursor.
         /// </summary>
         /// <param name="isBusy">if set to <c>true</c>, shows the busy indicator.</param>

@@ -22,6 +22,7 @@ using System.Windows;
 using System.Windows.Threading;
 using Caliburn.Micro;
 using PDS.Framework;
+using PDS.Witsml.Studio.Core.Properties;
 using PDS.Witsml.Studio.Core.ViewModels;
 
 namespace PDS.Witsml.Studio.Core.Runtime
@@ -32,6 +33,8 @@ namespace PDS.Witsml.Studio.Core.Runtime
     /// <seealso cref="PDS.Witsml.Studio.Core.Runtime.IRuntimeService" />
     public class TestRuntimeService : IRuntimeService
     {
+        private static readonly string _persistedDataFolderName = Settings.Default.PersistedDataFolderName;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRuntimeService"/> class.
         /// </summary>
@@ -57,6 +60,12 @@ namespace PDS.Witsml.Studio.Core.Runtime
         /// </summary>
         /// <value>The window manager.</value>
         public IWindowManager WindowManager { get; set; }
+
+        /// <summary>
+        /// Gets the data folder path.
+        /// </summary>
+        /// <value>The data folder path.</value>
+        public string DataFolderPath => $"{Environment.CurrentDirectory}\\{_persistedDataFolderName}";
 
         /// <summary>
         /// Gets or sets a value indicating the value to be returned by the ShowConfirm and ShowDialog methods.
