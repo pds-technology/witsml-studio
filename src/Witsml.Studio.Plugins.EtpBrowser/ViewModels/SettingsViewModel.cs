@@ -170,11 +170,11 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         public void ServerCapabilities()
         {
             if (!Model.Connection.Uri.ToLowerInvariant().StartsWith("ws")) return;
-            var url = $"http{Model.Connection.Uri.Substring(2)}/.well-known/etp-server-capabilities";
             var client = new JsonClient(Model.Connection.Username, Model.Connection.Password);
 
             try
             {
+                var url = Model.Connection.GetEtpServerCapabilitiesUrl();
                 var capabilities = client.GetServerCapabilities(url);
 
                 Parent.LogDetailMessage(

@@ -27,14 +27,17 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
 {
     public abstract class EtpProxyViewModel
     {
-        public EtpProxyViewModel(IRuntimeService runtime, Action<string> log)
+        public EtpProxyViewModel(IRuntimeService runtime, string dataSchemaVersion, Action<string> log)
         {
             TaskRunner = new TaskRunner();
             Runtime = runtime;
+            DataSchemaVersion = dataSchemaVersion;
             Log = log;
         }
 
         public IRuntimeService Runtime { get; private set; }
+
+        public string DataSchemaVersion { get; private set; }
 
         public Action<string> Log { get; private set; }
 

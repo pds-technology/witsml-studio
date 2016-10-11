@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
 using Energistics;
+using Energistics.Datatypes;
 using Energistics.Datatypes.ChannelData;
 using Energistics.Protocol.ChannelStreaming;
 using Energistics.Protocol.Discovery;
@@ -47,6 +48,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Simulation
         {
             Runtime = runtime;
             DisplayName = "Channels";
+            EtpVersions = new BindableCollection<string>();
             WitsmlVersions = new BindableCollection<string>();
             WitsmlConnectionPicker = new ConnectionPickerViewModel(runtime, ConnectionTypes.Witsml)
             {
@@ -104,6 +106,12 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Simulation
         /// </summary>
         /// <value>The server's supported witsml versions.</value>
         public BindableCollection<string> WitsmlVersions { get; }
+
+        /// <summary>
+        /// Gets the witsml versions retrieved from the server.
+        /// </summary>
+        /// <value>The server's supported witsml versions.</value>
+        public BindableCollection<string> EtpVersions { get; }
 
         private CancellationTokenSource _witsmlClientTokenSource;
         public CancellationTokenSource WitsmlClientTokenSource
@@ -180,6 +188,11 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Simulation
         public void OnWitsmlVersionChanged()
         {
             WitsmlClientProxy = CreateWitsmlClientProxy();
+        }
+
+        public void OnEtpVersionChanged()
+        {
+            EtpClientProxy = CreateEtpClientProxy();
         }
 
         public bool CanStartWitsmlClient
@@ -388,7 +401,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Simulation
             }
             catch (Exception ex)
             {
-                var errorMessage = "Error connecting to server: Invalid URL";
+                var errorMessage = "Error connecting to server: " + ex.GetBaseException().Message;
 
                 // Log the error
                 _log.Error(errorMessage, ex);
@@ -428,6 +441,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Simulation
             {
                 Runtime.ShowBusy(false);
                 EtpClientProxy = CreateEtpClientProxy();
+                GetSupportedObjects();
                 Messages.Clear();
             });
         }
@@ -441,7 +455,51 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Simulation
 
         private EtpProxyViewModel CreateEtpClientProxy()
         {
-            return new Etp141ProxyViewModel(Runtime, Log);
+            return new EtpChannelStreamingProxy(Runtime, Model.EtpVersion, Log);
+        }
+
+        private void GetSupportedObjects()
+        {
+            _log.Debug("Selecting supported versions from ETP server.");
+
+            try
+            {
+                EtpVersions.Clear();
+                var client = new JsonClient(Model.EtpConnection.Username, Model.EtpConnection.Password);
+                var url = Model.EtpConnection.GetEtpServerCapabilitiesUrl();
+                var capServer = client.GetServerCapabilities(url);
+
+                var versions = capServer.SupportedObjects
+                    .Select(x => new EtpContentType(x))
+                    .Where(x => x.IsValid)
+                    .Select(x => x.Version)
+                    .Distinct()
+                    .OrderBy(x => x)
+                    .ToList();
+
+                if (versions.Any())
+                {
+                    _log.DebugFormat("Supported versions '{0}' found on ETP server with URI '{1}'", string.Join(",", versions), Model.EtpConnection.Uri);
+                    EtpVersions.AddRange(versions);
+                    Model.EtpVersion = EtpVersions.Last();
+                }
+                else
+                {
+                    var msg = "The ETP server does not support any versions.";
+                    _log.Warn(msg);
+                    Runtime.ShowError(msg);
+                }
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "Error connecting to server: " + ex.GetBaseException().Message;
+
+                // Log the error
+                _log.Error(errorMessage, ex);
+
+                // Show the user the error in a dialog.
+                Runtime.ShowError(errorMessage, ex);
+            }
         }
 
         private void Log(string message, params object[] values)

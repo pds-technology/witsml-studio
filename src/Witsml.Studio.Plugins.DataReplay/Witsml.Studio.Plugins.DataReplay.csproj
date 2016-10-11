@@ -160,7 +160,7 @@
     <Compile Include="ViewModels\Proxies\EtpProxyViewModel.cs" />
     <Compile Include="ViewModels\Proxies\Log131ProxyViewModel.cs" />
     <Compile Include="ViewModels\Proxies\Log141ProxyViewModel.cs" />
-    <Compile Include="ViewModels\Proxies\Etp141ProxyViewModel.cs" />
+    <Compile Include="ViewModels\Proxies\EtpChannelStreamingProxy.cs" />
     <Compile Include="ViewModels\Proxies\WitsmlProxyViewModel.cs" />
     <Compile Include="ViewModels\Simulation\ChannelsViewModel.cs" />
     <Compile Include="ViewModels\DataReplayViewModel.cs" />

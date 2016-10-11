@@ -217,6 +217,36 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.Models
             }
         }
 
+        private string _channelSetName;
+        [DataMember]
+        public string ChannelSetName
+        {
+            get { return _channelSetName; }
+            set
+            {
+                if (!string.Equals(_channelSetName, value))
+                {
+                    _channelSetName = value;
+                    NotifyOfPropertyChange(() => ChannelSetName);
+                }
+            }
+        }
+
+        private string _channelSetUid;
+        [DataMember]
+        public string ChannelSetUid
+        {
+            get { return _channelSetUid; }
+            set
+            {
+                if (!string.Equals(_channelSetUid, value))
+                {
+                    _channelSetUid = value;
+                    NotifyOfPropertyChange(() => ChannelSetUid);
+                }
+            }
+        }
+
         private BindableCollection<ChannelMetadataRecord> _channels;
         [DataMember]
         public BindableCollection<ChannelMetadataRecord> Channels
@@ -243,6 +273,21 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.Models
                 {
                     _witsmlVersion = value;
                     NotifyOfPropertyChange(() => WitsmlVersion);
+                }
+            }
+        }
+
+        private string _etpVersion;
+        [DataMember]
+        public string EtpVersion
+        {
+            get { return _etpVersion; }
+            set
+            {
+                if (_etpVersion != value)
+                {
+                    _etpVersion = value;
+                    NotifyOfPropertyChange(() => EtpVersion);
                 }
             }
         }

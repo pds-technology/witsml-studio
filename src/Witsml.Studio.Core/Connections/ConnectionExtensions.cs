@@ -59,5 +59,18 @@ namespace PDS.Witsml.Studio.Core.Connections
             else
                 ServicePointManager.ServerCertificateValidationCallback = null;
         }
+
+        /// <summary>
+        /// Gets the ETP server capabilities URL for the connection.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <returns>The well-known server capabilities URL.</returns>
+        public static string GetEtpServerCapabilitiesUrl(this Connection connection)
+        {
+            if (string.IsNullOrWhiteSpace(connection?.Uri))
+                return string.Empty;
+
+            return $"http{connection.Uri.Substring(2)}/.well-known/etp-server-capabilities";
+        }
     }
 }

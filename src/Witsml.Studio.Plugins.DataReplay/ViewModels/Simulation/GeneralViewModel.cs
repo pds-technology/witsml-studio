@@ -54,6 +54,11 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Simulation
             Model.LogUid = Guid.NewGuid().ToString();
         }
 
+        public void NewChannelSetUid()
+        {
+            Model.ChannelSetUid = Guid.NewGuid().ToString();
+        }
+
         public void Save()
         {
             ((SimulationViewModel)Parent).Save();
