@@ -54,6 +54,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             Runtime = runtime;
             ConnectionType = connectionType;
             ConnectionNames = new string[0];
+            IsEtpConnection = connectionType == ConnectionTypes.Etp;
             DisplayName = string.Format("{0} Connection", ConnectionType.ToString().ToUpper());
             CanTestConnection = true;
         }
@@ -74,6 +75,14 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         /// <value>The list of connection names.</value>
         public string[] ConnectionNames { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the connection type is ETP.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if the connection type is ETP; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsEtpConnection { get; }
 
         /// <summary>
         /// Gets or sets the connection details for a connection
@@ -207,6 +216,22 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                     _ignoreInvalidCertificates = value;
                     NotifyOfPropertyChange(() => IgnoreInvalidCertificates);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets a JSON Web Token via a new Connection dialog.
+        /// </summary>
+        public void GetJsonWebToken()
+        {
+            var viewModel = new ConnectionViewModel(Runtime, ConnectionTypes.Jwt)
+            {
+                DataItem = new Connection()
+            };
+
+            if (Runtime.ShowDialog(viewModel))
+            {
+                EditItem.JsonWebToken = viewModel.DataItem.JsonWebToken;
             }
         }
 

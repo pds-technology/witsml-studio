@@ -6,8 +6,8 @@
         xmlns:cal="http://www.caliburnproject.org"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:conv="clr-namespace:PDS.Witsml.Studio.Core.Converters"
-        mc:Ignorable="d" Height="330" Width="600"
-        MinHeight="300"
+        mc:Ignorable="d" Height="350" Width="600"
+        MinHeight="350"
         MinWidth="600">
 
     <Window.Resources>
@@ -22,7 +22,7 @@
         </Grid.RowDefinitions>
 
         <TabControl Margin="5" SelectedIndex="{Binding AuthenticationType}">
-            <TabItem Header="Basic">
+            <TabItem Header="General">
 
                 <Grid Margin="5">
                     <Grid.RowDefinitions>
@@ -30,13 +30,11 @@
                         <RowDefinition Height="40" />
                         <RowDefinition Height="40" />
                         <RowDefinition Height="40" />
-                        <RowDefinition Height="40" />
-                        <RowDefinition Height="40" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="85" />
+                        <ColumnDefinition Width="90" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
@@ -46,18 +44,54 @@
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="URL:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
                     <TextBox Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Uri, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
 
-                    <TextBlock Grid.Row="3" Grid.Column="0" Text="User Name:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                    <TextBox Grid.Row="3" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Username}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Authentication:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <StackPanel Grid.Row="3" Grid.Column="1" Margin="5" Orientation="Horizontal">
+                        <RadioButton Content="Basic" VerticalAlignment="Center" IsChecked="{Binding EditItem.IsAuthenticationBasic}" Margin="0,0,20,0" />
+                        <RadioButton Content="Bearer" VerticalAlignment="Center" IsChecked="{Binding EditItem.IsAuthenticationBearer}" Margin="0,0,10,0" />
+                        <Button x:Name="GetJsonWebToken"  Content="..." VerticalAlignment="Center" Margin="0,0,120,0" Width="25" IsEnabled="{Binding EditItem.IsAuthenticationBearer}" />
+                        <CheckBox Content="Ignore Invalid Certificates" VerticalAlignment="Center" IsChecked="{Binding EditItem.IgnoreInvalidCertificates}" />
+                    </StackPanel>
 
-                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Password:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                    <PasswordBox Grid.Row="4" Grid.Column="1" Margin="5" Padding="5" PasswordChar="*" VerticalAlignment="Center"
+                    <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding EditItem.IsAuthenticationBasic, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="40" />
+                            <RowDefinition Height="40" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="90" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="User Name:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                        <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Username}" VerticalAlignment="Center" />
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Password:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                        <PasswordBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" PasswordChar="*" VerticalAlignment="Center"
                                  cal:Message.Attach="[Event Loaded] = [Action OnPasswordLoaded($source)]; [Event PasswordChanged] = [Action OnPasswordChanged($source)]" />
+                    </Grid>
 
-                    <CheckBox  Content="Ignore Invalid Certificates" Margin="5" Grid.Row="5" Grid.Column="1" IsChecked="{Binding EditItem.IgnoreInvalidCertificates}" VerticalAlignment="Center" />
+                    <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding EditItem.IsAuthenticationBearer, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="40" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="90" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="JWT:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                        <TextBox Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Margin="5" Padding="5" Text="{Binding EditItem.JsonWebToken}" VerticalAlignment="Stretch"
+                                 TextWrapping="Wrap" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />
+                    </Grid>
                 </Grid>
             </TabItem>
 
-            <TabItem Header="OpenID">
+            <TabItem Header="WebSocket" Visibility="{Binding IsEtpConnection, Converter={StaticResource BooleanToVisibilityConverter}}">
+            </TabItem>
+
+            <TabItem Header="OpenID" IsEnabled="False" Visibility="Collapsed">
 
                 <Grid Margin="5">
                     <Grid.RowDefinitions>

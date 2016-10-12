@@ -41,6 +41,7 @@ namespace PDS.Witsml.Studio.Core.Connections
         /// </summary>
         public Connection()
         {
+            IsAuthenticationBasic = true;
             RedirectPort = 9005;
         }
 
@@ -165,6 +166,24 @@ namespace PDS.Witsml.Studio.Core.Connections
         /// </summary>
         public SecureString SecurePassword { get; set; }
 
+        private string _jsonWebToken;
+
+        /// <summary>
+        /// Gets or sets the JSON Web Token to authenticate the connection.
+        /// </summary>
+        [DataMember]
+        public string JsonWebToken
+        {
+            get { return _jsonWebToken; }
+            set
+            {
+                if (!string.Equals(_jsonWebToken, value))
+                {
+                    _jsonWebToken = value;
+                    NotifyOfPropertyChange(() => JsonWebToken);
+                }
+            }
+        }
 
         private bool _ignoreInvalidCertificates;
 
@@ -184,6 +203,52 @@ namespace PDS.Witsml.Studio.Core.Connections
                 {
                     _ignoreInvalidCertificates = value;
                     NotifyOfPropertyChange(() => IgnoreInvalidCertificates);
+                }
+            }
+        }
+
+        private bool _isAuthenticationBasic;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to connect using Basic authentication.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if using Basic authentication; otherwise, <c>false</c>.
+        /// </value>
+        [DataMember]
+        public bool IsAuthenticationBasic
+        {
+            get { return _isAuthenticationBasic; }
+            set
+            {
+                if (_isAuthenticationBasic != value)
+                {
+                    _isAuthenticationBasic = value;
+                    IsAuthenticationBearer = !value;
+                    NotifyOfPropertyChange(() => IsAuthenticationBasic);
+                }
+            }
+        }
+
+        private bool _isAuthenticationBearer;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to connect using Bearer authentication.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if using Bearer authentication; otherwise, <c>false</c>.
+        /// </value>
+        [DataMember]
+        public bool IsAuthenticationBearer
+        {
+            get { return _isAuthenticationBearer; }
+            set
+            {
+                if (_isAuthenticationBearer != value)
+                {
+                    _isAuthenticationBearer = value;
+                    IsAuthenticationBasic = !value;
+                    NotifyOfPropertyChange(() => IsAuthenticationBearer);
                 }
             }
         }

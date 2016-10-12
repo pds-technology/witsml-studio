@@ -182,6 +182,7 @@
     <Compile Include="Connections\ConnectionTypes.cs" />
     <Compile Include="Connections\EtpConnectionTest.cs" />
     <Compile Include="Connections\IConnectionTest.cs" />
+    <Compile Include="Connections\JwtConnectionTest.cs" />
     <Compile Include="Connections\WitsmlConnectionTest.cs" />
     <Compile Include="Converters\BooleanInverseConverter.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
