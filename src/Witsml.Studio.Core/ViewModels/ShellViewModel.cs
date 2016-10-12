@@ -253,6 +253,9 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         {
             if (_windowSettings != null) return;
 
+            if (!Directory.Exists(Runtime.DataFolderPath))
+                Directory.CreateDirectory(Runtime.DataFolderPath);
+
             var settingsPath = $"{Runtime.DataFolderPath}\\{_windowSettingsFileName}";
             if (!File.Exists(settingsPath)) return;
 
