@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:cal="http://www.caliburnproject.org"
         mc:Ignorable="d" ResizeMode="CanResizeWithGrip"
+        Closing="ShellView_OnClosing"
         Height="800" Width="1200">
     <DockPanel>
         <Menu x:Name="MainMenu" DockPanel.Dock="Top" Padding="5">

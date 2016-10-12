@@ -67,5 +67,14 @@ namespace PDS.Witsml.Studio.Core.Properties {
                 return ((string)(this["OnlineHelpUrl"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("WindowSettings.json")]
+        public string WindowSettingsFileName {
+            get {
+                return ((string)(this["WindowSettingsFileName"]));
+            }
+        }
     }
 }

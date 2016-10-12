@@ -16,7 +16,10 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System;
+using System.ComponentModel;
 using System.Windows;
+using PDS.Witsml.Studio.Core.ViewModels;
 
 namespace PDS.Witsml.Studio.Core.Views
 {
@@ -31,6 +34,29 @@ namespace PDS.Witsml.Studio.Core.Views
         public ShellView()
         {
             InitializeComponent();
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Window.SourceInitialized" /> event.
+        /// </summary>
+        /// <param name="e">An <see cref="EventArgs" /> that contains the event data.</param>
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+
+            var shellViewModel = DataContext as IShellViewModel;
+            shellViewModel?.RestoreWindowPlacement(this);
+        }
+
+        /// <summary>
+        /// Handles the OnClosing event of the ShellView window.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="CancelEventArgs"/> instance containing the event data.</param>
+        private void ShellView_OnClosing(object sender, CancelEventArgs e)
+        {
+            var shellViewModel = DataContext as IShellViewModel;
+            shellViewModel?.SaveWindowPlacement(this);
         }
     }
 }

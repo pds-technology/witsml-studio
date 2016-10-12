@@ -19,9 +19,11 @@
 using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using Caliburn.Micro;
+using Newtonsoft.Json;
 using PDS.Witsml.Studio.Core.Properties;
 using PDS.Witsml.Studio.Core.Runtime;
 
@@ -35,6 +37,8 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(ShellViewModel));
         private static readonly string _applicationTitle = Settings.Default.ApplicationTitle;
         private static readonly string _onlineHelpUrl = Settings.Default.OnlineHelpUrl;
+        private static readonly string _windowSettingsFileName = Settings.Default.WindowSettingsFileName;
+        private WindowSettings _windowSettings;
 
         /// <summary>
         /// Initializes an instance of the ShellViewModel
@@ -132,6 +136,34 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         }
 
         /// <summary>
+        /// Restores the main application window placement.
+        /// </summary>
+        /// <param name="window">The main window.</param>
+        public void RestoreWindowPlacement(Window window)
+        {
+            LoadWindowSettings();
+            if (_windowSettings == null) return;
+            window.SetPlacement(_windowSettings.WindowPlacement);
+        }
+
+        /// <summary>
+        /// Saves the main application window placement.
+        /// </summary>
+        /// <param name="window">The main window.</param>
+        public void SaveWindowPlacement(Window window)
+        {
+            var settingsPath = $"{Runtime.DataFolderPath}\\{_windowSettingsFileName}";
+
+            var settings = new WindowSettings
+            {
+                WindowPlacement = window.GetPlacement(),
+                CurrentPluginIndex = Items.IndexOf(ActiveItem)
+            };
+
+            File.WriteAllText(settingsPath, JsonConvert.SerializeObject(settings));
+        }
+
+        /// <summary>
         /// Sets the application title.
         /// </summary>
         /// <param name="screen">The screen.</param>
@@ -177,6 +209,8 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         internal void LoadPlugins()
         {
+            LoadWindowSettings();
+
             Items.AddRange(Runtime.Container
                 .ResolveAll<IPluginViewModel>()
                 .OrderBy(x => x.DisplayOrder));
@@ -186,7 +220,8 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 _log.DebugFormat("{0}{1}{2}", "Plugins Loaded:", Environment.NewLine, string.Join(Environment.NewLine, Items.Select(x => x.DisplayName)));
             }
 
-            ActivateItem(Items.FirstOrDefault());
+            var index = _windowSettings?.CurrentPluginIndex ?? 0;
+            ActivateItem(Items.Skip(index).FirstOrDefault());
         }
 
         /// <summary>
@@ -212,6 +247,17 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             {
                 SetApplicationTitle(item);
             }
+        }
+
+        private void LoadWindowSettings()
+        {
+            if (_windowSettings != null) return;
+
+            var settingsPath = $"{Runtime.DataFolderPath}\\{_windowSettingsFileName}";
+            if (!File.Exists(settingsPath)) return;
+
+            var json = File.ReadAllText(settingsPath);
+            _windowSettings = JsonConvert.DeserializeObject<WindowSettings>(json);
         }
     }
 }

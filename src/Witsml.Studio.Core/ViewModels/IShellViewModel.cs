@@ -17,6 +17,7 @@
 //-----------------------------------------------------------------------
 
 using System.ComponentModel.Composition;
+using System.Windows;
 using Caliburn.Micro;
 using PDS.Witsml.Studio.Core.Runtime;
 
@@ -55,5 +56,17 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         /// <param name="screen">The screen.</param>
         void SetApplicationTitle(IScreen screen);
+
+        /// <summary>
+        /// Restores the main application window placement.
+        /// </summary>
+        /// <param name="window">The main window.</param>
+        void RestoreWindowPlacement(Window window);
+
+        /// <summary>
+        /// Saves the main application window placement.
+        /// </summary>
+        /// <param name="window">The main window.</param>
+        void SaveWindowPlacement(Window window);
     }
 }

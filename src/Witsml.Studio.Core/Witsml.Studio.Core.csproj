@@ -204,6 +204,8 @@
     <Compile Include="Runtime\DesktopRuntimeService.cs" />
     <Compile Include="Runtime\IRuntimeService.cs" />
     <Compile Include="Runtime\Win32WindowHandle.cs" />
+    <Compile Include="Runtime\WindowPlacement.cs" />
+    <Compile Include="Runtime\WindowSettings.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\ConnectionPickerViewModel.cs" />
     <Compile Include="ViewModels\ConnectionViewModel.cs" />
