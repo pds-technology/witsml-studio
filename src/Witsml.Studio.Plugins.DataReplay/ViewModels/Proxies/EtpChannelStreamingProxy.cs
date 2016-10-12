@@ -64,6 +64,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
                 Client.Handler<IChannelStreamingProducer>().OnChannelStreamingStop += OnChannelStreamingStop;
                 Client.Handler<IChannelStreamingProducer>().IsSimpleStreamer = Model.IsSimpleStreamer;
                 Client.Handler<IChannelStreamingProducer>().DefaultDescribeUri = EtpUri.RootUri;
+                Client.SocketClosed += OnClientSocketClosed;
                 Client.Output = Log;
                 Client.Open();
 
@@ -82,6 +83,11 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
                 Client.Handler<ICoreClient>()
                     .CloseSession("Streaming stopped.");
             }
+        }
+
+        private void OnClientSocketClosed(object sender, EventArgs e)
+        {
+            TaskRunner.Stop();
         }
 
         private void OnStart(object sender, ProtocolEventArgs<Start> e)
@@ -125,6 +131,8 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
 
         private void StreamChannelData()
         {
+            if (!Client.IsOpen) return;
+
             var dataItems = ChannelStreamingInfo
                 .Select(ToChannelDataItem)
                 .ToList();
@@ -276,7 +284,14 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
 
         private void LogStreamingError(Exception ex)
         {
-            Log("An error occurred: " + ex);
+            if (ex is TaskCanceledException)
+            {
+                Log(ex.Message);
+            }
+            else
+            {
+                Log("An error occurred: " + ex);
+            }
         }
     }
 }
