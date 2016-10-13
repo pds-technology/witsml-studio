@@ -220,7 +220,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 _log.DebugFormat("{0}{1}{2}", "Plugins Loaded:", Environment.NewLine, string.Join(Environment.NewLine, Items.Select(x => x.DisplayName)));
             }
 
-            var index = _windowSettings?.CurrentPluginIndex ?? 0;
+            var index = Math.Min(_windowSettings?.CurrentPluginIndex ?? 0, Math.Max(Items.Count - 1, 0));
             ActivateItem(Items.Skip(index).FirstOrDefault());
         }
 
