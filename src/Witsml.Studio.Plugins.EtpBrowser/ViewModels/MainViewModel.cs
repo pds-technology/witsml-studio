@@ -19,6 +19,7 @@
 using System;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Reflection;
 using Avro.Specific;
 using Caliburn.Micro;
 using Energistics;
@@ -64,7 +65,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             Resources = new BindableCollection<ResourceViewModel>();
             Model = new Models.EtpSettings()
             {
-                ApplicationName = _pluginDisplayName,
+                ApplicationName = Assembly.GetEntryAssembly().GetAssemblyName(),
                 ApplicationVersion = _pluginVersion
             };
 
