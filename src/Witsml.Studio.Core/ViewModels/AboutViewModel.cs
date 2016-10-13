@@ -42,6 +42,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             DisplayName = "About";
             Runtime = runtime;
             License = new TextEditorViewModel(Runtime, null, true);
+            Notice = new TextEditorViewModel(Runtime, null, true);
             ApplicationTitle = _applicationTitle;
             ApplicationVersion = Application.Current.GetType().GetAssemblyVersion();
         }
@@ -57,6 +58,12 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         /// <value>The license text editor control.</value>
         public TextEditorViewModel License { get; }
+
+        /// <summary>
+        /// Gets the notice text editor control.
+        /// </summary>
+        /// <value>The notice text editor control.</value>
+        public TextEditorViewModel Notice { get; }
 
         /// <summary>
         /// Gets the application title.
@@ -76,6 +83,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         protected override void OnInitialize()
         {
             License.SetText(File.ReadAllText("LICENSE.txt"));
+            Notice.SetText(File.ReadAllText("NOTICE.txt"));
         }
     }
 }

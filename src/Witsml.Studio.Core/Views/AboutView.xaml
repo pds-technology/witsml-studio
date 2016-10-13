@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:cal="http://www.caliburnproject.org"
         Width="675" MinWidth="675"
-        Height="440" MinHeight="440">
+        Height="480" MinHeight="480">
     
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -31,11 +31,19 @@
             </Grid>
         </Grid>
         
-        <Grid Grid.Row="1">
-            <Border Margin="5" BorderBrush="Silver" BorderThickness="1">
-                <ContentControl x:Name="License" />
-            </Border>
-        </Grid>
+        <TabControl Grid.Row="1" Margin="5">
+            <TabItem Header="License">
+                <Border Margin="5" BorderBrush="Silver" BorderThickness="1">
+                    <ContentControl x:Name="License" />
+                </Border>
+            </TabItem>
+
+            <TabItem Header="Notice">
+                <Border Margin="5" BorderBrush="Silver" BorderThickness="1">
+                    <ContentControl x:Name="Notice" />
+                </Border>
+            </TabItem>
+        </TabControl>
 
         <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Margin="5" Content="OK" Width="80" cal:Message.Attach="TryClose(true)" />
