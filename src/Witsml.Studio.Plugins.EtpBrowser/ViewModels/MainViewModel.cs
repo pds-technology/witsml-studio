@@ -37,6 +37,7 @@ using Energistics.Protocol.ChannelDataFrame;
 using Energistics.Protocol.DataArray;
 using Energistics.Protocol.GrowingObject;
 using Energistics.Protocol.StoreNotification;
+using PDS.Witsml.Studio.Core.Connections;
 
 namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 {
@@ -293,7 +294,9 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             try
             {
                 Runtime.Invoke(() => Runtime.Shell.StatusBarText = "Connecting...");
+
                 var headers = Authorization.Basic(Model.Connection.Username, Model.Connection.Password);
+                Model.Connection.UpdateEtpSettings(headers);
 
                 Client = new EtpClient(Model.Connection.Uri, Model.ApplicationName, Model.ApplicationVersion, headers);
 

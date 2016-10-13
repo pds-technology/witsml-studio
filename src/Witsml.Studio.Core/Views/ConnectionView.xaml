@@ -21,7 +21,8 @@
             <RowDefinition Height="40" />
         </Grid.RowDefinitions>
 
-        <TabControl Margin="5" SelectedIndex="{Binding AuthenticationType}">
+        <!-- SelectedIndex="{Binding AuthenticationType}" -->
+        <TabControl Margin="5">
             <TabItem Header="General">
 
                 <Grid Margin="5">
@@ -38,7 +39,7 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="1" Text="Name:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Name:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
                     <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Name}" VerticalAlignment="Center" />
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="URL:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
@@ -89,6 +90,26 @@
             </TabItem>
 
             <TabItem Header="WebSocket" Visibility="{Binding IsEtpConnection, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Sub-Protocol:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.SubProtocol}" VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Encoding:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <TextBox Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.EtpEncoding}" VerticalAlignment="Center" />
+                </Grid>
             </TabItem>
 
             <TabItem Header="OpenID" IsEnabled="False" Visibility="Collapsed">

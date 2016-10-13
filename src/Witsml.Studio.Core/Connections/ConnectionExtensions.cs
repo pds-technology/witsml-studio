@@ -16,8 +16,10 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System.Collections.Generic;
 using Energistics.DataAccess;
 using System.Net;
+using Energistics.Common;
 
 namespace PDS.Witsml.Studio.Core.Connections
 {
@@ -71,6 +73,20 @@ namespace PDS.Witsml.Studio.Core.Connections
                 return string.Empty;
 
             return $"http{connection.Uri.Substring(2)}/.well-known/etp-server-capabilities";
+        }
+
+        /// <summary>
+        /// Updates the ETP settings based on the connection settings.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="headers">The headers.</param>
+        public static void UpdateEtpSettings(this Connection connection, IDictionary<string, string> headers)
+        {
+            if (!string.IsNullOrWhiteSpace(connection.SubProtocol))
+                EtpSettings.EtpSubProtocolName = connection.SubProtocol;
+
+            if (!string.IsNullOrWhiteSpace(connection.EtpEncoding))
+                headers[EtpSettings.EtpEncodingHeader] = connection.EtpEncoding;
         }
     }
 }

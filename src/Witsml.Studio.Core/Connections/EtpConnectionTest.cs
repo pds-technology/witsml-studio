@@ -67,8 +67,11 @@ namespace PDS.Witsml.Studio.Core.Connections
         /// <returns>The boolean result from the asynchronous operation.</returns>
         public async Task<bool> CanConnect(Connection connection)
         {
-            if (connection.AuthenticationType == AuthenticationTypes.OpenId)
-                return await CanConnectUsingOpenId(connection);
+            //if (connection.AuthenticationType == AuthenticationTypes.OpenId)
+            //    return await CanConnectUsingOpenId(connection);
+
+            if (connection.IsAuthenticationBearer)
+                return await CanConnectUsingJsonWebToken(connection);
 
             return await CanConnectUsingBasic(connection);
         }
@@ -76,6 +79,12 @@ namespace PDS.Witsml.Studio.Core.Connections
         private async Task<bool> CanConnectUsingBasic(Connection connection)
         {
             var headers = Authorization.Basic(connection.Username, connection.Password);
+            return await CanConnect(connection, headers);
+        }
+
+        private async Task<bool> CanConnectUsingJsonWebToken(Connection connection)
+        {
+            var headers = Authorization.Bearer(connection.JsonWebToken);
             return await CanConnect(connection, headers);
         }
 
@@ -130,7 +139,7 @@ namespace PDS.Witsml.Studio.Core.Connections
                         window.Closed += (s, e) =>
                         {
                             closed = true;
-                            listener?.Stop();
+                            listener.Stop();
                         };
 
                         window.ShowDialog();
@@ -154,6 +163,7 @@ namespace PDS.Witsml.Studio.Core.Connections
                 var applicationName = GetType().Assembly.FullName;
                 var applicationVersion = GetType().GetAssemblyVersion();
 
+                connection.UpdateEtpSettings(headers);
                 connection.SetServerCertificateValidation();
 
                 using (var client = new EtpClient(connection.Uri, applicationName, applicationVersion, headers))

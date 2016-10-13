@@ -19,6 +19,7 @@
 using System.Runtime.Serialization;
 using System.Security;
 using Caliburn.Micro;
+using Energistics.Common;
 
 namespace PDS.Witsml.Studio.Core.Connections
 {
@@ -43,9 +44,12 @@ namespace PDS.Witsml.Studio.Core.Connections
         {
             IsAuthenticationBasic = true;
             RedirectPort = 9005;
+            SubProtocol = EtpSettings.EtpSubProtocolName;
+            EtpEncoding = "binary";
         }
 
         private AuthenticationTypes _authenticationType;
+
         /// <summary>
         /// Gets or sets the authentication type.
         /// </summary>
@@ -65,6 +69,7 @@ namespace PDS.Witsml.Studio.Core.Connections
         }
 
         private string _name;
+
         /// <summary>
         /// Gets or sets the name of the connection
         /// </summary>
@@ -83,6 +88,7 @@ namespace PDS.Witsml.Studio.Core.Connections
         }
 
         private string _uri;
+
         /// <summary>
         /// Gets or sets the uri to access the connection
         /// </summary>
@@ -101,6 +107,7 @@ namespace PDS.Witsml.Studio.Core.Connections
         }
 
         private string _clientId;
+
         /// <summary>
         /// Gets or sets the client ID
         /// </summary>
@@ -119,6 +126,7 @@ namespace PDS.Witsml.Studio.Core.Connections
         }
 
         private int _redirectPort;
+
         /// <summary>
         /// Gets or sets the redirect port.
         /// </summary>
@@ -138,6 +146,7 @@ namespace PDS.Witsml.Studio.Core.Connections
         }
 
         private string _username;
+
         /// <summary>
         /// Gets or sets the username to authenticate the connection
         /// </summary>
@@ -181,6 +190,44 @@ namespace PDS.Witsml.Studio.Core.Connections
                 {
                     _jsonWebToken = value;
                     NotifyOfPropertyChange(() => JsonWebToken);
+                }
+            }
+        }
+
+        private string _subProtocol;
+
+        /// <summary>
+        /// Gets or sets the sub protocol.
+        /// </summary>
+        [DataMember]
+        public string SubProtocol
+        {
+            get { return _subProtocol; }
+            set
+            {
+                if (!string.Equals(_subProtocol, value))
+                {
+                    _subProtocol = value;
+                    NotifyOfPropertyChange(() => SubProtocol);
+                }
+            }
+        }
+
+        private string _etpEncoding;
+
+        /// <summary>
+        /// Gets or sets the ETP encoding.
+        /// </summary>
+        [DataMember]
+        public string EtpEncoding
+        {
+            get { return _etpEncoding; }
+            set
+            {
+                if (!string.Equals(_etpEncoding, value))
+                {
+                    _etpEncoding = value;
+                    NotifyOfPropertyChange(() => EtpEncoding);
                 }
             }
         }
