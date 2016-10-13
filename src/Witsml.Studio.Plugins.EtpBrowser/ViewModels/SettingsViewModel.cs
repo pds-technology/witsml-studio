@@ -173,6 +173,15 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             Task.Run(GetServerCapabilities);
         }
 
+        /// <summary>
+        /// Called when the selected connection has changed.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        void ISessionAware.OnConnectionChanged(Connection connection)
+        {
+            // Nothing to do here as the connection change was initiated on this tab.
+        }
+
         public void OnSessionOpened(ProtocolEventArgs<OpenSession> e)
         {
             CanRequestSession = false;
@@ -189,6 +198,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         {
             Model.Connection = connection;
             Model.Connection.SetServerCertificateValidation();
+            Parent.OnConnectionChanged(false);
             CanRequestSession = true;
             CanCloseSession = false;
         }

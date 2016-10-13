@@ -30,6 +30,7 @@ using Energistics.Datatypes.Object;
 using Energistics.Protocol.Core;
 using Energistics.Protocol.Store;
 using ICSharpCode.AvalonEdit.Document;
+using PDS.Witsml.Studio.Core.Connections;
 using PDS.Witsml.Studio.Core.Runtime;
 using PDS.Witsml.Studio.Core.ViewModels;
 
@@ -189,6 +190,14 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             {
                 Parent.SendDeleteObject(Model.Store.Uri);
             }
+        }
+
+        /// <summary>
+        /// Called when the selected connection has changed.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        public void OnConnectionChanged(Connection connection)
+        {
         }
 
         /// <summary>

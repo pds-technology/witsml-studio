@@ -27,6 +27,7 @@ using Energistics.Common;
 using Energistics.Datatypes;
 using Energistics.Protocol.Core;
 using Newtonsoft.Json;
+using PDS.Witsml.Studio.Core.Connections;
 using PDS.Witsml.Studio.Core.Runtime;
 using PDS.Witsml.Studio.Core.ViewModels;
 
@@ -189,6 +190,14 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                     Parent.LogClientError("Error sending message:", ex);
                 }
             });
+        }
+
+        /// <summary>
+        /// Called when the selected connection has changed.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        public void OnConnectionChanged(Connection connection)
+        {
         }
 
         /// <summary>

@@ -18,6 +18,7 @@
 
 using Energistics.Common;
 using Energistics.Protocol.Core;
+using PDS.Witsml.Studio.Core.Connections;
 
 namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 {
@@ -26,6 +27,12 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
     /// </summary>
     public interface ISessionAware
     {
+        /// <summary>
+        /// Called when the selected connection has changed.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        void OnConnectionChanged(Connection connection);
+
         /// <summary>
         /// Called when the <see cref="OpenSession"/> message is recieved.
         /// </summary>

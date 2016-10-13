@@ -30,6 +30,7 @@ using Energistics.Protocol;
 using Energistics.Protocol.ChannelStreaming;
 using Energistics.Protocol.Core;
 using PDS.Framework;
+using PDS.Witsml.Studio.Core.Connections;
 using PDS.Witsml.Studio.Core.Runtime;
 
 namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
@@ -336,6 +337,14 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
+        /// Called when the selected connection has changed.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        public void OnConnectionChanged(Connection connection)
+        {
+        }
+
+        /// <summary>
         /// Called when the <see cref="OpenSession" /> message is recieved.
         /// </summary>
         /// <param name="e">The <see cref="ProtocolEventArgs{OpenSession}" /> instance containing the event data.</param>
@@ -370,7 +379,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void OnSocketClosed()
         {
-            if (!Parent.Client.CanHandle<IChannelStreamingConsumer>()) return;
+            if (Parent.Client == null || !Parent.Client.CanHandle<IChannelStreamingConsumer>()) return;
 
             var handler = Parent.Client.Handler<IChannelStreamingConsumer>();
             handler.OnChannelMetadata -= OnChannelMetadata;

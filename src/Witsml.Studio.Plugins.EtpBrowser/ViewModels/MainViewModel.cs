@@ -272,14 +272,19 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Called when the connection has changed.
         /// </summary>
-        public void OnConnectionChanged()
+        /// <param name="reconnect">if set to <c>true</c> automatically reconnect.</param>
+        public void OnConnectionChanged(bool reconnect = true)
         {
             CloseEtpClient();
             Resources.Clear();
             Messages.Clear();
             Details.Clear();
 
-            if (!string.IsNullOrWhiteSpace(Model.Connection.Uri))
+            // notify child view models
+            Items.OfType<ISessionAware>()
+                .ForEach(x => x.OnConnectionChanged(Model.Connection));
+
+            if (!string.IsNullOrWhiteSpace(Model.Connection.Uri) && reconnect)
             {
                 InitEtpClient();
             }
@@ -296,7 +301,10 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             {
                 Runtime.Invoke(() => Runtime.Shell.StatusBarText = "Connecting...");
 
-                var headers = Authorization.Basic(Model.Connection.Username, Model.Connection.Password);
+                var headers = Model.Connection.IsAuthenticationBasic
+                    ? Authorization.Basic(Model.Connection.Username, Model.Connection.Password)
+                    : Authorization.Bearer(Model.Connection.JsonWebToken);
+
                 Model.Connection.UpdateEtpSettings(headers);
 
                 Client = new EtpClient(Model.Connection.Uri, Model.ApplicationName, Model.ApplicationVersion, headers);
@@ -327,6 +335,8 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             Client.SocketClosed -= OnClientSocketClosed;
             Client.Dispose();
             Client = null;
+
+            OnClientSocketClosed(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -336,7 +346,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void OnClientSocketClosed(object sender, EventArgs e)
         {
-            Runtime.Invoke(() => Runtime.Shell.StatusBarText = "Connection closed");
+            Runtime.Invoke(() => Runtime.Shell.StatusBarText = "Connection Closed");
 
             // notify child view models
             Items.OfType<ISessionAware>()

@@ -24,6 +24,7 @@ using Energistics.Common;
 using Energistics.Datatypes;
 using Energistics.Protocol.Core;
 using PDS.Framework;
+using PDS.Witsml.Studio.Core.Connections;
 using PDS.Witsml.Studio.Core.Runtime;
 
 namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
@@ -188,6 +189,14 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             NotifyOfPropertyChange(() => CanGetObject);
             NotifyOfPropertyChange(() => CanDeleteObject);
             NotifyOfPropertyChange(() => CanDescribeChannels);
+        }
+
+        /// <summary>
+        /// Called when the selected connection has changed.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        public void OnConnectionChanged(Connection connection)
+        {
         }
 
         /// <summary>
