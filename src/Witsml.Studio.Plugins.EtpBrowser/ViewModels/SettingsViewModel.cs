@@ -18,6 +18,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using Energistics;
 using Energistics.Common;
@@ -169,23 +170,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void ServerCapabilities()
         {
-            if (!Model.Connection.Uri.ToLowerInvariant().StartsWith("ws")) return;
-            var client = new JsonClient(Model.Connection.Username, Model.Connection.Password);
-
-            try
-            {
-                var url = Model.Connection.GetEtpServerCapabilitiesUrl();
-                var capabilities = client.GetServerCapabilities(url);
-
-                Parent.LogDetailMessage(
-                    "Server Capabilites:",
-                    Parent.Client.Serialize(capabilities, true));
-            }
-            catch (Exception ex)
-            {
-                _log.Warn("Error getting server capabilities", ex);
-                Parent.LogClientError("Error getting server capabilities:", ex);
-            }
+            Task.Run(GetServerCapabilities);
         }
 
         public void OnSessionOpened(ProtocolEventArgs<OpenSession> e)
@@ -206,6 +191,40 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             Model.Connection.SetServerCertificateValidation();
             CanRequestSession = true;
             CanCloseSession = false;
+        }
+
+        private Task<bool> GetServerCapabilities()
+        {
+            if (!Model.Connection.Uri.ToLowerInvariant().StartsWith("ws"))
+                return Task.FromResult(false);
+
+            var client = Model.Connection.IsAuthenticationBasic
+                ? new JsonClient(Model.Connection.Username, Model.Connection.Password)
+                : new JsonClient(Model.Connection.JsonWebToken);
+
+            try
+            {
+                Runtime.ShowBusy();
+
+                var url = Model.Connection.GetEtpServerCapabilitiesUrl();
+                var capabilities = client.GetServerCapabilities(url);
+
+                Parent.LogDetailMessage(
+                    "Server Capabilites:",
+                    Parent.Client.Serialize(capabilities, true));
+
+                return Task.FromResult(true);
+            }
+            catch (Exception ex)
+            {
+                _log.Warn("Error getting server capabilities", ex);
+                Parent.LogClientError("Error getting server capabilities:", ex);
+                return Task.FromResult(false);
+            }
+            finally
+            {
+                Runtime.ShowBusy(false);
+            }
         }
     }
 }
