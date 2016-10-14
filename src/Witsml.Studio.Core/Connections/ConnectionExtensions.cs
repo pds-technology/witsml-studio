@@ -55,7 +55,7 @@ namespace PDS.Witsml.Studio.Core.Connections
         /// <param name="connection">The connection.</param>
         public static void SetServerCertificateValidation(this Connection connection)
         {
-            if (connection.IgnoreInvalidCertificates)
+            if (connection.AcceptInvalidCertificates)
                 ServicePointManager.ServerCertificateValidationCallback +=
                     (sender, certificate, chain, sslPolicyErrors) => true;
             else
