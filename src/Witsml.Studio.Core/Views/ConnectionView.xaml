@@ -50,7 +50,7 @@
                         <RadioButton Content="Basic" VerticalAlignment="Center" IsChecked="{Binding EditItem.IsAuthenticationBasic}" Margin="0,0,20,0" />
                         <RadioButton Content="Bearer" VerticalAlignment="Center" IsChecked="{Binding EditItem.IsAuthenticationBearer}" Margin="0,0,10,0" />
                         <Button x:Name="GetJsonWebToken"  Content="..." VerticalAlignment="Center" Margin="0,0,120,0" Width="25" IsEnabled="{Binding EditItem.IsAuthenticationBearer}" />
-                        <CheckBox Content="Ignore Invalid Certificates" VerticalAlignment="Center" IsChecked="{Binding EditItem.IgnoreInvalidCertificates}" />
+                        <CheckBox Content="Accept Invalid Certificates" VerticalAlignment="Center" IsChecked="{Binding EditItem.AcceptInvalidCertificates}" />
                     </StackPanel>
 
                     <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding EditItem.IsAuthenticationBasic, Converter={StaticResource BooleanToVisibilityConverter}}">

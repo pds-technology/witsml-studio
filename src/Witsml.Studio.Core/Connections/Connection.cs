@@ -232,24 +232,24 @@ namespace PDS.Witsml.Studio.Core.Connections
             }
         }
 
-        private bool _ignoreInvalidCertificates;
+        private bool _acceptInvalidCertificates;
 
         /// <summary>
-        /// Gets or sets a value indicating whether to ignore invalid certificates.
+        /// Gets or sets a value indicating whether to accept invalid certificates.
         /// </summary>
         /// <value>
-        /// <c>true</c> if ignoring invalid certificates; otherwise, <c>false</c>.
+        /// <c>true</c> if accept invalid certificates; otherwise, <c>false</c>.
         /// </value>
         [DataMember]
-        public bool IgnoreInvalidCertificates
+        public bool AcceptInvalidCertificates
         {
-            get { return _ignoreInvalidCertificates; }
+            get { return _acceptInvalidCertificates; }
             set
             {
-                if (_ignoreInvalidCertificates != value)
+                if (_acceptInvalidCertificates != value)
                 {
-                    _ignoreInvalidCertificates = value;
-                    NotifyOfPropertyChange(() => IgnoreInvalidCertificates);
+                    _acceptInvalidCertificates = value;
+                    NotifyOfPropertyChange(() => AcceptInvalidCertificates);
                 }
             }
         }
