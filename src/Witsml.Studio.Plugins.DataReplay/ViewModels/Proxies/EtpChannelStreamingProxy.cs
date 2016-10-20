@@ -80,7 +80,14 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
                         break;
                     }
 
-                    await Task.Delay(interval, token);
+                    try
+                    {
+                        await Task.Delay(interval, token);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        break;
+                    }
                 }
 
                 TaskRunner.Stop();
