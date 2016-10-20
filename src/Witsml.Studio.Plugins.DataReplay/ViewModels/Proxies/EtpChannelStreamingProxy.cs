@@ -37,7 +37,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
 {
     public class EtpChannelStreamingProxy : EtpProxyViewModel
     {
-        private Random _random;
+        private readonly Random _random;
 
         public EtpChannelStreamingProxy(IRuntimeService runtime, string dataSchemaVersion, Action<string> log) : base(runtime, dataSchemaVersion, log)
         {
@@ -46,9 +46,9 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
             ChannelStreamingInfo = new List<ChannelStreamingInfo>();
         }
 
-        public IList<ChannelMetadataRecord> Channels { get; private set; }
+        public IList<ChannelMetadataRecord> Channels { get; }
 
-        public IList<ChannelStreamingInfo> ChannelStreamingInfo { get; private set; }
+        public IList<ChannelStreamingInfo> ChannelStreamingInfo { get; }
 
         public override async Task Start(Models.Simulation model, CancellationToken token, int interval = 5000)
         {
@@ -80,7 +80,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
                         break;
                     }
 
-                    await Task.Delay(interval);
+                    await Task.Delay(interval, token);
                 }
 
                 TaskRunner.Stop();
@@ -90,12 +90,12 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
             }
         }
 
-        private void OnClientSocketClosed(object sender, EventArgs e)
+        protected virtual void OnClientSocketClosed(object sender, EventArgs e)
         {
             TaskRunner.Stop();
         }
 
-        private void OnStart(object sender, ProtocolEventArgs<Start> e)
+        protected virtual void OnStart(object sender, ProtocolEventArgs<Start> e)
         {
             TaskRunner = new TaskRunner(e.Message.MaxMessageRate)
             {
@@ -117,36 +117,24 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
             }
         }
 
-        private void OnChannelDescribe(object sender, ProtocolEventArgs<ChannelDescribe, IList<ChannelMetadataRecord>> e)
+        protected virtual void OnChannelDescribe(object sender, ProtocolEventArgs<ChannelDescribe, IList<ChannelMetadataRecord>> e)
         {
             GetChannelMetadata(e.Header)
                 .ForEach(e.Context.Add);
         }
 
-        private void OnChannelStreamingStart(object sender, ProtocolEventArgs<ChannelStreamingStart> e)
+        protected virtual void OnChannelStreamingStart(object sender, ProtocolEventArgs<ChannelStreamingStart> e)
         {
             e.Message.Channels.ForEach(ChannelStreamingInfo.Add);
             TaskRunner.Start();
         }
 
-        private void OnChannelStreamingStop(object sender, ProtocolEventArgs<ChannelStreamingStop> e)
+        protected virtual void OnChannelStreamingStop(object sender, ProtocolEventArgs<ChannelStreamingStop> e)
         {
             TaskRunner.Stop();
         }
 
-        private void StreamChannelData()
-        {
-            if (!Client.IsOpen) return;
-
-            var dataItems = ChannelStreamingInfo
-                .Select(ToChannelDataItem)
-                .ToList();
-
-            Client.Handler<IChannelStreamingProducer>()
-                .ChannelData(null, dataItems);
-        }
-
-        private List<ChannelMetadataRecord> GetChannelMetadata(MessageHeader header)
+        protected virtual List<ChannelMetadataRecord> GetChannelMetadata(MessageHeader header)
         {
             var indexMetadata = ToIndexMetadataRecord(Model.Channels.First());
 
@@ -159,7 +147,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
             return channelMetadata;
         }
 
-        private EtpUri GetChannelUri(string mnemonic)
+        protected virtual EtpUri GetChannelUri(string mnemonic)
         {
             if (OptionsIn.DataVersion.Version131.Equals(DataSchemaVersion))
             {
@@ -190,6 +178,18 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
             }
 
             return default(EtpUri);
+        }
+
+        private void StreamChannelData()
+        {
+            if (!Client.IsOpen) return;
+
+            var dataItems = ChannelStreamingInfo
+                .Select(ToChannelDataItem)
+                .ToList();
+
+            Client.Handler<IChannelStreamingProducer>()
+                .ChannelData(null, dataItems);
         }
 
         private static ChannelStreamingInfo ToChannelStreamingInfo(ChannelMetadataRecord record)
@@ -223,7 +223,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
                 Uuid = record.Uuid,
                 Status = record.Status,
                 Source = record.Source,
-                Indexes = new IndexMetadataRecord[]
+                Indexes = new[]
                 {
                     indexMetadata
                 },
@@ -254,6 +254,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
         private DataItem ToChannelDataItem(ChannelStreamingInfo streamingInfo)
         {
             var channel = Channels.FirstOrDefault(x => x.ChannelId == streamingInfo.ChannelId);
+            if (channel == null) return null;
 
             return new DataItem()
             {
