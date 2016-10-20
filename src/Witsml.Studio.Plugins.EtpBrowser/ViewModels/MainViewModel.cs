@@ -346,10 +346,11 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void OnClientSocketClosed(object sender, EventArgs e)
         {
-            if (Runtime.Shell == null) 
-                return;
-
-            Runtime.Invoke(() => Runtime.Shell.StatusBarText = "Connection Closed");
+            Runtime.Invoke(() =>
+            {
+                if (Runtime.Shell != null)
+                    Runtime.Shell.StatusBarText = "Connection Closed";
+            });
 
             // notify child view models
             Items.OfType<ISessionAware>()
