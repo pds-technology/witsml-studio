@@ -17,6 +17,7 @@
 //-----------------------------------------------------------------------
 
 using System.Windows;
+using Microsoft.Windows.Themes;
 
 namespace PDS.Witsml.Studio
 {
@@ -25,5 +26,7 @@ namespace PDS.Witsml.Studio
     /// </summary>
     public partial class App : Application
     {
+        // Static reference to PresentationFramework.Aero to force assembly to be loaded.
+        public static readonly FlowDirection FlowDirection = PlatformCulture.FlowDirection;
     }
 }
