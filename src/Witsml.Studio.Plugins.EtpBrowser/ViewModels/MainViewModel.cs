@@ -301,13 +301,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             {
                 Runtime.Invoke(() => Runtime.Shell.StatusBarText = "Connecting...");
 
-                var headers = Model.Connection.IsAuthenticationBasic
-                    ? Authorization.Basic(Model.Connection.Username, Model.Connection.Password)
-                    : Authorization.Bearer(Model.Connection.JsonWebToken);
-
-                Model.Connection.UpdateEtpSettings(headers);
-
-                Client = new EtpClient(Model.Connection.Uri, Model.ApplicationName, Model.ApplicationVersion, headers);
+                Client = Model.Connection.CreateEtpClient(Model.ApplicationName, Model.ApplicationVersion);
 
                 RegisterProtocolHandlers(Client);
 

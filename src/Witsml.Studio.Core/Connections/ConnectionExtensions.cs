@@ -19,7 +19,9 @@
 using System.Collections.Generic;
 using Energistics.DataAccess;
 using System.Net;
+using Energistics;
 using Energistics.Common;
+using Energistics.Datatypes;
 
 namespace PDS.Witsml.Studio.Core.Connections
 {
@@ -50,6 +52,36 @@ namespace PDS.Witsml.Studio.Core.Connections
         }
 
         /// <summary>
+        /// Creates a Json client for the current connection uri.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <returns>An <see cref="Energistics.JsonClient"/> instance.</returns>
+        public static JsonClient CreateJsonClient(this Connection connection)
+        {
+            return connection.IsAuthenticationBasic
+                ? new JsonClient(connection.Username, connection.Password)
+                : new JsonClient(connection.JsonWebToken);
+        }
+
+        /// <summary>
+        /// Creates an ETP client for the current connection
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="applicationName">Name of the application.</param>
+        /// <param name="applicationVersion">The application version.</param>
+        /// <returns>An <see cref="Energistics.EtpClient"/> instance.</returns>
+        public static EtpClient CreateEtpClient(this Connection connection, string applicationName, string applicationVersion)
+        {
+            var headers = connection.IsAuthenticationBasic
+                   ? Energistics.Security.Authorization.Basic(connection.Username, connection.Password)
+                   : Energistics.Security.Authorization.Bearer(connection.JsonWebToken);
+
+            connection.UpdateEtpSettings(headers);
+
+            return new EtpClient(connection.Uri, applicationName, applicationVersion, headers);
+        }
+
+        /// <summary>
         /// Sets the server certificate validation.
         /// </summary>
         /// <param name="connection">The connection.</param>
@@ -74,6 +106,14 @@ namespace PDS.Witsml.Studio.Core.Connections
 
             return $"http{connection.Uri.Substring(2)}/.well-known/etp-server-capabilities";
         }
+
+        /// <summary>
+        /// Gets the ETP server capabilities for the connection.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <returns>The <see cref="Energistics.Datatypes.ServerCapabilities"/> result</returns>
+        public static ServerCapabilities GetEtpServerCapabilities(this Connection connection) =>
+            CreateJsonClient(connection).GetServerCapabilities(GetEtpServerCapabilitiesUrl(connection));
 
         /// <summary>
         /// Updates the ETP settings based on the connection settings.

@@ -54,13 +54,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
         {
             Model = model;
 
-            var headers = Model.EtpConnection.IsAuthenticationBasic
-                ? Authorization.Basic(Model.EtpConnection.Username, Model.EtpConnection.Password)
-                : Authorization.Bearer(Model.EtpConnection.JsonWebToken);
-
-            Model.EtpConnection.UpdateEtpSettings(headers);
-
-            using (Client = new EtpClient(Model.EtpConnection.Uri, Model.Name, Model.Version, headers))
+            using (Client = Model.EtpConnection.CreateEtpClient(Model.Name, Model.Version))
             {
                 Client.Register<IChannelStreamingProducer, ChannelStreamingProducerHandler>();
                 Client.Handler<IChannelStreamingProducer>().OnStart += OnStart;

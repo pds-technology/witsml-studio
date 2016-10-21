@@ -466,10 +466,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Simulation
             {
                 EtpVersions.Clear();
 
-                var client = Model.EtpConnection.IsAuthenticationBasic
-                    ? new JsonClient(Model.EtpConnection.Username, Model.EtpConnection.Password)
-                    : new JsonClient(Model.EtpConnection.JsonWebToken);
-
+                var client = Model.EtpConnection.CreateJsonClient();
                 var url = Model.EtpConnection.GetEtpServerCapabilitiesUrl();
                 var capServer = client.GetServerCapabilities(url);
 

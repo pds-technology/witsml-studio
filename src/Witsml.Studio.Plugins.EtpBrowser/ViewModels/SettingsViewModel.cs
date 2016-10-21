@@ -208,16 +208,11 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             if (!Model.Connection.Uri.ToLowerInvariant().StartsWith("ws"))
                 return Task.FromResult(false);
 
-            var client = Model.Connection.IsAuthenticationBasic
-                ? new JsonClient(Model.Connection.Username, Model.Connection.Password)
-                : new JsonClient(Model.Connection.JsonWebToken);
-
             try
             {
                 Runtime.ShowBusy();
-
-                var url = Model.Connection.GetEtpServerCapabilitiesUrl();
-                var capabilities = client.GetServerCapabilities(url);
+                
+                var capabilities = Model.Connection.GetEtpServerCapabilities();
 
                 Parent.LogDetailMessage(
                     "Server Capabilites:",
