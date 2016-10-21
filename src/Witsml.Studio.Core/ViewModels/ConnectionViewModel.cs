@@ -197,28 +197,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 }
             }
         }
-
-        private bool _acceptInvalidCertificates;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to accept invalid certificates.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> if accept invalid certificates; otherwise, <c>false</c>.
-        /// </value>
-        public bool AcceptInvalidCertificates
-        {
-            get { return _acceptInvalidCertificates; }
-            set
-            {
-                if (_acceptInvalidCertificates != value)
-                {
-                    _acceptInvalidCertificates = value;
-                    NotifyOfPropertyChange(() => AcceptInvalidCertificates);
-                }
-            }
-        }
-
+        
         /// <summary>
         /// Gets a JSON Web Token via a new Connection dialog.
         /// </summary>
