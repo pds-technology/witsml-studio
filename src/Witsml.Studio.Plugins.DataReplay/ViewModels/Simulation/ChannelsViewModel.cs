@@ -466,9 +466,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Simulation
             {
                 EtpVersions.Clear();
 
-                var client = Model.EtpConnection.CreateJsonClient();
-                var url = Model.EtpConnection.GetEtpServerCapabilitiesUrl();
-                var capServer = client.GetServerCapabilities(url);
+                var capServer = Model.EtpConnection.GetEtpServerCapabilities();
 
                 var versions = capServer.SupportedObjects
                     .Select(x => new EtpContentType(x))
