@@ -113,7 +113,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels
             }
         }
 
-        public void DeleteItem()
+        public void RemoveItem()
         {
             if (ActiveItem != null)
             {
