@@ -26,6 +26,7 @@ using Caliburn.Micro;
 using Newtonsoft.Json;
 using PDS.Witsml.Studio.Core.Properties;
 using PDS.Witsml.Studio.Core.Runtime;
+using PDS.Witsml.Studio.Core.SaveWindowState;
 
 namespace PDS.Witsml.Studio.Core.ViewModels
 {

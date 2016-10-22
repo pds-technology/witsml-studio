@@ -18,7 +18,7 @@
 
 using System.Runtime.Serialization;
 
-namespace PDS.Witsml.Studio.Core.Runtime
+namespace PDS.Witsml.Studio.Core.SaveWindowState
 {
     /// <summary>
     /// Defines properties that can be used to persist the current application environment settings.

@@ -205,8 +205,11 @@
     <Compile Include="Runtime\DesktopRuntimeService.cs" />
     <Compile Include="Runtime\IRuntimeService.cs" />
     <Compile Include="Runtime\Win32WindowHandle.cs" />
-    <Compile Include="Runtime\WindowPlacement.cs" />
-    <Compile Include="Runtime\WindowSettings.cs" />
+    <Compile Include="SaveWindowState\WindowSettings.cs" />
+    <Compile Include="SaveWindowState\Point.cs" />
+    <Compile Include="SaveWindowState\Rect.cs" />
+    <Compile Include="SaveWindowState\WindowExtensions.cs" />
+    <Compile Include="SaveWindowState\WindowPlacement.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\ConnectionPickerViewModel.cs" />
     <Compile Include="ViewModels\ConnectionViewModel.cs" />
@@ -257,6 +260,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="SaveWindowState\LICENSE.txt" />
     <Resource Include="Images\StatusInvalid_16x.png" />
     <Resource Include="Images\StatusOK_16x.png" />
     <Content Include="Images\WitsmlStudio.ico" />
