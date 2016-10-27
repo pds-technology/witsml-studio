@@ -121,10 +121,18 @@ namespace PDS.Witsml.Studio.Core.ViewModels
 
                 if (HasPlaceholder && value)
                 {
-                    Children.Clear();
-                    Task.Run(() => LoadChildren(Resource.Uri));
+                    ClearAndLoadChildren();
                 }
             }
+        }
+
+        /// <summary>
+        /// Removes the children and loads children.
+        /// </summary>
+        public void ClearAndLoadChildren()
+        {
+            Children.Clear();
+            Task.Run(() => LoadChildren(Resource.Uri));
         }
 
         private bool _isSelected;

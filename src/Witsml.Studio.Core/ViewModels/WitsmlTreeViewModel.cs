@@ -228,9 +228,8 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         public void RefreshSelected()
         {
             var resource = Items.FindSelected();
-            resource.Children.Clear();
-            resource.Children.Add(ResourceViewModel.Placeholder);
-            resource.IsExpanded = false;
+            resource.ClearAndLoadChildren();
+            // Expand the node if it wasn't previously
             resource.IsExpanded = true;
         }
 

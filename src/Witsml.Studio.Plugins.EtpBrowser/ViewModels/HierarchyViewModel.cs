@@ -26,6 +26,7 @@ using Energistics.Protocol.Core;
 using PDS.Framework;
 using PDS.Witsml.Studio.Core.Connections;
 using PDS.Witsml.Studio.Core.Runtime;
+using PDS.Witsml.Studio.Core.ViewModels;
 
 namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 {
@@ -179,6 +180,17 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         public void RefreshHierarchy()
         {
             Parent.OnConnectionChanged();
+        }
+
+        /// <summary>
+        /// Refreshes the selected node.
+        /// </summary>
+        public void RefreshSelected()
+        {
+            var resource = Parent.Resources.FindSelected();
+            resource.ClearAndLoadChildren();
+            // Expand the node if it wasn't previously
+            resource.IsExpanded = true;
         }
 
         /// <summary>
