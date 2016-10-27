@@ -164,7 +164,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                         Uuid = Model.Store.Uuid,
                         Name = Model.Store.Name,
                         HasChildren = -1,
-                        ContentType = uri.ContentType,
+                        ContentType = Model.Store.ContentType,
                         ResourceType = ResourceTypes.DataObject.ToString(),
                         CustomData = new Dictionary<string, string>()
                     }
