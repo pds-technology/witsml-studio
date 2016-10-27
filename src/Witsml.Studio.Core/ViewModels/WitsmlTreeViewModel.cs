@@ -223,6 +223,18 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         }
 
         /// <summary>
+        /// Refreshes the selected item.
+        /// </summary>
+        public void RefreshSelected()
+        {
+            var resource = Items.FindSelected();
+            resource.Children.Clear();
+            resource.Children.Add(ResourceViewModel.Placeholder);
+            resource.IsExpanded = false;
+            resource.IsExpanded = true;
+        }
+
+        /// <summary>
         /// Refreshes the context menu.
         /// </summary>
         public void RefreshContextMenu()
