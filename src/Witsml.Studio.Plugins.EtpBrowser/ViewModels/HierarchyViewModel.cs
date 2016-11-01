@@ -183,11 +183,25 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether this selected node can be refreshed.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if this instance can be refreshed; otherwise, <c>false</c>.
+        /// </value>
+        public bool CanRefreshSelected
+        {
+            get { return CanDescribeChannels; }
+        }
+
+        /// <summary>
         /// Refreshes the selected node.
         /// </summary>
         public void RefreshSelected()
         {
             var resource = Parent.Resources.FindSelected();
+            // Return if there is nothing currently selected
+            if (resource == null)
+                return;
             resource.ClearAndLoadChildren();
             // Expand the node if it wasn't previously
             resource.IsExpanded = true;
@@ -201,6 +215,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             NotifyOfPropertyChange(() => CanGetObject);
             NotifyOfPropertyChange(() => CanDeleteObject);
             NotifyOfPropertyChange(() => CanDescribeChannels);
+            NotifyOfPropertyChange(() => CanRefreshSelected);
         }
 
         /// <summary>
