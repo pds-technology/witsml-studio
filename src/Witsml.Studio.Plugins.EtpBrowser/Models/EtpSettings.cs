@@ -51,6 +51,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.Models
                 IndexCount = 10
             };
             Store = new StoreSettings();
+            StoreFunction = Functions.GetObject;
             RequestedProtocols = new BindableCollection<EtpProtocolItem>();
             BaseUri = EtpUri.RootUri;
         }

@@ -132,7 +132,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void SubmitQuery()
         {
-            _log.DebugFormat("Submitting a query for '{0}'", Model.StoreFunction);
+            _log.DebugFormat("Sending ETP Message for '{0}'", Model.StoreFunction);
 
             switch (Model.StoreFunction)
             {
