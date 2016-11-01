@@ -169,6 +169,24 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.Models
             }
         }
 
+        private Functions _storeFunction;
+        /// <summary>
+        /// Gets or sets the ETP store function.
+        /// </summary>
+        /// <value>The ETP store function.</value>
+        [DataMember]
+        public Functions StoreFunction
+        {
+            get { return _storeFunction; }
+            set
+            {
+                if (!Equals(_storeFunction, value))
+                {
+                    _storeFunction = value;
+                }
+            }
+        }
+
         /// <summary>
         /// Gets the collection of requested protocols.
         /// </summary>

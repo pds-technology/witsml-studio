@@ -17,6 +17,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reflection;
@@ -75,6 +76,11 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 IsScrollingEnabled = true
             };
         }
+
+        /// <summary>
+        /// Gets the available ETP store functions.
+        /// </summary>
+        public IEnumerable<Functions> StoreFunctions => new[] { Functions.GetObject, Functions.PutObject, Functions.DeleteObject };
 
         /// <summary>
         /// Gets the display order of the plug-in when loaded by the main application shell

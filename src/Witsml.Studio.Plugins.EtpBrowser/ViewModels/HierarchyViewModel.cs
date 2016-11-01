@@ -97,7 +97,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Gets resources using the current Base URI
         /// </summary>
-        public void BaseUri()
+        public void GetBaseUri()
         {
             Parent.OnConnectionChanged();
         }

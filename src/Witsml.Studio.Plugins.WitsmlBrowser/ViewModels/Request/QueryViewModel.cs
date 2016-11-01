@@ -106,7 +106,11 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
         public void SubmitQuery()
         {
             _log.DebugFormat("Submitting a query for '{0}'", Model.StoreFunction);
-
+            if (Model.StoreFunction == Functions.DeleteFromStore)
+            {
+                if (MessageBox.Show("Are you sure you want to delete this object?", "Confirm", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                    return;
+            }
             MainViewModel.SubmitQuery(Model.StoreFunction);
         }
 

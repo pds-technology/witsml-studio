@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Windows;
 using System.Xml.Linq;
 using Caliburn.Micro;
 using Energistics.Common;
@@ -128,6 +129,27 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
+        /// Submits a query to the WITSML server for the given function type.
+        /// </summary>
+        public void SubmitQuery()
+        {
+            _log.DebugFormat("Submitting a query for '{0}'", Model.StoreFunction);
+
+            switch (Model.StoreFunction)
+            {
+                case Functions.GetObject:
+                    GetObject();
+                    break;
+                case Functions.PutObject:
+                    PutObject();
+                    break;
+                case Functions.DeleteObject:
+                    DeleteObject();
+                    break;
+            }
+        }
+
+        /// <summary>
         /// Gets the specified resource's details using the Store protocol.
         /// </summary>
         public void GetObject()
@@ -186,6 +208,9 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void DeleteObject()
         {
+            if (MessageBox.Show("Are you sure you want to delete this object?", "Confirm", MessageBoxButton.YesNo) != MessageBoxResult.Yes) 
+                return;
+
             if (!string.IsNullOrWhiteSpace(Model.Store.Uri))
             {
                 Parent.SendDeleteObject(Model.Store.Uri);
