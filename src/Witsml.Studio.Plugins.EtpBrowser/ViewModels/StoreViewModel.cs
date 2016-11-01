@@ -20,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Windows;
 using System.Xml.Linq;
 using Caliburn.Micro;
 using Energistics.Common;
@@ -208,7 +207,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void DeleteObject()
         {
-            if (MessageBox.Show("Are you sure you want to delete this object?", "Confirm", MessageBoxButton.YesNo) != MessageBoxResult.Yes) 
+            if (System.Windows.MessageBox.Show("Are you sure you want to delete this object?", "Confirm", System.Windows.MessageBoxButton.YesNo) != System.Windows.MessageBoxResult.Yes) 
                 return;
 
             if (!string.IsNullOrWhiteSpace(Model.Store.Uri))
