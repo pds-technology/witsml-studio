@@ -408,8 +408,10 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             //  Handle when message is received from JSON Message tab
             if (e.Context == null)
                 return;
-
-            if (EtpUri.IsRoot(e.Context))
+            
+            //  If the message URI equals "/" or the current base URI then treat
+            //  it as a root object.
+            if (EtpUri.IsRoot(e.Context) || e.Context.EqualsIgnoreCase(Model.BaseUri))
             {
                 Resources.ForEach(x => x.IsSelected = false);
                 viewModel.IsSelected = true;

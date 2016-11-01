@@ -19,6 +19,7 @@
 using System;
 using System.Runtime.Serialization;
 using Caliburn.Micro;
+using Energistics.Datatypes;
 using PDS.Witsml.Studio.Core.Connections;
 using PDS.Witsml.Studio.Plugins.EtpBrowser.Properties;
 
@@ -51,6 +52,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.Models
             };
             Store = new StoreSettings();
             RequestedProtocols = new BindableCollection<EtpProtocolItem>();
+            BaseUri = EtpUri.RootUri;
         }
 
         private Connection _connection;
@@ -144,6 +146,25 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.Models
                 {
                     _applicationVersion = value;
                     NotifyOfPropertyChange(() => ApplicationVersion);
+                }
+            }
+        }
+
+        private string _baseUri;
+        /// <summary>
+        /// Gets or sets the base URI for discovery.
+        /// </summary>
+        /// <value>The base URI for discovery.</value>
+        [DataMember]
+        public string BaseUri
+        {
+            get { return _baseUri; }
+            set
+            {
+                if (!string.Equals(_baseUri, value))
+                {
+                    _baseUri = value;
+                    NotifyOfPropertyChange(() => BaseUri);
                 }
             }
         }

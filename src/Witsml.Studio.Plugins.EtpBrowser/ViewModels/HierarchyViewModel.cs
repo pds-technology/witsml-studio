@@ -95,6 +95,14 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
+        /// Gets resources using the current Base URI
+        /// </summary>
+        public void BaseUri()
+        {
+            Parent.OnConnectionChanged();
+        }
+
+        /// <summary>
         /// Determines whether the GetObject message can be sent for the selected resource.
         /// </summary>
         /// <returns><c>true</c> if the selected resource's level is greater than 1; otherwise, <c>false</c>.</returns>
@@ -234,8 +242,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         {
             if (e.Message.SupportedProtocols.All(x => x.Protocol != (int)Protocols.Discovery))
                 return;
-
-            Parent.GetResources(EtpUri.RootUri);
+            Parent.GetResources(Model?.BaseUri);
             CanExecute = true;
             RefreshContextMenu();
         }
