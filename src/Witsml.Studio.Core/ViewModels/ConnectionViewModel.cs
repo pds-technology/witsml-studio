@@ -41,6 +41,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(ConnectionViewModel));
         private static readonly string _connectionBaseFileName = Settings.Default.ConnectionBaseFileName;
         private PasswordBox _passwordControl;
+        private readonly string[] _ignoredPropertyChanges = new[] {"name"};
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConnectionViewModel" /> class.
@@ -219,8 +220,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         public Task<bool> TestConnection()
         {
-            IsTestSuccess = false;
-            IsTestFailure = false;
+            ResetTestStatus();
 
             _log.DebugFormat("Testing a {0} connection", ConnectionType);
 
@@ -232,7 +232,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 Runtime.ShowBusy();
                 CanTestConnection = false;
 
-                return Task.Run(async() =>
+                return Task.Run(async () =>
                 {
                     var result = await connectionTest.CanConnect(EditItem);
                     await Runtime.InvokeAsync(() => ShowTestResult(result));
@@ -246,6 +246,15 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             }
 
             return Task.FromResult(IsTestSuccess);
+        }
+
+        /// <summary>
+        /// Resets the test status.
+        /// </summary>
+        private void ResetTestStatus()
+        {
+            IsTestSuccess = false;
+            IsTestFailure = false;
         }
 
         /// <summary>
@@ -379,6 +388,21 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             {
                 EditItem = OpenConnectionFile() ?? new Connection();
             }
+            EditItem.PropertyChanged += EditItem_PropertyChanged;
+        }
+
+        /// <summary>
+        /// Handles the PropertyChanged event of the EditItem control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.ComponentModel.PropertyChangedEventArgs"/> instance containing the event data.</param>
+        private void EditItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (_ignoredPropertyChanges.ContainsIgnoreCase(e.PropertyName))
+                return;
+
+            // Reset the test status
+            ResetTestStatus();
         }
 
         /// <summary>
