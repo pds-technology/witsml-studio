@@ -59,10 +59,11 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 
             var recordType = typeof (ISpecificRecord);
 
-            MessageTypes.AddRange(typeof (MessageHeader).Assembly.GetTypes()
+            MessageTypes.AddRange(typeof(MessageHeader).Assembly.GetTypes()
                 .Where(x => recordType.IsAssignableFrom(x) && HasProtocolProperty(x))
-                .OrderBy(x => x.Name)
-                .Select(x => new KeyValuePair<string, Type>(x.Name, x)));
+                .OrderBy(GetProtocol)
+                .ThenBy(x => x.Name)
+                .Select(x => new KeyValuePair<string, Type>($"{GetProtocol(x)} - {x.Name}", x)));
 
             SelectedMessageType = MessageTypes[0];
         }
@@ -278,6 +279,17 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         {
             var record = Activator.CreateInstance(type) as ISpecificRecord;
             return !string.IsNullOrWhiteSpace(record?.Schema.GetProperty("protocol"));
+        }
+
+        /// <summary>
+        /// Gets the protocol of the type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The protocol of the type</returns>
+        private string GetProtocol(Type type)
+        {
+            var record = Activator.CreateInstance(type) as ISpecificRecord;
+            return record?.Schema.GetProperty("protocol");
         }
     }
 }
