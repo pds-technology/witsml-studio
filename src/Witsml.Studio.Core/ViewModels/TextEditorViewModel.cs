@@ -16,7 +16,9 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System;
 using System.Windows;
+using System.Xml.Linq;
 using Caliburn.Micro;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Document;
@@ -32,6 +34,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
     public class TextEditorViewModel : Screen
     {
         private TextEditor _textEditor;
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(TextEditorViewModel));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TextEditorViewModel" /> class.
@@ -39,12 +42,14 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// <param name="runtime">The runtime service.</param>
         /// <param name="language">The language.</param>
         /// <param name="isReadOnly">if set to <c>true</c> the control is read only.</param>
-        public TextEditorViewModel(IRuntimeService runtime, string language = null, bool isReadOnly = false)
+        /// <param name="isPrettyPrintAllowed">if set to <c>true</c> the document allows pretty print.</param>
+        public TextEditorViewModel(IRuntimeService runtime, string language = null, bool isReadOnly = false, bool isPrettyPrintAllowed = false)
         {
             Runtime = runtime;
             Language = language;
             IsReadOnly = isReadOnly;
             Document = new TextDocument();
+            IsPrettyPrintAllowed = isPrettyPrintAllowed;
         }
 
         /// <summary>
@@ -89,6 +94,27 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                     _syntax = HighlightingManager.Instance.GetDefinition(value);
                     NotifyOfPropertyChange(() => Language);
                     NotifyOfPropertyChange(() => Syntax);
+                }
+            }
+        }
+
+        private bool _isPrettyPrintAllowed;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance allows pretty print.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if this instance allows pretty print; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsPrettyPrintAllowed
+        {
+            get { return _isPrettyPrintAllowed; }
+            set
+            {
+                if (_isPrettyPrintAllowed != value)
+                {
+                    _isPrettyPrintAllowed = value;
+                    NotifyOfPropertyChange(() => IsPrettyPrintAllowed);
                 }
             }
         }
@@ -148,6 +174,25 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 {
                     _isWordWrapEnabled = value;
                     NotifyOfPropertyChange(() => IsWordWrapEnabled);
+                }
+            }
+        }
+
+        private bool _isPrettyPrintEnabled;
+
+        /// <summary>
+        /// Gets or sets whether XML Messages uses PrettyPrint.
+        /// </summary>
+        /// <value>If XML Messages will use PrettyPrint.</value>
+        public bool IsPrettyPrintEnabled
+        {
+            get { return _isPrettyPrintEnabled; }
+            set
+            {
+                if (_isPrettyPrintEnabled != value)
+                {
+                    _isPrettyPrintEnabled = value;
+                    NotifyOfPropertyChange(() => IsPrettyPrintEnabled);
                 }
             }
         }
@@ -236,7 +281,21 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         {
             Runtime.Invoke(() =>
             {
-                Document.Text = text;
+                if (IsPrettyPrintAllowed && IsPrettyPrintEnabled)
+                {
+                    try
+                    {
+                        Document.Text = XDocument.Parse(text).ToString();
+                    }
+                    catch (Exception ex)
+                    {
+                        _log.Warn($"Error parsing XML:{Environment.NewLine}{text}{Environment.NewLine}{Environment.NewLine}{ex}");
+                    }
+                }
+                else
+                {
+                    Document.Text = text;
+                }
             });
         }
 

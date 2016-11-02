@@ -75,6 +75,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             {
                 IsScrollingEnabled = true
             };
+            DataObject = new TextEditorViewModel(runtime, "XML", true, true);
         }
 
         /// <summary>
@@ -172,6 +173,26 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 }
             }
         }
+
+        private TextEditorViewModel _dataObject;
+
+        /// <summary>
+        /// Gets or sets the xml messages editor.
+        /// </summary>
+        /// <value>The xml messages editor.</value>
+        public TextEditorViewModel DataObject
+        {
+            get { return _dataObject; }
+            set
+            {
+                if (!string.Equals(_dataObject, value))
+                {
+                    _dataObject = value;
+                    NotifyOfPropertyChange(() => DataObject);
+                }
+            }
+        }
+
 
         /// <summary>
         /// Gets the resources using the Discovery protocol.
@@ -446,6 +467,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 Client.Serialize(e.Message, true),
                 e.Message.DataObject.GetXml(),
                 Environment.NewLine));
+            DataObject.SetText(e.Message.DataObject.GetXml());
         }
 
         /// <summary>

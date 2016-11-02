@@ -21,6 +21,9 @@
                 <TabItem Header="Results">
                     <ContentControl x:Name="Details" />
                 </TabItem>
+                <TabItem Header="Data Object">
+                    <ContentControl x:Name="DataObject" />
+                </TabItem>
                 <TabItem Header="ETP Messages">
                     <ContentControl x:Name="Messages" />
                 </TabItem>
