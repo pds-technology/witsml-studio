@@ -244,7 +244,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         public void SendDeleteObject(string uri)
         {
             Client.Handler<IStoreCustomer>()
-                .DeleteObject(new[] { uri });
+                .DeleteObject(uri);
         }
 
         /// <summary>
