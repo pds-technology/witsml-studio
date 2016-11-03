@@ -465,10 +465,9 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         private void OnObject(object sender, ProtocolEventArgs<Energistics.Protocol.Store.Object> e)
         {
             Details.SetText(string.Format(
-                "// Header:{3}{0}{3}{3}// Body:{3}{1}{3}{3}/* Data:{3}{2}{3}*/{3}",
+                "// Header:{2}{0}{2}{2}// Body:{2}{1}",
                 Client.Serialize(e.Header, true),
                 Client.Serialize(e.Message, true),
-                e.Message.DataObject.GetXml(),
                 Environment.NewLine));
 
             DataObject.SetText(e.Message.DataObject.GetXml());
