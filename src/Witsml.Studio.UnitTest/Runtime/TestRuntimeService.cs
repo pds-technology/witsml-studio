@@ -129,6 +129,19 @@ namespace PDS.Witsml.Studio.Core.Runtime
         }
 
         /// <summary>
+        /// Shows the dialog at a manually specfied location.
+        /// </summary>
+        /// <param name="viewModel">The view model.</param>
+        /// <param name="leftOffset">The position of the window's left edge</param>
+        /// <param name="topOffset">The position of the window's top edge</param>
+        /// <returns>The view model dialog's result.</returns>
+        public bool ShowDialog(object viewModel, int leftOffset, int topOffset)
+        {
+            Console.WriteLine("ShowDialog: {0}", viewModel);
+            return DialogResult;
+        }
+
+        /// <summary>
         /// Shows the error message.
         /// </summary>
         /// <param name="message">The message.</param>
