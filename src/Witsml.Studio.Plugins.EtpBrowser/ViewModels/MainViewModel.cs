@@ -303,7 +303,8 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// Called when the connection has changed.
         /// </summary>
         /// <param name="reconnect">if set to <c>true</c> automatically reconnect.</param>
-        public void OnConnectionChanged(bool reconnect = true)
+        /// <param name="updateTitle">if set to <c>true</c> set the application title.</param>
+        public void OnConnectionChanged(bool reconnect = true, bool updateTitle = true)
         {
             CloseEtpClient();
             Resources.Clear();
@@ -318,8 +319,8 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             {
                 InitEtpClient();
             }
-
-            Runtime.Shell.SetApplicationTitle(this);
+            if(updateTitle)
+                Runtime.Shell.SetApplicationTitle(this);
         }
 
         /// <summary>

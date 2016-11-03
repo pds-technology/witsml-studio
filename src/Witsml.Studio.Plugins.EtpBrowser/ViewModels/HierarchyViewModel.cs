@@ -99,7 +99,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void GetBaseUri()
         {
-            Parent.OnConnectionChanged();
+            Parent.OnConnectionChanged(true, false);
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void RefreshHierarchy()
         {
-            Parent.OnConnectionChanged();
+            Parent.OnConnectionChanged(true, false);
         }
 
         /// <summary>

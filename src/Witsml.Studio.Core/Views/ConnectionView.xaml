@@ -49,7 +49,7 @@
                     <StackPanel Grid.Row="3" Grid.Column="1" Margin="5" Orientation="Horizontal">
                         <RadioButton Content="Basic" VerticalAlignment="Center" IsChecked="{Binding EditItem.IsAuthenticationBasic}" Margin="0,0,20,0" />
                         <RadioButton Content="Bearer" VerticalAlignment="Center" IsChecked="{Binding EditItem.IsAuthenticationBearer}" Margin="0,0,10,0" />
-                        <Button x:Name="GetJsonWebToken"  Content="..." VerticalAlignment="Center" Margin="0,0,120,0" Width="25" IsEnabled="{Binding EditItem.IsAuthenticationBearer}" />
+                        <Button x:Name="GetJsonWebToken"  Content="..." ToolTip="Click to retrieve a JSON Web Token from a Token Provider Service" VerticalAlignment="Center" Margin="0,0,120,0" Width="25" IsEnabled="{Binding EditItem.IsAuthenticationBearer}" />
                         <CheckBox Content="Accept Invalid Certificates" VerticalAlignment="Center" IsChecked="{Binding EditItem.AcceptInvalidCertificates}" />
                     </StackPanel>
 
