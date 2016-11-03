@@ -10,7 +10,7 @@
     <UserControl.Resources>
         <conv:NullToBooleanConverter x:Key="NullToBooleanConverter" />
     </UserControl.Resources>
-    <Grid Margin="5">
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition />

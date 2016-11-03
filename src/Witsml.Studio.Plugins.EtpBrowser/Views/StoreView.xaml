@@ -48,12 +48,12 @@
             <ContentControl x:Name="Data" />
         </Border>
 
-        <Grid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" Margin="5,0,5,5" IsEnabled="{Binding CanExecute}">
+        <Grid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" IsEnabled="{Binding CanExecute}">
             <StackPanel Orientation="Horizontal" IsEnabled="{Binding Model.Store.Uri, Converter={StaticResource NullToBooleanConverter}}">
-                <ComboBox Width="120" Margin="5,5,0,5" VerticalContentAlignment="Center" ToolTip="ETP Store Function" IsEditable="False"
+                <ComboBox Width="120" Margin="5,0,0,5" VerticalContentAlignment="Center" ToolTip="ETP Store Function" IsEditable="False"
                           ItemsSource="{Binding Parent.StoreFunctions}"
                           SelectedItem="{Binding Model.StoreFunction}" />
-                <Button x:Name="SubmitQuery" Content="Execute" Width="70" Margin="5,5,0,5" />
+                <Button x:Name="SubmitQuery" Content="Execute" Width="70" Margin="5,0,0,5" />
             </StackPanel>
         </Grid>
     </Grid>
