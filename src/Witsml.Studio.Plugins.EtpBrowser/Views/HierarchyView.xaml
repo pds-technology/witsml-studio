@@ -10,7 +10,7 @@
     <UserControl.Resources>
         <conv:NullToBooleanConverter x:Key="NullToBooleanConverter" />
     </UserControl.Resources>
-    <Grid>
+    <Grid Margin="5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition />
@@ -20,9 +20,9 @@
             <RowDefinition Height="40" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Base URI:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
-        <TextBox Text="{Binding Model.BaseUri}" Grid.Column="1" Grid.Row="0" Margin="5" Padding="5" VerticalContentAlignment="Center" />
-        <Button x:Name="GetBaseUri" Grid.Row="0" Grid.Column="2" Margin="5" Content="Get" Width="40" HorizontalAlignment="Right" IsEnabled="{Binding Model.Connection.Uri, Converter={StaticResource NullToBooleanConverter}}" />
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Base URI:" Margin="10,0,0,10" HorizontalAlignment="Right" VerticalAlignment="Center" />
+        <TextBox Text="{Binding Model.BaseUri}" Grid.Column="1" Grid.Row="0" Margin="5,0,0,10" Padding="5" VerticalContentAlignment="Center" />
+        <Button x:Name="GetBaseUri" Grid.Row="0" Grid.Column="2" Margin="5,0,0,10" Content="Get" Width="40" HorizontalAlignment="Right" IsEnabled="{Binding Model.Connection.Uri, Converter={StaticResource NullToBooleanConverter}}" />
         <TreeView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" ItemsSource="{Binding Parent.Resources}" cal:Message.Attach="[Event SelectedItemChanged] = [Action RefreshContextMenu()]">
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
