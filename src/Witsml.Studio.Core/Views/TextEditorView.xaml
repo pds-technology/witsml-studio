@@ -33,7 +33,8 @@
                     <MenuItem Header="Clear" cal:Message.Attach="Clear" />
                     <Separator />
                     <MenuItem Header="Word Wrap" IsChecked="{Binding IsWordWrapEnabled}" IsCheckable="True" />
-                    <MenuItem Header="Pretty Print" IsChecked="{Binding IsPrettyPrintEnabled}" IsCheckable="True" Visibility="{Binding IsPrettyPrintAllowed, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    <MenuItem Header="Pretty Print" IsChecked="{Binding IsPrettyPrintEnabled}" IsCheckable="True" 
+                              Visibility="{Binding IsPrettyPrintAllowed, Converter={StaticResource BooleanToVisibilityConverter}}" />
                 </ContextMenu>
             </avalon:TextEditor.ContextMenu>
         </avalon:TextEditor>

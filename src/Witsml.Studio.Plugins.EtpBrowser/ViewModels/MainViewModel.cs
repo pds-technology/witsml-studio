@@ -75,7 +75,10 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             {
                 IsScrollingEnabled = true
             };
-            DataObject = new TextEditorViewModel(runtime, "XML", true, true);
+            DataObject = new TextEditorViewModel(runtime, "XML", true)
+            {
+                IsPrettyPrintAllowed = true
+            };
         }
 
         /// <summary>
@@ -177,9 +180,9 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         private TextEditorViewModel _dataObject;
 
         /// <summary>
-        /// Gets or sets the xml messages editor.
+        /// Gets or sets the data object editor.
         /// </summary>
-        /// <value>The xml messages editor.</value>
+        /// <value>The data object editor.</value>
         public TextEditorViewModel DataObject
         {
             get { return _dataObject; }
@@ -467,6 +470,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 Client.Serialize(e.Message, true),
                 e.Message.DataObject.GetXml(),
                 Environment.NewLine));
+
             DataObject.SetText(e.Message.DataObject.GetXml());
         }
 
