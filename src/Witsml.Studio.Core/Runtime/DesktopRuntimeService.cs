@@ -80,9 +80,9 @@ namespace PDS.Witsml.Studio.Core.Runtime
         public string DataFolderPath { get; }
 
         /// <summary>
-        /// Gets the get current window location.
+        /// Gets the current window location.
         /// </summary>
-        /// <value>The get current window location</value>
+        /// <value>The current window location.</value>
         public Point GetCurrentWindowLocation
         {
             get
