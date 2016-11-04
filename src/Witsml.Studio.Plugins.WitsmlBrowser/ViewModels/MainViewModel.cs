@@ -346,6 +346,9 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             // Trim query text before submitting request
             string xmlIn = XmlQuery.Text.Trim();
 
+            // Format the text of XmlQuery
+            XmlQuery.SetText(xmlIn);
+
             _log.DebugFormat("Query submitted for function '{0}'", functionType);
 
             // Options In 
