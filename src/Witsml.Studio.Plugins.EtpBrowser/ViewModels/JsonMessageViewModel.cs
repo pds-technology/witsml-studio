@@ -277,8 +277,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 
         private bool HasProtocolProperty(Type type)
         {
-            var record = Activator.CreateInstance(type) as ISpecificRecord;
-            return !string.IsNullOrWhiteSpace(record?.Schema.GetProperty("protocol"));
+            return !string.IsNullOrWhiteSpace(GetProtocol(type));
         }
 
         /// <summary>

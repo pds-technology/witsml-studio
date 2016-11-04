@@ -80,21 +80,6 @@ namespace PDS.Witsml.Studio.Core.Runtime
         public string DataFolderPath { get; }
 
         /// <summary>
-        /// Gets the current window location.
-        /// </summary>
-        /// <value>The current window location.</value>
-        public Point GetCurrentWindowLocation
-        {
-            get
-            {
-                var currentWindow = Application.Current?.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
-                return currentWindow == null
-                    ? new Point()
-                    : new Point(currentWindow.Left, currentWindow.Top);
-            }
-        }
-
-        /// <summary>
         /// Invokes the specified action on the UI thread.
         /// </summary>
         /// <param name="action">The action.</param>
@@ -160,7 +145,7 @@ namespace PDS.Witsml.Studio.Core.Runtime
         /// <returns>The view model dialog's result.</returns>
         public bool ShowDialog(object viewModel, int leftOffset, int topOffset)
         {
-            var screenCoordinates = GetCurrentWindowLocation;
+            var screenCoordinates = GetActiveWindowLocation();
             screenCoordinates.X += leftOffset;
             screenCoordinates.Y += topOffset;
 
@@ -197,6 +182,27 @@ namespace PDS.Witsml.Studio.Core.Runtime
         public void ShowInfo(string message)
         {
             MessageBox.Show(Application.Current.MainWindow, message, "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        /// <summary>
+        /// Gets the current window location.
+        /// </summary>
+        /// <value>The current window location.</value>
+        private Point GetActiveWindowLocation()
+        {
+            var currentWindow = GetActiveWindow();
+            return currentWindow == null
+                ? new Point()
+                : new Point(currentWindow.Left, currentWindow.Top);
+        }
+
+        /// <summary>
+        /// Gets the active window.
+        /// </summary>
+        /// <value>The active window.</value>
+        private static Window GetActiveWindow()
+        {
+            return Application.Current?.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
         }
     }
 }
