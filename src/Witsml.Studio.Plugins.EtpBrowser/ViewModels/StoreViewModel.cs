@@ -52,7 +52,11 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         {
             Runtime = runtime;
             DisplayName = string.Format("{0:D} - {0}", Protocols.Store);
-            Data = new TextEditorViewModel(runtime, "XML");
+            Data = new TextEditorViewModel(runtime, "XML")
+            {
+                IsScrollingEnabled = true,
+                IsPrettyPrintAllowed = true
+            };
             Data.Document.Changed += OnDataObjectChanged;
         }
 

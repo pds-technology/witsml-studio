@@ -270,9 +270,27 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         }
 
         /// <summary>
+        /// Gets wether to display the pretty print context menu checkbox
+        /// </summary>
+        public bool DisplayPrettyPrintCheckBox => IsPrettyPrintAllowed && IsReadOnly;
+
+        /// <summary>
+        /// Gets wether to display the pretty print context menu item
+        /// </summary>
+        public bool DisplayPrettyPrintItem => IsPrettyPrintAllowed && !IsReadOnly;
+
+        /// <summary>
         /// Gets the document text.
         /// </summary>
         public string Text => Document.Text;
+
+        /// <summary>
+        /// Pretties the print text.
+        /// </summary>
+        public void PrettyPrintText()
+        {
+            SetText(Text);
+        } 
 
         /// <summary>
         /// Sets the document text.

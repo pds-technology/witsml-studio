@@ -76,7 +76,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 IsScrollingEnabled = true,
                 IsPrettyPrintAllowed = true
             };
-            QueryResults = new TextEditorViewModel(runtime, "XML")
+            QueryResults = new TextEditorViewModel(runtime, "XML", true)
             {
                 IsScrollingEnabled = true,
                 IsPrettyPrintAllowed = true
