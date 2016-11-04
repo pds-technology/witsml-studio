@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -77,6 +78,21 @@ namespace PDS.Witsml.Studio.Core.Runtime
         /// </summary>
         /// <value>The data folder path.</value>
         public string DataFolderPath { get; }
+
+        /// <summary>
+        /// Gets the get current window location.
+        /// </summary>
+        /// <value>The get current window location</value>
+        public Point GetCurrentWindowLocation
+        {
+            get
+            {
+                var currentWindow = Application.Current?.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
+                return currentWindow == null
+                    ? new Point()
+                    : new Point(currentWindow.Left, currentWindow.Top);
+            }
+        }
 
         /// <summary>
         /// Invokes the specified action on the UI thread.
@@ -144,11 +160,15 @@ namespace PDS.Witsml.Studio.Core.Runtime
         /// <returns>The view model dialog's result.</returns>
         public bool ShowDialog(object viewModel, int leftOffset, int topOffset)
         {
+            var screenCoordinates = GetCurrentWindowLocation;
+            screenCoordinates.X += leftOffset;
+            screenCoordinates.Y += topOffset;
+
             var settings = new Dictionary<string, object>()
             {
                 { "WindowStartupLocation", WindowStartupLocation.Manual },
-                { "Left", leftOffset },
-                { "Top", topOffset }
+                { "Left", screenCoordinates.X },
+                { "Top", screenCoordinates.Y }
             };
 
             return WindowManager.ShowDialog(viewModel, null, settings).GetValueOrDefault();

@@ -208,8 +208,9 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             {
                 DataItem = new Connection()
             };
-            
-            if (Runtime.ShowDialog(viewModel, 150, 150)) 
+            // Capture window location
+
+            if (Runtime.ShowDialog(viewModel, 10, 10)) 
             {
                 EditItem.JsonWebToken = viewModel.DataItem.JsonWebToken;
             }
@@ -249,15 +250,6 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         }
 
         /// <summary>
-        /// Resets the test status.
-        /// </summary>
-        private void ResetTestStatus()
-        {
-            IsTestSuccess = false;
-            IsTestFailure = false;
-        }
-
-        /// <summary>
         /// Called when the password control is loaded.
         /// </summary>
         /// <param name="control">The control.</param>
@@ -275,6 +267,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         {
             EditItem.Password = control.Password;
             EditItem.SecurePassword = control.SecurePassword;
+            ResetTestStatus();
         }
 
         /// <summary>
@@ -389,6 +382,15 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 EditItem = OpenConnectionFile() ?? new Connection();
             }
             EditItem.PropertyChanged += EditItem_PropertyChanged;
+        }
+
+        /// <summary>
+        /// Resets the test status.
+        /// </summary>
+        private void ResetTestStatus()
+        {
+            IsTestSuccess = false;
+            IsTestFailure = false;
         }
 
         /// <summary>

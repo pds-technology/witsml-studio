@@ -65,7 +65,7 @@
                         </Grid.ColumnDefinitions>
                         
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="User Name:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                        <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Username}" VerticalAlignment="Center" />
+                        <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Username, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
 
                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Password:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
                         <PasswordBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" PasswordChar="*" VerticalAlignment="Center"
@@ -83,7 +83,7 @@
                         </Grid.ColumnDefinitions>
 
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="JWT:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                        <TextBox Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Margin="5" Padding="5" Text="{Binding EditItem.JsonWebToken}" VerticalAlignment="Stretch"
+                        <TextBox Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Margin="5" Padding="5" Text="{Binding EditItem.JsonWebToken, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Stretch"
                                  TextWrapping="Wrap" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />
                     </Grid>
                 </Grid>
@@ -105,10 +105,10 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Sub-Protocol:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                    <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.SubProtocol}" VerticalAlignment="Center" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.SubProtocol, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Encoding:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                    <TextBox Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.EtpEncoding}" VerticalAlignment="Center" />
+                    <TextBox Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.EtpEncoding, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
                 </Grid>
             </TabItem>
 
