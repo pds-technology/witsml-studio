@@ -73,12 +73,10 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             // Create documents used by Avalon Editors used on query/result tabs.
             XmlQuery = new TextEditorViewModel(runtime, "XML")
             {
-                IsScrollingEnabled = true,
                 IsPrettyPrintAllowed = true
             };
             QueryResults = new TextEditorViewModel(runtime, "XML", true)
             {
-                IsScrollingEnabled = true,
                 IsPrettyPrintAllowed = true
             };
             Messages = new TextDocument();

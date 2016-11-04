@@ -73,7 +73,6 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser
             var mainViewModel = new MainViewModel(_runtime);
             var xmlQuery = new TextEditorViewModel(_runtime, "XML")
             {
-                IsScrollingEnabled = true,
                 IsPrettyPrintAllowed = true
             };
             var requestViewModel = new RequestViewModel(_runtime, xmlQuery);
