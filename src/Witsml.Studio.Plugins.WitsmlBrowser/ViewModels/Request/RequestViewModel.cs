@@ -22,6 +22,7 @@ using Caliburn.Micro;
 using Energistics.DataAccess;
 using PDS.Framework;
 using PDS.Witsml.Studio.Core.Runtime;
+using PDS.Witsml.Studio.Core.ViewModels;
 
 namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
 {
@@ -37,10 +38,12 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
         /// Initializes a new instance of the <see cref="RequestViewModel"/> class.
         /// </summary>
         /// <param name="runtime">The runtime service.</param>
-        public RequestViewModel(IRuntimeService runtime)
+        /// <param name="xmlQuery"></param>
+        public RequestViewModel(IRuntimeService runtime, TextEditorViewModel xmlQuery)
         {
             _log.Debug("Creating view model instance");
             Runtime = runtime;
+            XmlQuery = xmlQuery;
         }
 
         /// <summary>
@@ -60,6 +63,25 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
         public Models.WitsmlSettings Model
         {
             get { return Parent.Model; }
+        }
+
+        private TextEditorViewModel _xmlQuery;
+
+        /// <summary>
+        /// Gets or sets the query editor.
+        /// </summary>
+        /// <value>The query editor.</value>
+        public TextEditorViewModel XmlQuery
+        {
+            get { return _xmlQuery; }
+            set
+            {
+                if (!ReferenceEquals(_xmlQuery, value))
+                {
+                    _xmlQuery = value;
+                    NotifyOfPropertyChange(() => XmlQuery);
+                }
+            }
         }
 
         /// <summary>
@@ -121,7 +143,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
             Items.Add(new SettingsViewModel(Runtime));
             Items.Add(new TreeViewViewModel(Runtime));
             //Items.Add(new TemplatesViewModel());
-            Items.Add(new QueryViewModel(Runtime, Parent.XmlQuery));
+            Items.Add(new QueryViewModel(Runtime, XmlQuery));
 
             ActivateItem(Items.FirstOrDefault());
         }

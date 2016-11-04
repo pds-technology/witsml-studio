@@ -36,17 +36,14 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
         /// Initializes a new instance of the <see cref="QueryViewModel" /> class.
         /// </summary>
         /// <param name="runtime">The runtime.</param>
-        /// <param name="xmlQuery">The XML query.</param>
-        public QueryViewModel(IRuntimeService runtime, TextDocument xmlQuery)
+        /// <param name="xmlQuery">The xml query.</param>
+        public QueryViewModel(IRuntimeService runtime, TextEditorViewModel xmlQuery)
         {
             _log.Debug("Creating view model instance");
             Runtime = runtime;
             DisplayName = "Query";
 
-            XmlQuery = new TextEditorViewModel(runtime, "XML")
-            {
-                Document = xmlQuery
-            };
+            XmlQuery = xmlQuery;
         }
 
         /// <summary>

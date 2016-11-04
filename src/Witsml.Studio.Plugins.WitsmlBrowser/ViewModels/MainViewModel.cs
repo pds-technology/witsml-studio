@@ -71,8 +71,16 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             Model = new WitsmlSettings();
 
             // Create documents used by Avalon Editors used on query/result tabs.
-            XmlQuery = new TextDocument();
-            QueryResults = new TextDocument();
+            XmlQuery = new TextEditorViewModel(runtime, "XML")
+            {
+                IsScrollingEnabled = true,
+                IsPrettyPrintAllowed = true
+            };
+            QueryResults = new TextEditorViewModel(runtime, "XML")
+            {
+                IsScrollingEnabled = true,
+                IsPrettyPrintAllowed = true
+            };
             Messages = new TextDocument();
             SoapMessages = new TextDocument();
 
@@ -80,7 +88,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             Proxy = CreateProxy();
 
             // Create view models displayed within this view model.
-            RequestControl = new RequestViewModel(Runtime);
+            RequestControl = new RequestViewModel(Runtime, XmlQuery);
             ResultControl = new ResultViewModel(Runtime, QueryResults, Messages, SoapMessages);
 
             // Handle notifications for our witsml settings model changes
@@ -195,7 +203,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// </value>
         public ResultViewModel ResultControl { get; set; }
 
-        private TextDocument _xmlQuery;
+        private TextEditorViewModel _xmlQuery;
 
         /// <summary>
         /// Gets or sets the XML query document.
@@ -203,7 +211,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// <value>
         /// The XML query document.
         /// </value>
-        public TextDocument XmlQuery
+        public TextEditorViewModel XmlQuery
         {
             get { return _xmlQuery; }
             set
@@ -216,7 +224,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             }
         }
 
-        private TextDocument _queryResults;
+        private TextEditorViewModel _queryResults;
 
         /// <summary>
         /// Gets or sets the query results document.
@@ -224,7 +232,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// <value>
         /// The query results document.
         /// </value>
-        public TextDocument QueryResults
+        public TextEditorViewModel QueryResults
         {
             get { return _queryResults; }
             set
@@ -308,7 +316,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// </summary>
         public void ClearQueryResults()
         {
-            QueryResults.Text = string.Empty;
+            QueryResults.SetText(string.Empty);
         }
 
         /// <summary>
@@ -336,7 +344,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         public void SubmitQuery(Functions functionType, bool isPartialQuery = false)
         {
             // Trim query text before submitting request
-            string xmlIn = XmlQuery.Text = XmlQuery.Text.Trim();
+            string xmlIn = XmlQuery.Text;
 
             _log.DebugFormat("Query submitted for function '{0}'", functionType);
 
@@ -574,7 +582,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 }
 
                 //... update the query
-                XmlQuery.Text = AutoQueryProvider.UpdateDataQuery(xmlOut);
+                XmlQuery.SetText(AutoQueryProvider.UpdateDataQuery(xmlOut));
 
                 // Submit the query if one was returned.
                 if (!string.IsNullOrEmpty(XmlQuery.Text))
@@ -650,7 +658,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 xmlOut = $"<!-- WARNING: Response larger than { Model.TruncateSize } characters -->" + Environment.NewLine +
                          $"<!-- Results automatically saved to { outputPath } -->";
             }
-            else if (!xmlOut.Contains(Environment.NewLine))
+            else if (QueryResults.IsPrettyPrintAllowed && QueryResults.IsPrettyPrintEnabled)
             {
                 xmlOut = document.ToString();
             }
@@ -740,12 +748,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
 
             var type = ObjectTypes.GetObjectGroupType(DataObject, Model.WitsmlVersion);
             var query = Proxy.BuildEmtpyQuery(type, Model.WitsmlVersion);
-
-            Runtime.Invoke(() =>
-            {
-                XmlQuery.Text = WitsmlParser.ToXml(query);
-                DataObject = QueryTemplateText;
-            });
+            XmlQuery.SetText(WitsmlParser.ToXml(query));
         }
 
         /// <summary>
@@ -778,19 +781,19 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                         : suppMsgOut)
                     : xmlOut;
 
-            if (isPartialQuery && QueryResults.TextLength > 0)
+            if (isPartialQuery && QueryResults.Text.Length > 0)
             {
-                QueryResults.Insert(QueryResults.TextLength, 
-                    string.Format("{0}{0}<!-- Partial Result -->{0}{0}", Environment.NewLine));
+                QueryResults.Append(string.Format("{0}{0}<!-- Partial Result -->{0}{0}", Environment.NewLine));
             }
             else if (returnCode > 1)
             {
-                QueryResults.Text = string.Format("<!-- {0} -->{1}{1}", ErrorCodes.ParialSuccess.GetDescription(), Environment.NewLine);
+                QueryResults.SetText(string.Format("<!-- {0} -->{1}{1}", ErrorCodes.ParialSuccess.GetDescription(),
+                    Environment.NewLine));
             }
 
             if (!string.IsNullOrEmpty(text))
             {
-                QueryResults.Insert(QueryResults.TextLength, text);
+                QueryResults.Append(text);
             }
         }
 
@@ -804,13 +807,13 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             var stackTrace = error?.StackTrace;
             error = error?.GetBaseException();
 
-            QueryResults.Text = error == null
+            QueryResults.SetText(error == null
                 ? message
                 : string.Format("{0}{3}{3}Error Message: {1}{3}{3}Stack Trace:{3}{2}{3}",
                     message,
                     error.Message,
                     stackTrace,
-                    Environment.NewLine);
+                    Environment.NewLine));
 
             OutputMessages(null, null, 0,
                 GetErrorText(0, string.Concat(

@@ -38,17 +38,15 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Result
         /// <param name="queryResults">The query results.</param>
         /// <param name="messages">The WITSML messages.</param>
         /// <param name="soapMessages">The SOAP messages.</param>
-        public ResultViewModel(IRuntimeService runtime, TextDocument queryResults, TextDocument messages, TextDocument soapMessages)
+        public ResultViewModel(IRuntimeService runtime, TextEditorViewModel queryResults, TextDocument messages, TextDocument soapMessages)
         {
             _log.Debug("Creating view model instance");
             Runtime = runtime;
             ObjectData = new DataGridViewModel(runtime);
             ObjectProperties = new PropertyGridViewModel(runtime, ObjectData);
 
-            QueryResults = new TextEditorViewModel(runtime, "XML", true)
-            {
-                Document = queryResults
-            };
+            QueryResults = queryResults;
+
             Messages = new TextEditorViewModel(runtime, "XML", true)
             {
                 Document = messages

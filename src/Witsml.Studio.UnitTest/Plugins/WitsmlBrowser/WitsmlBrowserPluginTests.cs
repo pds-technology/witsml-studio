@@ -21,6 +21,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels;
 using PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request;
 using PDS.Witsml.Studio.Core.Runtime;
+using PDS.Witsml.Studio.Core.ViewModels;
 
 namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser
 {
@@ -70,7 +71,12 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser
         public void RequestViewModel_LoadScreens_Can_Load_RequestViewModel_Screens()
         {
             var mainViewModel = new MainViewModel(_runtime);
-            var requestViewModel = new RequestViewModel(_runtime);
+            var xmlQuery = new TextEditorViewModel(_runtime, "XML")
+            {
+                IsScrollingEnabled = true,
+                IsPrettyPrintAllowed = true
+            };
+            var requestViewModel = new RequestViewModel(_runtime, xmlQuery);
 
             mainViewModel.Items.Add(requestViewModel);
             requestViewModel.LoadScreens();

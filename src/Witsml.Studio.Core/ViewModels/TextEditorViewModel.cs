@@ -155,7 +155,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             }
         }
 
-        private bool _isPrettyPrintEnabled;
+        private bool _isPrettyPrintEnabled = true;
 
         /// <summary>
         /// Gets or sets whether this instance uses pretty print.
@@ -270,12 +270,17 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         }
 
         /// <summary>
+        /// Gets the document text.
+        /// </summary>
+        public string Text => Document.Text;
+
+        /// <summary>
         /// Sets the document text.
         /// </summary>
         /// <param name="text">The text.</param>
         public void SetText(string text)
         {
-            if (IsPrettyPrintAllowed && IsPrettyPrintEnabled)
+            if (!string.IsNullOrWhiteSpace(text) && IsPrettyPrintAllowed && IsPrettyPrintEnabled)
             {
                 try
                 {

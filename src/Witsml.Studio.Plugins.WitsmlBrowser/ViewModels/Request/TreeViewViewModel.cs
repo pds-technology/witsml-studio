@@ -104,7 +104,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
             Runtime.InvokeAsync(() =>
             {
                 Parent.Parent.Model.StoreFunction = function;
-                Parent.Parent.XmlQuery.Text = xmlIn;
+                Parent.Parent.XmlQuery.SetText(xmlIn);
             });
         }
 
