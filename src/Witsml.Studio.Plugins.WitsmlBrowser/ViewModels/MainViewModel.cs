@@ -649,18 +649,39 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             var options = OptionsIn.Parse(optionsIn);
             var returnElements = OptionsIn.GetValue(options, OptionsIn.ReturnElements.Requested);
             var outputPath = new DirectoryInfo(Path.Combine(Model.OutputPath, returnElements)).FullName;
-            var document = WitsmlParser.Parse(xmlOut);
 
-            if (Model.IsSaveQueryResponse || xmlOut.Length > Model.TruncateSize)
-                outputPath = SaveQueryResult(outputPath, document, Model.IsSplitResults);
+            string xmlOutOriginal = xmlOut;
 
-            if (xmlOut.Length > Model.TruncateSize)
+            if (xmlOutOriginal.Length > Model.TruncateSize)
             {
-                xmlOut = $"<!-- WARNING: Response larger than { Model.TruncateSize } characters -->" + Environment.NewLine +
-                         $"<!-- Results automatically saved to { outputPath } -->";
+                QueryResults.IsPrettyPrintEnabled = false;
+                xmlOut = $"<!-- WARNING: Response larger than {Model.TruncateSize} characters -->" + Environment.NewLine;
             }
-            else if (QueryResults.IsPrettyPrintAllowed && QueryResults.IsPrettyPrintEnabled)
+
+            if (Model.IsSaveQueryResponse || xmlOutOriginal.Length > Model.TruncateSize)
             {
+                Task.Run(async () =>
+                {
+                    Runtime.ShowBusy();
+                    var document = WitsmlParser.Parse(xmlOutOriginal);
+
+                    outputPath = await SaveQueryResult(outputPath, document, Model.IsSplitResults);
+
+                    xmlOut = Environment.NewLine + $"<!-- Results automatically saved to {outputPath} -->";
+
+                    await Runtime.InvokeAsync(() =>
+                    {
+                        if (xmlOutOriginal.Length > Model.TruncateSize)
+                            QueryResults.Append(xmlOut);
+                    });
+
+                    Runtime.ShowBusy(false);
+                });
+            }
+
+            if (QueryResults.IsPrettyPrintAllowed && QueryResults.IsPrettyPrintEnabled)
+            {
+                var document = WitsmlParser.Parse(xmlOut);
                 xmlOut = document.ToString();
             }
 
@@ -674,16 +695,16 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// <param name="document">The XML document.</param>
         /// <param name="splitResults">if set to <c>true</c> results will be split into multiple files.</param>
         /// <returns>The full output path.</returns>
-        private string SaveQueryResult(string outputPath, XDocument document, bool splitResults)
+        private Task<string> SaveQueryResult(string outputPath, XDocument document, bool splitResults)
         {
-            if (document?.Root == null) return outputPath;
+            if (document?.Root == null) return Task.FromResult(outputPath);
 
             if (!splitResults)
             {
                 Directory.CreateDirectory(outputPath);
                 outputPath = Path.Combine(outputPath, DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".xml");
                 document.Save(outputPath);
-                return outputPath;
+                return Task.FromResult(outputPath);
             }
 
             var ns = document.Root.GetDefaultNamespace();
@@ -708,7 +729,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 clone.Save(Path.Combine(objectPath, fileName));
             });
 
-            return objectPath;
+            return Task.FromResult(objectPath);
         }
 
         /// <summary>
