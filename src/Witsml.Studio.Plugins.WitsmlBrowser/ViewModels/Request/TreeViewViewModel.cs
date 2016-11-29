@@ -86,6 +86,17 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
 
             TreeViewModel.Context.LogQuery = LogQuery;
             TreeViewModel.Context.LogResponse = LogResponse;
+
+            TreeViewModel.MaxDataRows = Model.MaxDataRows;
+        }
+
+        /// <summary>
+        /// Called when maximum data rows changed.
+        /// </summary>
+        /// <param name="maxDataRows">The maximum data rows.</param>
+        public void OnMaxDataRowsChanged(int? maxDataRows)
+        {
+            TreeViewModel.MaxDataRows = maxDataRows;
         }
 
         /// <summary>

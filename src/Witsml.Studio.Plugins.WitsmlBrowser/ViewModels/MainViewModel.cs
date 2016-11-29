@@ -310,6 +310,15 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         }
 
         /// <summary>
+        /// Called when maximum data rows has changed.
+        /// </summary>
+        /// <param name="maxDataRows">The maximum data rows.</param>
+        public void OnMaxDataRowsChanged(int? maxDataRows)
+        {
+            RequestControl.OnMaxDataRowsChanged(maxDataRows);
+        }
+
+        /// <summary>
         /// Clears the query results.
         /// </summary>
         public void ClearQueryResults()
@@ -785,6 +794,11 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             {
                 _log.Debug("WitsmlVersion property changed");
                 OnWitsmlVersionChanged(Model.WitsmlVersion);
+            }
+            else if (e.PropertyName.Equals("MaxDataRows"))
+            {
+                _log.Debug("MaxDataRows property changed");
+                OnMaxDataRowsChanged(Model.MaxDataRows);
             }
         }
 

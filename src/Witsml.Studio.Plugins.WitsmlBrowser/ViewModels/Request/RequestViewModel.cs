@@ -135,6 +135,17 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
         }
 
         /// <summary>
+        /// Called when maximum data rows has changed.
+        /// </summary>
+        /// <param name="maxDataRows">The maximum data rows.</param>
+        public void OnMaxDataRowsChanged(int? maxDataRows)
+        {
+            Items
+                .OfType<TreeViewViewModel>()
+                .ForEach(x => x.OnMaxDataRowsChanged(maxDataRows));
+        }
+
+        /// <summary>
         /// Loads the screens for the request view model.
         /// </summary>
         internal void LoadScreens()

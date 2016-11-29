@@ -66,7 +66,13 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// Gets the collection of supported data objects.
         /// </summary>
         /// <value>The data objects.</value>
-        public BindableCollection<string> DataObjects { get; } 
+        public BindableCollection<string> DataObjects { get; }
+
+        /// <summary>
+        /// Gets or sets the maximum data rows.
+        /// </summary>
+        /// <value>The maximum data rows.</value>
+        public int? MaxDataRows { get; set; }
 
         private IWitsmlContext _context;
 
@@ -176,7 +182,10 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             Runtime.ShowBusy();
             Runtime.InvokeAsync(() =>
             {
-                Context.GetObjectDetails(uri.ObjectType, uri);
+                if (CanGetObjectHeader && MaxDataRows.HasValue)
+                    Context.GetObjectDetails(uri.ObjectType, uri, OptionsIn.ReturnElements.All, OptionsIn.MaxReturnNodes.Eq(MaxDataRows.Value));
+                else
+                    Context.GetObjectDetails(uri.ObjectType, uri);
                 Runtime.ShowBusy(false);
             });
         }
