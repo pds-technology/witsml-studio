@@ -76,5 +76,14 @@ namespace PDS.Witsml.Studio.Core.Properties {
                 return ((string)(this["WindowSettingsFileName"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5000")]
+        public int MaxChannelDataRows {
+            get {
+                return ((int)(this["MaxChannelDataRows"]));
+            }
+        }
     }
 }

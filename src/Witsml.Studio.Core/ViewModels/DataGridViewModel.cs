@@ -22,6 +22,7 @@ using Caliburn.Micro;
 using Energistics.Datatypes;
 using PDS.Framework;
 using PDS.Witsml.Data.Channels;
+using PDS.Witsml.Studio.Core.Properties;
 using PDS.Witsml.Studio.Core.Runtime;
 using Xceed.Wpf.DataGrid;
 using Witsml131 = Energistics.DataAccess.WITSML131;
@@ -36,6 +37,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
     public class DataGridViewModel : Screen, IDisposable
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(DataGridViewModel));
+        private static readonly int _maxChannelDataRows = Settings.Default.MaxChannelDataRows;
         private readonly DataTable _dataTable;
         private DataGridControl _control;
         
@@ -188,6 +190,9 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         {
             try
             {
+                // For performance, only load data grid if below the max number of allowed rows
+                if (reader.RecordsAffected > _maxChannelDataRows) return;
+
                 reader.IncludeUnitWithName = true;
                 DataTable.BeginLoadData();
                 DataTable.Load(reader, LoadOption.Upsert);

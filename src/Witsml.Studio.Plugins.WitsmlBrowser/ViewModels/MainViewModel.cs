@@ -566,46 +566,8 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             // Show data object on the Properties tab
             if (functionType == Functions.GetFromStore && result.ReturnCode > 0)
             {
-                if (result.ReturnCode > 0)
-                    ShowObjectProperties(result);
-
-                if (result.ReturnCode == 1)
-                    AutoQueryProvider = null;
-
-                var model = GetModel();
-
-                // If there is only a partial success and the user has selected to retrieve parital results...
-                if (result.ReturnCode <= 1 || !model.RetrievePartialResults)
-                    return;
-
-                // Check if the auto-query operation has been cancelled by the user
-                if (AutoQueryProvider != null && AutoQueryProvider.IsCancelled)
-                {
-                    AutoQueryProvider = null;
-                    return;
-                }
-
-                if (AutoQueryProvider == null)
-                {
-                    AutoQueryProvider = new GrowingObjectQueryProvider<WitsmlSettings>(model, result.ObjectType, XmlQuery.Text);
-                }
-
-                //... update the query
-                XmlQuery.SetText(AutoQueryProvider.UpdateDataQuery(xmlOut));
-
-                // Submit the query if one was returned.
-                if (!string.IsNullOrEmpty(XmlQuery.Text))
-                {
-                    // Change return elements to requested
-                    AutoQueryProvider.Context.RetrievePartialResults = true;
-
-                    //... and Submit a Query for the next set of data.
-                    SubmitQuery(Functions.GetFromStore, true);
-                }
-                else
-                {
-                    AutoQueryProvider = null;
-                }
+                ShowObjectProperties(result);
+                SubmitAutoQuery(result);
             }
         }
 
@@ -632,14 +594,64 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 OutputMessages(string.Empty, string.Empty, 0, GetErrorText((short)ex.ErrorCode, message));
             };
 
-            try
+            Task.Run(() =>
             {
-                ResultControl.ObjectProperties.SetCurrentObject(result.ObjectType, result.XmlOut, Model.WitsmlVersion, Model.KeepGridData, Model.IsRequestObjectSelectionCapability, errorHandler);
+                try
+                {
+                    ResultControl.ObjectProperties.SetCurrentObject(
+                        result.ObjectType,
+                        result.XmlOut,
+                        Model.WitsmlVersion,
+                        Model.KeepGridData,
+                        Model.IsRequestObjectSelectionCapability,
+                        errorHandler);
+                }
+                catch (WitsmlException ex)
+                {
+                    _log.WarnFormat("Error parsing query response: {0}{2}{2}{1}", result.XmlOut, ex, Environment.NewLine);
+                    errorHandler(ex);
+                }
+            });
+        }
+
+        /// <summary>
+        /// Submits the automatic query.
+        /// </summary>
+        /// <param name="result">The result.</param>
+        private void SubmitAutoQuery(WitsmlResult result)
+        {
+            var model = GetModel();
+
+            // Do not execute an auto-query:
+            // ... if the Partial Success return code is missing, or
+            // ... if the user has not selected to retrieve parital results, or
+            // ... if the current auto-query operation has been cancelled by the user
+            if (result.ReturnCode <= 1 || !model.RetrievePartialResults || (AutoQueryProvider != null && AutoQueryProvider.IsCancelled))
+            {
+                AutoQueryProvider = null;
+                return;
             }
-            catch (WitsmlException ex)
+
+            if (AutoQueryProvider == null)
             {
-                _log.WarnFormat("Error parsing query response: {0}{2}{2}{1}", result.XmlOut, ex, Environment.NewLine);
-                errorHandler(ex);
+                AutoQueryProvider = new GrowingObjectQueryProvider<WitsmlSettings>(model, result.ObjectType, XmlQuery.Text);
+            }
+
+            //... update the query using the original XmlOut
+            XmlQuery.SetText(AutoQueryProvider.UpdateDataQuery(result.XmlOut));
+
+            // Submit the query if one was returned.
+            if (!string.IsNullOrEmpty(XmlQuery.Text))
+            {
+                // Change return elements to requested
+                AutoQueryProvider.Context.RetrievePartialResults = true;
+
+                //... and Submit a Query for the next set of data.
+                SubmitQuery(Functions.GetFromStore, true);
+            }
+            else
+            {
+                AutoQueryProvider = null;
             }
         }
 
@@ -658,15 +670,20 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             var returnElements = OptionsIn.GetValue(options, OptionsIn.ReturnElements.Requested);
             var outputPath = new DirectoryInfo(Path.Combine(Model.OutputPath, returnElements)).FullName;
 
-            string xmlOutOriginal = xmlOut;
+            var isAutoSave = xmlOut.Length > Model.TruncateSize;
+            var xmlOutOriginal = xmlOut;
 
-            if (xmlOutOriginal.Length > Model.TruncateSize)
+            if (isAutoSave)
             {
                 xmlOut = $"<!-- WARNING: Response larger than {Model.TruncateSize} characters -->";
-                QueryResults.IsPrettyPrintEnabled = false;
+            }
+            else if (QueryResults.IsPrettyPrintAllowed && QueryResults.IsPrettyPrintEnabled)
+            {
+                var document = WitsmlParser.Parse(xmlOut);
+                xmlOut = document.ToString();
             }
 
-            if (Model.IsSaveQueryResponse || xmlOutOriginal.Length > Model.TruncateSize)
+            if (Model.IsSaveQueryResponse || isAutoSave)
             {
                 Task.Run(async () =>
                 {
@@ -678,11 +695,10 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
 
                         outputPath = await SaveQueryResult(outputPath, document, Model.IsSplitResults);
 
-                        xmlOut = $"{Environment.NewLine}<!-- Results automatically saved to {outputPath} -->";
-
-                        if (xmlOutOriginal.Length > Model.TruncateSize)
+                        if (isAutoSave)
                         {
-                            QueryResults.Append(xmlOut);
+                            var message = $"{Environment.NewLine}<!-- Results automatically saved to {outputPath} -->";
+                            QueryResults.Append(message);
                         }
                     }
                     catch (Exception ex)
@@ -694,12 +710,6 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                         Runtime.ShowBusy(false);
                     }
                 });
-            }
-
-            if (QueryResults.IsPrettyPrintAllowed && QueryResults.IsPrettyPrintEnabled)
-            {
-                var document = WitsmlParser.Parse(xmlOut);
-                xmlOut = document.ToString();
             }
 
             return xmlOut;
@@ -878,7 +888,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         {
             var now = DateTime.Now.ToString(TimestampFormat);
 
-            Runtime.Invoke(() =>
+            Runtime.InvokeAsync(() =>
             {
                 Messages.Insert(
                     Messages.TextLength,
