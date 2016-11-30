@@ -18,6 +18,7 @@
 
 using System;
 using System.Data;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using Energistics.Datatypes;
 using PDS.Framework;
@@ -110,7 +111,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         private void SetLogData(Witsml131.Log log, bool keepGridData, Action<WitsmlException> errorHandler)
         {
             ClearDataTable(log.GetUri(), keepGridData);
-            Runtime.InvokeAsync(() =>
+            Task.Run(() =>
             {
                 try
                 {
@@ -133,7 +134,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         private void SetLogData(Witsml141.Log log, bool keepGridData, Action<WitsmlException> errorHandler)
         {
             ClearDataTable(log.GetUri(), keepGridData);
-            Runtime.InvokeAsync(() =>
+            Task.Run(() =>
             {
                 try
                 {
@@ -186,25 +187,27 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// Sets the channel data.
         /// </summary>
         /// <param name="reader">The reader.</param>
-        private void SetChannelData(ChannelDataReader reader)
+        private async void SetChannelData(ChannelDataReader reader)
         {
             try
             {
                 // For performance, only load data grid if below the max number of allowed rows
-                if (reader.RecordsAffected > _maxChannelDataRows) return;
+                //if (reader.RecordsAffected > _maxChannelDataRows) return;
 
                 reader.IncludeUnitWithName = true;
                 DataTable.BeginLoadData();
-                DataTable.Load(reader, LoadOption.Upsert);
-                DataTable.PrimaryKey = new[] { DataTable.Columns[0] };
+                await Task.Run(() => DataTable.Load(reader, LoadOption.Upsert));
+                DataTable.PrimaryKey = new[] {DataTable.Columns[0]};
                 DataTable.AcceptChanges();
                 DataTable.EndLoadData();
 
                 if (DataTable.Columns.Count > 1 && _control != null)
                 {
                     // Use DateTimeOffset formatting for Time logs
-                    _control.Columns[0].CellContentStringFormat = 
-                        DataTable.Columns[0].DataType.IsNumeric() ? null : "{0:o}";
+                    Runtime.Invoke(() =>
+                            _control.Columns[0].CellContentStringFormat =
+                                DataTable.Columns[0].DataType.IsNumeric() ? null : "{0:o}"
+                    );
                 }
 
                 NotifyOfPropertyChange(() => DataTable);
