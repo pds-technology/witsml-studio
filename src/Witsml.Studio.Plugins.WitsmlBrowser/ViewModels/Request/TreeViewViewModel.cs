@@ -17,6 +17,7 @@
 //-----------------------------------------------------------------------
 
 using System.Linq;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using PDS.Witsml.Studio.Core.Runtime;
 using PDS.Witsml.Studio.Core.ViewModels;
@@ -67,7 +68,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
         /// Gets the runtime service.
         /// </summary>
         /// <value>The runtime.</value>
-        public IRuntimeService Runtime { get; private set; }
+        public IRuntimeService Runtime { get; }
 
         /// <summary>
         /// Gets the TreeView view model.
@@ -86,7 +87,6 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
 
             TreeViewModel.Context.LogQuery = LogQuery;
             TreeViewModel.Context.LogResponse = LogResponse;
-
             TreeViewModel.MaxDataRows = Model.MaxDataRows;
         }
 
@@ -112,7 +112,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
 
         private void LogQuery(Functions function, string objectType, string xmlIn, string optionsIn)
         {
-            Runtime.InvokeAsync(() =>
+            Task.Run(() =>
             {
                 Parent.Parent.Model.StoreFunction = function;
                 Parent.Parent.XmlQuery.SetText(xmlIn);
@@ -130,7 +130,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
                 messageOut: suppMsgOut,
                 returnCode: returnCode);
 
-            Runtime.InvokeAsync(() =>
+            Task.Run(() =>
             {
                 Parent.Parent.ClearQueryResults();
                 Parent.Parent.ShowSubmitResult(function, result);

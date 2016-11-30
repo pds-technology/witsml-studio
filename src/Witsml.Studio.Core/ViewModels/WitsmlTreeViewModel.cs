@@ -121,7 +121,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
-            Runtime.InvokeAsync(() =>
+            Task.Run(() =>
             {
                 Context.GetObjectIdOnly(uri.ObjectType, uri);
                 Runtime.ShowBusy(false);
@@ -155,7 +155,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
-            Runtime.InvokeAsync(() =>
+            Task.Run(() =>
             {
                 Context.GetGrowingObjectHeaderOnly(uri.ObjectType, uri);
                 Runtime.ShowBusy(false);
@@ -180,12 +180,13 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
-            Runtime.InvokeAsync(() =>
+            Task.Run(() =>
             {
                 if (CanGetObjectHeader && MaxDataRows.HasValue)
                     Context.GetObjectDetails(uri.ObjectType, uri, OptionsIn.ReturnElements.All, OptionsIn.MaxReturnNodes.Eq(MaxDataRows.Value));
                 else
                     Context.GetObjectDetails(uri.ObjectType, uri);
+
                 Runtime.ShowBusy(false);
             });
         }
@@ -249,8 +250,8 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         {
             var resource = Items.FindSelected();
             // Return if there is nothing currently selected
-            if (resource==null)
-                return;
+            if (resource == null) return;
+
             resource.ClearAndLoadChildren();
             // Expand the node if it wasn't previously
             resource.IsExpanded = true;

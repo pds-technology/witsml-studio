@@ -18,6 +18,7 @@
 
 using System;
 using System.Windows;
+using System.Windows.Threading;
 using System.Xml.Linq;
 using Caliburn.Micro;
 using ICSharpCode.AvalonEdit;
@@ -282,10 +283,10 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// <summary>
         /// Gets the document text.
         /// </summary>
-        public string Text => Document.Text;
+        public string Text => Runtime.Invoke(() => Document.Text, DispatcherPriority.Send);
 
         /// <summary>
-        /// Pretties the print text.
+        /// Formats the text using an XML parser.
         /// </summary>
         public void PrettyPrintText()
         {
@@ -306,13 +307,12 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    _log.Warn($"Error parsing XML:{Environment.NewLine}{text}{Environment.NewLine}{Environment.NewLine}{ex}");
+                    var crlf = Environment.NewLine;
+                    _log.Warn($"Error parsing XML:{crlf}{text}{crlf}{crlf}{ex}");
                 }
             }
-            Runtime.Invoke(() =>
-            {
-                Document.Text = text;
-            });
+
+            Runtime.Invoke(() => Document.Text = text, DispatcherPriority.Send);
         }
 
         /// <summary>

@@ -105,11 +105,29 @@ namespace PDS.Witsml.Studio.Core.Runtime
         void Invoke(System.Action action, DispatcherPriority priority = DispatcherPriority.Normal);
 
         /// <summary>
+        /// Invokes the specified callback on the UI thread.
+        /// </summary>
+        /// <typeparam name="T">The result type.</typeparam>
+        /// <param name="callback">The callback.</param>
+        /// <param name="priority">The priority.</param>
+        /// <returns>The result of the callback.</returns>
+        T Invoke<T>(Func<T> callback, DispatcherPriority priority = DispatcherPriority.Normal);
+
+        /// <summary>
         /// Invokes the specified action on the UI thread.
         /// </summary>
         /// <param name="action">The action.</param>
         /// <param name="priority">The priority.</param>
         /// <returns>An awaitable <see cref="Task"/>.</returns>
         Task InvokeAsync(System.Action action, DispatcherPriority priority = DispatcherPriority.Normal);
+
+        /// <summary>
+        /// Invokes the specified callback on the UI thread.
+        /// </summary>
+        /// <typeparam name="T">The result type.</typeparam>
+        /// <param name="callback">The callback.</param>
+        /// <param name="priority">The priority.</param>
+        /// <returns>An awaitable <see cref="Task{T}"/>.</returns>
+        Task<T> InvokeAsync<T>(Func<T> callback, DispatcherPriority priority = DispatcherPriority.Normal);
     }
 }

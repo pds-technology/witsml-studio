@@ -369,16 +369,15 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             {
                 // Call internal SubmitQuery method with references to all inputs and outputs.
                 var result = await SubmitQuery(functionType, xmlIn, optionsIn);
-                await Runtime.InvokeAsync(() =>
+
+                // Clear any previous query results if this is not a partial query
+                if (!isPartialQuery)
                 {
-                    // Clear any previous query results if this is not a partial query
-                    if (!isPartialQuery)
-                    {
-                        ClearQueryResults();
-                    }
-                    ShowSubmitResult(functionType, result, isPartialQuery);
-                    Runtime.ShowBusy(false);
-                });
+                    ClearQueryResults();
+                }
+
+                ShowSubmitResult(functionType, result, isPartialQuery);
+                Runtime.ShowBusy(false);
             });
         }
 
@@ -663,8 +662,8 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
 
             if (xmlOutOriginal.Length > Model.TruncateSize)
             {
+                xmlOut = $"<!-- WARNING: Response larger than {Model.TruncateSize} characters -->";
                 QueryResults.IsPrettyPrintEnabled = false;
-                xmlOut = $"<!-- WARNING: Response larger than {Model.TruncateSize} characters -->" + Environment.NewLine;
             }
 
             if (Model.IsSaveQueryResponse || xmlOutOriginal.Length > Model.TruncateSize)
@@ -672,19 +671,28 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 Task.Run(async () =>
                 {
                     Runtime.ShowBusy();
-                    var document = WitsmlParser.Parse(xmlOutOriginal);
 
-                    outputPath = await SaveQueryResult(outputPath, document, Model.IsSplitResults);
-
-                    xmlOut = Environment.NewLine + $"<!-- Results automatically saved to {outputPath} -->";
-
-                    await Runtime.InvokeAsync(() =>
+                    try
                     {
-                        if (xmlOutOriginal.Length > Model.TruncateSize)
-                            QueryResults.Append(xmlOut);
-                    });
+                        var document = WitsmlParser.Parse(xmlOutOriginal);
 
-                    Runtime.ShowBusy(false);
+                        outputPath = await SaveQueryResult(outputPath, document, Model.IsSplitResults);
+
+                        xmlOut = $"{Environment.NewLine}<!-- Results automatically saved to {outputPath} -->";
+
+                        if (xmlOutOriginal.Length > Model.TruncateSize)
+                        {
+                            QueryResults.Append(xmlOut);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _log.Error("Error saving query results to file", ex);
+                    }
+                    finally
+                    {
+                        Runtime.ShowBusy(false);
+                    }
                 });
             }
 
@@ -870,9 +878,12 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         {
             var now = DateTime.Now.ToString(TimestampFormat);
 
-            Messages.Insert(
-                Messages.TextLength,
-                messageText ?? GetMessageText(now, xmlOut, suppMsgOut, returnCode));
+            Runtime.Invoke(() =>
+            {
+                Messages.Insert(
+                    Messages.TextLength,
+                    messageText ?? GetMessageText(now, xmlOut, suppMsgOut, returnCode));
+            });
         }
 
         /// <summary>
@@ -885,21 +896,24 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         {
             var now = DateTime.Now.ToString(TimestampFormat);
 
-            Messages.Insert(
-                Messages.TextLength,
-                string.Format(
-                    "<!---------- Request : {0} ----------{5}" +
-                    "   Function    : {1}{5}" +
-                    "   OptionsIn   : {2}{5}" +
-                    "   XmlIn       : {3}{5}" +
-                    "-->{5}" +
-                    "{4}{5}{5}",
-                    now,
-                    functionType,
-                    string.IsNullOrEmpty(optionsIn) ? "None" : optionsIn,
-                    string.IsNullOrEmpty(queryText) ? "None" : string.Empty,
-                    string.IsNullOrEmpty(queryText) ? string.Empty : queryText,
-                    Environment.NewLine));
+            Runtime.InvokeAsync(() =>
+            {
+                Messages.Insert(
+                    Messages.TextLength,
+                    string.Format(
+                        "<!---------- Request : {0} ----------{5}" +
+                        "   Function    : {1}{5}" +
+                        "   OptionsIn   : {2}{5}" +
+                        "   XmlIn       : {3}{5}" +
+                        "-->{5}" +
+                        "{4}{5}{5}",
+                        now,
+                        functionType,
+                        string.IsNullOrEmpty(optionsIn) ? "None" : optionsIn,
+                        string.IsNullOrEmpty(queryText) ? "None" : string.Empty,
+                        string.IsNullOrEmpty(queryText) ? string.Empty : queryText,
+                        Environment.NewLine));
+            });
         }
 
         /// <summary>
@@ -912,18 +926,21 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         {
             var now = DateTime.Now.ToString(TimestampFormat);
 
-            SoapMessages.Insert(
-                SoapMessages.TextLength,
-                string.Format(
-                    "<!---------- {0} : {1} ----------{4}" +
-                    "   Action : {2}{4}" +
-                    "-->{4}" +
-                    "{3}{4}{4}",
-                    type,
-                    now,
-                    action,
-                    message,
-                    Environment.NewLine));
+            Runtime.InvokeAsync(() =>
+            {
+                SoapMessages.Insert(
+                    SoapMessages.TextLength,
+                    string.Format(
+                        "<!---------- {0} : {1} ----------{4}" +
+                        "   Action : {2}{4}" +
+                        "-->{4}" +
+                        "{3}{4}{4}",
+                        type,
+                        now,
+                        action,
+                        message,
+                        Environment.NewLine));
+            });
         }
 
         /// <summary>
@@ -933,7 +950,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// <param name="message">The SOAP message.</param>
         void ISoapMessageHandler.LogRequest(string action, string message)
         {
-            Runtime.InvokeAsync(() => LogSoapMessage("Request", action, message));
+            LogSoapMessage("Request", action, message);
         }
 
         /// <summary>
@@ -943,7 +960,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// <param name="message">The SOAP message.</param>
         void ISoapMessageHandler.LogResponse(string action, string message)
         {
-            Runtime.InvokeAsync(() => LogSoapMessage("Response", action, message));
+            LogSoapMessage("Response", action, message);
         }
 
         /// <summary>
