@@ -174,20 +174,23 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         public void ClearDataTable()
         {
-            DataTable.BeginLoadData();
-            DataTable.PrimaryKey = new DataColumn[0];
-            DataTable.Clear();
-            DataTable.Rows.Clear();
-            DataTable.Columns.Clear();
-            DataTable.AcceptChanges();
-            DataTable.EndLoadData();
+            lock (DataTable)
+            {
+                DataTable.BeginLoadData();
+                DataTable.PrimaryKey = new DataColumn[0];
+                DataTable.Clear();
+                DataTable.Rows.Clear();
+                DataTable.Columns.Clear();
+                DataTable.AcceptChanges();
+                DataTable.EndLoadData();
+            }
         }
 
         /// <summary>
         /// Sets the channel data.
         /// </summary>
         /// <param name="reader">The reader.</param>
-        private async void SetChannelData(ChannelDataReader reader)
+        private void SetChannelData(ChannelDataReader reader)
         {
             try
             {
@@ -195,11 +198,15 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 //if (reader.RecordsAffected > _maxChannelDataRows) return;
 
                 reader.IncludeUnitWithName = true;
-                DataTable.BeginLoadData();
-                await Task.Run(() => DataTable.Load(reader, LoadOption.Upsert));
-                DataTable.PrimaryKey = new[] {DataTable.Columns[0]};
-                DataTable.AcceptChanges();
-                DataTable.EndLoadData();
+
+                lock (DataTable)
+                {
+                    DataTable.BeginLoadData();
+                    DataTable.Load(reader, LoadOption.Upsert);
+                    DataTable.PrimaryKey = new[] {DataTable.Columns[0]};
+                    DataTable.AcceptChanges();
+                    DataTable.EndLoadData();
+                }
 
                 if (DataTable.Columns.Count > 1 && _control != null)
                 {
