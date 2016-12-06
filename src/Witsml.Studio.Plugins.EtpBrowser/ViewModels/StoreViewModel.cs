@@ -220,17 +220,54 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
-        /// Clears the store input settings.
+        /// Clears the input settings.
         /// </summary>
-        public void ClearInputTextFields()
+        /// <param name="includeUri">if set to <c>true</c> [include URI].</param>
+        public void ClearInputSettings(bool includeUri = true)
         {
             var emptyString = string.Empty;
 
-            Model.Store.Uri = emptyString;
+            if(includeUri)
+                Model.Store.Uri = emptyString;
+
             Model.Store.Uuid = emptyString;
             Model.Store.Name = emptyString;
             Model.Store.ContentType = emptyString;
-            Data.Document.Text = emptyString;
+            Data.SetText(emptyString);
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether input setting is editable.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if input setting editable; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsInputSettingEditable
+        {
+            get
+            {
+                switch (Model.StoreFunction)
+                {
+                    case Functions.PutObject:
+                        return true;
+                    case Functions.GetObject:
+                    case Functions.DeleteObject:
+                        return false;
+                    default:
+                        return true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called when store function has changed.
+        /// </summary>
+        public void OnStoreFunctionChanged()
+        {
+            if(Model.StoreFunction == Functions.GetObject || Model.StoreFunction == Functions.DeleteObject)
+                ClearInputSettings(false);
+
+            NotifyOfPropertyChange(() => IsInputSettingEditable);
         }
 
         /// <summary>
