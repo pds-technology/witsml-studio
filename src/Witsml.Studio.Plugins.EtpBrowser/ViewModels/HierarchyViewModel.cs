@@ -224,6 +224,61 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             NotifyOfPropertyChange(() => CanDeleteObject);
             NotifyOfPropertyChange(() => CanDescribeChannels);
             NotifyOfPropertyChange(() => CanRefreshSelected);
+            NotifyOfPropertyChange(() => CanCopyUriToClipboard);
+            NotifyOfPropertyChange(() => CanCopyUriToStore);
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance can copy URI to clipboard.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if this instance can copy URI to clipboard; otherwise, <c>false</c>.
+        /// </value>
+        public bool CanCopyUriToClipboard
+        {
+            get
+            {
+                var resource = Parent.SelectedResource;
+
+                return CanExecute && !string.IsNullOrWhiteSpace(resource?.Resource?.Uri);
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance can copy URI to store.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if this instance can copy URI to store; otherwise, <c>false</c>.
+        /// </value>
+        public bool CanCopyUriToStore => CanGetObject;
+
+        /// <summary>
+        /// Copies the URI to clipboard.
+        /// </summary>
+        public void CopyUriToClipboard()
+        {
+            var resource = Parent.SelectedResource;
+
+            if (resource?.Resource == null)
+                return;
+
+            Clipboard.SetText(resource.Resource.Uri);
+        }
+
+        /// <summary>
+        /// Copies the URI to store.
+        /// </summary>
+        public void CopyUriToStore()
+        {
+            var resource = Parent.SelectedResource;
+            var storeViewModel = Parent.Items.OfType<StoreViewModel>().FirstOrDefault();
+
+            if (resource?.Resource == null || storeViewModel == null)
+                return;
+
+            storeViewModel.ClearStoreInputSettings();
+            storeViewModel.Model.Store.Uri = resource.Resource.Uri;
+            Parent.ActivateItem(storeViewModel);
         }
 
         /// <summary>

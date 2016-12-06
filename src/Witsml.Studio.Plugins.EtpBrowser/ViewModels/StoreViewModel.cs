@@ -220,6 +220,20 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
+        /// Clears the store input settings.
+        /// </summary>
+        public void ClearStoreInputSettings()
+        {
+            var emptyString = string.Empty;
+
+            Model.Store.Uri = emptyString;
+            Model.Store.Uuid = emptyString;
+            Model.Store.Name = emptyString;
+            Model.Store.ContentType = emptyString;
+            Data.Document.Text = emptyString;
+        }
+
+        /// <summary>
         /// Called when the selected connection has changed.
         /// </summary>
         /// <param name="connection">The connection.</param>
