@@ -222,7 +222,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Clears the store input settings.
         /// </summary>
-        public void ClearStoreInputSettings()
+        public void ClearInputTextFields()
         {
             var emptyString = string.Empty;
 

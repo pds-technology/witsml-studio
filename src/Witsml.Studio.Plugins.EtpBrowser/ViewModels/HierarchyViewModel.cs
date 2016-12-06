@@ -276,7 +276,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             if (resource?.Resource == null || storeViewModel == null)
                 return;
 
-            storeViewModel.ClearStoreInputSettings();
+            storeViewModel.ClearInputTextFields();
             storeViewModel.Model.Store.Uri = resource.Resource.Uri;
             Parent.ActivateItem(storeViewModel);
         }

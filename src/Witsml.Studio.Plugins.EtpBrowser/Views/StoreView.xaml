@@ -54,6 +54,7 @@
                           ItemsSource="{Binding Parent.StoreFunctions}"
                           SelectedItem="{Binding Model.StoreFunction}" />
                 <Button x:Name="SubmitQuery" Content="Execute" Width="70" Margin="5,0,0,5" />
+                <Button x:Name="ClearInputTextFields" Content="Clear" Width="70" Margin="5,0,0,5" />
             </StackPanel>
         </Grid>
     </Grid>
