@@ -454,7 +454,6 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             if (parent == null) return;
 
             viewModel.Parent = parent;
-            viewModel.Level = parent.Level + 1;
             parent.Children.Add(viewModel);
         }
 

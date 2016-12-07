@@ -151,24 +151,6 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                     NotifyOfPropertyChange(() => IsSelected);
                 }
             }
-        }
-
-        private int _level;
-        /// <summary>
-        /// Gets or sets the level.
-        /// </summary>
-        /// <value>The level.</value>
-        public int Level
-        {
-            get { return _level; }
-            set
-            {
-                if (_level != value)
-                {
-                    _level = value;
-                    NotifyOfPropertyChange(() => Level);
-                }
-            }
-        }
+        }        
     }
 }

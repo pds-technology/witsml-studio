@@ -40,11 +40,10 @@
                     <MenuItem Header="Get Object" cal:Message.Attach="GetObject" />
                     <MenuItem Header="Delete Object" cal:Message.Attach="DeleteObject" />
                     <Separator />
-                    <MenuItem Header="Describe" cal:Message.Attach="DescribeChannels" />
-                    <MenuItem Header="Refresh" cal:Message.Attach="RefreshSelected" />
-                    <Separator />
                     <MenuItem Header="Copy URI" cal:Message.Attach="CopyUriToClipboard"/>
                     <MenuItem Header="Copy URI to Store" cal:Message.Attach="CopyUriToStore" />
+                    <MenuItem Header="Copy URI to Describe" cal:Message.Attach="DescribeChannels" />
+                    <MenuItem Header="Refresh" cal:Message.Attach="RefreshSelected" />
                     <Separator />
                     <MenuItem Header="Refresh All" cal:Message.Attach="RefreshHierarchy" />
                 </ContextMenu>

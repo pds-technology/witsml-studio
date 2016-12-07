@@ -111,10 +111,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             get
             {
                 var resource = Parent.SelectedResource;
-
-                return CanExecute && resource != null && resource.Level > 0 && 
-                    !string.IsNullOrWhiteSpace(resource.Resource.Uri) &&
-                    !string.IsNullOrWhiteSpace(new EtpUri(resource.Resource.Uri).ObjectId);
+                return CanExecute && !string.IsNullOrWhiteSpace(resource?.Resource?.Uri);
             }
         }
 
@@ -234,15 +231,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// <value>
         /// <c>true</c> if this instance can copy URI to clipboard; otherwise, <c>false</c>.
         /// </value>
-        public bool CanCopyUriToClipboard
-        {
-            get
-            {
-                var resource = Parent.SelectedResource;
-
-                return CanExecute && !string.IsNullOrWhiteSpace(resource?.Resource?.Uri);
-            }
-        }
+        public bool CanCopyUriToClipboard => CanGetObject;
 
         /// <summary>
         /// Gets a value indicating whether this instance can copy URI to store.
