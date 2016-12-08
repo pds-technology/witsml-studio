@@ -55,7 +55,7 @@
                           SelectedItem="{Binding Model.StoreFunction}" 
                           cal:Message.Attach="[Event SelectionChanged] = [Action OnStoreFunctionChanged]" />
                 <Button x:Name="SubmitQuery" Content="Execute" Width="70" Margin="5,0,0,5" />
-                <Button Content="Clear" cal:Message.Attach="ClearInputSettings('true')" Width="70" Margin="5,0,0,5" />
+                <Button x:Name="ClearInputSettings" Content="Clear" Width="70" Margin="5,0,0,5" />
             </StackPanel>
         </Grid>
     </Grid>

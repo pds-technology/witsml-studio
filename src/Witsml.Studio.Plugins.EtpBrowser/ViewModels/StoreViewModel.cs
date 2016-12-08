@@ -222,14 +222,11 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Clears the input settings.
         /// </summary>
-        /// <param name="includeUri">if set to <c>true</c> [include URI].</param>
-        public void ClearInputSettings(bool includeUri = true)
+        public void ClearInputSettings()
         {
             var emptyString = string.Empty;
 
-            if(includeUri)
-                Model.Store.Uri = emptyString;
-
+            Model.Store.Uri = emptyString;
             Model.Store.Uuid = emptyString;
             Model.Store.Name = emptyString;
             Model.Store.ContentType = emptyString;
@@ -264,9 +261,6 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void OnStoreFunctionChanged()
         {
-            if(Model.StoreFunction == Functions.GetObject || Model.StoreFunction == Functions.DeleteObject)
-                ClearInputSettings(false);
-
             NotifyOfPropertyChange(() => IsInputSettingEditable);
         }
 
