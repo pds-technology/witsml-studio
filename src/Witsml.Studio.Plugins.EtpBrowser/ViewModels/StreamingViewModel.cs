@@ -396,7 +396,10 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         private void OnChannelMetadata(object sender, ProtocolEventArgs<ChannelMetadata> e)
         {
             if (!e.Message.Channels.Any())
+            {
+                Parent.Details.Append(Environment.NewLine + "// No channels were described");
                 return;
+            }
 
             // add to channel metadata collection
             e.Message.Channels.ForEach(x =>
