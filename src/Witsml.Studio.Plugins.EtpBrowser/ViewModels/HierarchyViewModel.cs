@@ -164,22 +164,6 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
-        /// Requests channel metadata for the selected resource using the ChannelStreaming protocol.
-        /// </summary>
-        public void DescribeChannels()
-        {
-            var viewModel = Parent.Items.OfType<StreamingViewModel>().FirstOrDefault();
-            var resource = Parent.SelectedResource;
-
-            if (viewModel != null && resource != null)
-            {
-                Model.Streaming.Uri = resource.Resource.Uri;
-                viewModel.AddUri();
-                Parent.ActivateItem(viewModel);
-            }
-        }
-
-        /// <summary>
         /// Refreshes the hierarchy.
         /// </summary>
         public void RefreshHierarchy()
@@ -268,6 +252,22 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             storeViewModel.ClearInputSettings();
             storeViewModel.Model.Store.Uri = resource.Resource.Uri;
             Parent.ActivateItem(storeViewModel);
+        }
+
+        /// <summary>
+        /// Copies the URI to streaming.
+        /// </summary>
+        public void CopyUriToStreaming()
+        {
+            var viewModel = Parent.Items.OfType<StreamingViewModel>().FirstOrDefault();
+            var resource = Parent.SelectedResource;
+
+            if (viewModel != null && resource != null)
+            {
+                Model.Streaming.Uri = resource.Resource.Uri;
+                viewModel.AddUri();
+                Parent.ActivateItem(viewModel);
+            }
         }
 
         /// <summary>
