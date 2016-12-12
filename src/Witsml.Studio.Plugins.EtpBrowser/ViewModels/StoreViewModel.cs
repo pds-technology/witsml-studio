@@ -30,6 +30,7 @@ using Energistics.Datatypes.Object;
 using Energistics.Protocol.Core;
 using Energistics.Protocol.Store;
 using ICSharpCode.AvalonEdit.Document;
+using PDS.Framework;
 using PDS.Witsml.Studio.Core.Connections;
 using PDS.Witsml.Studio.Core.Runtime;
 using PDS.Witsml.Studio.Core.ViewModels;
@@ -43,7 +44,6 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
     public sealed class StoreViewModel : Screen, ISessionAware
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof (StoreViewModel));
-        private bool _autoUpdating;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StoreViewModel"/> class.
@@ -120,14 +120,13 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 }
             }
         }
-
+        
         /// <summary>
         /// Generates a new UUID value.
         /// </summary>
         public void NewUuid()
         {
             Model.Store.Uuid = Guid.NewGuid().ToString();
-            UpdateInput();
         }
 
         /// <summary>
@@ -292,10 +291,23 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             CanExecute = false;
         }
 
-        private void UpdateInput(bool isUserInput = false)
+        /// <summary>
+        /// When the screen is activated attach event.
+        /// </summary>
+        protected override void OnActivate()
         {
+            base.OnActivate();
+            if (Parent != null)
+                Model.Store.PropertyChanged += StoreSettingsModel_PropertyChanged;
+        }
+
+        private void UpdateInput(bool fromXml = true)
+        {            
             var input = Data.Document.Text;
-            if (string.IsNullOrWhiteSpace(input)) return;
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return;
+            }
 
             XDocument doc;
             try
@@ -313,6 +325,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 
             var ns = root.GetDefaultNamespace();
             var version = root.Attribute("version");
+            var match = false;
 
             if (version != null)
             {
@@ -320,8 +333,10 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
 
                 var dataObject = root.Elements().FirstOrDefault();
                 var nameElement = dataObject?.Element(ns + "name");
+                match = CheckInputDataXmlMatch(dataObject, version.Value, "uid", nameElement);
 
-                _autoUpdating = UpdateInput(dataObject, version.Value, "uid", nameElement);
+                if(!match)
+                    UpdateInput(dataObject, version.Value, "uid", nameElement, fromXml);
             }
             else
             {
@@ -334,72 +349,205 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                     .Elements()
                     .FirstOrDefault(e => e.Name.LocalName == "Title");
 
-                _autoUpdating = UpdateInput(root, schemaVersion.Value, "uuid", nameElement);
+                match = CheckInputDataXmlMatch(root, schemaVersion.Value, "uuid", nameElement);
+
+                if (!match)
+                    UpdateInput(root, schemaVersion.Value, "uuid", nameElement, fromXml);
             }
 
-            if (_autoUpdating && !isUserInput)
+            if (!fromXml && !match)
             {
-                Data.Document.Text = doc.ToString();
+                Data.SetText(doc.ToString());
             }
+        }
+               
+        private void UpdateInput(XElement element, string version, string idField, XElement nameElement, bool fromXml)
+        {
+            try
+            {
+                var isXmlUpdated = false;
+                var objectType = element?.Name.LocalName;
 
-            _autoUpdating = false;
+                if (string.IsNullOrEmpty(objectType)) return;
+
+                Model.Store.ContentType = new EtpContentType(EtpContentTypes.Witsml141.Family, version, objectType);
+
+                var idAttribute = element.Attribute(idField);
+
+                if (idAttribute != null)
+                {
+                    if (!IsUuidMatch(Model.Store?.Uuid, idAttribute.Value))
+                        if (fromXml)
+                            Model.Store.Uuid = idAttribute.Value;
+                        else
+                        {
+                            idAttribute.Value = Model.Store.Uuid;
+                            isXmlUpdated = true;
+                        }
+                }
+                else if (!string.IsNullOrWhiteSpace(Model.Store.Uuid))
+                {
+                    idAttribute = new XAttribute(idField, Model.Store.Uuid);
+                    element.Add(idAttribute);
+                    isXmlUpdated = true;
+                }
+
+                if (nameElement != null)
+                {
+                    if (!IsNameMatch(Model.Store?.Name, nameElement.Value))
+                        if (fromXml)
+                            Model.Store.Name = nameElement.Value;
+                        else nameElement.Value = Model.Store.Name;
+                }
+                else Model.Store.Name = null;
+
+                var uri = GetUriFromXml(element, version, objectType)?.Uri;
+                
+                if (!IsUriMatch(Model.Store.Uri, uri))
+                    if (fromXml || isXmlUpdated)
+                        Model.Store.Uri = uri;
+                    else
+                    {
+                        var etpUri = GetEtpUriFromInputUri();
+                        etpUri.GetObjectIds().ForEach(x =>
+                        {
+                            var xAttribute = etpUri.ObjectType == x.ObjectType
+                                ? element.Attribute(idField)
+                                : element.Attribute(idField + x.ObjectType.ToPascalCase());
+
+                            if (xAttribute != null)
+                            {
+                                xAttribute.Value = x.ObjectId;
+                                if(etpUri.ObjectType == x.ObjectType)
+                                    Model.Store.Uuid = x.ObjectId;
+                            }
+                        });
+                    }
+            }
+            catch
+            {
+                // ignore
+            }
         }
 
-        private bool UpdateInput(XElement element, string version, string idField, XElement nameElement)
+        private bool CheckInputDataXmlMatch(XElement element, string version, string idField, XElement nameElement)
         {
+            var match = true;
+
             var objectType = element?.Name.LocalName;
+            if (string.IsNullOrEmpty(objectType)) return true;
 
-            if (string.IsNullOrEmpty(objectType)) return false;
+            var idAttribute = element?.Attribute(idField);
 
-            Model.Store.ContentType = new EtpContentType(EtpContentTypes.Witsml141.Family, version, objectType);
+            if (idAttribute != null && !IsUuidMatch(Model.Store?.Uuid, idAttribute.Value))
+                match = false;
 
-            var idAttribute = element.Attribute(idField);
-
-            if (idAttribute != null)
-            {
-                if (string.IsNullOrWhiteSpace(Model.Store.Uuid))
-                    Model.Store.Uuid = idAttribute.Value;
-                else
-                    idAttribute.Value = Model.Store.Uuid;
-            }
-            else if (!string.IsNullOrWhiteSpace(Model.Store.Uuid))
-            {
-                idAttribute = new XAttribute(idField, Model.Store.Uuid);
-                element.Add(idAttribute);
-            }
-
-            if (!string.IsNullOrWhiteSpace(nameElement?.Value))
-            {
-                Model.Store.Name = nameElement.Value;
-            }
+            if (!IsNameMatch(Model.Store?.Name, nameElement?.Value))
+                match = false;
 
             try
             {
-                var type = ObjectTypes.GetObjectGroupType(objectType, version) ?? 
-                           ObjectTypes.GetObjectType(objectType, version);
+                var uri = GetUriFromXml(element, version, objectType);
 
-                var entity = WitsmlParser.Parse(type, element.Document?.Root, false);
-                var collection = entity as IEnergisticsCollection;
-
-                var uri = collection?.Items
-                    .OfType<IDataObject>()
-                    .Select(x => x.GetUri())
-                    .FirstOrDefault() ?? (entity as AbstractObject)?.GetUri();
-
-                Model.Store.Uri = uri;
+                if (!IsUriMatch(Model.Store?.Uri, uri?.Uri))
+                    match = false;
             }
             catch
             {
                 // ignore
             }
 
-            return true;
+            return match;
+        }
+
+        private void UpdateUuidFromUri()
+        {
+            var etpUri = GetEtpUriFromInputUri();
+            if (etpUri.IsValid)
+            {
+                etpUri.GetObjectIds().ForEach(x =>
+                {
+                    if (etpUri.ObjectType == x.ObjectType && !IsUuidMatch(Model.Store.Uuid, x.ObjectId))
+                        Model.Store.Uuid = x.ObjectId;
+                });
+            }
+        }
+
+        private void UpdateUriFromUuid()
+        {
+            var etpUri = GetEtpUriFromInputUri();
+            if (etpUri.IsValid)
+            {
+                etpUri.GetObjectIds().ForEach(x =>
+                {
+                    if (etpUri.ObjectType == x.ObjectType && !IsUuidMatch(Model.Store.Uuid, x.ObjectId))
+                        Model.Store.Uri = new EtpUri(etpUri.Parent.Uri).Append(x.ObjectType, Model.Store.Uuid);
+                });
+            }
+        }
+
+        private static EtpUri? GetUriFromXml(XElement element, string version, string objectType)
+        {
+            var type = ObjectTypes.GetObjectGroupType(objectType, version) ??
+                       ObjectTypes.GetObjectType(objectType, version);
+
+            var entity = WitsmlParser.Parse(type, element?.Document?.Root, false);
+            var collection = entity as IEnergisticsCollection;
+
+            var uri = collection?.Items
+                          .OfType<IDataObject>()
+                          .Select(x => x.GetUri())
+                          .FirstOrDefault() ?? (entity as AbstractObject)?.GetUri();
+            return uri;
+        }
+
+        private EtpUri GetEtpUriFromInputUri()
+        {
+            var etpUri = new EtpUri();
+            if (Model.Store?.Uri != null)
+            {
+                etpUri = new EtpUri(Model.Store.Uri);
+            }
+            return etpUri;
+        }
+
+        private static bool IsUuidMatch(string storeUuid, string uuid)
+        {
+            return string.Equals(storeUuid, uuid, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        private static bool IsNameMatch(string storeName, string name)
+        {
+            return string.Equals(storeName, name, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        private static bool IsUriMatch(string storeUri, string uri)
+        {
+            return string.Equals(storeUri, uri, StringComparison.InvariantCultureIgnoreCase);
         }
 
         private void OnDataObjectChanged(object sender, DocumentChangeEventArgs e)
         {
-            if (_autoUpdating) return;
-            Runtime.Invoke(() => UpdateInput(true));
+            Runtime.Invoke(() => UpdateInput());
+        }
+
+        private void StoreSettingsModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var validInputFields = new[] {"Name", "Uri", "Uuid"};
+            if (!validInputFields.ContainsIgnoreCase(e.PropertyName)) return;
+
+            if (string.IsNullOrWhiteSpace(Data.Text))
+            {
+                if (e.PropertyName == "Uri")
+                {
+                    UpdateUuidFromUri();
+                }
+                else if (e.PropertyName == "Uuid")
+                {
+                    UpdateUriFromUuid();
+                }
+            }
+            else Runtime.Invoke(() => UpdateInput(false));
         }
     }
 }

@@ -33,7 +33,7 @@
         <TextBox Text="{Binding Model.Store.Uri, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center" />
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="UUID:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
-        <TextBox Text="{Binding Model.Store.Uuid}" IsEnabled="{Binding IsInputSettingEditable}" Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" VerticalContentAlignment="Center" />
+        <TextBox Text="{Binding Model.Store.Uuid, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsInputSettingEditable}" Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" VerticalContentAlignment="Center" />
         <Button x:Name="NewUuid" Grid.Row="1" Grid.Column="2" Margin="5" Content="New" Width="40" HorizontalAlignment="Right" IsEnabled="{Binding IsInputSettingEditable }" />
 
         <TextBlock Grid.Row="2" Grid.Column="0" Text="Name:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />

@@ -250,8 +250,9 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 return;
 
             storeViewModel.ClearInputSettings();
-            storeViewModel.Model.Store.Uri = resource.Resource.Uri;
             Parent.ActivateItem(storeViewModel);
+            storeViewModel.Model.Store.Uri = resource.Resource.Uri;
+            NotifyOfPropertyChange(() => storeViewModel.Model.Store.Uri);
         }
 
         /// <summary>
