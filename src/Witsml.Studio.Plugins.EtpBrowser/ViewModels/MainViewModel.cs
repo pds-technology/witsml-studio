@@ -237,7 +237,16 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             if (resource == null) return;
 
             SendDeleteObject(resource.Resource.Uri);
-            resource.Parent.Children.Remove(resource);
+
+            if (resource.Parent == null)
+            {
+                Resources.Remove(resource);
+            }
+            else
+            {
+                resource.Parent.Children.Remove(resource);
+            } 
+
         }
 
         /// <summary>
