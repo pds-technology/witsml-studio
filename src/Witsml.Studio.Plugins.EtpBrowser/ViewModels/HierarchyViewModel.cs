@@ -147,7 +147,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// Determines whether the ChannelDescribe message can be sent for the selected resource.
         /// </summary>
         /// <value><c>true</c> if the channels can be described; otherwise, <c>false</c>.</value>
-        public bool CanDescribeChannels
+        public bool CanCopyUriToStreaming
         {
             get
             {
@@ -177,10 +177,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// <value>
         /// <c>true</c> if this instance can be refreshed; otherwise, <c>false</c>.
         /// </value>
-        public bool CanRefreshSelected
-        {
-            get { return CanDescribeChannels; }
-        }
+        public bool CanRefreshSelected => CanCopyUriToStreaming;
 
         /// <summary>
         /// Refreshes the selected node.
@@ -203,7 +200,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         {
             NotifyOfPropertyChange(() => CanGetObject);
             NotifyOfPropertyChange(() => CanDeleteObject);
-            NotifyOfPropertyChange(() => CanDescribeChannels);
+            NotifyOfPropertyChange(() => CanCopyUriToStreaming);
             NotifyOfPropertyChange(() => CanRefreshSelected);
             NotifyOfPropertyChange(() => CanCopyUriToClipboard);
             NotifyOfPropertyChange(() => CanCopyUriToStore);
