@@ -448,8 +448,9 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             try
             {
                 var uri = GetUriFromXml(element, version, objectType);
+                var inputUri = GetEtpUriFromInputUri();
 
-                if (!IsUriMatch(Model.Store?.Uri, uri?.Uri))
+                if (inputUri.IsValid && !IsUriMatch(Model.Store?.Uri, uri?.Uri))
                     match = false;
             }
             catch
