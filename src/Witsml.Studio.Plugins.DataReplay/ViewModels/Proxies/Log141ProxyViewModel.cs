@@ -16,6 +16,7 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -84,13 +85,18 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
 
                 index = generator.GenerateLogData(log, startIndex: index, interval: 0.1);
 
-                result.Log[0].LogData[0].MnemonicList = generator.Mnemonics(result.Log[0].LogCurveInfo);
-                result.Log[0].LogData[0].UnitList = generator.Units(result.Log[0].LogCurveInfo);
+                result.Log[0].LogData[0].MnemonicList = ToList(result.Log[0], x => x.Mnemonic.Value);
+                result.Log[0].LogData[0].UnitList = ToList(result.Log[0], x => x.Unit);
 
                 Connection.Update(result);
 
                 await Task.Delay(interval);
             }
+        }
+
+        private string ToList(Log log, Func<LogCurveInfo, string> func)
+        {
+            return string.Join(",", log.LogCurveInfo.Select(func));
         }
 
         private LogCurveInfo ToLogCurveInfo(ChannelMetadataRecord channel)
