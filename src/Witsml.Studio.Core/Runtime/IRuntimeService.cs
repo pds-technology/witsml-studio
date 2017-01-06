@@ -55,6 +55,12 @@ namespace PDS.Witsml.Studio.Core.Runtime
         string DataFolderPath { get; }
 
         /// <summary>
+        /// Gets or sets the output folder path.
+        /// </summary>
+        /// <value>The output folder path.</value>
+        string OutputFolderPath { get; set; }
+
+        /// <summary>
         /// Shows the busy indicator cursor.
         /// </summary>
         /// <param name="isBusy">if set to <c>true</c>, shows the busy indicator.</param>

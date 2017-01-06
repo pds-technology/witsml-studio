@@ -43,7 +43,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
         public SettingsViewModel(IRuntimeService runtime)
         {
             _log.Debug("Creating view model instance");
-            Runtime = runtime;
+            Runtime = runtime;            
             DisplayName = "Settings";
             WitsmlVersions = new BindableCollection<string>();
             ConnectionPicker = new ConnectionPickerViewModel(runtime, ConnectionTypes.Witsml)
@@ -143,6 +143,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
             if (dialog.ShowDialog(owner) == System.Windows.Forms.DialogResult.OK)
             {
                 Model.OutputPath = dialog.SelectedPath;
+                Runtime.OutputFolderPath = Model.OutputPath;
             }
         }
 
@@ -202,6 +203,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
             _log.Debug("Initializing screen");
             base.OnInitialize();
             Model.ReturnElementType = OptionsIn.ReturnElements.All;
+            Runtime.OutputFolderPath = $"{Environment.CurrentDirectory}\\Data\\Results";            
         }
 
         /// <summary>

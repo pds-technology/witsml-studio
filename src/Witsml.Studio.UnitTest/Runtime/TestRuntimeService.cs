@@ -68,6 +68,12 @@ namespace PDS.Witsml.Studio.Core.Runtime
         public string DataFolderPath => $"{Environment.CurrentDirectory}\\{_persistedDataFolderName}";
 
         /// <summary>
+        /// Gets the output folder path.
+        /// </summary>
+        /// <value>The output folder path.</value>
+        public string OutputFolderPath { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating the value to be returned by the ShowConfirm and ShowDialog methods.
         /// </summary>
         /// <value><c>true</c> if ShowConfirm and ShowDialog should return <c>true</c>; otherwise, <c>false</c>.</value>

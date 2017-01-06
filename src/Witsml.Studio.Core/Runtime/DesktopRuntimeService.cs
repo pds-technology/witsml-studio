@@ -47,7 +47,7 @@ namespace PDS.Witsml.Studio.Core.Runtime
             Container = container;
 
             var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            DataFolderPath = $"{appDataPath}\\PDS.Witsml.Studio\\{_persistedDataFolderName}";
+            DataFolderPath = $"{appDataPath}\\PDS.Witsml.Studio\\{_persistedDataFolderName}";            
         }
 
         /// <summary>
@@ -78,6 +78,12 @@ namespace PDS.Witsml.Studio.Core.Runtime
         /// </summary>
         /// <value>The data folder path.</value>
         public string DataFolderPath { get; }
+
+        /// <summary>
+        /// Gets or sets the output folder path.
+        /// </summary>
+        /// <value>The output folder path.</value>
+        public string OutputFolderPath { get; set; }
 
         /// <summary>
         /// Invokes the specified action on the UI thread.

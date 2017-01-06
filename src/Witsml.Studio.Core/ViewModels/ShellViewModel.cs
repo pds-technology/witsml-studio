@@ -113,6 +113,14 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         }
 
         /// <summary>
+        /// Opens the current output directory.
+        /// </summary>
+        public void OpenOutputDirectory()
+        {
+            Process.Start("explorer.exe", Runtime.OutputFolderPath);
+        }
+
+        /// <summary>
         /// Exits the application.
         /// </summary>
         public void Exit()
