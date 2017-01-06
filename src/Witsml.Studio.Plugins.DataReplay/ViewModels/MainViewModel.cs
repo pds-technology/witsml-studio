@@ -44,6 +44,19 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels
         }
 
         /// <summary>
+        /// Update status when activated
+        /// </summary>
+        protected override void OnActivate()
+        {
+            base.OnActivate();
+            Runtime.Invoke(() =>
+            {
+                if (Runtime.Shell != null)
+                    Runtime.Shell.StatusBarText = "Ready";
+            });
+        }
+
+        /// <summary>
         /// Gets the display order of the plug-in when loaded by the main application shell
         /// </summary>
         public int DisplayOrder => Settings.Default.PluginDisplayOrder;
@@ -121,4 +134,5 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels
             }
         }
     }
+
 }

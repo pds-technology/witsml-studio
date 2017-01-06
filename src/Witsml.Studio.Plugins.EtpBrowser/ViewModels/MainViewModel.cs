@@ -271,6 +271,19 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             Items.Add(new StoreViewModel(Runtime));
             Items.Add(new JsonMessageViewModel(Runtime));
         }
+        
+        /// <summary>
+        /// Update status when activated
+        /// </summary>
+        protected override void OnActivate()
+        {
+            base.OnActivate();
+            Runtime.Invoke(() =>
+            {
+                if (Runtime.Shell != null)
+                    Runtime.Shell.StatusBarText = "Ready";
+            });
+        }
 
         /// <summary>
         /// Called when deactivating.

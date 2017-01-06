@@ -51,7 +51,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
 
             Runtime = runtime;
             DisplayName = _applicationTitle;
-            StatusBarText = "Ready.";
+            StatusBarText = "Ready";
         }
 
         /// <summary>
