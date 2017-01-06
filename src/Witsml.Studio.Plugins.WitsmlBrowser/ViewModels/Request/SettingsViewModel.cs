@@ -25,6 +25,7 @@ using Energistics.DataAccess;
 using PDS.Witsml.Studio.Core.Connections;
 using PDS.Witsml.Studio.Core.Runtime;
 using PDS.Witsml.Studio.Core.ViewModels;
+using System.Threading.Tasks;
 
 namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
 {
@@ -219,10 +220,10 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
 
             // Make connection and get version
             Runtime.ShowBusy();
-            Runtime.InvokeAsync(() =>
+            Task.Run(() =>
             {
-                Runtime.ShowBusy(false);
                 GetWitsmlVersions();
+                Runtime.ShowBusy(false);
             });
         }
 
