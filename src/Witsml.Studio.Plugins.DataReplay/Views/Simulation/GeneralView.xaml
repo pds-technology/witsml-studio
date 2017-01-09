@@ -21,6 +21,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="40" />
                 <RowDefinition Height="40" />
+                <RowDefinition Height="40" />
                 <RowDefinition Height="20" />
 
                 <RowDefinition Height="40" />
@@ -46,48 +47,51 @@
             <TextBlock Grid.Column="0" Grid.Row="1" Text="Version:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
             <TextBox Text="{Binding Model.Version}" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center" />
 
-            <Border Grid.Row="2" Grid.ColumnSpan="3" BorderBrush="Gray" BorderThickness="0,1,0,0" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="0" Grid.Row="2" Text="Interval:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+            <TextBox Text="{Binding Model.Interval}" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center" />
+
+            <Border Grid.Row="3" Grid.ColumnSpan="3" BorderBrush="Gray" BorderThickness="0,1,0,0" VerticalAlignment="Center" />
 
             <!-- Well -->
-            <TextBlock Grid.Column="0" Grid.Row="3" Text="Well Name:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-            <TextBox Text="{Binding Model.WellName}" Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center" />
+            <TextBlock Grid.Column="0" Grid.Row="4" Text="Well Name:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+            <TextBox Text="{Binding Model.WellName}" Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center" />
 
-            <TextBlock Grid.Column="0" Grid.Row="4" Text="Well UID:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-            <TextBox Text="{Binding Model.WellUid}" Grid.Column="1" Grid.Row="4" Margin="5" Padding="5" VerticalContentAlignment="Center" />
-            <Button x:Name="NewWellUid" Grid.Column="2" Grid.Row="4" Margin="5" Content="New" Width="40" HorizontalAlignment="Right" />
+            <TextBlock Grid.Column="0" Grid.Row="5" Text="Well UID:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+            <TextBox Text="{Binding Model.WellUid}" Grid.Column="1" Grid.Row="5" Margin="5" Padding="5" VerticalContentAlignment="Center" />
+            <Button x:Name="NewWellUid" Grid.Column="2" Grid.Row="5" Margin="5" Content="New" Width="40" HorizontalAlignment="Right" />
 
-            <Border Grid.Row="5" Grid.ColumnSpan="6" BorderBrush="Gray" BorderThickness="0,1,0,0" VerticalAlignment="Center" />
+            <Border Grid.Row="6" Grid.ColumnSpan="6" BorderBrush="Gray" BorderThickness="0,1,0,0" VerticalAlignment="Center" />
 
             <!-- Wellbore -->
-            <TextBlock Grid.Column="0" Grid.Row="6" Text="Wellbore Name:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-            <TextBox Text="{Binding Model.WellboreName}" Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center" />
+            <TextBlock Grid.Column="0" Grid.Row="7" Text="Wellbore Name:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+            <TextBox Text="{Binding Model.WellboreName}" Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center" />
 
-            <TextBlock Grid.Column="0" Grid.Row="7" Text="Wellbore UID:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-            <TextBox Text="{Binding Model.WellboreUid}" Grid.Column="1" Grid.Row="7" Margin="5" Padding="5" VerticalContentAlignment="Center" />
-            <Button x:Name="NewWellboreUid" Grid.Column="2" Grid.Row="7" Margin="5" Content="New" Width="40" HorizontalAlignment="Right" />
+            <TextBlock Grid.Column="0" Grid.Row="8" Text="Wellbore UID:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+            <TextBox Text="{Binding Model.WellboreUid}" Grid.Column="1" Grid.Row="8" Margin="5" Padding="5" VerticalContentAlignment="Center" />
+            <Button x:Name="NewWellboreUid" Grid.Column="2" Grid.Row="8" Margin="5" Content="New" Width="40" HorizontalAlignment="Right" />
 
-            <Border Grid.Row="8" Grid.ColumnSpan="6" BorderBrush="Gray" BorderThickness="0,1,0,0" VerticalAlignment="Center" />
+            <Border Grid.Row="9" Grid.ColumnSpan="6" BorderBrush="Gray" BorderThickness="0,1,0,0" VerticalAlignment="Center" />
 
             <!-- Log -->
-            <TextBlock Grid.Column="0" Grid.Row="9" Text="Log Name:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-            <TextBox Text="{Binding Model.LogName}" Grid.Column="1" Grid.Row="9" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center" />
+            <TextBlock Grid.Column="0" Grid.Row="10" Text="Log Name:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+            <TextBox Text="{Binding Model.LogName}" Grid.Column="1" Grid.Row="10" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center" />
 
-            <TextBlock Grid.Column="0" Grid.Row="10" Text="Log UID:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-            <TextBox Text="{Binding Model.LogUid}" Grid.Column="1" Grid.Row="10" Margin="5" Padding="5" VerticalContentAlignment="Center" />
-            <Button x:Name="NewLogUid" Grid.Column="2" Grid.Row="10" Margin="5" Content="New" Width="40" HorizontalAlignment="Right" />
+            <TextBlock Grid.Column="0" Grid.Row="11" Text="Log UID:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+            <TextBox Text="{Binding Model.LogUid}" Grid.Column="1" Grid.Row="11" Margin="5" Padding="5" VerticalContentAlignment="Center" />
+            <Button x:Name="NewLogUid" Grid.Column="2" Grid.Row="11" Margin="5" Content="New" Width="40" HorizontalAlignment="Right" />
 
-            <TextBlock Grid.Column="0" Grid.Row="11" Text="Index Type:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-            <ComboBox SelectedItem="{Binding Model.LogIndexType}" ItemsSource="{Binding LogIndexTypes}" Grid.Column="1" Grid.Row="11" Grid.ColumnSpan="2" Margin="5" VerticalContentAlignment="Center" />
+            <TextBlock Grid.Column="0" Grid.Row="12" Text="Index Type:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+            <ComboBox SelectedItem="{Binding Model.LogIndexType}" ItemsSource="{Binding LogIndexTypes}" Grid.Column="1" Grid.Row="12" Grid.ColumnSpan="2" Margin="5" VerticalContentAlignment="Center" />
 
-            <Border Grid.Row="12" Grid.ColumnSpan="6" BorderBrush="Gray" BorderThickness="0,1,0,0" VerticalAlignment="Center" />
+            <Border Grid.Row="13" Grid.ColumnSpan="6" BorderBrush="Gray" BorderThickness="0,1,0,0" VerticalAlignment="Center" />
 
             <!-- ChannelSet -->
-            <TextBlock Grid.Column="0" Grid.Row="13" Text="ChannelSet Name:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-            <TextBox Text="{Binding Model.ChannelSetName}" Grid.Column="1" Grid.Row="13" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center" />
+            <TextBlock Grid.Column="0" Grid.Row="14" Text="ChannelSet Name:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+            <TextBox Text="{Binding Model.ChannelSetName}" Grid.Column="1" Grid.Row="14" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center" />
 
-            <TextBlock Grid.Column="0" Grid.Row="14" Text="ChannelSet UID:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-            <TextBox Text="{Binding Model.ChannelSetUid}" Grid.Column="1" Grid.Row="14" Margin="5" Padding="5" VerticalContentAlignment="Center" />
-            <Button x:Name="NewChannelSetUid" Grid.Column="2" Grid.Row="14" Margin="5" Content="New" Width="40" HorizontalAlignment="Right" />
+            <TextBlock Grid.Column="0" Grid.Row="15" Text="ChannelSet UID:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+            <TextBox Text="{Binding Model.ChannelSetUid}" Grid.Column="1" Grid.Row="15" Margin="5" Padding="5" VerticalContentAlignment="Center" />
+            <Button x:Name="NewChannelSetUid" Grid.Column="2" Grid.Row="15" Margin="5" Content="New" Width="40" HorizontalAlignment="Right" />
         </Grid>
 
     </DockPanel>
