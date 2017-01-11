@@ -311,7 +311,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
                             ? indexDateTimeOffset 
                             : indexDateTimeOffset.AddSeconds(_random.Next(1, 5));
 
-                        dataValue += dto.ToString("o");
+                        dataValue = dto.ToString("o");
                         break;
                     }
                 case LogDataType.@double:
