@@ -397,6 +397,40 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         }
 
         /// <summary>
+        /// Determines whether a GetFromStore request can be sent for the selected item.
+        /// </summary>
+        /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
+        public bool CanGetObjectDetails
+        {
+            get { return CanGetObjectIds; }
+        }
+
+        /// <summary>
+        /// Gets the selected item's details using a GetFromStore request.
+        /// </summary>
+        public void GetObjectDetails()
+        {
+            var resource = Items.FindSelected();
+            var uri = new EtpUri(resource.Resource.Uri);
+
+            Runtime.ShowBusy();
+            Task.Run(() =>
+            {
+                try
+                {
+                    if (CanGetObjectHeader && MaxDataRows.HasValue)
+                        Context.GetObjectDetails(uri.ObjectType, uri, OptionsIn.ReturnElements.All, OptionsIn.MaxReturnNodes.Eq(MaxDataRows.Value));
+                    else
+                        Context.GetObjectDetails(uri.ObjectType, uri);
+                }
+                finally
+                {
+                    Runtime.ShowBusy(false);
+                }
+            });
+        }
+
+        /// <summary>
         /// Creates a WITSML proxy for the specified version.
         /// </summary>
         /// <param name="connection">The connection.</param>
