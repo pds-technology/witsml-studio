@@ -108,14 +108,14 @@
       "indexes": [],
       "channelName": "MSG",
       "dataType": "string",
-      "uom": "unitless",
+      "uom": "",
       "startIndex": null,
       "endIndex": null,
       "description": "Message",
       "status": "Active",
       "contentType": null,
       "source": "MWD",
-      "measureClass": "unitless",
+      "measureClass": "",
       "uuid": "c4da05c0-ddb1-473d-913e-57a348bff0ae"
     }
   ],
