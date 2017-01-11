@@ -23,7 +23,7 @@
                 <ContextMenu>
                     <MenuItem Header="Get IDs" cal:Message.Attach="GetObjectIds" />
                     <MenuItem Header="Get Header" cal:Message.Attach="GetObjectHeader" />
-                    <MenuItem Header="Get Details" IsEnabled="{Binding CanGetObjectIds}">
+                    <MenuItem Header="Get Details" IsEnabled="{Binding CanGetObjectDetails}">
                         <MenuItem Header="Return Elements = all" ToolTip="returnElements=all" cal:Message.Attach="GetObjectDetailsWithReturnElementsAll"/>
                         <MenuItem ToolTip="{Binding ObjectDetailsWithRequestLatestTooltip}" cal:Message.Attach="GetObjectDetailsWithRequestLatest">
                             <MenuItem.HeaderTemplate>

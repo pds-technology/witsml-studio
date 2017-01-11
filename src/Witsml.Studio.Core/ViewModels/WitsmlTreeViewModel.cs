@@ -230,6 +230,15 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// Determines whether a GetFromStore request can be sent for the selected item.
         /// </summary>
         /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
+        public bool CanGetObjectDetails
+        {
+            get { return CanGetObjectIds && !_isGettingDetails; }
+        }
+
+        /// <summary>
+        /// Determines whether a GetFromStore request can be sent for the selected item.
+        /// </summary>
+        /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
         public bool CanGetObjectDetailsWithReturnElementsAll => CanGetObjectIds;
 
         /// <summary>
@@ -295,12 +304,19 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
+            _isGettingDetails = true;
             Task.Run(() =>
             {
-                Context.GetObjectDetails(uri.ObjectType, uri);
+                try
+                {
+                    Context.GetObjectDetails(uri.ObjectType, uri);
+                }
+                finally
+                {
+                    Runtime.ShowBusy(false);
+                    _isGettingDetails = false;
+                }
             });
-
-            Runtime.ShowBusy(false);
         }
 
         /// <summary>
@@ -312,13 +328,20 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
+            _isGettingDetails = true;
             Task.Run(() =>
+            {
+            try
             {
                 if (CanGetObjectHeader && MaxDataRows.HasValue)
                     Context.GetObjectDetails(uri.ObjectType, uri, OptionsIn.ReturnElements.All, OptionsIn.MaxReturnNodes.Eq(MaxDataRows.Value));
+                }
+                finally
+                {
+                    Runtime.ShowBusy(false);
+                    _isGettingDetails = false;
+                }
             });
-
-            Runtime.ShowBusy(false);
         }
 
         /// <summary>
@@ -330,13 +353,20 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
+            _isGettingDetails = true;
             Task.Run(() =>
+            {
+            try
             {
                 if (CanGetObjectHeader && RequestLatestValues.HasValue)
                     Context.GetObjectDetails(uri.ObjectType, uri, OptionsIn.ReturnElements.All, OptionsIn.RequestLatestValues.Eq(RequestLatestValues.Value));
+                }
+                finally
+                {
+                    Runtime.ShowBusy(false);
+                    _isGettingDetails = false;
+                }
             });
-
-            Runtime.ShowBusy(false);
         }
 
         /// <summary>
@@ -348,7 +378,10 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
+            _isGettingDetails = true;
             Task.Run(() =>
+            {
+            try
             {
                 if (CanGetObjectHeader)
                 {
@@ -360,9 +393,13 @@ namespace PDS.Witsml.Studio.Core.ViewModels
 
                     Context.GetObjectDetails(uri.ObjectType, uri, optionsIn.ToArray());
                 }
+                }
+                finally
+                {
+                    Runtime.ShowBusy(false);
+                    _isGettingDetails = false;
+                }
             });
-
-            Runtime.ShowBusy(false);
         }
 
         /// <summary>
@@ -374,7 +411,10 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
+            _isGettingDetails = true;
             Task.Run(() =>
+            {
+            try
             {
                 if (CanGetObjectHeader && !string.IsNullOrWhiteSpace(ExtraOptionsIn))
                 {
@@ -393,48 +433,16 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                     }
                     Context.GetObjectDetails(uri.ObjectType, uri, optionsIn.ToArray());
                 }
-
-            });
-
-            Runtime.ShowBusy(false);
-        }
-
-        /// <summary>
-        /// Determines whether a GetFromStore request can be sent for the selected item.
-        /// </summary>
-        /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
-        public bool CanGetObjectDetails
-        {
-            get { return CanGetObjectIds && !_isGettingDetails; }
-        }
-
-        /// <summary>
-        /// Gets the selected item's details using a GetFromStore request.
-        /// </summary>
-        public void GetObjectDetails()
-        {
-            var resource = Items.FindSelected();
-            var uri = new EtpUri(resource.Resource.Uri);
-
-            Runtime.ShowBusy();
-            _isGettingDetails = true;
-            Task.Run(() =>
-            {
-                try
-                {
-                    if (CanGetObjectHeader && MaxDataRows.HasValue)
-                        Context.GetObjectDetails(uri.ObjectType, uri, OptionsIn.ReturnElements.All, OptionsIn.MaxReturnNodes.Eq(MaxDataRows.Value));
-                    else
-                        Context.GetObjectDetails(uri.ObjectType, uri);                    
                 }
                 finally
                 {
                     Runtime.ShowBusy(false);
                     _isGettingDetails = false;
                 }
+
             });
         }
-
+                
         /// <summary>
         /// Creates a WITSML proxy for the specified version.
         /// </summary>
@@ -514,6 +522,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithExtraOptionsIn);
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithAllOptions);
             NotifyOfPropertyChange(() => CanRefreshSelected);
+            NotifyOfPropertyChange(() => CanGetObjectDetails);
             //NotifyOfPropertyChange(() => CanDeleteObject);
         }
 
