@@ -155,7 +155,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Output Path:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Padding="5" VerticalContentAlignment="Center" Text="{Binding Model.OutputPath}" />
+                <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Padding="5" VerticalContentAlignment="Center" Text="{Binding Model.OutputPath}" IsReadOnly="True" />
                 <Button Grid.Row="0" Grid.Column="2" Margin="0,5,5,5" Content="..." ToolTip="Select Folder" x:Name="SelectOutputPath" />
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Auto-Save Size:" Margin="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Right" />

@@ -77,7 +77,7 @@ namespace PDS.Witsml.Studio.ViewModels
         {
             _viewModel.LoadPlugins();
 
-            Assert.AreEqual("Ready.", _viewModel.StatusBarText);
+            Assert.AreEqual("Ready", _viewModel.StatusBarText);
         }
 
         [TestMethod]

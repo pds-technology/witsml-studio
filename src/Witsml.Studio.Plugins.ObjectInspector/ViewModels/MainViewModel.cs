@@ -132,6 +132,19 @@ namespace PDS.Witsml.Studio.Plugins.ObjectInspector.ViewModels
         }
 
         /// <summary>
+        /// Update status when activated
+        /// </summary>
+        protected override void OnActivate()
+        {
+            base.OnActivate();
+            Runtime.Invoke(() =>
+            {
+                if (Runtime.Shell != null)
+                    Runtime.Shell.StatusBarText = "Ready";
+            });
+        }
+
+        /// <summary>
         /// Handles the PropertyChanged event of the FamilyVersionControl control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>

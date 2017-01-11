@@ -600,6 +600,19 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         }
 
         /// <summary>
+        /// Update status when activated
+        /// </summary>
+        protected override void OnActivate()
+        {
+            base.OnActivate();
+            Runtime.Invoke(() =>
+            {
+                if (Runtime.Shell != null)
+                    Runtime.Shell.StatusBarText = "Ready";
+            });
+        }
+
+        /// <summary>
         /// Shows the object properties.
         /// </summary>
         /// <param name="result">The WITSML query result.</param>

@@ -212,7 +212,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Simulation
                     try
                     {
                         Log("WITSML Client simulation starting. URL: {0}", Model.WitsmlConnection.Uri);
-                        await WitsmlClientProxy.Start(Model, token);
+                        await WitsmlClientProxy.Start(Model, token, Model.Interval);
                         Log("WITSML Client simulation stopped.");
                     }
                     catch (ContainerException)

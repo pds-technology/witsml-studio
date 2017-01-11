@@ -40,6 +40,9 @@ namespace PDS.Witsml.Studio.Core.ViewModels
     /// <seealso cref="Caliburn.Micro.Screen" />
     public class WitsmlTreeViewModel : Screen
     {
+        // Flag determines when get object details is running
+        private bool _isGettingDetails = false;
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="WitsmlTreeViewModel"/> class.
         /// </summary>
@@ -48,7 +51,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         {
             Runtime = runtime;
             Items = new BindableCollection<ResourceViewModel>();
-            DataObjects = new BindableCollection<string>();
+            DataObjects = new BindableCollection<string>();       
         }
 
         /// <summary>
@@ -402,7 +405,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
         public bool CanGetObjectDetails
         {
-            get { return CanGetObjectIds; }
+            get { return CanGetObjectIds && !_isGettingDetails; }
         }
 
         /// <summary>
@@ -414,6 +417,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
+            _isGettingDetails = true;
             Task.Run(() =>
             {
                 try
@@ -421,11 +425,12 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                     if (CanGetObjectHeader && MaxDataRows.HasValue)
                         Context.GetObjectDetails(uri.ObjectType, uri, OptionsIn.ReturnElements.All, OptionsIn.MaxReturnNodes.Eq(MaxDataRows.Value));
                     else
-                        Context.GetObjectDetails(uri.ObjectType, uri);
+                        Context.GetObjectDetails(uri.ObjectType, uri);                    
                 }
                 finally
                 {
                     Runtime.ShowBusy(false);
+                    _isGettingDetails = false;
                 }
             });
         }

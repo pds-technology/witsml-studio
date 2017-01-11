@@ -18,17 +18,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energistics;
 using Energistics.Common;
 using Energistics.DataAccess.WITSML141.ReferenceData;
 using Energistics.Datatypes;
 using Energistics.Datatypes.ChannelData;
 using Energistics.Protocol.ChannelStreaming;
 using Energistics.Protocol.Core;
-using Energistics.Security;
 using PDS.Framework;
 using PDS.Witsml.Studio.Core.Connections;
 using PDS.Witsml.Studio.Core.Runtime;
@@ -257,24 +256,26 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
             var channel = Channels.FirstOrDefault(x => x.ChannelId == streamingInfo.ChannelId);
             if (channel == null) return null;
 
+            var indexDateTimeOffset = DateTimeOffset.UtcNow;
+
             return new DataItem()
             {
                 ChannelId = channel.ChannelId,
                 Indexes = channel.Indexes
-                    .Select(x => ToChannelIndexValue(streamingInfo, x))
-                    .ToList(),
+                .Select(x => ToChannelIndexValue(streamingInfo, x, indexDateTimeOffset))
+                .ToList(),
                 ValueAttributes = new DataAttribute[0],
                 Value = new DataValue()
                 {
-                    Item = _random.NextDouble()
+                    Item = ToChannelDataValue(channel, indexDateTimeOffset)
                 }
             };
         }
 
-        private long ToChannelIndexValue(ChannelStreamingInfo streamingInfo, IndexMetadataRecord index)
+        private long ToChannelIndexValue(ChannelStreamingInfo streamingInfo, IndexMetadataRecord index, DateTimeOffset indexDateTimeOffset)
         {
             if (index.IndexType == ChannelIndexTypes.Time)
-                return DateTimeOffset.UtcNow.ToUnixTimeMicroseconds();
+                return indexDateTimeOffset.ToUnixTimeMicroseconds();
 
             var value = 0d;
 
@@ -287,6 +288,58 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
             streamingInfo.StartIndex.Item = value;
 
             return (long)value;
+        }
+
+        private object ToChannelDataValue(ChannelMetadataRecord channel, DateTimeOffset indexDateTimeOffset)
+        {
+            object dataValue = null;
+            var indexType = channel.Indexes.Select(i => i.IndexType).FirstOrDefault();
+
+            LogDataType logDataType;
+            var logDataTypeExists = Enum.TryParse<LogDataType>(channel.DataType, out logDataType);
+
+            switch (logDataType)
+            {
+                case LogDataType.@byte:
+                    {
+                        dataValue = "Y";
+                        break;
+                    }
+                case LogDataType.datetime:
+                {
+                        var dto = indexType == ChannelIndexTypes.Time 
+                            ? indexDateTimeOffset 
+                            : indexDateTimeOffset.AddSeconds(_random.Next(1, 5));
+
+                        dataValue += dto.ToString("o");
+                        break;
+                    }
+                case LogDataType.@double:
+                case LogDataType.@float:
+                    {
+                        dataValue = _random.NextDouble().ToString(CultureInfo.InvariantCulture);
+                        break;
+                    }
+                case LogDataType.@int:
+                case LogDataType.@long:
+                case LogDataType.@short:
+                    {
+                        dataValue = _random.Next(11);
+                        break;
+                    }
+                case LogDataType.@string:
+                    {
+                        dataValue = "abc";
+                        break;
+                    }
+                default:
+                    {
+                        dataValue = "null";
+                    }
+                    break;
+            }
+
+            return dataValue;
         }
 
         private void LogStreamingError(Exception ex)

@@ -35,6 +35,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.Models
             LogIndexType = LogIndexType.measureddepth;
             IsSimpleStreamer = true;
             PortNumber = 9000;
+            Interval = 5000;
         }
 
         private string _name;
@@ -63,6 +64,22 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.Models
                 {
                     _version = value;
                     NotifyOfPropertyChange(() => Version);
+                }
+            }
+        }
+
+        private int _interval;
+        [DataMember]
+        public int Interval
+        {
+            get { return _interval; }
+
+            set
+            {
+                if (_interval != value)
+                {
+                    _interval = value;
+                    NotifyOfPropertyChange(() => Interval);
                 }
             }
         }

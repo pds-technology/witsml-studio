@@ -51,7 +51,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
 
             Runtime = runtime;
             DisplayName = _applicationTitle;
-            StatusBarText = "Ready.";
+            StatusBarText = "Ready";
         }
 
         /// <summary>
@@ -110,6 +110,14 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         public void OpenDataDirectory()
         {
             Process.Start("explorer.exe", Runtime.DataFolderPath);
+        }
+
+        /// <summary>
+        /// Opens the current output directory.
+        /// </summary>
+        public void OpenOutputDirectory()
+        {
+            Process.Start("explorer.exe", Runtime.OutputFolderPath);
         }
 
         /// <summary>

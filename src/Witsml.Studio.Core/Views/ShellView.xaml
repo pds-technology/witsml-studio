@@ -13,6 +13,7 @@
                 <MenuItem Header="Open">
                     <MenuItem Header="Data Directory" cal:Message.Attach="OpenDataDirectory" />
                     <MenuItem Header="Working Directory" cal:Message.Attach="OpenWorkingDirectory" />
+                    <MenuItem Header="Output Directory" cal:Message.Attach="OpenOutputDirectory" />
                 </MenuItem>
                 <MenuItem Header="Exit" cal:Message.Attach="Exit" />
             </MenuItem>
