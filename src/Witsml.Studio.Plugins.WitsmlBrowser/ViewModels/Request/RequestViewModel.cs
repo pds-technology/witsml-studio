@@ -146,6 +146,28 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
         }
 
         /// <summary>
+        /// Called when request latest values has changed.
+        /// </summary>
+        /// <param name="requestLatestValues">The request latest values.</param>
+        public void OnRequestLatestValuesChanged(int? requestLatestValues)
+        {
+            Items
+             .OfType<TreeViewViewModel>()
+             .ForEach(x => x.OnRequestLatestValuesChanged(requestLatestValues));
+        }
+
+        /// <summary>
+        /// Called when extra options in is changed.
+        /// </summary>
+        /// <param name="extraOptionsIn">The extra options in.</param>
+        public void OnExtraOptionsInChanged(string extraOptionsIn)
+        {
+            Items
+             .OfType<TreeViewViewModel>()
+             .ForEach(x => x.OnExtraOptionsInChanged(extraOptionsIn));
+        }
+
+        /// <summary>
         /// Loads the screens for the request view model.
         /// </summary>
         internal void LoadScreens()

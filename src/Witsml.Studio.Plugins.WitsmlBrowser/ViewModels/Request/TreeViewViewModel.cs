@@ -100,6 +100,24 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
         }
 
         /// <summary>
+        /// Called when request latest values has changed.
+        /// </summary>
+        /// <param name="requestLatestValues">The request latest values.</param>
+        public void OnRequestLatestValuesChanged(int? requestLatestValues)
+        {
+            TreeViewModel.RequestLatestValues = requestLatestValues;
+        }
+
+        /// <summary>
+        /// Called when extra options in is changed.
+        /// </summary>
+        /// <param name="extraOptionsIn">The extra options in.</param>
+        public void OnExtraOptionsInChanged(string extraOptionsIn)
+        {
+            TreeViewModel.ExtraOptionsIn = extraOptionsIn;
+        }
+
+        /// <summary>
         /// Called the first time the page's LayoutUpdated event fires after it is navigated to.
         /// </summary>
         /// <param name="view"></param>

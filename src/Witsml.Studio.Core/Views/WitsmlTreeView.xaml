@@ -23,7 +23,23 @@
                 <ContextMenu>
                     <MenuItem Header="Get IDs" cal:Message.Attach="GetObjectIds" />
                     <MenuItem Header="Get Header" cal:Message.Attach="GetObjectHeader" />
-                    <MenuItem Header="Get Details" cal:Message.Attach="GetObjectDetails" />
+                    <MenuItem Header="Get Details" IsEnabled="{Binding CanGetObjectIds}">
+                        <MenuItem Header="Return Elements = all" ToolTip="returnElements=all" cal:Message.Attach="GetObjectDetailsWithReturnElementsAll"/>
+                        <MenuItem ToolTip="{Binding ObjectDetailsWithRequestLatestTooltip}" cal:Message.Attach="GetObjectDetailsWithRequestLatest">
+                            <MenuItem.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="+ Latest "/>
+                                        <TextBlock Text="n " FontStyle="Italic"/>
+                                        <TextBlock Text="Values"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </MenuItem.HeaderTemplate>
+                        </MenuItem>
+                        <MenuItem Header="+ Max Data Rows" ToolTip="{Binding ObjectDetailsWithMaxDataRowsTooltip}" cal:Message.Attach="GetObjectDetailsWithMaxDataRows"/>
+                        <MenuItem Header="All of the Above" ToolTip="{Binding ObjectDetailsWithAllOptionsTooltip}" cal:Message.Attach="GetObjectDetailsWithAllOptions"/>
+                        <MenuItem Header="Custom Options In" ToolTip="{Binding ExtraOptionsIn}" cal:Message.Attach="GetObjectDetailsWithExtraOptionsIn"/>
+                    </MenuItem>
                     <MenuItem Header="Refresh" cal:Message.Attach="RefreshSelected" />
                     <!--<MenuItem Header="Delete" cal:Message.Attach="DeleteObject" IsEnabled="False" />-->
                     <Separator />

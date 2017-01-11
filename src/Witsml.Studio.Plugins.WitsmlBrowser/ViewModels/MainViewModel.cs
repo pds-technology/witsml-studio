@@ -315,7 +315,25 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// <param name="maxDataRows">The maximum data rows.</param>
         public void OnMaxDataRowsChanged(int? maxDataRows)
         {
-            RequestControl.OnMaxDataRowsChanged(maxDataRows);
+            RequestControl.OnMaxDataRowsChanged(maxDataRows);                
+        }
+
+        /// <summary>
+        /// Called when request latest values has changed.
+        /// </summary>
+        /// <param name="requestLatestValues">The request latest values.</param>
+        public void OnRequestLatestValuesChanged(int? requestLatestValues)
+        {
+            RequestControl.OnRequestLatestValuesChanged(requestLatestValues);
+        }
+
+        /// <summary>
+        /// Called when extra options in is changed.
+        /// </summary>
+        /// <param name="extraOptionsIn">The extra options in.</param>
+        public void OnExtraOptionsInChanged(string extraOptionsIn)
+        {
+            RequestControl.OnExtraOptionsInChanged(extraOptionsIn);
         }
 
         /// <summary>
@@ -817,6 +835,16 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             {
                 _log.Debug("MaxDataRows property changed");
                 OnMaxDataRowsChanged(Model.MaxDataRows);
+            }
+            else if (e.PropertyName.Equals("_requestLatestValues"))
+            {
+                _log.Debug("RequestLatestValues property changed");
+                OnRequestLatestValuesChanged(Model.RequestLatestValues);
+            }
+            else if (e.PropertyName.Equals("ExtraOptionsIn"))
+            {
+                _log.Debug("ExtraOptionsIn property changed");
+                OnExtraOptionsInChanged(Model.ExtraOptionsIn);
             }
         }
 
