@@ -184,10 +184,12 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
+            OnGetObjectDetails?.Invoke(true);
             Task.Run(() =>
             {
                 Context.GetObjectIdOnly(uri.ObjectType, uri);
                 Runtime.ShowBusy(false);
+                OnGetObjectDetails?.Invoke(false);
             });
         }
 
@@ -218,10 +220,12 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
+            OnGetObjectDetails?.Invoke(true);
             Task.Run(() =>
             {
                 Context.GetGrowingObjectHeaderOnly(uri.ObjectType, uri);
                 Runtime.ShowBusy(false);
+                OnGetObjectDetails?.Invoke(false);
             });
         }
 
@@ -482,28 +486,31 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             //NotifyOfPropertyChange(() => CanDeleteObject);
         }
 
-
         private void LoadWells()
         {
             Runtime.ShowBusy();
+            OnGetObjectDetails?.Invoke(true);
 
             Task.Run(async () =>
             {
                 var wells = Context.GetAllWells();
                 await LoadDataItems(wells, Items, LoadWellbores, x => x.GetUri());
                 Runtime.ShowBusy(false);
+                OnGetObjectDetails?.Invoke(false);
             });
         }
 
         private void LoadWellbores(ResourceViewModel parent, string uri)
         {
             Runtime.ShowBusy();
+            OnGetObjectDetails?.Invoke(true);
 
             Task.Run(async () =>
             {
                 var wellbores = Context.GetWellbores(new EtpUri(uri));
                 await LoadDataItems(wellbores, parent.Children, LoadWellboreFolders, x => x.GetUri());
                 Runtime.ShowBusy(false);
+                OnGetObjectDetails?.Invoke(false);
             });
         }
 
@@ -519,6 +526,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         private void LoadWellboreObjects(ResourceViewModel parent, string uri)
         {
             Runtime.ShowBusy();
+            OnGetObjectDetails?.Invoke(true);
 
             Task.Run(async () =>
             {
@@ -529,12 +537,14 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                     ObjectTypes.Log.EqualsIgnoreCase(etpUri.ObjectType) ? -1 : 0);
 
                 Runtime.ShowBusy(false);
+                OnGetObjectDetails?.Invoke(false);
             });
         }
 
         private void LoadGrowingObjectChildren(ResourceViewModel parent, string uri)
         {
             Runtime.ShowBusy();
+            OnGetObjectDetails?.Invoke(true);
 
             Task.Run(async () =>
             {
@@ -546,6 +556,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
 
                 await Task.Yield();
                 Runtime.ShowBusy(false);
+                OnGetObjectDetails?.Invoke(false);
             });
         }
 
