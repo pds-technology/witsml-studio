@@ -383,6 +383,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             OutputRequestMessages(functionType, functionType == Functions.GetCap ? string.Empty : xmlIn, optionsIn);
 
             Runtime.ShowBusy();
+            Model.IsQueryExecuting = true;
             Task.Run(async () =>
             {
                 // Call internal SubmitQuery method with references to all inputs and outputs.
@@ -395,6 +396,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 }
 
                 ShowSubmitResult(functionType, result, isPartialQuery);
+                Model.IsQueryExecuting = false;
                 Runtime.ShowBusy(false);
             });
         }

@@ -430,7 +430,28 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.Models
         /// <value>
         /// <c>true</c> if ReturnElementType equals All; otherwise, <c>false</c>.
         /// </value>
-        public bool IsReturnElementsAll => OptionsIn.ReturnElements.All.Equals(ReturnElementType?.Value);     
+        public bool IsReturnElementsAll => OptionsIn.ReturnElements.All.Equals(ReturnElementType?.Value);
+
+        private bool _isQueryExecuting;
+
+        /// <summary>
+        /// Gets or sets the value indicating whether Query is executing.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if query is executing; otherwise, <c>false</c>
+        /// </value>
+        public bool IsQueryExecuting
+        {
+            get { return _isQueryExecuting; }
+            set
+            {
+                if (_isQueryExecuting != value)
+                {
+                    _isQueryExecuting = value;
+                    NotifyOfPropertyChange(() => IsQueryExecuting);
+                }
+            }
+        }
 
         /// <summary>
         /// Clones this instance.

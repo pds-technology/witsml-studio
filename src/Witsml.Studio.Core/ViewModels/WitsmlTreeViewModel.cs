@@ -40,9 +40,6 @@ namespace PDS.Witsml.Studio.Core.ViewModels
     /// <seealso cref="Caliburn.Micro.Screen" />
     public class WitsmlTreeViewModel : Screen
     {
-        // Flag determines when get object details is running
-        private bool _isGettingDetails = false;
-        
         /// <summary>
         /// Initializes a new instance of the <see cref="WitsmlTreeViewModel"/> class.
         /// </summary>
@@ -51,7 +48,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         {
             Runtime = runtime;
             Items = new BindableCollection<ResourceViewModel>();
-            DataObjects = new BindableCollection<string>();       
+            DataObjects = new BindableCollection<string>();
         }
 
         /// <summary>
@@ -72,6 +69,12 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// <value>The data objects.</value>
         public BindableCollection<string> DataObjects { get; }
 
+        /// <summary>
+        /// Gets or sets the on get object details.
+        /// </summary>
+        /// <value>The on get object details.</value>
+        public Action<bool> OnGetObjectDetails { get; set; }
+
         private int? _maxDataRows;
 
         /// <summary>
@@ -83,14 +86,11 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             get { return _maxDataRows; }
             set
             {
-                if (!ReferenceEquals(_maxDataRows, value))
+                if (_maxDataRows != value)
                 {
                     _maxDataRows = value;
                     NotifyOfPropertyChange(() => MaxDataRows);
-                    NotifyOfPropertyChange(() => CanGetObjectDetailsWithMaxDataRows);
-                    NotifyOfPropertyChange(() => CanGetObjectDetailsWithAllOptions);
-                    NotifyOfPropertyChange(() => ObjectDetailsWithMaxDataRowsTooltip);
-                    NotifyOfPropertyChange(() => ObjectDetailsWithAllOptionsTooltip);
+                    UpdateGetObjectDetailsProperties();
                 }
             }
         }
@@ -104,15 +104,13 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         public int? RequestLatestValues
         {
             get { return _requestLatestValues; }
-            set {
-                if (!ReferenceEquals(_requestLatestValues, value))
+            set
+            {
+                if (_requestLatestValues != value)
                 {
                     _requestLatestValues = value;
                     NotifyOfPropertyChange(() => RequestLatestValues);
-                    NotifyOfPropertyChange(() => CanGetObjectDetailsWithRequestLatest);
-                    NotifyOfPropertyChange(() => CanGetObjectDetailsWithAllOptions);
-                    NotifyOfPropertyChange(() => ObjectDetailsWithRequestLatestTooltip);
-                    NotifyOfPropertyChange(() => ObjectDetailsWithAllOptionsTooltip);
+                    UpdateGetObjectDetailsProperties();
                 }
             }
         }
@@ -128,12 +126,13 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         public string ExtraOptionsIn
         {
             get { return _extraOptionsIn; }
-            set {
-                if (!ReferenceEquals(_extraOptionsIn, value))
+            set
+            {
+                if (_extraOptionsIn != value)
                 {
                     _extraOptionsIn = value;
                     NotifyOfPropertyChange(() => ExtraOptionsIn);
-                    NotifyOfPropertyChange(() => CanGetObjectDetailsWithExtraOptionsIn);                    
+                    NotifyOfPropertyChange(() => CanGetObjectDetailsWithExtraOptionsIn);
                 }
             }
         }
@@ -172,7 +171,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 var parentUri = uri.Parent;
 
                 return !string.IsNullOrWhiteSpace(uri.ObjectId)
-                    && !ObjectTypes.IsGrowingDataObject(parentUri.ObjectType);
+                       && !ObjectTypes.IsGrowingDataObject(parentUri.ObjectType);
             }
         }
 
@@ -206,7 +205,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 var uri = new EtpUri(resource.Resource.Uri);
 
                 return !string.IsNullOrWhiteSpace(uri.ObjectId)
-                    && ObjectTypes.IsGrowingDataObject(uri.ObjectType);
+                       && ObjectTypes.IsGrowingDataObject(uri.ObjectType);
             }
         }
 
@@ -224,15 +223,6 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 Context.GetGrowingObjectHeaderOnly(uri.ObjectType, uri);
                 Runtime.ShowBusy(false);
             });
-        }
-
-        /// <summary>
-        /// Determines whether a GetFromStore request can be sent for the selected item.
-        /// </summary>
-        /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
-        public bool CanGetObjectDetails
-        {
-            get { return CanGetObjectIds && !_isGettingDetails; }
         }
 
         /// <summary>
@@ -257,25 +247,31 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// Determines whether a GetFromStore request can be sent for the selected item.
         /// </summary>
         /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
-        public bool CanGetObjectDetailsWithAllOptions => CanGetObjectHeader && (MaxDataRows.HasValue || RequestLatestValues.HasValue);
+        public bool CanGetObjectDetailsWithAllOptions
+            => CanGetObjectHeader && (MaxDataRows.HasValue || RequestLatestValues.HasValue);
 
         /// <summary>
         /// Determines whether a GetFromStore request can be sent for the selected item.
         /// </summary>
         /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
-        public bool CanGetObjectDetailsWithExtraOptionsIn => CanGetObjectHeader && !string.IsNullOrWhiteSpace(ExtraOptionsIn);
+        public bool CanGetObjectDetailsWithExtraOptionsIn
+            => CanGetObjectHeader && !string.IsNullOrWhiteSpace(ExtraOptionsIn);
 
         /// <summary>
         /// Gets the selected item's tooltip.
         /// </summary>
         /// <value>The tooltip</value>
-        public string ObjectDetailsWithMaxDataRowsTooltip => MaxDataRows.HasValue ? $"returnElements=all;maxDataRows={MaxDataRows.Value}" : "returnElements=all;";
+        public string ObjectDetailsWithMaxDataRowsTooltip => MaxDataRows.HasValue
+            ? $"returnElements=all;maxDataRows={MaxDataRows.Value}"
+            : "returnElements=all";
 
         /// <summary>
         /// Gets the selected item's tooltip.
         /// </summary>
         /// <value>The tooltip</value>
-        public string ObjectDetailsWithRequestLatestTooltip => RequestLatestValues.HasValue ? $"returnElements=all;requestLatestValues={RequestLatestValues.Value}" : "returnElements=all;";
+        public string ObjectDetailsWithRequestLatestTooltip => RequestLatestValues.HasValue
+            ? $"returnElements=all;requestLatestValues={RequestLatestValues.Value}"
+            : "returnElements=all";
 
         /// <summary>
         /// Gets the selected item's tooltip.
@@ -296,27 +292,52 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         }
 
         /// <summary>
-        /// Gets the selected item's details using a GetFromStore request.
+        /// Updates the properties.
         /// </summary>
-        public void GetObjectDetailsWithReturnElementsAll()
+        public void UpdateGetObjectDetailsProperties()
+        {
+            NotifyOfPropertyChange(() => CanGetObjectDetailsWithMaxDataRows);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsWithRequestLatest);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsWithAllOptions);
+            NotifyOfPropertyChange(() => ObjectDetailsWithMaxDataRowsTooltip);
+            NotifyOfPropertyChange(() => ObjectDetailsWithRequestLatestTooltip);
+            NotifyOfPropertyChange(() => ObjectDetailsWithAllOptionsTooltip);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="optionIn"></param>
+        public void GetObjectDetails(params OptionsIn[] optionIn)
         {
             var resource = Items.FindSelected();
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
-            _isGettingDetails = true;
+            OnGetObjectDetails?.Invoke(true);
+
             Task.Run(() =>
             {
                 try
                 {
-                    Context.GetObjectDetails(uri.ObjectType, uri);
+                    if (optionIn == null)
+                        Context.GetObjectDetails(uri.ObjectType, uri);
+                    else Context.GetObjectDetails(uri.ObjectType, uri, optionIn);
                 }
                 finally
                 {
                     Runtime.ShowBusy(false);
-                    _isGettingDetails = false;
+                    OnGetObjectDetails?.Invoke(false);
                 }
             });
+        }
+
+        /// <summary>
+        /// Gets the selected item's details using a GetFromStore request.
+        /// </summary>
+        public void GetObjectDetailsWithReturnElementsAll()
+        {
+            GetObjectDetails(null);
         }
 
         /// <summary>
@@ -324,24 +345,8 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         public void GetObjectDetailsWithMaxDataRows()
         {
-            var resource = Items.FindSelected();
-            var uri = new EtpUri(resource.Resource.Uri);
-
-            Runtime.ShowBusy();
-            _isGettingDetails = true;
-            Task.Run(() =>
-            {
-            try
-            {
-                if (CanGetObjectHeader && MaxDataRows.HasValue)
-                    Context.GetObjectDetails(uri.ObjectType, uri, OptionsIn.ReturnElements.All, OptionsIn.MaxReturnNodes.Eq(MaxDataRows.Value));
-                }
-                finally
-                {
-                    Runtime.ShowBusy(false);
-                    _isGettingDetails = false;
-                }
-            });
+            if (CanGetObjectHeader && MaxDataRows.HasValue)
+                GetObjectDetails(OptionsIn.ReturnElements.All, OptionsIn.MaxReturnNodes.Eq(MaxDataRows.Value));
         }
 
         /// <summary>
@@ -349,57 +354,26 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         public void GetObjectDetailsWithRequestLatest()
         {
-            var resource = Items.FindSelected();
-            var uri = new EtpUri(resource.Resource.Uri);
-
-            Runtime.ShowBusy();
-            _isGettingDetails = true;
-            Task.Run(() =>
-            {
-            try
-            {
-                if (CanGetObjectHeader && RequestLatestValues.HasValue)
-                    Context.GetObjectDetails(uri.ObjectType, uri, OptionsIn.ReturnElements.All, OptionsIn.RequestLatestValues.Eq(RequestLatestValues.Value));
-                }
-                finally
-                {
-                    Runtime.ShowBusy(false);
-                    _isGettingDetails = false;
-                }
-            });
+            if (CanGetObjectHeader && RequestLatestValues.HasValue)
+                GetObjectDetails(OptionsIn.ReturnElements.All, OptionsIn.RequestLatestValues.Eq(RequestLatestValues.Value));
         }
+
 
         /// <summary>
         /// Gets the selected item's details using a GetFromStore request.
         /// </summary>
         public void GetObjectDetailsWithAllOptions()
         {
-            var resource = Items.FindSelected();
-            var uri = new EtpUri(resource.Resource.Uri);
-
-            Runtime.ShowBusy();
-            _isGettingDetails = true;
-            Task.Run(() =>
+            if (CanGetObjectHeader)
             {
-            try
-            {
-                if (CanGetObjectHeader)
-                {
-                    var optionsIn = new List<OptionsIn> { OptionsIn.ReturnElements.All };
-                    if (MaxDataRows.HasValue)
-                        optionsIn.Add(OptionsIn.MaxReturnNodes.Eq(MaxDataRows.Value));
-                    if (RequestLatestValues.HasValue)
-                        optionsIn.Add(OptionsIn.RequestLatestValues.Eq(RequestLatestValues.Value));
+                var optionsIn = new List<OptionsIn> {OptionsIn.ReturnElements.All};
+                if (MaxDataRows.HasValue)
+                    optionsIn.Add(OptionsIn.MaxReturnNodes.Eq(MaxDataRows.Value));
+                if (RequestLatestValues.HasValue)
+                    optionsIn.Add(OptionsIn.RequestLatestValues.Eq(RequestLatestValues.Value));
 
-                    Context.GetObjectDetails(uri.ObjectType, uri, optionsIn.ToArray());
-                }
-                }
-                finally
-                {
-                    Runtime.ShowBusy(false);
-                    _isGettingDetails = false;
-                }
-            });
+                GetObjectDetails(optionsIn.ToArray());
+            }
         }
 
         /// <summary>
@@ -407,42 +381,25 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         public void GetObjectDetailsWithExtraOptionsIn()
         {
-            var resource = Items.FindSelected();
-            var uri = new EtpUri(resource.Resource.Uri);
-
-            Runtime.ShowBusy();
-            _isGettingDetails = true;
-            Task.Run(() =>
+            if (CanGetObjectHeader && !string.IsNullOrWhiteSpace(ExtraOptionsIn))
             {
-            try
-            {
-                if (CanGetObjectHeader && !string.IsNullOrWhiteSpace(ExtraOptionsIn))
+                var optionsIn = new List<OptionsIn> {OptionsIn.ReturnElements.All};
+                var extraOptions = OptionsIn.Parse(ExtraOptionsIn);
+                foreach (var extraOptionsKey in extraOptions.Keys)
                 {
-                    var optionsIn = new List<OptionsIn> { OptionsIn.ReturnElements.All };
-                    var extraOptions = OptionsIn.Parse(ExtraOptionsIn);
-                    foreach (var extraOptionsKey in extraOptions.Keys)
+                    try
                     {
-                        try
-                        {
-                            optionsIn.Add(new OptionsIn(extraOptionsKey, extraOptions[extraOptionsKey]));
-                        }
-                        catch
-                        {
-                            //ignore if invalid optionsIn pair
-                        }
+                        optionsIn.Add(new OptionsIn(extraOptionsKey, extraOptions[extraOptionsKey]));
                     }
-                    Context.GetObjectDetails(uri.ObjectType, uri, optionsIn.ToArray());
+                    catch
+                    {
+                        //ignore if invalid optionsIn pair
+                    }
                 }
-                }
-                finally
-                {
-                    Runtime.ShowBusy(false);
-                    _isGettingDetails = false;
-                }
-
-            });
+                GetObjectDetails(optionsIn.ToArray());
+            }
         }
-                
+
         /// <summary>
         /// Creates a WITSML proxy for the specified version.
         /// </summary>
@@ -521,8 +478,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithRequestLatest);
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithExtraOptionsIn);
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithAllOptions);
-            NotifyOfPropertyChange(() => CanRefreshSelected);
-            NotifyOfPropertyChange(() => CanGetObjectDetails);
+            NotifyOfPropertyChange(() => CanRefreshSelected);            
             //NotifyOfPropertyChange(() => CanDeleteObject);
         }
 

@@ -29,7 +29,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
     /// Manages the behavior for the TreeView view UI elements.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    public sealed class TreeViewViewModel : Screen, IConnectionAware
+    public sealed class TreeViewViewModel : Conductor<IScreen>.Collection.OneActive, IConnectionAware
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(TreeViewViewModel));
 
@@ -87,7 +87,10 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
 
             TreeViewModel.Context.LogQuery = LogQuery;
             TreeViewModel.Context.LogResponse = LogResponse;
-            TreeViewModel.MaxDataRows = Model.MaxDataRows;
+            TreeViewModel.OnGetObjectDetails = (executing) =>
+            {
+                Model.IsQueryExecuting = executing;
+            };
         }
 
         /// <summary>
@@ -115,6 +118,12 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
         public void OnExtraOptionsInChanged(string extraOptionsIn)
         {
             TreeViewModel.ExtraOptionsIn = extraOptionsIn;
+        }
+
+        protected override void OnActivate()
+        {
+            base.OnActivate();
+            ActivateItem(TreeViewModel);
         }
 
         /// <summary>
