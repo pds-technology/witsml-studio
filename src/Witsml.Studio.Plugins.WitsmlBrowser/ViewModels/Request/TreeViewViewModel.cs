@@ -142,6 +142,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
             Task.Run(() =>
             {
                 Parent.Parent.Model.StoreFunction = function;
+                Parent.Parent.OutputRequestMessages(function, xmlIn, optionsIn);
                 Parent.Parent.XmlQuery.SetText(xmlIn);
             });
         }

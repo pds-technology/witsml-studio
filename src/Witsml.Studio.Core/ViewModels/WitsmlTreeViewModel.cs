@@ -305,7 +305,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         }
 
         /// <summary>
-        /// 
+        /// Gets the selected item's details using a GetFromStore request.
         /// </summary>
         /// <param name="optionIn"></param>
         public void GetObjectDetails(params OptionsIn[] optionIn)
