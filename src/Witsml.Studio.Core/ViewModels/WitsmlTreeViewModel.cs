@@ -266,7 +266,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         /// <value>The tooltip</value>
         public string ObjectDetailsWithMaxDataRowsTooltip => MaxDataRows.HasValue
-            ? $"returnElements=all;maxDataRows={MaxDataRows.Value}"
+            ? $"returnElements=all;maxReturnNodes={MaxDataRows.Value}"
             : "returnElements=all";
 
         /// <summary>
@@ -287,7 +287,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             {
                 var tooltip = new StringBuilder("returnElements=all;");
                 if (MaxDataRows.HasValue)
-                    tooltip.Append($"maxDataRows={MaxDataRows.Value};");
+                    tooltip.Append($"maxReturnNodes={MaxDataRows.Value};");
                 if (RequestLatestValues.HasValue)
                     tooltip.Append($"requestLatestValues={RequestLatestValues.Value};");
 
@@ -326,7 +326,8 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 {
                     if (optionIn == null)
                         Context.GetObjectDetails(uri.ObjectType, uri);
-                    else Context.GetObjectDetails(uri.ObjectType, uri, optionIn);
+                    else
+                        Context.GetObjectDetails(uri.ObjectType, uri, optionIn);
                 }
                 finally
                 {

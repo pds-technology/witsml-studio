@@ -383,7 +383,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             OutputRequestMessages(functionType, functionType == Functions.GetCap ? string.Empty : xmlIn, optionsIn);
 
             Runtime.ShowBusy();
-            Model.IsQueryExecuting = true;
+            
             Task.Run(async () =>
             {
                 // Call internal SubmitQuery method with references to all inputs and outputs.
@@ -396,7 +396,6 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 }
 
                 ShowSubmitResult(functionType, result, isPartialQuery);
-                Model.IsQueryExecuting = false;
                 Runtime.ShowBusy(false);
             });
         }
@@ -424,6 +423,8 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
 
             try
             {
+                Model.IsQueryExecuting = true;
+
                 // Compute the object type of the incoming xml.
                 if (!clientControlledFunctions.Contains(functionType) && !string.IsNullOrWhiteSpace(xmlIn))
                 {
@@ -433,7 +434,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
 
                 using (var client = Proxy.CreateClientProxy())
                 {
-                    var wmls = (IWitsmlClient)client;
+                    var wmls = (IWitsmlClient) client;
                     string suppMsgOut;
 
                     // Execute the WITSML server function for the given functionType
@@ -467,13 +468,17 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             catch (Exception ex)
             {
                 var message = string.Format("Error calling WITSML Store API method '{0}'{3}{3}Error Message: {1}{3}{3}Stack Trace:{3}{2}{3}",
-                    functionType, ex.Message, ex.StackTrace, Environment.NewLine);
+                        functionType, ex.Message, ex.StackTrace, Environment.NewLine);
 
                 // Log the error message
                 _log.Error(message);
 
                 // Return the error to the caller so message and call stack can be displayed to the user
                 return await Task.FromResult(new WitsmlResult(objectType, xmlIn, optionsIn, null, xmlOut, message, returnCode));
+            }
+            finally
+            {
+                Model.IsQueryExecuting = AutoQueryProvider != null;
             }
         }
 
@@ -653,7 +658,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// <param name="result">The result.</param>
         private void SubmitAutoQuery(WitsmlResult result)
         {
-            var model = GetModel();
+            var model = GetModel();            
 
             // Do not execute an auto-query:
             // ... if the Partial Success return code is missing, or
