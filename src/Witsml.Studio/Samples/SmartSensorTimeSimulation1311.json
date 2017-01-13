@@ -90,7 +90,7 @@
       "indexes": [],
       "channelName": "CNT",
       "dataType": "long",
-      "uom": "s",
+      "uom": "",
       "startIndex": null,
       "endIndex": null,
       "description": "Count",

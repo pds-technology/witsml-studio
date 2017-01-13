@@ -20,7 +20,7 @@
   "logUid": "e2401b72-550f-4695-ab27-d5b0589bde17",
   "logIndexType": "measureddepth",
   "channelSetName": "Test Depth Channel Set 2.0",
-  "channelSetUid": "9a573379-846b-4e38-b01e-9cec5e2e2070",
+  "channelSetUid": "9a573379-846b-4e38-b01e-9cec5e2e2071",
   "channels": [
     {
       "channelUri": "",
@@ -92,7 +92,7 @@
       "indexes": [],
       "channelName": "CNT",
       "dataType": "long",
-      "uom": "s",
+      "uom": "",
       "startIndex": null,
       "endIndex": null,
       "description": "Count",
