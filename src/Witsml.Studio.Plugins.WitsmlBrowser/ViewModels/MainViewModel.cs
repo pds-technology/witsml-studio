@@ -478,7 +478,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             }
             finally
             {
-                Model.IsQueryExecuting = AutoQueryProvider != null;
+                Model.IsQueryExecuting = false;
             }
         }
 
