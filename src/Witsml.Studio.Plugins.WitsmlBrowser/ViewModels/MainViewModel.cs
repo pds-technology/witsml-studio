@@ -423,8 +423,6 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
 
             try
             {
-                Model.IsQueryExecuting = true;
-
                 // Compute the object type of the incoming xml.
                 if (!clientControlledFunctions.Contains(functionType) && !string.IsNullOrWhiteSpace(xmlIn))
                 {
@@ -475,10 +473,6 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
 
                 // Return the error to the caller so message and call stack can be displayed to the user
                 return await Task.FromResult(new WitsmlResult(objectType, xmlIn, optionsIn, null, xmlOut, message, returnCode));
-            }
-            finally
-            {
-                Model.IsQueryExecuting = false;
             }
         }
 

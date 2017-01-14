@@ -87,10 +87,6 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
 
             TreeViewModel.Context.LogQuery = LogQuery;
             TreeViewModel.Context.LogResponse = LogResponse;
-            TreeViewModel.OnGetObjectDetails = (executing) =>
-            {
-                Model.IsQueryExecuting = executing;
-            };
         }
 
         /// <summary>

@@ -69,12 +69,6 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// <value>The data objects.</value>
         public BindableCollection<string> DataObjects { get; }
 
-        /// <summary>
-        /// Gets or sets the on get object details.
-        /// </summary>
-        /// <value>The on get object details.</value>
-        public Action<bool> OnGetObjectDetails { get; set; }
-
         private int? _maxDataRows;
 
         /// <summary>
@@ -90,7 +84,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 {
                     _maxDataRows = value;
                     NotifyOfPropertyChange(() => MaxDataRows);
-                    UpdateGetObjectDetailsProperties();
+                    UpdateGetObjectDetailsProperties();                    
                 }
             }
         }
@@ -110,7 +104,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 {
                     _requestLatestValues = value;
                     NotifyOfPropertyChange(() => RequestLatestValues);
-                    UpdateGetObjectDetailsProperties();
+                    UpdateGetObjectDetailsProperties();                    
                 }
             }
         }
@@ -184,12 +178,10 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
-            OnGetObjectDetails?.Invoke(true);
             Task.Run(() =>
             {
                 Context.GetObjectIdOnly(uri.ObjectType, uri);
                 Runtime.ShowBusy(false);
-                OnGetObjectDetails?.Invoke(false);
             });
         }
 
@@ -220,12 +212,10 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
-            OnGetObjectDetails?.Invoke(true);
             Task.Run(() =>
             {
                 Context.GetGrowingObjectHeaderOnly(uri.ObjectType, uri);
                 Runtime.ShowBusy(false);
-                OnGetObjectDetails?.Invoke(false);
             });
         }
 
@@ -318,21 +308,16 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
-            OnGetObjectDetails?.Invoke(true);
 
             Task.Run(() =>
             {
                 try
                 {
-                    if (optionIn == null)
-                        Context.GetObjectDetails(uri.ObjectType, uri);
-                    else
-                        Context.GetObjectDetails(uri.ObjectType, uri, optionIn);
+                    Context.GetObjectDetails(uri.ObjectType, uri, optionIn);
                 }
                 finally
                 {
                     Runtime.ShowBusy(false);
-                    OnGetObjectDetails?.Invoke(false);
                 }
             });
         }
@@ -342,7 +327,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         public void GetObjectDetailsWithReturnElementsAll()
         {
-            GetObjectDetails(null);
+            GetObjectDetails(OptionsIn.ReturnElements.All);
         }
 
         /// <summary>
@@ -490,28 +475,24 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         private void LoadWells()
         {
             Runtime.ShowBusy();
-            OnGetObjectDetails?.Invoke(true);
 
             Task.Run(async () =>
             {
                 var wells = Context.GetAllWells();
                 await LoadDataItems(wells, Items, LoadWellbores, x => x.GetUri());
                 Runtime.ShowBusy(false);
-                OnGetObjectDetails?.Invoke(false);
             });
         }
 
         private void LoadWellbores(ResourceViewModel parent, string uri)
         {
             Runtime.ShowBusy();
-            OnGetObjectDetails?.Invoke(true);
 
             Task.Run(async () =>
             {
                 var wellbores = Context.GetWellbores(new EtpUri(uri));
                 await LoadDataItems(wellbores, parent.Children, LoadWellboreFolders, x => x.GetUri());
                 Runtime.ShowBusy(false);
-                OnGetObjectDetails?.Invoke(false);
             });
         }
 
@@ -527,7 +508,6 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         private void LoadWellboreObjects(ResourceViewModel parent, string uri)
         {
             Runtime.ShowBusy();
-            OnGetObjectDetails?.Invoke(true);
 
             Task.Run(async () =>
             {
@@ -538,14 +518,12 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                     ObjectTypes.Log.EqualsIgnoreCase(etpUri.ObjectType) ? -1 : 0);
 
                 Runtime.ShowBusy(false);
-                OnGetObjectDetails?.Invoke(false);
             });
         }
 
         private void LoadGrowingObjectChildren(ResourceViewModel parent, string uri)
         {
             Runtime.ShowBusy();
-            OnGetObjectDetails?.Invoke(true);
 
             Task.Run(async () =>
             {
@@ -557,7 +535,6 @@ namespace PDS.Witsml.Studio.Core.ViewModels
 
                 await Task.Yield();
                 Runtime.ShowBusy(false);
-                OnGetObjectDetails?.Invoke(false);
             });
         }
 
