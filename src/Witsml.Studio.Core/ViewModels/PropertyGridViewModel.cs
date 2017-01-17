@@ -78,10 +78,11 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// <param name="objectType">The data object type.</param>
         /// <param name="xml">The XML string.</param>
         /// <param name="version">The WITSML version.</param>
-        /// <param name="keepGridData">True if not clearing data when querying partial results</param>
+        /// <param name="bindDataGrid">True if grid can be bound with results.</param>
+        /// <param name="keepGridData">True if not clearing data when querying partial results.</param>
         /// <param name="retrieveObjectSelection">if set to <c>true</c> the retrieve object selection setting is selected.</param>
         /// <param name="errorHandler">The error handler.</param>
-        public void SetCurrentObject(string objectType, string xml, string version, bool keepGridData, bool retrieveObjectSelection, Action<WitsmlException> errorHandler)
+        public void SetCurrentObject(string objectType, string xml, string version, bool bindDataGrid, bool keepGridData, bool retrieveObjectSelection, Action<WitsmlException> errorHandler)
         {
             var dataType = ObjectTypes.GetObjectGroupType(objectType, version);
             var document = WitsmlParser.Parse(xml);
@@ -98,14 +99,14 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 ? collection.Items[0]
                 : collection;
 
-            if (collection == null || collection.Items.Count == 1)
-            {
-                ObjectData?.SetCurrentObject(objectType, CurrentObject, keepGridData, retrieveObjectSelection, errorHandler);
-            }
-            else
-            {
-                ObjectData?.ClearDataTable();
-            }
+                if ((collection == null || collection.Items.Count == 1) && (bindDataGrid || keepGridData))
+                {
+                        ObjectData?.SetCurrentObject(objectType, CurrentObject, keepGridData, retrieveObjectSelection, errorHandler);
+                }
+                else
+                {
+                    ObjectData?.ClearDataTable();
+                }
         }
     }
 }

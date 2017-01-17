@@ -626,6 +626,9 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 OutputMessages(string.Empty, string.Empty, 0, GetErrorText((short)ex.ErrorCode, message));
             };
 
+            //Bind data grid with the last set of results only when partial results are returned or when auto query is checked or cancelled, 
+            var bindDataGrid = result.ReturnCode == 1 || (result.ReturnCode == 2 && !Model.RetrievePartialResults) || (AutoQueryProvider != null && AutoQueryProvider.IsCancelled);
+
             Task.Run(() =>
             {
                 try
@@ -634,6 +637,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                         result.ObjectType,
                         result.XmlOut,
                         Model.WitsmlVersion,
+                        bindDataGrid,
                         Model.KeepGridData,
                         Model.IsRequestObjectSelectionCapability,
                         errorHandler);
