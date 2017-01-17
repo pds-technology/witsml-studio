@@ -365,8 +365,9 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// The results of a query are displayed in the Results and Messages tabs.
         /// </summary>
         /// <param name="functionType">Type of the function.</param>
+        /// <param name="optionsIn">The options in.</param>
         /// <param name="isPartialQuery">if set to <c>true</c> [is partial query].</param>
-        public void SubmitQuery(Functions functionType, bool isPartialQuery = false)
+        public void SubmitQuery(Functions functionType, string optionsIn = null, bool isPartialQuery = false)
         {
             // Trim query text before submitting request
             string xmlIn = XmlQuery.Text.Trim();
@@ -377,7 +378,21 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             _log.DebugFormat("Query submitted for function '{0}'", functionType);
 
             // Options In 
-            var optionsIn = GetOptionsIn(functionType, isPartialQuery);
+            if (string.IsNullOrEmpty(optionsIn))
+            {
+                optionsIn = GetOptionsIn(functionType, isPartialQuery);
+            }
+            else if (isPartialQuery)
+            {
+                var optionsInUpdated = new List<OptionsIn> {OptionsIn.ReturnElements.DataOnly};
+                var optionsInFromPreviousQuery = OptionsIn.Parse(optionsIn);
+                foreach (var key in optionsInFromPreviousQuery.Keys)
+                {
+                    if (key != OptionsIn.ReturnElements.All.Key && key != OptionsIn.ReturnElements.DataOnly.Key)
+                        optionsInUpdated.Add(new OptionsIn(key, optionsInFromPreviousQuery[key]));
+                }
+                optionsIn = OptionsIn.Join(optionsInUpdated.ToArray());
+            }
 
             // Output Request
             OutputRequestMessages(functionType, functionType == Functions.GetCap ? string.Empty : xmlIn, optionsIn);
@@ -498,7 +513,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                     optionsIn = Model.CascadedDelete ? OptionsIn.CascadedDelete.True : null;
                     break;
                 case Functions.GetFromStore:
-                    optionsIn = GetGetFromStoreOptionsIn(isPartialQuery);
+                    optionsIn = GetFromStoreOptionsIn(isPartialQuery);
                     break;
                 default:
                     optionsIn = null;
@@ -683,7 +698,7 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
                 AutoQueryProvider.Context.RetrievePartialResults = true;
 
                 //... and Submit a Query for the next set of data.
-                SubmitQuery(Functions.GetFromStore, true);
+                SubmitQuery(Functions.GetFromStore, result.OptionsIn, true);
             }
             else
             {
@@ -1062,12 +1077,12 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
         /// </summary>
         /// <param name="isPartialQuery">if set to <c>true</c> [is partial query].</param>
         /// <returns></returns>
-        private string GetGetFromStoreOptionsIn(bool isPartialQuery)
+        private string GetFromStoreOptionsIn(bool isPartialQuery)
         {
             var model = GetModel();
             var optionsIn = new List<string>
             {
-                isPartialQuery? OptionsIn.ReturnElements.DataOnly: model.ReturnElementType ?? string.Empty,
+                isPartialQuery ? OptionsIn.ReturnElements.DataOnly : model.ReturnElementType ?? string.Empty,
                 model.IsRequestObjectSelectionCapability
                     ? OptionsIn.RequestObjectSelectionCapability.True
                     : string.Empty,
