@@ -25,8 +25,8 @@
                 <ContextMenu>
                     <MenuItem Header="Get IDs" cal:Message.Attach="GetObjectIds" />
                     <MenuItem Header="Get Header" cal:Message.Attach="GetObjectHeader" />
-                    <MenuItem Header="Get Details" IsEnabled="{Binding CanGetObjectIds}">
-                        <MenuItem Header="Return Elements = all" ToolTip="returnElements=all" cal:Message.Attach="GetObjectDetailsWithReturnElementsAll"/>
+                    <MenuItem Header="Get Details" IsEnabled="{Binding CanGetObjectIds}" cal:Message.Attach="[Event PreviewMouseLeftButtonUp] = [Action GetObjectDetailsWithReturnElementsAll($eventArgs)]">
+                        <MenuItem Header="Return Elements = all" ToolTip="returnElements=all" cal:Message.Attach="GetObjectDetailsWithReturnElementsAll($null)"/>
                         <MenuItem ToolTip="{Binding ObjectDetailsWithRequestLatestTooltip}" cal:Message.Attach="GetObjectDetailsWithRequestLatest">
                             <MenuItem.HeaderTemplate>
                                 <DataTemplate>

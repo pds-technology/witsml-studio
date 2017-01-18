@@ -190,6 +190,7 @@
     <Compile Include="Converters\NullToBooleanConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
     <Compile Include="Converters\ExpandableListConverterOfT.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Models\ListItemPropertyDescriptor.cs" />
     <Compile Include="Models\ListItemPropertyDescriptorOfT.cs" />
     <Compile Include="Models\TypeDecorationManager.cs" />
