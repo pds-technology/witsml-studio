@@ -39,7 +39,15 @@ namespace PDS.Witsml.Studio.Core.Converters
         /// </returns>        
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return System.Convert.ToBoolean(value) ? Visibility.Visible : Visibility.Collapsed;
+            var inverse = System.Convert.ToBoolean(parameter ?? false);
+            var flag = System.Convert.ToBoolean(value);
+
+            if (inverse)
+            {
+                return flag ? Visibility.Collapsed : Visibility.Visible;
+            }
+
+            return flag ? Visibility.Visible : Visibility.Collapsed;
         }
 
         /// <summary>

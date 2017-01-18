@@ -5,9 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:vm="clr-namespace:PDS.Witsml.Studio.Core.ViewModels"
-             xmlns:converters="clr-namespace:PDS.Witsml.Studio.Core.Converters"
+             xmlns:conv="clr-namespace:PDS.Witsml.Studio.Core.Converters"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
-        
+
+    <UserControl.Resources>
+        <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </UserControl.Resources>
+
     <Grid>
         <TreeView ItemsSource="{Binding Items}" cal:Message.Attach="[Event SelectedItemChanged] = [Action RefreshContextMenu()]">
             <TreeView.ItemContainerStyle>
@@ -25,8 +29,14 @@
                 <ContextMenu>
                     <MenuItem Header="Get IDs" cal:Message.Attach="GetObjectIds" />
                     <MenuItem Header="Get Header" cal:Message.Attach="GetObjectHeader" />
-                    <MenuItem Header="Get Details" IsEnabled="{Binding CanGetObjectIds}" cal:Message.Attach="[Event PreviewMouseLeftButtonUp] = [Action GetObjectDetailsWithReturnElementsAll($eventArgs)]">
-                        <MenuItem Header="Return Elements = all" ToolTip="returnElements=all" cal:Message.Attach="GetObjectDetailsWithReturnElementsAll($null)"/>
+                    
+                    <MenuItem Header="Get Details" IsEnabled="{Binding CanGetObjectIds}" cal:Message.Attach="GetObjectDetailsWithReturnElementsAll"
+                              Visibility="{Binding CanGetObjectHeader, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=true}"/>
+                    
+                    <MenuItem Header="Get Details" IsEnabled="{Binding CanGetObjectIds}"
+                              Visibility="{Binding CanGetObjectHeader, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        
+                        <MenuItem Header="Return Elements = all" ToolTip="returnElements=all" cal:Message.Attach="GetObjectDetailsWithReturnElementsAll"/>
                         <MenuItem ToolTip="{Binding ObjectDetailsWithRequestLatestTooltip}" cal:Message.Attach="GetObjectDetailsWithRequestLatest">
                             <MenuItem.HeaderTemplate>
                                 <DataTemplate>
@@ -38,10 +48,12 @@
                                 </DataTemplate>
                             </MenuItem.HeaderTemplate>
                         </MenuItem>
+                        
                         <MenuItem Header="+ Max Data Rows" ToolTip="{Binding ObjectDetailsWithMaxDataRowsTooltip}" cal:Message.Attach="GetObjectDetailsWithMaxDataRows"/>
                         <MenuItem Header="All of the Above" ToolTip="{Binding ObjectDetailsWithAllOptionsTooltip}" cal:Message.Attach="GetObjectDetailsWithAllOptions"/>
                         <MenuItem Header="Custom Options In" ToolTip="{Binding ExtraOptionsIn}" cal:Message.Attach="GetObjectDetailsWithExtraOptionsIn"/>
                     </MenuItem>
+                    
                     <MenuItem Header="Refresh" cal:Message.Attach="RefreshSelected" />
                     <!--<MenuItem Header="Delete" cal:Message.Attach="DeleteObject" IsEnabled="False" />-->
                     <Separator />

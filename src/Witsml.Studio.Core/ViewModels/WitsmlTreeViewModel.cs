@@ -325,16 +325,8 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// <summary>
         /// Gets the selected item's details using a GetFromStore request.
         /// </summary>
-        public void GetObjectDetailsWithReturnElementsAll(System.Windows.RoutedEventArgs e)
+        public void GetObjectDetailsWithReturnElementsAll()
         {
-            var menuItem = (e?.OriginalSource as System.Windows.DependencyObject)
-                .FindParent<System.Windows.Controls.MenuItem>();
-
-            if (e != null && "Get Details" != menuItem?.Header?.ToString())
-            {
-                return;
-            }
-
             GetObjectDetails(OptionsIn.ReturnElements.All);
         }
 
