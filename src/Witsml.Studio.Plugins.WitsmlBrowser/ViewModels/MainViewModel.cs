@@ -598,12 +598,15 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             OutputMessages(xmlOut, result.MessageOut, result.ReturnCode);
 
             // Show data object on the Properties tab
-            if (functionType == Functions.GetFromStore && result.ReturnCode > -1)
+            if (functionType == Functions.GetFromStore && result.ReturnCode > 0)
             {
-                if (result.ReturnCode > 0)
-                    ShowObjectProperties(result);
-
+                ShowObjectProperties(result);
                 SubmitAutoQuery(result);
+            }
+            else // If there are any errors
+            {
+                if (AutoQueryProvider != null)
+                    AutoQueryProvider = null;
             }
         }
 
