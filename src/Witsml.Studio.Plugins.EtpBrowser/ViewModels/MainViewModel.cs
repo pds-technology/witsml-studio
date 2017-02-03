@@ -39,6 +39,7 @@ using Energistics.Protocol.ChannelDataFrame;
 using Energistics.Protocol.DataArray;
 using Energistics.Protocol.GrowingObject;
 using Energistics.Protocol.StoreNotification;
+using Newtonsoft.Json;
 using PDS.Witsml.Studio.Core.Connections;
 
 namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
@@ -492,7 +493,22 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 Client.Serialize(e.Message, true),
                 Environment.NewLine));
 
-            DataObject.SetText(e.Message.DataObject.GetXml());
+            var data = e.Message.DataObject.GetString();
+            var uri = new EtpUri(e.Message.DataObject.Resource.Uri);
+            var isJson = EtpContentType.Json.EqualsIgnoreCase(uri.Format);
+
+            if (isJson)
+            {
+                var objectType = OptionsIn.DataVersion.Version200.Equals(uri.Version)
+                    ? ObjectTypes.GetObjectType(uri.ObjectType, uri.Version)
+                    : ObjectTypes.GetObjectGroupType(uri.ObjectType, uri.Version);
+
+                var dataObject = EtpExtensions.Deserialize(objectType, data);
+                data = EtpExtensions.Serialize(dataObject, true);
+            }
+
+            DataObject.SetText(data);
+            Runtime.Invoke(() => DataObject.Language = isJson ? "JavaScript" : "XML");
         }
 
         /// <summary>

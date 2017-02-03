@@ -193,7 +193,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                     }
                 };
 
-                dataObject.SetXml(xml);
+                dataObject.SetString(xml);
 
                 Parent.Client.Handler<IStoreCustomer>()
                     .PutObject(dataObject);
