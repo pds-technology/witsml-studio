@@ -87,6 +87,8 @@ namespace PDS.Witsml.Studio.Core.Connections
         /// <param name="connection">The connection.</param>
         public static void SetServerCertificateValidation(this Connection connection)
         {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
             if (connection.AcceptInvalidCertificates)
                 ServicePointManager.ServerCertificateValidationCallback +=
                     (sender, certificate, chain, sslPolicyErrors) => true;
