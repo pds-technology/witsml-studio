@@ -42,7 +42,10 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
             _log.Debug("Creating view model instance");
             Runtime = runtime;
             DisplayName = "Hierarchy";
-            TreeViewModel = new WitsmlTreeViewModel(runtime);
+            TreeViewModel = new WitsmlTreeViewModel(runtime)
+            {
+                IsContextMenuEnabled = true
+            };
         }
 
         /// <summary>

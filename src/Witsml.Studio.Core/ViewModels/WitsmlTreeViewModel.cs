@@ -150,6 +150,23 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             }
         }
 
+        private bool _isContextMenuEnabled;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the context menu is enabled.
+        /// </summary>
+        /// <value><c>true</c> if the context menu is enabled; otherwise, <c>false</c>.</value>
+        public bool IsContextMenuEnabled
+        {
+            get { return _isContextMenuEnabled; }
+            set
+            {
+                if (_isContextMenuEnabled == value) return;
+                _isContextMenuEnabled = value;
+                NotifyOfPropertyChange(() => IsContextMenuEnabled);
+            }
+        }
+
         /// <summary>
         /// Determines whether a GetFromStore request can be sent for the selected item.
         /// </summary>

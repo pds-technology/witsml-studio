@@ -26,7 +26,7 @@
                 </HierarchicalDataTemplate>
             </TreeView.Resources>
             <TreeView.ContextMenu>
-                <ContextMenu>
+                <ContextMenu Visibility="{Binding IsContextMenuEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <MenuItem Header="Get IDs" cal:Message.Attach="GetObjectIds" />
                     <MenuItem Header="Get Header" cal:Message.Attach="GetObjectHeader" />
                     
