@@ -529,8 +529,11 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             Task.Run(async () =>
             {
                 var etpUri = new EtpUri(uri);
-                var dataObjects = Context.GetWellboreObjects(etpUri.ObjectType, etpUri);
 
+                var dataObjects = ObjectTypes.IsGrowingDataObject(etpUri.ObjectType) 
+                    ? Context.GetGrowingObjectsHeaderOnly(etpUri.ObjectType, etpUri) 
+                    : Context.GetWellboreObjects(etpUri.ObjectType, etpUri);
+                
                 await LoadDataItems(dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri(),
                     ObjectTypes.Log.EqualsIgnoreCase(etpUri.ObjectType) ? -1 : 0);
 
@@ -587,10 +590,26 @@ namespace PDS.Witsml.Studio.Core.ViewModels
 
         private ResourceViewModel ToResourceViewModel<T>(T dataObject, Action<ResourceViewModel, string> action, Func<T, EtpUri> getUri, int children = -1) where T : IDataObject
         {
-            return ToResourceViewModel(getUri(dataObject), dataObject.Name, action, children);
+            var uri = getUri(dataObject);
+
+            bool isIndicatorVisible = false;
+            string indicatorTooltip = string.Empty;
+
+            if (ObjectTypes.Wellbore.EqualsIgnoreCase(uri.ObjectType))
+            {
+                isIndicatorVisible = dataObject.GetWellboreStatus().GetValueOrDefault();
+                indicatorTooltip = "Active";
+            }
+            else if(ObjectTypes.IsGrowingDataObject(uri.ObjectType))
+            {
+                isIndicatorVisible = dataObject.GetObjectGrowingStatus().GetValueOrDefault();
+                indicatorTooltip = "Growing";
+            }
+
+            return ToResourceViewModel(uri, dataObject.Name, action, children, isIndicatorVisible, indicatorTooltip);
         }
 
-        private ResourceViewModel ToResourceViewModel(EtpUri uri, string name, Action<ResourceViewModel, string> action, int children = -1)
+        private ResourceViewModel ToResourceViewModel(EtpUri uri, string name, Action<ResourceViewModel, string> action, int children = -1, bool isIndicatorVisible = false, string indicatorTooltip = "")
         {
             var resource = new Resource()
             {
@@ -600,7 +619,11 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 HasChildren = children
             };
 
-            var viewModel = new ResourceViewModel(resource);
+            var viewModel = new ResourceViewModel(resource)
+            {
+                IsIndicatorVisible = isIndicatorVisible,
+                IndicatorTooltip = indicatorTooltip
+            };
 
             if (children != 0 && action != null)
                 viewModel.LoadChildren = x => action(viewModel, x);
