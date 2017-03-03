@@ -215,6 +215,7 @@
     <Compile Include="ViewModels\ConnectionPickerViewModel.cs" />
     <Compile Include="ViewModels\ConnectionViewModel.cs" />
     <Compile Include="ViewModels\DataGridViewModel.cs" />
+    <Compile Include="ViewModels\IndicatorViewModel.cs" />
     <Compile Include="ViewModels\IPluginViewModel.cs" />
     <Compile Include="ViewModels\IShellViewModel.cs" />
     <Compile Include="ViewModels\PropertyGridViewModel.cs" />

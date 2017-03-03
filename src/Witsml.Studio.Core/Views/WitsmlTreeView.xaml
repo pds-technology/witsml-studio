@@ -27,10 +27,10 @@
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{Binding Resource.Name}" />
-                        <Ellipse Grid.Column="1" Height="10" Width="10" Margin="5,0,5,0" Fill="LimeGreen" StrokeThickness="1" Stroke="Black" 
-                                 Visibility="{Binding IsIndicatorVisible, Converter={StaticResource BooleanToVisibilityConverter}}" 
-                                 ToolTip="{Binding IndicatorTooltip}"/>
+                        <TextBlock Grid.Column="0" Text="{Binding Resource.Name}" VerticalAlignment="Center" />
+                        <Ellipse Grid.Column="1" Height="10" Width="10" Margin="5,0,5,0" Fill="{Binding Indicator.Color}" StrokeThickness="1" Stroke="Black" 
+                                 Visibility="{Binding Indicator.IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}" 
+                                 ToolTip="{Binding Indicator.Tooltip}" VerticalAlignment="Center"/>
                     </Grid>
                 </HierarchicalDataTemplate>
             </TreeView.Resources>

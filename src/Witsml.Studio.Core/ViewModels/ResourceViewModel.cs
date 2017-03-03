@@ -51,6 +51,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         {
             Resource = resource;
             Children = new BindableCollection<ResourceViewModel>();
+            Indicator = new IndicatorViewModel();
 
             if (resource.HasChildren != 0)
             {
@@ -69,6 +70,11 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         /// <value>The children.</value>
         public BindableCollection<ResourceViewModel> Children { get; private set; }
+
+        /// <summary>
+        /// Gets the Indicator
+        /// </summary>
+        public IndicatorViewModel Indicator { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether this instance has a placeholder element.
@@ -151,45 +157,6 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                     NotifyOfPropertyChange(() => IsSelected);
                 }
             }
-        }
-
-        private bool _isIndicatorVisible;
-        /// <summary>
-        /// Gets or sets a value whether indicator is visible.
-        /// </summary>
-        /// <value><c>true</c> if indicator is visible; otherwise, <c>false</c>.</value>
-        public bool IsIndicatorVisible
-        {
-            get { return _isIndicatorVisible; }
-            set
-            {
-                if (_isIndicatorVisible != value)
-                {
-                    _isIndicatorVisible = value;
-                    NotifyOfPropertyChange(() => IsIndicatorVisible);
-                }
-            }
-        }
-
-        private string _indicatorTooltip;
-
-        /// <summary>
-        /// Gets or sets the indicator tootip.
-        /// </summary>
-        /// <value>
-        /// The indicator tooltip.
-        /// </value>
-        public string IndicatorTooltip
-        {
-            get { return _indicatorTooltip; }
-            set
-            {
-                if (_indicatorTooltip != value)
-                {
-                    _indicatorTooltip = value;
-                    NotifyOfPropertyChange(()=> IsIndicatorVisible);
-                }
-            }
-        }
+        }        
     }
 }
