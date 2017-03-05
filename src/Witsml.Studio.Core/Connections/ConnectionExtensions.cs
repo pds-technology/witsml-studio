@@ -124,11 +124,9 @@ namespace PDS.Witsml.Studio.Core.Connections
         /// <param name="headers">The headers.</param>
         public static void UpdateEtpSettings(this Connection connection, IDictionary<string, string> headers)
         {
-            if (!string.IsNullOrWhiteSpace(connection.SubProtocol))
-                EtpSettings.EtpSubProtocolName = connection.SubProtocol;
-
-            if (!string.IsNullOrWhiteSpace(connection.EtpEncoding))
-                headers[EtpSettings.EtpEncodingHeader] = connection.EtpEncoding;
+            // Allow settings to be blanked out via Connection dialog
+            EtpSettings.EtpSubProtocolName = connection.SubProtocol ?? string.Empty;
+            headers[EtpSettings.EtpEncodingHeader] = connection.EtpEncoding ?? string.Empty;
         }
     }
 }

@@ -38,6 +38,17 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         }
 
         /// <summary>
+        /// Finds a resource by URI.
+        /// </summary>
+        /// <param name="resources">The resources.</param>
+        /// <param name="messageId">The message identifier.</param>
+        /// <returns>A <see cref="ResourceViewModel" /> instance.</returns>
+        public static ResourceViewModel FindByMessageId(this IList<ResourceViewModel> resources, long messageId)
+        {
+            return resources.Find(x => x.MessageId == messageId);
+        }
+
+        /// <summary>
         /// Finds the selected resource.
         /// </summary>
         /// <param name="resources">The resources.</param>

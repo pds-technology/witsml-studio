@@ -44,7 +44,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         private bool _isPlaceholder;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ResourceViewModel"/> class.
+        /// Initializes a new instance of the <see cref="ResourceViewModel" /> class.
         /// </summary>
         /// <param name="resource">The resource.</param>
         public ResourceViewModel(Resource resource)
@@ -64,6 +64,12 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// </summary>
         /// <value>The resource.</value>
         public Resource Resource { get; private set; }
+
+        /// <summary>
+        /// Gets the message identifier.
+        /// </summary>
+        /// <value>The message identifier.</value>
+        public long? MessageId { get; private set; }
 
         /// <summary>
         /// Gets the collection of child resources.
@@ -89,7 +95,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         /// Gets or sets the action method used to load child resources.
         /// </summary>
         /// <value>The load children.</value>
-        public Action<string> LoadChildren { get; set; }
+        public Func<string, long> LoadChildren { get; set; }
 
         private ResourceViewModel _parent;
         /// <summary>
@@ -138,7 +144,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         public void ClearAndLoadChildren()
         {
             Children.Clear();
-            Task.Run(() => LoadChildren(Resource.Uri));
+            Task.Run(() => MessageId = LoadChildren(Resource.Uri));
         }
 
         private bool _isSelected;

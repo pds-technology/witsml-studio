@@ -202,9 +202,10 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// Gets the resources using the Discovery protocol.
         /// </summary>
         /// <param name="uri">The URI.</param>
-        public void GetResources(string uri)
+        /// <returns>The message identifier.</returns>
+        public long GetResources(string uri)
         {
-            Client.Handler<IDiscoveryCustomer>()
+            return Client.Handler<IDiscoveryCustomer>()
                 .GetResources(uri);
         }
 
@@ -447,7 +448,6 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
         /// <param name="e">The <see cref="ProtocolEventArgs{GetResourcesResponse, String}"/> instance containing the event data.</param>
         private void OnGetResourcesResponse(object sender, ProtocolEventArgs<GetResourcesResponse, string> e)
         {
-
             var viewModel = ResourceViewModel.NoData;
 
             // Handle case when "No Data" Acknowledge message was received
@@ -473,7 +473,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
                 return;
             }
 
-            var parent = Resources.FindByUri(e.Context);
+            var parent = Resources.FindByMessageId(e.Header.CorrelationId);
             if (parent == null) return;
 
             viewModel.Parent = parent;

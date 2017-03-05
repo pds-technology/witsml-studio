@@ -40,6 +40,8 @@ namespace PDS.Witsml.Studio.Core.ViewModels
     /// <seealso cref="Caliburn.Micro.Screen" />
     public class WitsmlTreeViewModel : Screen
     {
+        private long _messageId;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="WitsmlTreeViewModel"/> class.
         /// </summary>
@@ -625,7 +627,13 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 viewModel.Indicator = indicator;
 
             if (children != 0 && action != null)
-                viewModel.LoadChildren = x => action(viewModel, x);
+            {
+                viewModel.LoadChildren = x =>
+                {
+                    action(viewModel, x);
+                    return _messageId++;
+                };
+            }
 
             return viewModel;
         }
