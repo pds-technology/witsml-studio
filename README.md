@@ -38,7 +38,7 @@ Unit tests for the WITSML Browser and core functionality.
 ---
 
 ### Copyright and License
-Copyright &copy; 2016 Petrotechnical Data Systems
+Copyright &copy; 2017 Petrotechnical Data Systems
 
 Released under the Apache License, Version 2.0
 
