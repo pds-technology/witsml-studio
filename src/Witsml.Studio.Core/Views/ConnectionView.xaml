@@ -89,6 +89,29 @@
                 </Grid>
             </TabItem>
 
+            <TabItem Header="Proxy">
+
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Host:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.ProxyHost, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Port:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <xctk:IntegerUpDown Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.ProxyPort}" Minimum="0" VerticalAlignment="Center" />
+                </Grid>
+            </TabItem>
+
             <TabItem Header="WebSocket" Visibility="{Binding IsEtpConnection, Converter={StaticResource BooleanToVisibilityConverter}}">
 
                 <Grid Margin="5">

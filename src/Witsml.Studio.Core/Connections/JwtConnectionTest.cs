@@ -41,6 +41,8 @@ namespace PDS.Witsml.Studio.Core.Connections
         {
             try
             {
+                _log.Debug($"Token connection test for {connection}");
+
                 var client = new JsonClient(connection.Username, connection.Password);
                 connection.JsonWebToken = client.GetJsonWebToken(connection.Uri);
 

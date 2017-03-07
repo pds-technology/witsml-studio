@@ -43,6 +43,7 @@ namespace PDS.Witsml.Studio.Core.Connections
         public Connection()
         {
             IsAuthenticationBasic = true;
+            ProxyPort = 80;
             RedirectPort = 9005;
             SubProtocol = EtpSettings.EtpSubProtocolName;
             EtpEncoding = "binary";
@@ -141,6 +142,45 @@ namespace PDS.Witsml.Studio.Core.Connections
                 {
                     _redirectPort = value;
                     NotifyOfPropertyChange(() => RedirectPort);
+                }
+            }
+        }
+
+        private string _proxyHost;
+
+        /// <summary>
+        /// Gets or sets the proxy host name.
+        /// </summary>
+        [DataMember]
+        public string ProxyHost
+        {
+            get { return _proxyHost; }
+            set
+            {
+                if (!string.Equals(_proxyHost, value))
+                {
+                    _proxyHost = value;
+                    NotifyOfPropertyChange(() => ProxyHost);
+                }
+            }
+        }
+
+        private int _proxyPort;
+
+        /// <summary>
+        /// Gets or sets the proxy port.
+        /// </summary>
+        /// <value>The proxy port.</value>
+        [DataMember]
+        public int ProxyPort
+        {
+            get { return _proxyPort; }
+            set
+            {
+                if (_proxyPort != value)
+                {
+                    _proxyPort = value;
+                    NotifyOfPropertyChange(() => ProxyPort);
                 }
             }
         }
@@ -298,6 +338,19 @@ namespace PDS.Witsml.Studio.Core.Connections
                     NotifyOfPropertyChange(() => IsAuthenticationBearer);
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            return $"Uri: {Uri}; Username: {Username}; AuthenticationType: {AuthenticationType}; ProxyHost: {ProxyHost}; ProxyPort: {ProxyPort};" +
+                   (!string.IsNullOrWhiteSpace(SubProtocol) ? $" SubProtocol: {SubProtocol};" : string.Empty) +
+                   (!string.IsNullOrWhiteSpace(EtpEncoding) ? $" EtpEncoding: {EtpEncoding};" : string.Empty);
         }
     }
 }

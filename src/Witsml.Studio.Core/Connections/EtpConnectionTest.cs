@@ -17,15 +17,12 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Navigation;
-using Authorization = Energistics.Security.Authorization;
-using Energistics;
 using Energistics.Protocol.ChannelStreaming;
 using Energistics.Protocol.Discovery;
 using Energistics.Protocol.Store;
@@ -70,22 +67,44 @@ namespace PDS.Witsml.Studio.Core.Connections
             //if (connection.AuthenticationType == AuthenticationTypes.OpenId)
             //    return await CanConnectUsingOpenId(connection);
 
-            if (connection.IsAuthenticationBearer)
-                return await CanConnectUsingJsonWebToken(connection);
-
-            return await CanConnectUsingBasic(connection);
+            return await CanConnectUsingAuthorization(connection);
         }
 
-        private async Task<bool> CanConnectUsingBasic(Connection connection)
+        private async Task<bool> CanConnectUsingAuthorization(Connection connection)
         {
-            var headers = Authorization.Basic(connection.Username, connection.Password);
-            return await CanConnect(connection, headers);
-        }
+            try
+            {
+                _log.Debug($"ETP connection test for {connection}");
 
-        private async Task<bool> CanConnectUsingJsonWebToken(Connection connection)
-        {
-            var headers = Authorization.Bearer(connection.JsonWebToken);
-            return await CanConnect(connection, headers);
+                var applicationName = GetType().Assembly.FullName;
+                var applicationVersion = GetType().GetAssemblyVersion();
+
+                using (var client = connection.CreateEtpClient(applicationName, applicationVersion))
+                {
+                    client.Register<IChannelStreamingConsumer, ChannelStreamingConsumerHandler>();
+                    client.Register<IDiscoveryCustomer, DiscoveryCustomerHandler>();
+                    client.Register<IStoreCustomer, StoreCustomerHandler>();
+
+                    var count = 0;
+                    client.Open();
+
+                    while (string.IsNullOrWhiteSpace(client.SessionId) && count < 10)
+                    {
+                        await Task.Delay(1000);
+                        count++;
+                    }
+
+                    var result = !string.IsNullOrWhiteSpace(client.SessionId);
+                    _log.DebugFormat("ETP connection test {0}", result ? "passed" : "failed");
+
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.Error("ETP connection test failed", ex);
+                return false;
+            }
         }
 
         private async Task<bool> CanConnectUsingOpenId(Connection connection)
@@ -153,44 +172,6 @@ namespace PDS.Witsml.Studio.Core.Connections
             {
                 _log.Error("OpenID connection test failed", ex);
                 return await Task.FromResult(false);
-            }
-        }
-
-        private async Task<bool> CanConnect(Connection connection, IDictionary<string, string> headers)
-        {
-            try
-            {
-                var applicationName = GetType().Assembly.FullName;
-                var applicationVersion = GetType().GetAssemblyVersion();
-
-                connection.UpdateEtpSettings(headers);
-                connection.SetServerCertificateValidation();
-
-                using (var client = new EtpClient(connection.Uri, applicationName, applicationVersion, headers))
-                {
-                    client.Register<IChannelStreamingConsumer, ChannelStreamingConsumerHandler>();
-                    client.Register<IDiscoveryCustomer, DiscoveryCustomerHandler>();
-                    client.Register<IStoreCustomer, StoreCustomerHandler>();
-
-                    var count = 0;
-                    client.Open();
-
-                    while (string.IsNullOrWhiteSpace(client.SessionId) && count < 10)
-                    {
-                        await Task.Delay(1000);
-                        count++;
-                    }
-
-                    var result = !string.IsNullOrWhiteSpace(client.SessionId);
-                    _log.DebugFormat("ETP connection test {0}", result ? "passed" : "failed");
-
-                    return result;
-                }
-            }
-            catch (Exception ex)
-            {
-                _log.Error("ETP connection test failed", ex);
-                return false;
             }
         }
     }

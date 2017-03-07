@@ -16,6 +16,7 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using Energistics.DataAccess;
 using System.Net;
@@ -48,6 +49,13 @@ namespace PDS.Witsml.Studio.Core.Connections
                 proxy.SetSecurePassword(connection.SecurePassword);
             }
 
+            if (!string.IsNullOrWhiteSpace(connection.ProxyHost))
+            {
+                proxy.Proxy = connection.ProxyHost.Contains("://")
+                    ? new WebProxy(new Uri(connection.ProxyHost))
+                    : new WebProxy(connection.ProxyHost, connection.ProxyPort);
+            }
+
             return proxy;
         }
 
@@ -77,8 +85,14 @@ namespace PDS.Witsml.Studio.Core.Connections
                    : Energistics.Security.Authorization.Bearer(connection.JsonWebToken);
 
             connection.UpdateEtpSettings(headers);
+            connection.SetServerCertificateValidation();
 
-            return new EtpClient(connection.Uri, applicationName, applicationVersion, headers);
+            var client = new EtpClient(connection.Uri, applicationName, applicationVersion, headers);
+
+            if (!string.IsNullOrWhiteSpace(connection.ProxyHost))
+                client.SetProxy(connection.ProxyHost, connection.ProxyPort);
+
+            return client;
         }
 
         /// <summary>

@@ -36,6 +36,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
 {
     public class EtpChannelStreamingProxy : EtpProxyViewModel
     {
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(EtpChannelStreamingProxy));
         private readonly Random _random;
 
         public EtpChannelStreamingProxy(IRuntimeService runtime, string dataSchemaVersion, Action<string> log) : base(runtime, dataSchemaVersion, log)
@@ -52,6 +53,8 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
         public override async Task Start(Models.Simulation model, CancellationToken token, int interval = 5000)
         {
             Model = model;
+
+            _log.Debug($"Establishing ETP connection for {Model.EtpConnection}");
 
             using (Client = Model.EtpConnection.CreateEtpClient(Model.Name, Model.Version))
             {

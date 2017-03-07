@@ -51,6 +51,7 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
     /// <seealso cref="PDS.Witsml.Studio.Core.ViewModels.IPluginViewModel" />
     public sealed class MainViewModel : Conductor<IScreen>.Collection.OneActive, IPluginViewModel, IDisposable
     {
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(MainViewModel));
         private static readonly string _pluginDisplayName = Settings.Default.PluginDisplayName;
         private static readonly string _pluginVersion = typeof(MainViewModel).GetAssemblyVersion();
 
@@ -355,6 +356,8 @@ namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
             try
             {
                 Runtime.Invoke(() => Runtime.Shell.StatusBarText = "Connecting...");
+
+                _log.Debug($"Establishing ETP connection for {Model.Connection}");
 
                 Client = Model.Connection.CreateEtpClient(Model.ApplicationName, Model.ApplicationVersion);
 

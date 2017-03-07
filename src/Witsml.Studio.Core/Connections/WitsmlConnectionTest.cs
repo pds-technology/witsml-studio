@@ -52,6 +52,8 @@ namespace PDS.Witsml.Studio.Core.Connections
         {
             try
             {
+                _log.Debug($"Witsml connection test for {connection}");
+
                 var proxy = new WITSMLWebServiceConnection(connection.Uri, WMLSVersion.WITSML141);
 
                 if (!string.IsNullOrWhiteSpace(connection.Username))
