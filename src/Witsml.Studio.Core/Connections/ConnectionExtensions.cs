@@ -40,8 +40,21 @@ namespace PDS.Witsml.Studio.Core.Connections
         public static WITSMLWebServiceConnection CreateProxy(this Connection connection, WMLSVersion version)
         {
             //_log.DebugFormat("A new Proxy is being created with URI: {0}; WitsmlVersion: {1};", connection.Uri, version);
-            var proxy = new WITSMLWebServiceConnection(connection.Uri, version);
+            return connection.UpdateProxy(new WITSMLWebServiceConnection(connection.Uri, version));
+        }
+
+        /// <summary>
+        /// Updates a WITSMLWebServiceConnection for the current connection settings.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="proxy">The WITSML web service proxy.</param>
+        /// <returns>The <see cref="WITSMLWebServiceConnection"/> instance.</returns>
+        public static WITSMLWebServiceConnection UpdateProxy(this Connection connection, WITSMLWebServiceConnection proxy)
+        {
+            proxy.Url = connection.Uri;
             proxy.Timeout *= 5;
+
+            connection.SetServerCertificateValidation();
 
             if (!string.IsNullOrWhiteSpace(connection.Username))
             {

@@ -157,13 +157,8 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
         /// <returns>The supported versions.</returns>
         internal string GetVersions(WITSMLWebServiceConnection proxy, Connection connection, bool throwOnError = true)
         {
-            proxy.Url = connection.Uri;
-
-            if (!string.IsNullOrWhiteSpace(connection.Username))
-            {
-                proxy.Username = connection.Username;
-                proxy.SetSecurePassword(connection.SecurePassword);
-            }
+            // Update proxy connection settings
+            connection.UpdateProxy(proxy);
 
             var parent = Parent?.Parent;
             var supportedVersions = string.Empty;
@@ -239,8 +234,6 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
             try
             {
                 WitsmlVersions.Clear();
-
-                Model.Connection.SetServerCertificateValidation();
 
                 var versions = GetVersions(Proxy, Model.Connection);
 
