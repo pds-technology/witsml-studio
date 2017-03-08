@@ -40,8 +40,9 @@ namespace PDS.Witsml.Studio.Core.ViewModels
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(ConnectionViewModel));
         private static readonly string _connectionBaseFileName = Settings.Default.ConnectionBaseFileName;
+        private readonly string[] _ignoredPropertyChanges = { "name" };
         private PasswordBox _passwordControl;
-        private readonly string[] _ignoredPropertyChanges = new[] {"name"};
+        private PasswordBox _proxyPasswordControl;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConnectionViewModel" /> class.
@@ -56,7 +57,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             ConnectionType = connectionType;
             ConnectionNames = new string[0];
             IsEtpConnection = connectionType == ConnectionTypes.Etp;
-            DisplayName = string.Format("{0} Connection", ConnectionType.ToString().ToUpper());
+            DisplayName = $"{ConnectionType.ToString().ToUpper()} Connection";
             CanTestConnection = true;
         }
 
@@ -271,6 +272,27 @@ namespace PDS.Witsml.Studio.Core.ViewModels
         }
 
         /// <summary>
+        /// Called when the proxy password control is loaded.
+        /// </summary>
+        /// <param name="control">The control.</param>
+        public void OnProxyPasswordLoaded(PasswordBox control)
+        {
+            _proxyPasswordControl = control;
+            _proxyPasswordControl.Password = EditItem.ProxyPassword;
+        }
+
+        /// <summary>
+        /// Called when the proxy password changed.
+        /// </summary>
+        /// <param name="control">The control.</param>
+        public void OnProxyPasswordChanged(PasswordBox control)
+        {
+            EditItem.ProxyPassword = control.Password;
+            EditItem.SecureProxyPassword = control.SecurePassword;
+            ResetTestStatus();
+        }
+
+        /// <summary>
         /// Called when the URL has changed, to trim leading white space.
         /// </summary>
         /// <param name="uri">The URI.</param>
@@ -335,6 +357,8 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 var connection = JsonConvert.DeserializeObject<Connection>(json);
                 connection.Password = connection.Password.Decrypt();
                 connection.SecurePassword = connection.Password.ToSecureString();
+                connection.ProxyPassword = connection.ProxyPassword.Decrypt();
+                connection.SecureProxyPassword = connection.ProxyPassword.ToSecureString();
                 return connection;
             }
 
@@ -351,8 +375,10 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             string filename = GetConnectionFilename();
             _log.DebugFormat("Persisting Connection to '{0}'", filename);
             connection.Password = connection.Password.Encrypt();
+            connection.ProxyPassword = connection.ProxyPassword.Encrypt();
             File.WriteAllText(filename, JsonConvert.SerializeObject(connection));
             connection.Password = connection.Password.Decrypt();
+            connection.ProxyPassword = connection.ProxyPassword.Decrypt();
         }
 
         /// <summary>

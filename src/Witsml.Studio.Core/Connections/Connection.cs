@@ -185,6 +185,36 @@ namespace PDS.Witsml.Studio.Core.Connections
             }
         }
 
+        private string _proxyUsername;
+
+        /// <summary>
+        /// Gets or sets the username to authenticate with the proxy server.
+        /// </summary>
+        [DataMember]
+        public string ProxyUsername
+        {
+            get { return _proxyUsername; }
+            set
+            {
+                if (!string.Equals(_proxyUsername, value))
+                {
+                    _proxyUsername = value;
+                    NotifyOfPropertyChange(() => ProxyUsername);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the proxy password.
+        /// </summary>
+        [DataMember]
+        public string ProxyPassword { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecureString password to authenticate with the proxy server.
+        /// </summary>
+        public SecureString SecureProxyPassword { get; set; }
+
         private string _username;
 
         /// <summary>
@@ -348,7 +378,8 @@ namespace PDS.Witsml.Studio.Core.Connections
         /// </returns>
         public override string ToString()
         {
-            return $"Uri: {Uri}; Username: {Username}; AuthenticationType: {AuthenticationType}; ProxyHost: {ProxyHost}; ProxyPort: {ProxyPort};" +
+            return $"Uri: {Uri}; Username: {Username}; AuthenticationType: {AuthenticationType};" +
+                   $" ProxyHost: {ProxyHost}; ProxyPort: {ProxyPort}; ProxyUsername: {ProxyUsername};" +
                    (!string.IsNullOrWhiteSpace(SubProtocol) ? $" SubProtocol: {SubProtocol};" : string.Empty) +
                    (!string.IsNullOrWhiteSpace(EtpEncoding) ? $" EtpEncoding: {EtpEncoding};" : string.Empty);
         }

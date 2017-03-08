@@ -67,6 +67,13 @@ namespace PDS.Witsml.Studio.Core.Connections
                 proxy.Proxy = connection.ProxyHost.Contains("://")
                     ? new WebProxy(new Uri(connection.ProxyHost))
                     : new WebProxy(connection.ProxyHost, connection.ProxyPort);
+
+                if (!string.IsNullOrWhiteSpace(connection.ProxyUsername) &&
+                    !string.IsNullOrWhiteSpace(connection.ProxyPassword))
+                {
+                    proxy.UseDefaultNetworkCredentials = false;
+                    proxy.Proxy.Credentials = new NetworkCredential(connection.ProxyUsername, connection.SecureProxyPassword);
+                }
             }
 
             return proxy;

@@ -96,6 +96,8 @@
                         <RowDefinition Height="5" />
                         <RowDefinition Height="40" />
                         <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
@@ -109,6 +111,13 @@
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Port:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
                     <xctk:IntegerUpDown Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.ProxyPort}" Minimum="0" VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="User Name:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <TextBox Grid.Row="3" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.ProxyUsername, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Password:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <PasswordBox Grid.Row="4" Grid.Column="1" Margin="5" Padding="5" PasswordChar="*" VerticalAlignment="Center"
+                                 cal:Message.Attach="[Event Loaded] = [Action OnProxyPasswordLoaded($source)]; [Event PasswordChanged] = [Action OnProxyPasswordChanged($source)]" />
                 </Grid>
             </TabItem>
 
