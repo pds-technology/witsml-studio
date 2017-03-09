@@ -29,6 +29,7 @@ using Energistics.Datatypes;
 using Energistics.Datatypes.Object;
 using PDS.Framework;
 using PDS.Witsml.Linq;
+using PDS.Witsml.Query;
 using PDS.Witsml.Studio.Core.Connections;
 using PDS.Witsml.Studio.Core.Runtime;
 
@@ -422,9 +423,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 Context.LogResponse = null;
             }
 
-            Context = version == WMLSVersion.WITSML131
-                ? (IWitsmlContext) new Witsml131Context(connection.Uri, connection.Username, connection.SecurePassword)
-                : new Witsml141Context(connection.Uri, connection.Username, connection.SecurePassword);
+            Context = new WitsmlQueryContext(connection.Uri, connection.Username, connection.SecurePassword, version);
 
             Items.Clear();
         }
@@ -533,7 +532,7 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 var etpUri = new EtpUri(uri);
 
                 var dataObjects = ObjectTypes.IsGrowingDataObject(etpUri.ObjectType) 
-                    ? Context.GetGrowingObjectsHeaderOnly(etpUri.ObjectType, etpUri) 
+                    ? Context.GetGrowingObjectsWithStatus(etpUri.ObjectType, etpUri) 
                     : Context.GetWellboreObjects(etpUri.ObjectType, etpUri);
                 
                 await LoadDataItems(dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri(),
