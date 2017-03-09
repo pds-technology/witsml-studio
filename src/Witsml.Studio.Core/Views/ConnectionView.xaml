@@ -110,7 +110,8 @@
                     <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.ProxyHost, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Port:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                    <xctk:IntegerUpDown Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.ProxyPort}" Minimum="0" VerticalAlignment="Center" />
+                    <xctk:IntegerUpDown Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.ProxyPort}" Minimum="0" VerticalAlignment="Center"
+                                        IsEnabled="{Binding EditItem.IsProxyHostName}" />
 
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="User Name:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
                     <TextBox Grid.Row="3" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.ProxyUsername, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />

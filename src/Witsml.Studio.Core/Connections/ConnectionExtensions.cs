@@ -51,6 +51,7 @@ namespace PDS.Witsml.Studio.Core.Connections
         /// <returns>The <see cref="WITSMLWebServiceConnection"/> instance.</returns>
         public static WITSMLWebServiceConnection UpdateProxy(this Connection connection, WITSMLWebServiceConnection proxy)
         {
+            proxy.Proxy = connection.CreateWebProxy();
             proxy.Url = connection.Uri;
             proxy.Timeout *= 5;
 
@@ -62,18 +63,26 @@ namespace PDS.Witsml.Studio.Core.Connections
                 proxy.SetSecurePassword(connection.SecurePassword);
             }
 
-            if (!string.IsNullOrWhiteSpace(connection.ProxyHost))
-            {
-                proxy.Proxy = connection.ProxyHost.Contains("://")
-                    ? new WebProxy(new Uri(connection.ProxyHost))
-                    : new WebProxy(connection.ProxyHost, connection.ProxyPort);
+            return proxy;
+        }
 
-                if (!string.IsNullOrWhiteSpace(connection.ProxyUsername) &&
-                    !string.IsNullOrWhiteSpace(connection.ProxyPassword))
-                {
-                    proxy.UseDefaultNetworkCredentials = false;
-                    proxy.Proxy.Credentials = new NetworkCredential(connection.ProxyUsername, connection.SecureProxyPassword);
-                }
+        /// <summary>
+        /// Creates a web proxy for the current connection settings.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <returns>A new <see cref="WebProxy"/> instance.</returns>
+        public static WebProxy CreateWebProxy(this Connection connection)
+        {
+            if (string.IsNullOrWhiteSpace(connection.ProxyHost)) return null;
+
+            var proxy = connection.ProxyHost.Contains("://")
+                ? new WebProxy(new Uri(connection.ProxyHost))
+                : new WebProxy(connection.ProxyHost, connection.ProxyPort);
+
+            if (!string.IsNullOrWhiteSpace(connection.ProxyUsername) &&
+                !string.IsNullOrWhiteSpace(connection.ProxyPassword))
+            {
+                proxy.Credentials = new NetworkCredential(connection.ProxyUsername, connection.SecureProxyPassword);
             }
 
             return proxy;
@@ -87,8 +96,8 @@ namespace PDS.Witsml.Studio.Core.Connections
         public static JsonClient CreateJsonClient(this Connection connection)
         {
             return connection.IsAuthenticationBasic
-                ? new JsonClient(connection.Username, connection.Password)
-                : new JsonClient(connection.JsonWebToken);
+                ? new JsonClient(connection.Username, connection.Password, connection.CreateWebProxy())
+                : new JsonClient(connection.JsonWebToken, connection.CreateWebProxy());
         }
 
         /// <summary>
@@ -110,7 +119,10 @@ namespace PDS.Witsml.Studio.Core.Connections
             var client = new EtpClient(connection.Uri, applicationName, applicationVersion, headers);
 
             if (!string.IsNullOrWhiteSpace(connection.ProxyHost))
-                client.SetProxy(connection.ProxyHost, connection.ProxyPort);
+            {
+                client.SetProxy(connection.ProxyHost, connection.ProxyPort,
+                                connection.ProxyUsername, connection.ProxyPassword);
+            }
 
             return client;
         }

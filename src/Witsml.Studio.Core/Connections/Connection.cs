@@ -146,6 +146,14 @@ namespace PDS.Witsml.Studio.Core.Connections
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the proxy host name is not a URI.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if the proxy host name is not a URI; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsProxyHostName => !ProxyHost?.Contains("://") ?? false;
+
         private string _proxyHost;
 
         /// <summary>
@@ -161,6 +169,7 @@ namespace PDS.Witsml.Studio.Core.Connections
                 {
                     _proxyHost = value;
                     NotifyOfPropertyChange(() => ProxyHost);
+                    NotifyOfPropertyChange(() => IsProxyHostName);
                 }
             }
         }
