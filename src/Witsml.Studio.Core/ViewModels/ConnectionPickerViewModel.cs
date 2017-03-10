@@ -230,6 +230,8 @@ namespace PDS.Witsml.Studio.Core.ViewModels
                 {
                     x.Password = x.Password.Decrypt();
                     x.SecurePassword = x.Password.ToSecureString();
+                    x.ProxyPassword = x.ProxyPassword.Decrypt();
+                    x.SecureProxyPassword = x.ProxyPassword.ToSecureString();
                 });
 
                 return connections.ToArray();
@@ -243,9 +245,20 @@ namespace PDS.Witsml.Studio.Core.ViewModels
             EnsureDataFolder();
             var fileName = GetConnectionFileName();
             //_log.DebugFormat("Persisting Connection to '{0}'", filename);
-            connections.ForEach(x => x.Password = x.Password.Encrypt());
+
+            connections.ForEach(x =>
+            {
+                x.Password = x.Password.Encrypt();
+                x.ProxyPassword = x.ProxyPassword.Encrypt();
+            });
+
             File.WriteAllText(fileName, JsonConvert.SerializeObject(connections));
-            connections.ForEach(x => x.Password = x.Password.Decrypt());
+
+            connections.ForEach(x =>
+            {
+                x.Password = x.Password.Decrypt();
+                x.ProxyPassword = x.ProxyPassword.Decrypt();
+            });
         }
 
         /// <summary>
