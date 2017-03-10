@@ -905,10 +905,9 @@ namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
             {
                 QueryResults.Append(string.Format("{0}{0}<!-- Partial Result -->{0}{0}", Environment.NewLine));
             }
-            else if (returnCode > 1)
+            else if (returnCode == (short) ErrorCodes.ParialSuccess)
             {
-                QueryResults.SetText(string.Format("<!-- {0} -->{1}{1}", ErrorCodes.ParialSuccess.GetDescription(),
-                    Environment.NewLine));
+                QueryResults.SetText(string.Format("<!-- {0} -->{1}{1}", ErrorCodes.ParialSuccess.GetDescription(), Environment.NewLine));
             }
 
             if (!string.IsNullOrEmpty(text))
