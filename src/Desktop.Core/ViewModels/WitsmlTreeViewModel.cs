@@ -423,7 +423,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 Context.LogResponse = null;
             }
 
-            Context = new WitsmlQueryContext(connection.Uri, connection.Username, connection.SecurePassword, version);
+            Context = new WitsmlQueryContext(connection.CreateProxy(version), version);
 
             Items.Clear();
         }
