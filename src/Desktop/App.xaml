@@ -1,7 +1,7 @@
-﻿<Application x:Class="PDS.Witsml.Studio.App"
+﻿<Application x:Class="PDS.WITSMLstudio.Desktop.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:PDS.Witsml.Studio">
+             xmlns:local="clr-namespace:PDS.WITSMLstudio.Desktop">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

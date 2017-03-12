@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -18,7 +18,7 @@
 
 using System.Threading.Tasks;
 
-namespace PDS.Witsml.Studio.Core.Connections
+namespace PDS.WITSMLstudio.Desktop.Core.Connections
 {
     /// <summary>
     /// Interface for a connection test against a Connection instance.

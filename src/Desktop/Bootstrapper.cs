@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -23,11 +23,11 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using Caliburn.Micro;
-using PDS.Framework;
-using PDS.Witsml.Studio.Core.Runtime;
-using PDS.Witsml.Studio.Core.ViewModels;
+using PDS.WITSMLstudio.Framework;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
+using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 
-namespace PDS.Witsml.Studio
+namespace PDS.WITSMLstudio.Desktop
 {
     /// <summary>
     /// Configures the composition container to be used for dependecy injection.

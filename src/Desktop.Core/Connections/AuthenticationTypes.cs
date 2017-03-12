@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -16,7 +16,7 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
-namespace PDS.Witsml.Studio.Core.Connections
+namespace PDS.WITSMLstudio.Desktop.Core.Connections
 {
     /// <summary>
     /// An enumeration of supported authentication types.

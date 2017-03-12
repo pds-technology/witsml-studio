@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -23,11 +23,11 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using Energistics.DataAccess.Validation;
-using PDS.Framework;
-using PDS.Witsml.Studio.Core.Converters;
+using PDS.WITSMLstudio.Framework;
+using PDS.WITSMLstudio.Desktop.Core.Converters;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
-namespace PDS.Witsml.Studio.Core.Models
+namespace PDS.WITSMLstudio.Desktop.Core.Models
 {
     /// <summary>
     /// Provides methods that can be used to register custom type converters.

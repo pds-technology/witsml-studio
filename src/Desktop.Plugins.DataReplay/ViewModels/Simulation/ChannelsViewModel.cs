@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -31,14 +31,14 @@ using Energistics.Protocol.ChannelStreaming;
 using Energistics.Protocol.Discovery;
 using Microsoft.Win32;
 using Newtonsoft.Json;
-using PDS.Framework;
-using PDS.Witsml.Studio.Core.Connections;
-using PDS.Witsml.Studio.Plugins.DataReplay.Providers;
-using PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies;
-using PDS.Witsml.Studio.Core.Runtime;
-using PDS.Witsml.Studio.Core.ViewModels;
+using PDS.WITSMLstudio.Framework;
+using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers;
+using PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
+using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 
-namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Simulation
+namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Simulation
 {
     public sealed class ChannelsViewModel : Screen
     {

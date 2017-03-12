@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -18,11 +18,11 @@
 
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PDS.Framework;
-using PDS.Witsml.Studio.Core.Connections;
-using PDS.Witsml.Studio.Core.Runtime;
+using PDS.WITSMLstudio.Framework;
+using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
-namespace PDS.Witsml.Studio.Connections
+namespace PDS.WITSMLstudio.Desktop.Connections
 {
     [TestClass]
     public class ConnectionTestTests

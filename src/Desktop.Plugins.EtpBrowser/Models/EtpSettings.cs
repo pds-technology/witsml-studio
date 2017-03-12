@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -20,10 +20,10 @@ using System;
 using System.Runtime.Serialization;
 using Caliburn.Micro;
 using Energistics.Datatypes;
-using PDS.Witsml.Studio.Core.Connections;
-using PDS.Witsml.Studio.Plugins.EtpBrowser.Properties;
+using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Properties;
 
-namespace PDS.Witsml.Studio.Plugins.EtpBrowser.Models
+namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
 {
     /// <summary>
     /// Defines all of the properties needed to comunicate via ETP.

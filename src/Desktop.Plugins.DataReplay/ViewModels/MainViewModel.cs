@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -23,12 +23,12 @@ using System.Windows;
 using Caliburn.Micro;
 using Microsoft.Win32;
 using Newtonsoft.Json;
-using PDS.Witsml.Studio.Plugins.DataReplay.Properties;
-using PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Simulation;
-using PDS.Witsml.Studio.Core.Runtime;
-using PDS.Witsml.Studio.Core.ViewModels;
+using PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Properties;
+using PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Simulation;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
+using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 
-namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels
+namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels
 {
     public sealed class MainViewModel : Conductor<IScreen>.Collection.OneActive, IPluginViewModel
     {

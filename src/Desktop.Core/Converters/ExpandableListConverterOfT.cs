@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -19,9 +19,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using PDS.Witsml.Studio.Core.Models;
+using PDS.WITSMLstudio.Desktop.Core.Models;
 
-namespace PDS.Witsml.Studio.Core.Converters
+namespace PDS.WITSMLstudio.Desktop.Core.Converters
 {
     /// <summary>
     /// Provides a type converter to convert generic list properties

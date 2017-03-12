@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -22,9 +22,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Caliburn.Micro;
-using PDS.Witsml.Studio.ViewModels;
+using PDS.WITSMLstudio.Desktop.ViewModels;
 
-namespace PDS.Witsml.Studio
+namespace PDS.WITSMLstudio.Desktop
 {
     public class ShellHarness : ShellViewModel
     {

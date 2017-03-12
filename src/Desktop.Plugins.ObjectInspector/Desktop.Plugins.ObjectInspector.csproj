@@ -7,8 +7,8 @@
     <ProjectGuid>{C17BF64B-B129-4CBC-91DF-69F1EBD4365E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PDS.Witsml.Studio.Plugins.ObjectInspector</RootNamespace>
-    <AssemblyName>PDS.Witsml.Studio.Plugins.ObjectInspector</AssemblyName>
+    <RootNamespace>PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector</RootNamespace>
+    <AssemblyName>PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -19,9 +19,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Energistics.DataAccess;
-using PDS.Witsml.Studio.Core.Connections;
+using PDS.WITSMLstudio.Desktop.Core.Connections;
 
-namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
+namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 {
     public abstract class WitsmlProxyViewModel
     {

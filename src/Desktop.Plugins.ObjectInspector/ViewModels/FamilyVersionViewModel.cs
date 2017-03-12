@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -21,11 +21,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Caliburn.Micro;
 using Energistics.DataAccess.Reflection;
-using PDS.Framework;
-using PDS.Witsml.Studio.Core.Runtime;
-using PDS.Witsml.Studio.Plugins.ObjectInspector.Models;
+using PDS.WITSMLstudio.Framework;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
+using PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models;
 
-namespace PDS.Witsml.Studio.Plugins.ObjectInspector.ViewModels
+namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.ViewModels
 {
     /// <summary>
     /// Manages the behavior for the family version selection UI elements.

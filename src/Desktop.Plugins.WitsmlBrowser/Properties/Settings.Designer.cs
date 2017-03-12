@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.Properties {
+namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

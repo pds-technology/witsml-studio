@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -19,10 +19,10 @@
 using System;
 using Caliburn.Micro;
 using Energistics.DataAccess;
-using PDS.Witsml.Studio.Core.Models;
-using PDS.Witsml.Studio.Core.Runtime;
+using PDS.WITSMLstudio.Desktop.Core.Models;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
-namespace PDS.Witsml.Studio.Core.ViewModels
+namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 {
     /// <summary>
     /// Manages the behavior of the property grid control.

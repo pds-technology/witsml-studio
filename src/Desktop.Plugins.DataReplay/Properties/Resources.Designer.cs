@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace PDS.Witsml.Studio.Plugins.DataReplay.Properties {
+namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace PDS.Witsml.Studio.Plugins.DataReplay.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("PDS.Witsml.Studio.Plugins.DataReplay.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

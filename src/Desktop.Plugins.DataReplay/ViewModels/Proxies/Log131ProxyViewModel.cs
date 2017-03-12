@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -24,10 +24,10 @@ using Energistics.DataAccess.WITSML131;
 using Energistics.DataAccess.WITSML131.ComponentSchemas;
 using Energistics.DataAccess.WITSML131.ReferenceData;
 using Energistics.Datatypes.ChannelData;
-using PDS.Witsml.Data.Logs;
-using PDS.Witsml.Studio.Core.Runtime;
+using PDS.WITSMLstudio.Data.Logs;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
-namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Proxies
+namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 {
     public class Log131ProxyViewModel : WitsmlProxyViewModel
     {

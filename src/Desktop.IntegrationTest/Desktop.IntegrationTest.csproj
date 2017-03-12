@@ -6,8 +6,8 @@
     <ProjectGuid>{84C06B18-C1D6-4AD1-AA4D-7B08872B8D8F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PDS.Witsml.Studio</RootNamespace>
-    <AssemblyName>PDS.Witsml.Studio.IntegrationTest</AssemblyName>
+    <RootNamespace>PDS.WITSMLstudio.Desktop</RootNamespace>
+    <AssemblyName>PDS.WITSMLstudio.Desktop.IntegrationTest</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>

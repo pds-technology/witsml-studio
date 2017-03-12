@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -23,10 +23,10 @@ using System.Windows;
 using Caliburn.Micro;
 using Energistics.Common;
 using Microsoft.Win32;
-using PDS.Framework;
-using PDS.Witsml.Studio.Core.Runtime;
+using PDS.WITSMLstudio.Framework;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
-namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels.Simulation
+namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Simulation
 {
     public class SimulationViewModel : Conductor<IScreen>.Collection.OneActive
     {

@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 using Caliburn.Micro;
 using Energistics.Datatypes.Object;
 
-namespace PDS.Witsml.Studio.Core.ViewModels
+namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 {
     /// <summary>
     /// Represents the user interface elements that will be displayed in the tree view.

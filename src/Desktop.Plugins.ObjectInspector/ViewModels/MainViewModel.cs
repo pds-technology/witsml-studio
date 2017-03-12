@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -20,12 +20,12 @@ using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using Caliburn.Micro;
-using PDS.Framework;
-using PDS.Witsml.Studio.Core.Runtime;
-using PDS.Witsml.Studio.Core.ViewModels;
-using PDS.Witsml.Studio.Plugins.ObjectInspector.Properties;
+using PDS.WITSMLstudio.Framework;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
+using PDS.WITSMLstudio.Desktop.Core.ViewModels;
+using PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Properties;
 
-namespace PDS.Witsml.Studio.Plugins.ObjectInspector.ViewModels
+namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.ViewModels
 {
     /// <summary>
     /// Manages the behavior of the main user interface for the Object Inspector plug-in.

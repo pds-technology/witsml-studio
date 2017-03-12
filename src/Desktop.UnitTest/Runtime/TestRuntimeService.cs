@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -21,16 +21,16 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Caliburn.Micro;
-using PDS.Framework;
-using PDS.Witsml.Studio.Core.Properties;
-using PDS.Witsml.Studio.Core.ViewModels;
+using PDS.WITSMLstudio.Framework;
+using PDS.WITSMLstudio.Desktop.Core.Properties;
+using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 
-namespace PDS.Witsml.Studio.Core.Runtime
+namespace PDS.WITSMLstudio.Desktop.Core.Runtime
 {
     /// <summary>
     /// Provides an implementation of <see cref="IRuntimeService"/> that can be used from within unit/integation tests.
     /// </summary>
-    /// <seealso cref="PDS.Witsml.Studio.Core.Runtime.IRuntimeService" />
+    /// <seealso cref="PDS.WITSMLstudio.Desktop.Core.Runtime.IRuntimeService" />
     public class TestRuntimeService : IRuntimeService
     {
         private static readonly string _persistedDataFolderName = Settings.Default.PersistedDataFolderName;

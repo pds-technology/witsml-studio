@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -18,9 +18,9 @@
 
 using Energistics.Common;
 using Energistics.Protocol.Core;
-using PDS.Witsml.Studio.Core.Connections;
+using PDS.WITSMLstudio.Desktop.Core.Connections;
 
-namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
+namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 {
     /// <summary>
     /// Defines methods that can be implemented to receive <see cref="Energistics.EtpClient"/> status notifications.

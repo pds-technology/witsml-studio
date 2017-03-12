@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -17,9 +17,9 @@
 //-----------------------------------------------------------------------
 
 using Caliburn.Micro;
-using PDS.Witsml.Studio.Core.Connections;
+using PDS.WITSMLstudio.Desktop.Core.Connections;
 
-namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.Models
+namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.Models
 {
     /// <summary>
     /// Encapsulates Witsml settings and options sent to the store.

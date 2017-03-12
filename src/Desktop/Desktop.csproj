@@ -7,8 +7,8 @@
     <ProjectGuid>{E7531DA0-51BD-4C58-B020-FFCE2DFBCED6}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PDS.Witsml.Studio</RootNamespace>
-    <AssemblyName>PDS.Witsml.Studio</AssemblyName>
+    <RootNamespace>PDS.WITSMLstudio.Desktop</RootNamespace>
+    <AssemblyName>PDS.WITSMLstudio.Desktop</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -30,7 +30,7 @@
     <SupportUrl>https://witsml.pds.technology/docs/support/</SupportUrl>
     <ProductName>PDS WITSMLstudio Desktop</ProductName>
     <PublisherName>Petrotechnical Data Systems</PublisherName>
-    <SuiteName>PDS.Witsml</SuiteName>
+    <SuiteName>PDS.WITSMLstudio</SuiteName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>index.htm</WebPage>
     <ApplicationRevision>8</ApplicationRevision>

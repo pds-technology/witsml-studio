@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -24,8 +24,8 @@ using System.Windows;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("PDS.Witsml.Studio.Plugins.WitsmlBrowser")]
-[assembly: AssemblyDescription("PDS WITSML Studio WITSML Browser Plug-in")]
+[assembly: AssemblyTitle("PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser")]
+[assembly: AssemblyDescription("PDS WITSMLstudio Desktop WITSML Browser Plug-in")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -50,5 +50,5 @@ using System.Windows;
                                       // app, or any theme specific resource dictionaries)
 )]
 
-[assembly: InternalsVisibleTo("PDS.Witsml.Studio.UnitTest")]
-[assembly: InternalsVisibleTo("PDS.Witsml.Studio.IntegrationTest")]
+[assembly: InternalsVisibleTo("PDS.WITSMLstudio.Desktop.UnitTest")]
+[assembly: InternalsVisibleTo("PDS.WITSMLstudio.Desktop.IntegrationTest")]

@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -20,7 +20,7 @@ using System;
 using System.Windows;
 using System.Windows.Interop;
 
-namespace PDS.Witsml.Studio.Core.Runtime
+namespace PDS.WITSMLstudio.Desktop.Core.Runtime
 {
     /// <summary>
     /// Provides a handle for a WPF <see cref="Window"/> that can be used along with Win32 windows and dialogs.

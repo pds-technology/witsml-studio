@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace PDS.Witsml.Studio.Core.Properties {
+namespace PDS.WITSMLstudio.Desktop.Core.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -52,15 +52,6 @@ namespace PDS.Witsml.Studio.Core.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("PDS WITSML Studio")]
-        public string ApplicationTitle {
-            get {
-                return ((string)(this["ApplicationTitle"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("https://witsml.pds.technology/docs/user-guide/")]
         public string OnlineHelpUrl {
             get {
@@ -83,6 +74,15 @@ namespace PDS.Witsml.Studio.Core.Properties {
         public int MaxChannelDataRows {
             get {
                 return ((int)(this["MaxChannelDataRows"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PDS WITSMLstudio Desktop")]
+        public string ApplicationTitle {
+            get {
+                return ((string)(this["ApplicationTitle"]));
             }
         }
     }

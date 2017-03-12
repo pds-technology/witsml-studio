@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace PDS.Witsml.Studio.Plugins.DataReplay.Properties {
+namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

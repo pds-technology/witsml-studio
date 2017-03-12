@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -27,15 +27,15 @@ using Energistics.Protocol.ChannelStreaming;
 using Energistics.Protocol.Discovery;
 using Energistics.Protocol.Store;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using PDS.Framework;
-using PDS.Witsml.Studio.Core.Runtime;
+using PDS.WITSMLstudio.Framework;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
-namespace PDS.Witsml.Studio.Core.Connections
+namespace PDS.WITSMLstudio.Desktop.Core.Connections
 {
     /// <summary>
     /// Provides a connection test for an Ept Connection instance.
     /// </summary>
-    /// <seealso cref="PDS.Witsml.Studio.Core.Connections.IConnectionTest" />
+    /// <seealso cref="PDS.WITSMLstudio.Desktop.Core.Connections.IConnectionTest" />
     [Export("Etp", typeof(IConnectionTest))]
     public class EtpConnectionTest : IConnectionTest
     {

@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -24,7 +24,7 @@ using Energistics;
 using Energistics.Common;
 using Energistics.Datatypes;
 
-namespace PDS.Witsml.Studio.Core.Connections
+namespace PDS.WITSMLstudio.Desktop.Core.Connections
 {
     /// <summary>
     /// Defines static helper methods that can be used to configure WITSML store connections.

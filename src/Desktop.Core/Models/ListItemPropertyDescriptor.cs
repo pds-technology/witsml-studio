@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -22,7 +22,7 @@ using System.ComponentModel;
 using System.Linq;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
-namespace PDS.Witsml.Studio.Core.Models
+namespace PDS.WITSMLstudio.Desktop.Core.Models
 {
     /// <summary>
     /// Provides a property descriptor for list item types.

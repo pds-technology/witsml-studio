@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -28,7 +28,7 @@ using System.Windows;
 using System.Windows.Interop;
 using Energistics.DataAccess;
 
-namespace PDS.Witsml.Studio.Core.SaveWindowState
+namespace PDS.WITSMLstudio.Desktop.Core.SaveWindowState
 {
     /// <summary>
     /// Provides static helper methods that can be used to save and restore <see cref="Window"/> state.

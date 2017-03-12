@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -19,11 +19,11 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Caliburn.Micro;
-using PDS.Witsml.Studio.Core.Runtime;
-using PDS.Witsml.Studio.Core.ViewModels;
-using PDS.Witsml.Studio.Plugins.WitsmlBrowser.Models;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
+using PDS.WITSMLstudio.Desktop.Core.ViewModels;
+using PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.Models;
 
-namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
+namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
 {
     /// <summary>
     /// Manages the behavior for the TreeView view UI elements.

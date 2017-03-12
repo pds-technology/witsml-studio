@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -24,9 +24,9 @@ using Caliburn.Micro;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Highlighting;
-using PDS.Witsml.Studio.Core.Runtime;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
-namespace PDS.Witsml.Studio.Core.ViewModels
+namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 {
     /// <summary>
     /// Manages the behavior of the text editor control.

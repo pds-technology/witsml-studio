@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -20,11 +20,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Caliburn.Micro;
 using Energistics.DataAccess;
-using PDS.Framework;
-using PDS.Witsml.Studio.Core.Runtime;
-using PDS.Witsml.Studio.Core.ViewModels;
+using PDS.WITSMLstudio.Framework;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
+using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 
-namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request
+namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
 {
     /// <summary>
     /// Manages the behavior for the request UI elements.

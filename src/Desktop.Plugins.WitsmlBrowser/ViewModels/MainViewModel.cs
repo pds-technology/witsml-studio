@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -26,26 +26,26 @@ using System.Xml.Linq;
 using Caliburn.Micro;
 using Energistics.DataAccess;
 using ICSharpCode.AvalonEdit.Document;
-using PDS.Framework;
-using PDS.Witsml.Studio.Core.Connections;
-using PDS.Witsml.Studio.Plugins.WitsmlBrowser.Models;
-using PDS.Witsml.Studio.Plugins.WitsmlBrowser.Properties;
-using PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Request;
-using PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Result;
-using PDS.Witsml.Studio.Core.Runtime;
-using PDS.Witsml.Studio.Core.ViewModels;
-using PDS.Witsml.Studio.Core.Providers;
+using PDS.WITSMLstudio.Framework;
+using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.Models;
+using PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.Properties;
+using PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request;
+using PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Result;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
+using PDS.WITSMLstudio.Desktop.Core.ViewModels;
+using PDS.WITSMLstudio.Desktop.Core.Providers;
 
-namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels
+namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
 {
     /// <summary>
     /// Manages the behavior of the main user interface for the Witsml Browser plug-in.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Conductor{IScreen}.Collection.AllActive" />
-    /// <seealso cref="PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.IConnectionAware" />
-    /// <seealso cref="PDS.Witsml.Studio.Core.Providers.ISoapMessageHandler" />
+    /// <seealso cref="PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.IConnectionAware" />
+    /// <seealso cref="PDS.WITSMLstudio.Desktop.Core.Providers.ISoapMessageHandler" />
     /// <seealso cref="Caliburn.Micro.Conductor{IScreen}.Collection.AllActive" />
-    /// <seealso cref="PDS.Witsml.Studio.Core.ViewModels.IPluginViewModel" />
+    /// <seealso cref="PDS.WITSMLstudio.Desktop.Core.ViewModels.IPluginViewModel" />
     public sealed class MainViewModel : Conductor<IScreen>.Collection.AllActive, IPluginViewModel, IConnectionAware, ISoapMessageHandler
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(MainViewModel));

@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -20,7 +20,7 @@ using System;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace PDS.Witsml.Studio.Core.Converters
+namespace PDS.WITSMLstudio.Desktop.Core.Converters
 {
     /// <summary>
     /// Converts a boolean to its inverse value.

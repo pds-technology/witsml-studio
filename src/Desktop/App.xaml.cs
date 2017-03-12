@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -19,7 +19,7 @@
 using System.Windows;
 using Microsoft.Windows.Themes;
 
-namespace PDS.Witsml.Studio
+namespace PDS.WITSMLstudio.Desktop
 {
     /// <summary>
     /// Interaction logic for App.xaml

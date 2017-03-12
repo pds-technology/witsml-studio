@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -18,7 +18,7 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PDS.Witsml.Studio.ViewModels
+namespace PDS.WITSMLstudio.Desktop.ViewModels
 {
     [TestClass]
     public class ConnectionViewModelTests : ConnectionViewModelTestBase

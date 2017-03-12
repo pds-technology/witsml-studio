@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -19,9 +19,9 @@
 using System;
 using System.ComponentModel;
 using System.Windows;
-using PDS.Witsml.Studio.Core.ViewModels;
+using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 
-namespace PDS.Witsml.Studio.Core.Views
+namespace PDS.WITSMLstudio.Desktop.Core.Views
 {
     /// <summary>
     /// Interaction logic for ShellView.xaml

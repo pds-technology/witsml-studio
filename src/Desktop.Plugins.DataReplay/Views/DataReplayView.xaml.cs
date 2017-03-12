@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -31,7 +31,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PDS.Witsml.Studio.Plugins.DataReplay.Views
+namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Views
 {
     /// <summary>
     /// Interaction logic for DataReplayView.xaml

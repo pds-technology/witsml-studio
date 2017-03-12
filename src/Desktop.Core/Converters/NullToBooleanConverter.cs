@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -24,7 +24,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace PDS.Witsml.Studio.Core.Converters
+namespace PDS.WITSMLstudio.Desktop.Core.Converters
 {
     /// <summary>
     /// Converts an object to a Boolean using a null test.
@@ -32,7 +32,7 @@ namespace PDS.Witsml.Studio.Core.Converters
     /// <seealso cref="System.Windows.Data.IValueConverter" />
     public class NullToBooleanConverter : IValueConverter
     {
-        /// <summary>Initializes a new instance of the <see cref="T:PDS.Witsml.Studio.Core.Converters.NullToBooleanConverter" /> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="T:PDS.WITSMLstudio.Desktop.Core.Converters.NullToBooleanConverter" /> class.</summary>
         public NullToBooleanConverter()
         {
         }

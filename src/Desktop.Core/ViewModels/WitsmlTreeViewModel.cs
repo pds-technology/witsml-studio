@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -27,13 +27,13 @@ using Witsml131 = Energistics.DataAccess.WITSML131;
 using Witsml141 = Energistics.DataAccess.WITSML141;
 using Energistics.Datatypes;
 using Energistics.Datatypes.Object;
-using PDS.Framework;
-using PDS.Witsml.Linq;
-using PDS.Witsml.Query;
-using PDS.Witsml.Studio.Core.Connections;
-using PDS.Witsml.Studio.Core.Runtime;
+using PDS.WITSMLstudio.Framework;
+using PDS.WITSMLstudio.Linq;
+using PDS.WITSMLstudio.Query;
+using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
-namespace PDS.Witsml.Studio.Core.ViewModels
+namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 {
     /// <summary>
     /// Manages the display and interaction of the WITSML hierarchy view.

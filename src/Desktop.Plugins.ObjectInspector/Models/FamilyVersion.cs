@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -21,9 +21,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Energistics.DataAccess.Reflection;
-using PDS.Framework;
+using PDS.WITSMLstudio.Framework;
 
-namespace PDS.Witsml.Studio.Plugins.ObjectInspector.Models
+namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
 {
     /// <summary>
     /// Encapsulates the standard family and data schema version of objects to inspect.

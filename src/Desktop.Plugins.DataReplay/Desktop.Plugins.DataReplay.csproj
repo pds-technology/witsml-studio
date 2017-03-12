@@ -7,8 +7,8 @@
     <ProjectGuid>{4B191A5D-0F2F-4DF1-AAD3-C0F2BE0032D2}</ProjectGuid>
     <OutputType>library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PDS.Witsml.Studio.Plugins.DataReplay</RootNamespace>
-    <AssemblyName>PDS.Witsml.Studio.Plugins.DataReplay</AssemblyName>
+    <RootNamespace>PDS.WITSMLstudio.Desktop.Plugins.DataReplay</RootNamespace>
+    <AssemblyName>PDS.WITSMLstudio.Desktop.Plugins.DataReplay</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>

@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -21,12 +21,12 @@ using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using Energistics;
 
-namespace PDS.Witsml.Studio.Core.Connections
+namespace PDS.WITSMLstudio.Desktop.Core.Connections
 {
     /// <summary>
     /// Provides a connection test for a JWT Connection instance.
     /// </summary>
-    /// <seealso cref="PDS.Witsml.Studio.Core.Connections.IConnectionTest" />
+    /// <seealso cref="PDS.WITSMLstudio.Desktop.Core.Connections.IConnectionTest" />
     [Export("Jwt", typeof(IConnectionTest))]
     public class JwtConnectionTest : IConnectionTest
     {

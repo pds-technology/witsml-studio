@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -21,10 +21,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Caliburn.Micro;
-using PDS.Framework;
-using PDS.Witsml.Studio.Core.ViewModels;
+using PDS.WITSMLstudio.Framework;
+using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 
-namespace PDS.Witsml.Studio.Core.Runtime
+namespace PDS.WITSMLstudio.Desktop.Core.Runtime
 {
     /// <summary>
     /// Defines properties and methods that can be used to interact with the current runtime environment (e.g. Desktop, Console, Test, etc.).

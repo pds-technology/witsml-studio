@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -18,7 +18,7 @@
 
 using Caliburn.Micro;
 
-namespace PDS.Witsml.Studio.Plugins.DataReplay.ViewModels
+namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels
 {
     public class DataReplayViewModel : Screen
     {

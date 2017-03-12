@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -18,13 +18,13 @@
 
 using Caliburn.Micro;
 
-namespace PDS.Witsml.Studio.Core.ViewModels
+namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 {
     /// <summary>
     /// An IPluginViewModel for testing.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    /// <seealso cref="PDS.Witsml.Studio.Core.ViewModels.IPluginViewModel" />
+    /// <seealso cref="PDS.WITSMLstudio.Desktop.Core.ViewModels.IPluginViewModel" />
     public sealed class ASecondViewModel : Screen, IPluginViewModel
     {
         /// <summary>

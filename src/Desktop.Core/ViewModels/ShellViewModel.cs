@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -24,11 +24,11 @@ using System.Linq;
 using System.Windows;
 using Caliburn.Micro;
 using Newtonsoft.Json;
-using PDS.Witsml.Studio.Core.Properties;
-using PDS.Witsml.Studio.Core.Runtime;
-using PDS.Witsml.Studio.Core.SaveWindowState;
+using PDS.WITSMLstudio.Desktop.Core.Properties;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
+using PDS.WITSMLstudio.Desktop.Core.SaveWindowState;
 
-namespace PDS.Witsml.Studio.Core.ViewModels
+namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 {
     /// <summary>
     /// Manages the main application user interface

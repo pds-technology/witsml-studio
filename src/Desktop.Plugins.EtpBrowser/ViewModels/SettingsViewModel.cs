@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -24,12 +24,12 @@ using Energistics;
 using Energistics.Common;
 using Energistics.Datatypes;
 using Energistics.Protocol.Core;
-using PDS.Witsml.Studio.Core.Connections;
-using PDS.Witsml.Studio.Core.Runtime;
-using PDS.Witsml.Studio.Core.ViewModels;
-using PDS.Witsml.Studio.Plugins.EtpBrowser.Models;
+using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
+using PDS.WITSMLstudio.Desktop.Core.ViewModels;
+using PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models;
 
-namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
+namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 {
     /// <summary>
     /// Manages the behavior of the settings view.

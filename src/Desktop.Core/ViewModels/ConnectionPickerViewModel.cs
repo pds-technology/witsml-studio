@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -23,12 +23,12 @@ using System.Linq;
 using System.Windows.Input;
 using Caliburn.Micro;
 using Newtonsoft.Json;
-using PDS.Framework;
-using PDS.Witsml.Studio.Core.Connections;
-using PDS.Witsml.Studio.Core.Properties;
-using PDS.Witsml.Studio.Core.Runtime;
+using PDS.WITSMLstudio.Framework;
+using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Desktop.Core.Properties;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
-namespace PDS.Witsml.Studio.Core.ViewModels
+namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 {
     /// <summary>
     /// Manages the behavior of the connection drop down list control.

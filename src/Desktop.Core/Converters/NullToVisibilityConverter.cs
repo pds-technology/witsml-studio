@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -21,7 +21,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace PDS.Witsml.Studio.Core.Converters
+namespace PDS.WITSMLstudio.Desktop.Core.Converters
 {
     /// <summary>
     /// Converts an object to a Visibility enumeration using a null test.
@@ -29,7 +29,7 @@ namespace PDS.Witsml.Studio.Core.Converters
     /// <seealso cref="System.Windows.Data.IValueConverter" />
     public class NullToVisibilityConverter : IValueConverter
     {
-        /// <summary>Initializes a new instance of the <see cref="T:PDS.Witsml.Studio.Core.Converters.NullToVisibilityConverter" /> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="T:PDS.WITSMLstudio.Desktop.Core.Converters.NullToVisibilityConverter" /> class.</summary>
         public NullToVisibilityConverter()
         {
         }

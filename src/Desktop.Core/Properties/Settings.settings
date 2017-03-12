@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="PDS.Witsml.Studio.Core.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="PDS.WITSMLstudio.Desktop.Core.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="PersistedDataFolderName" Type="System.String" Scope="Application">
@@ -11,9 +11,6 @@
     <Setting Name="ConnectionListBaseFileName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">ConnectionList.json</Value>
     </Setting>
-    <Setting Name="ApplicationTitle" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">PDS WITSML Studio</Value>
-    </Setting>
     <Setting Name="OnlineHelpUrl" Type="System.String" Scope="Application">
       <Value Profile="(Default)">https://witsml.pds.technology/docs/user-guide/</Value>
     </Setting>
@@ -22,6 +19,9 @@
     </Setting>
     <Setting Name="MaxChannelDataRows" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">5000</Value>
+    </Setting>
+    <Setting Name="ApplicationTitle" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">PDS WITSMLstudio Desktop</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -1,11 +1,11 @@
-﻿<UserControl x:Class="PDS.Witsml.Studio.Plugins.EtpBrowser.Views.HierarchyView"
+﻿<UserControl x:Class="PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Views.HierarchyView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:cal="http://www.caliburnproject.org"
-             xmlns:conv="clr-namespace:PDS.Witsml.Studio.Core.Converters;assembly=PDS.Witsml.Studio.Core"
-             xmlns:vm="clr-namespace:PDS.Witsml.Studio.Core.ViewModels;assembly=PDS.Witsml.Studio.Core"
+             xmlns:conv="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters;assembly=PDS.WITSMLstudio.Desktop.Core"
+             xmlns:vm="clr-namespace:PDS.WITSMLstudio.Desktop.Core.ViewModels;assembly=PDS.WITSMLstudio.Desktop.Core"
              mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="300">
     <UserControl.Resources>
         <conv:NullToBooleanConverter x:Key="NullToBooleanConverter" />

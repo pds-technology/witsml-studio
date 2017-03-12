@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -18,7 +18,7 @@
 
 using System.Runtime.Serialization;
 
-namespace PDS.Witsml.Studio.Core.SaveWindowState
+namespace PDS.WITSMLstudio.Desktop.Core.SaveWindowState
 {
     /// <summary>
     /// Defines properties that can be used to persist the current application environment settings.

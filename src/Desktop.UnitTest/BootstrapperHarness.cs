@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -22,12 +22,12 @@ using System.Linq;
 using System.Reflection;
 using Caliburn.Micro;
 
-namespace PDS.Witsml.Studio
+namespace PDS.WITSMLstudio.Desktop
 {
     /// <summary>
     /// Exposes protected bootstrapper methods for unit testing.
     /// </summary>
-    /// <seealso cref="PDS.Witsml.Studio.Bootstrapper" />
+    /// <seealso cref="PDS.WITSMLstudio.Desktop.Bootstrapper" />
     public class BootstrapperHarness : Bootstrapper
     {
         /// <summary>

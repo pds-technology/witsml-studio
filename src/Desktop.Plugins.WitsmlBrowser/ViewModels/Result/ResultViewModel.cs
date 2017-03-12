@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -18,10 +18,10 @@
 
 using Caliburn.Micro;
 using ICSharpCode.AvalonEdit.Document;
-using PDS.Witsml.Studio.Core.Runtime;
-using PDS.Witsml.Studio.Core.ViewModels;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
+using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 
-namespace PDS.Witsml.Studio.Plugins.WitsmlBrowser.ViewModels.Result
+namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Result
 {
     /// <summary>
     /// Manages the behavior for the query result UI elements.

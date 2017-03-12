@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -22,7 +22,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Interactivity;
 
-namespace PDS.Witsml.Studio.Core.Behaviors
+namespace PDS.WITSMLstudio.Desktop.Core.Behaviors
 {
     /// <summary>
     /// Manages the behavior of the context menu for a dropdown button control.

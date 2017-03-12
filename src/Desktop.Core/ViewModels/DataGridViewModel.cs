@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -21,15 +21,15 @@ using System.Data;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using Energistics.Datatypes;
-using PDS.Framework;
-using PDS.Witsml.Data.Channels;
-using PDS.Witsml.Studio.Core.Properties;
-using PDS.Witsml.Studio.Core.Runtime;
+using PDS.WITSMLstudio.Framework;
+using PDS.WITSMLstudio.Data.Channels;
+using PDS.WITSMLstudio.Desktop.Core.Properties;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using Xceed.Wpf.DataGrid;
 using Witsml131 = Energistics.DataAccess.WITSML131;
 using Witsml141 = Energistics.DataAccess.WITSML141;
 
-namespace PDS.Witsml.Studio.Core.ViewModels
+namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 {
     /// <summary>
     /// Manages the loading of data displayed in the data grid control.

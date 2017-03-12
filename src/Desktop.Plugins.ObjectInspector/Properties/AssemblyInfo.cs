@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -23,8 +23,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("PDS.Witsml.Studio.Plugins.ObjectInspector")]
-[assembly: AssemblyDescription("PDS WITSML Studio Object Inspector Plug-in")]
+[assembly: AssemblyTitle("PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector")]
+[assembly: AssemblyDescription("PDS WITSMLstudio Desktop Object Inspector Plug-in")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -34,5 +34,5 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("c17bf64b-b129-4cbc-91df-69f1ebd4365e")]
 
-[assembly: InternalsVisibleTo("PDS.Witsml.Studio.UnitTest")]
-[assembly: InternalsVisibleTo("PDS.Witsml.Studio.IntegrationTest")]
+[assembly: InternalsVisibleTo("PDS.WITSMLstudio.Desktop.UnitTest")]
+[assembly: InternalsVisibleTo("PDS.WITSMLstudio.Desktop.IntegrationTest")]

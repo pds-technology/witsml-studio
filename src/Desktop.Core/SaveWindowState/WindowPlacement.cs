@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -25,7 +25,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace PDS.Witsml.Studio.Core.SaveWindowState
+namespace PDS.WITSMLstudio.Desktop.Core.SaveWindowState
 {
     /// <summary>
     /// WINDOWPLACEMENT stores the position, size, and state of a window

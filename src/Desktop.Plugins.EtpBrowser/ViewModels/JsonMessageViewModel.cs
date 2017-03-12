@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------- 
-// PDS.Witsml.Studio, 2017.1
+// PDS WITSMLstudio Desktop, 2017.1
 //
 // Copyright 2017 Petrotechnical Data Systems
 // 
@@ -27,17 +27,17 @@ using Energistics.Common;
 using Energistics.Datatypes;
 using Energistics.Protocol.Core;
 using Newtonsoft.Json;
-using PDS.Witsml.Studio.Core.Connections;
-using PDS.Witsml.Studio.Core.Runtime;
-using PDS.Witsml.Studio.Core.ViewModels;
+using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
+using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 
-namespace PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels
+namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 {
     /// <summary>
     /// Manages the behavior of the JSON Message user interface elements.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    /// <seealso cref="PDS.Witsml.Studio.Plugins.EtpBrowser.ViewModels.ISessionAware" />
+    /// <seealso cref="PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels.ISessionAware" />
     public sealed class JsonMessageViewModel : Screen, ISessionAware
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(JsonMessageViewModel));
