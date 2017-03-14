@@ -78,8 +78,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.Providers
             if (ObjectTypes.Log.EqualsIgnoreCase(ObjectType))
                 return UpdateLogDataQuery(queryDoc, resultDoc);
 
+            if (ObjectTypes.Trajectory.EqualsIgnoreCase(ObjectType))
+                return UpdateTrajectoryQuery(queryDoc, resultDoc);
+
             return string.Empty;
-        }
+        }        
 
         private string UpdateLogDataQuery(XDocument queryDoc, XDocument resultDoc)
         {
@@ -150,6 +153,59 @@ namespace PDS.WITSMLstudio.Desktop.Core.Providers
 
             endDateTimeIndex.Value = string.Empty;
             queryLog.Elements().Where(e => !fields.Contains(e.Name.LocalName)).Remove();
+            QueryIn = queryDoc.ToString();
+            return QueryIn;
+        }
+
+        private string UpdateTrajectoryQuery(XDocument queryDoc, XDocument resultDoc)
+        {
+            const string mdMn = "mdMn";
+            const string mdMx = "mdMx";
+
+            var ns = queryDoc.Root?.GetDefaultNamespace();
+            var queryLog = queryDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == "trajectory");
+            var resultLog = resultDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == "trajectory");
+
+            var fields = new List<string>();
+
+            if (queryLog == null || resultLog == null)
+                return string.Empty;
+
+            fields.ForEach(x =>
+            {
+                if (queryLog.Elements().All(e => e.Name.LocalName != x))
+                    queryLog.Add(new XElement(ns + x));
+            });
+
+            var mdMaxResult = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == mdMx);
+            if (mdMaxResult != null)
+            {
+                fields.Add(mdMn);
+                fields.Add(mdMx);
+
+                var mdMaxQuery = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == mdMx);
+                if (mdMaxQuery == null)
+                    queryLog.AddFirst(new XElement(ns + mdMx));
+
+                var mdMinQuery = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == mdMn);
+                if (mdMinQuery != null)
+                {
+                    mdMinQuery.Value = mdMaxResult.Value;
+                }
+                else
+                {
+                    var mdMnElement = new XElement(ns + mdMn, mdMaxResult.Value);
+                    foreach (var attribute in mdMaxResult.Attributes())
+                    {
+                        mdMnElement.SetAttributeValue(attribute.Name, attribute.Value);
+                    }
+                    queryLog.AddFirst(mdMnElement);
+                }
+
+                mdMaxResult.Value = string.Empty;
+                queryLog.Elements().Where(e => !fields.Contains(e.Name.LocalName)).Remove();
+            }
+
             QueryIn = queryDoc.ToString();
             return QueryIn;
         }
