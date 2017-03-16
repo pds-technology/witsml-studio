@@ -133,7 +133,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
         /// <param name="connection">The connection.</param>
         public static void SetServerCertificateValidation(this Connection connection)
         {
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
 
             if (connection.AcceptInvalidCertificates)
                 ServicePointManager.ServerCertificateValidationCallback +=
