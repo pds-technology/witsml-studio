@@ -219,7 +219,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 var uri = new EtpUri(resource.Resource.Uri);
 
                 return !string.IsNullOrWhiteSpace(uri.ObjectId)
-                       && ObjectTypes.IsGrowingDataObject(uri.ObjectType);
+                       && ObjectTypes.IsGrowingDataObject(uri.ObjectType) 
+                       && uri.Version.Equals(OptionsIn.DataVersion.Version141.Value);
             }
         }
 
@@ -326,6 +327,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             var resource = Items.FindSelected();
             var uri = new EtpUri(resource.Resource.Uri);
+
+            // For 131 always perform requested for details
+            optionIn = uri.Version.Equals(OptionsIn.DataVersion.Version131.Value)
+                ? new OptionsIn[] { OptionsIn.ReturnElements.Requested }
+                : optionIn;
 
             Runtime.ShowBusy();
 
