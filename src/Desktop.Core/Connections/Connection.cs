@@ -16,6 +16,7 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System.Net;
 using System.Runtime.Serialization;
 using System.Security;
 using Caliburn.Micro;
@@ -42,6 +43,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
         /// </summary>
         public Connection()
         {
+            SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
             IsAuthenticationBasic = true;
             ProxyPort = 80;
             RedirectPort = 9005;
@@ -65,6 +67,26 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
                 {
                     _authenticationType = value;
                     NotifyOfPropertyChange(() => AuthenticationType);
+                }
+            }
+        }
+
+        private SecurityProtocolType _securityProtocol;
+
+        /// <summary>
+        /// Gets or sets the security protocol.
+        /// </summary>
+        /// <value>The security protocol.</value>
+        [DataMember]
+        public SecurityProtocolType SecurityProtocol
+        {
+            get { return _securityProtocol; }
+            set
+            {
+                if (_securityProtocol != value)
+                {
+                    _securityProtocol = value;
+                    NotifyOfPropertyChange(() => SecurityProtocol);
                 }
             }
         }
@@ -387,7 +409,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
         /// </returns>
         public override string ToString()
         {
-            return $"Uri: {Uri}; Username: {Username}; AuthenticationType: {AuthenticationType};" +
+            return $"Uri: {Uri}; Username: {Username}; AuthenticationType: {AuthenticationType}; SecurityProtocol: {SecurityProtocol};" +
                    $" ProxyHost: {ProxyHost}; ProxyPort: {ProxyPort}; ProxyUsername: {ProxyUsername};" +
                    (!string.IsNullOrWhiteSpace(SubProtocol) ? $" SubProtocol: {SubProtocol};" : string.Empty) +
                    (!string.IsNullOrWhiteSpace(EtpEncoding) ? $" EtpEncoding: {EtpEncoding};" : string.Empty);

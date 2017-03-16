@@ -122,6 +122,33 @@
                 </Grid>
             </TabItem>
 
+            <TabItem Header="Security">
+
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="SSL Protocols:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <StackPanel Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" Margin="5" Orientation="Vertical" VerticalAlignment="Top">
+                        <ListBox ItemsSource="{Binding SecurityProtocols}" Padding="5">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected, Mode=TwoWay}" IsEnabled="{Binding IsEnabled}" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
             <TabItem Header="WebSocket" Visibility="{Binding IsEtpConnection, Converter={StaticResource BooleanToVisibilityConverter}}">
 
                 <Grid Margin="5">

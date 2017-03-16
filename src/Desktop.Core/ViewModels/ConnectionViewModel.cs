@@ -19,6 +19,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -28,6 +29,7 @@ using log4net.Appender;
 using Newtonsoft.Json;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Desktop.Core.Properties;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
@@ -59,6 +61,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             IsEtpConnection = connectionType == ConnectionTypes.Etp;
             DisplayName = $"{ConnectionType.ToString().ToUpper()} Connection";
             CanTestConnection = true;
+
+            SecurityProtocols = new BindableCollection<SecurityProtocolItem>
+            {
+                new SecurityProtocolItem(SecurityProtocolType.Tls12, "TLS 1.2"),
+                new SecurityProtocolItem(SecurityProtocolType.Tls11, "TLS 1.1"),
+                new SecurityProtocolItem(SecurityProtocolType.Tls, "TLS 1.0"),
+                new SecurityProtocolItem(SecurityProtocolType.Ssl3, "SSL 3.0")
+            };
         }
 
         /// <summary>
@@ -77,6 +87,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         /// <value>The list of connection names.</value>
         public string[] ConnectionNames { get; set; }
+
+        /// <summary>
+        /// Gets the collection of all security protocols.
+        /// </summary>
+        /// <value>The collection of security protocols.</value>
+        public BindableCollection<SecurityProtocolItem> SecurityProtocols { get; }
 
         /// <summary>
         /// Gets a value indicating whether the connection type is ETP.
@@ -209,7 +225,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 DataItem = new Connection()
             };
-            // Capture window location
 
             if (Runtime.ShowDialog(viewModel, 10, 10)) 
             {
@@ -314,6 +329,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 return;
             }
 
+            // Reset saved SSL protocol
+            EditItem.SecurityProtocol = 0;
+
+            // Get selected SSL protocols
+            SecurityProtocols
+                .Where(x => x.IsEnabled && x.IsSelected)
+                .ForEach(x => EditItem.SecurityProtocol |= x.Protocol);
+
             TestConnection()
                 .ContinueWith(x =>
                 {
@@ -407,7 +430,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 EditItem = OpenConnectionFile() ?? new Connection();
             }
+
             EditItem.PropertyChanged += EditItem_PropertyChanged;
+
+            // Set selected SSL protocols
+            SecurityProtocols
+                .Where(x => x.IsEnabled)
+                .ForEach(x => x.IsSelected = EditItem.SecurityProtocol.HasFlag(x.Protocol));
         }
 
         /// <summary>
