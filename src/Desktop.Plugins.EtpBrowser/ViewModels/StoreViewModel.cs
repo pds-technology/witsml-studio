@@ -120,7 +120,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 }
             }
         }
-        
+
         /// <summary>
         /// Generates a new UUID value.
         /// </summary>
@@ -209,7 +209,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void DeleteObject()
         {
-            if (System.Windows.MessageBox.Show("Are you sure you want to delete this object?", "Confirm", System.Windows.MessageBoxButton.YesNo) != System.Windows.MessageBoxResult.Yes) 
+            if (System.Windows.MessageBox.Show("Are you sure you want to delete this object?", "Confirm", System.Windows.MessageBoxButton.YesNo) != System.Windows.MessageBoxResult.Yes)
                 return;
 
             if (!string.IsNullOrWhiteSpace(Model.Store.Uri))
@@ -302,7 +302,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         private void UpdateInput(bool fromXml = true)
-        {            
+        {
             var input = Data.Document.Text;
             if (string.IsNullOrWhiteSpace(input))
             {
@@ -335,12 +335,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 var nameElement = dataObject?.Element(ns + "name");
                 match = CheckInputDataXmlMatch(dataObject, version.Value, "uid", nameElement);
 
-                if(!match)
+                if (!match)
                     UpdateInput(dataObject, version.Value, "uid", nameElement, fromXml);
             }
             else
             {
-                var schemaVersion = root.Attribute("schemaVersion");
+                var schemaVersion = OptionsIn.DataVersion.Version200;
                 if (string.IsNullOrWhiteSpace(schemaVersion?.Value)) return;
 
                 var nameElement = root
@@ -360,7 +360,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 Data.SetText(doc.ToString());
             }
         }
-               
+
         private void UpdateInput(XElement element, string version, string idField, XElement nameElement, bool fromXml)
         {
             try
@@ -370,7 +370,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
                 if (string.IsNullOrEmpty(objectType)) return;
 
-                Model.Store.ContentType = new EtpContentType(EtpContentTypes.Witsml141.Family, version, objectType);
+                var uri = GetUriFromXml(element, version, objectType)?.Uri;
+
+                Model.Store.ContentType = !string.IsNullOrEmpty(uri)
+                    ? new EtpUri(uri).ContentType
+                    : new EtpContentType(EtpContentTypes.Witsml141.Family, version, objectType);
 
                 var idAttribute = element.Attribute(idField);
 
@@ -401,8 +405,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 }
                 else Model.Store.Name = null;
 
-                var uri = GetUriFromXml(element, version, objectType)?.Uri;
-                
+
                 if (!IsUriMatch(Model.Store.Uri, uri))
                     if (fromXml || isXmlUpdated)
                         Model.Store.Uri = uri;
@@ -418,7 +421,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                             if (xAttribute != null)
                             {
                                 xAttribute.Value = x.ObjectId;
-                                if(etpUri.ObjectType == x.ObjectType)
+                                if (etpUri.ObjectType == x.ObjectType)
                                     Model.Store.Uuid = x.ObjectId;
                             }
                         });
