@@ -192,6 +192,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <param name="reader">The reader.</param>
         private void SetChannelData(ChannelDataReader reader)
         {
+            // There's nothing to do if the reader is null.
+            if (reader == null)
+                return;
+
             try
             {
                 // For performance, only load data grid if below the max number of allowed rows
