@@ -299,20 +299,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <param name="text">The text.</param>
         public void SetText(string text)
         {
-            if (!string.IsNullOrWhiteSpace(text) && IsPrettyPrintAllowed && IsPrettyPrintEnabled)
-            {
-                try
-                {
-                    text = XDocument.Parse(text).ToString();
-                }
-                catch (Exception ex)
-                {
-                    var crlf = Environment.NewLine;
-                    _log.Warn($"Error parsing XML:{crlf}{text}{crlf}{crlf}{ex}");
-                }
-            }
-
-            Runtime.Invoke(() => Document.Text = text, DispatcherPriority.Send);
+            Runtime.Invoke(() => Document.Text = Format(text), DispatcherPriority.Send);
         }
 
         /// <summary>
@@ -321,10 +308,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <param name="text">The text to append.</param>
         public void Append(string text)
         {
-            Runtime.Invoke(() =>
-            {
-                Document.Insert(Document.TextLength, text);
-            });
+            Runtime.Invoke(() => Document.Insert(Document.TextLength, Format(text)));
         }
 
         /// <summary>
@@ -413,6 +397,29 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 control.ScrollToEnd();
             }
+        }
+
+        /// <summary>
+        /// Formats the specified text.
+        /// </summary>
+        /// <param name="text">The text.</param>
+        /// <returns>The formatted text.</returns>
+        private string Format(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text) || !IsPrettyPrintAllowed || !IsPrettyPrintEnabled)
+                return text;
+
+            try
+            {
+                text = XDocument.Parse(text).ToString();
+            }
+            catch (Exception ex)
+            {
+                var crlf = Environment.NewLine;
+                _log.Warn($"Error parsing XML:{crlf}{text}{crlf}{crlf}{ex}");
+            }
+
+            return text;
         }
     }
 }
