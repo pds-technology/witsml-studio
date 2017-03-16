@@ -219,7 +219,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 var uri = new EtpUri(resource.Resource.Uri);
 
                 return !string.IsNullOrWhiteSpace(uri.ObjectId)
-                       && ObjectTypes.IsGrowingDataObject(uri.ObjectType);
+                       && ObjectTypes.IsGrowingDataObject(uri.ObjectType) 
+                       && uri.Version.Equals(OptionsIn.DataVersion.Version141.Value);
             }
         }
 
