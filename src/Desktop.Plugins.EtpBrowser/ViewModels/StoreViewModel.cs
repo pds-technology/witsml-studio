@@ -57,6 +57,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 IsPrettyPrintAllowed = true
             };
             Data.Document.Changed += OnDataObjectChanged;
+            ResetDataEditorBorderColor();
         }
 
         /// <summary>
@@ -117,6 +118,30 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 {
                     _canExecute = value;
                     NotifyOfPropertyChange(() => CanExecute);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The data editor border color
+        /// </summary>
+        private string _dataEditorBorderColor;
+
+        /// <summary>
+        /// Gets or sets the color of the data editor border.
+        /// </summary>
+        /// <value>
+        /// The color of the data editor border.
+        /// </value>
+        public string DataEditorBorderColor
+        {
+            get { return _dataEditorBorderColor; }
+            set
+            {
+                if (_dataEditorBorderColor != value)
+                {
+                    _dataEditorBorderColor = value;
+                    NotifyOfPropertyChange(() => DataEditorBorderColor);
                 }
             }
         }
@@ -230,6 +255,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             Model.Store.Name = emptyString;
             Model.Store.ContentType = emptyString;
             Data.SetText(emptyString);
+            ResetDataEditorBorderColor();
         }
 
         /// <summary>
@@ -301,6 +327,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 Model.Store.PropertyChanged += StoreSettingsModel_PropertyChanged;
         }
 
+        private void ResetDataEditorBorderColor() => DataEditorBorderColor = "#FFABADB3";
+
         private void UpdateInput(bool fromXml = true)
         {
             var input = Data.Document.Text;
@@ -313,41 +341,62 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             try
             {
                 doc = WitsmlParser.Parse(input);
+                ResetDataEditorBorderColor();
+                
             }
             catch (Exception ex)
             {
                 _log.Warn("Error parsing data object XML", ex);
+                DataEditorBorderColor = "#FFFF0000";
                 return;
             }
 
             var root = doc.Root;
             if (root == null) return;
 
-            var ns = root.GetDefaultNamespace();
             var version = root.Attribute("version");
             var match = false;
 
             if (version != null)
             {
+                var ns = root.GetDefaultNamespace();
+
                 if (string.IsNullOrWhiteSpace(version.Value)) return;
 
                 var dataObject = root.Elements().FirstOrDefault();
                 var nameElement = dataObject?.Element(ns + "name");
+
+                if (nameElement == null)
+                {
+                    nameElement = new XElement(ns + "name");
+                    dataObject?.AddFirst(nameElement);
+                }
+
                 match = CheckInputDataXmlMatch(dataObject, version.Value, "uid", nameElement);
 
                 if (!match)
                     UpdateInput(dataObject, version.Value, "uid", nameElement, fromXml);
             }
             else
-            {
+            {                
                 var schemaVersion = OptionsIn.DataVersion.Version200;
                 if (string.IsNullOrWhiteSpace(schemaVersion?.Value)) return;
 
-                var nameElement = root
+                var citationRoot = root
                     .Elements()
-                    .Where(e => e.Name.LocalName == "Citation")
-                    .Elements()
+                    .FirstOrDefault(e => e.Name.LocalName == "Citation");
+
+                var nameElement = citationRoot
+                    ?.Elements()
                     .FirstOrDefault(e => e.Name.LocalName == "Title");
+
+                var ns = citationRoot?.GetDefaultNamespace();
+
+                if (ns != null && nameElement == null)
+                {
+                    nameElement = new XElement(ns + "Title");
+                    citationRoot.AddFirst(nameElement);
+                }
 
                 match = CheckInputDataXmlMatch(root, schemaVersion.Value, "uuid", nameElement);
 
@@ -403,8 +452,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                             Model.Store.Name = nameElement.Value;
                         else nameElement.Value = Model.Store.Name;
                 }
-                else Model.Store.Name = null;
 
+                uri = GetUriFromXml(element, version, objectType)?.Uri;
 
                 if (!IsUriMatch(Model.Store.Uri, uri))
                     if (fromXml || isXmlUpdated)

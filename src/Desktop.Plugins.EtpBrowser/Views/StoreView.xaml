@@ -44,7 +44,7 @@
 
         <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3"  Text="Data Object (XML):" Margin="10,5,5,5" HorizontalAlignment="Left" VerticalAlignment="Bottom" />
 
-        <Border Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" BorderThickness="1" BorderBrush="#FFABADB3">
+        <Border Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" BorderThickness="1" BorderBrush="{Binding DataEditorBorderColor}">
             <ContentControl x:Name="Data" />
         </Border>
 
