@@ -340,7 +340,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             TestConnection()
                 .ContinueWith(x =>
                 {
-                    if (x.Result)
+                    if (x.Result || Runtime.Invoke(() => Runtime.ShowConfirm("Connection failed.\n\nDo you wish to save the connection settings anyway?", MessageBoxButton.YesNo)))
                     {
                         AcceptConnectionChanges();
                     }

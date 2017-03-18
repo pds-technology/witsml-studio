@@ -148,7 +148,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// <returns><c>true</c> if the user clicks OK/Yes; otherwise, <c>false</c>.</returns>
         public bool ShowConfirm(string message, MessageBoxButton buttons = MessageBoxButton.OKCancel)
         {
-            var result = MessageBox.Show(Application.Current.MainWindow, message, "Confirm", buttons, MessageBoxImage.Question);
+            var result = MessageBox.Show(GetActiveWindow(), message, "Confirm", buttons, MessageBoxImage.Question);
             return (result == MessageBoxResult.OK || result == MessageBoxResult.Yes);
         }
 
@@ -203,7 +203,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
                 message = string.Format("{0}{2}{2}{1}", message, error.Message, Environment.NewLine);
             }
 #endif
-            MessageBox.Show(Application.Current.MainWindow, message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(GetActiveWindow(), message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         /// <summary>
@@ -212,7 +212,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// <param name="message">The message.</param>
         public void ShowInfo(string message)
         {
-            MessageBox.Show(Application.Current.MainWindow, message, "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(GetActiveWindow(), message, "Information", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         /// <summary>
