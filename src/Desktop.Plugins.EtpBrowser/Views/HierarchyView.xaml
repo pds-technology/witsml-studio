@@ -32,7 +32,7 @@
             </TreeView.ItemContainerStyle>
             <TreeView.Resources>
                 <HierarchicalDataTemplate DataType="{x:Type vm:ResourceViewModel}" ItemsSource="{Binding Children}">
-                    <TextBlock Text="{Binding Resource.Name}" />
+                    <TextBlock Text="{Binding DisplayName}" />
                 </HierarchicalDataTemplate>
             </TreeView.Resources>
             <TreeView.ContextMenu>

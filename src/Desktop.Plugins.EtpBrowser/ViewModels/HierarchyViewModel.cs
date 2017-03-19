@@ -23,10 +23,10 @@ using Caliburn.Micro;
 using Energistics.Common;
 using Energistics.Datatypes;
 using Energistics.Protocol.Core;
-using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
+using PDS.WITSMLstudio.Framework;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 {
@@ -36,12 +36,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
     /// <seealso cref="Caliburn.Micro.Screen" />
     public sealed class HierarchyViewModel : Screen, ISessionAware
     {
-        private static readonly string[] _describeObjectTypes =
-        {
-            ObjectTypes.Well, ObjectTypes.Wellbore, ObjectTypes.Log, ObjectTypes.LogCurveInfo,
-            ObjectTypes.ChannelSet, ObjectTypes.Channel, ObjectTypes.Message
-        };
-
         /// <summary>
         /// Initializes a new instance of the <see cref="HierarchyViewModel"/> class.
         /// </summary>
@@ -155,8 +149,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
                 if (CanExecute && !string.IsNullOrWhiteSpace(resource?.Resource?.Uri))
                 {
-                    var uri = new EtpUri(resource.Resource.Uri);
-                    return uri.IsBaseUri || _describeObjectTypes.ContainsIgnoreCase(uri.ObjectType);
+                    return resource.Resource.ChannelSubscribable;
                 }
 
                 return false;
@@ -177,7 +170,22 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <value>
         /// <c>true</c> if this instance can be refreshed; otherwise, <c>false</c>.
         /// </value>
-        public bool CanRefreshSelected => CanCopyUriToStreaming;
+        public bool CanRefreshSelected
+        {
+            get
+            {
+                var resource = Parent.SelectedResource;
+
+                if (CanExecute && !string.IsNullOrWhiteSpace(resource?.Resource?.Uri))
+                {
+                    return resource.Resource.HasChildren != 0 ||
+                           ResourceTypes.Folder.ToString().EqualsIgnoreCase(resource.Resource.ResourceType) ||
+                           ResourceTypes.DecoratorFolder.ToString().EqualsIgnoreCase(resource.Resource.ResourceType);
+                }
+
+                return false;
+            }
+        }
 
         /// <summary>
         /// Refreshes the selected node.
@@ -186,8 +194,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             var resource = Parent.Resources.FindSelected();
             // Return if there is nothing currently selected
-            if (resource == null)
-                return;
+            if (resource == null) return;
+
             resource.ClearAndLoadChildren();
             // Expand the node if it wasn't previously
             resource.IsExpanded = true;

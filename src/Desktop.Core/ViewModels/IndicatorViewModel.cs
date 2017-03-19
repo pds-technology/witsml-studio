@@ -26,6 +26,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
     /// <seealso cref="Caliburn.Micro.PropertyChangedBase" />
     public class IndicatorViewModel : PropertyChangedBase
     {
+        private const string Transparent = "Transparent";
+
         private bool _isVisible;
         /// <summary>
         /// Gets or sets a value whether indicator is visible.
@@ -49,9 +51,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Gets or sets the indicator tootip.
         /// </summary>
-        /// <value>
-        /// The indicator tooltip.
-        /// </value>
+        /// <value>The indicator tooltip.</value>
         public string Tooltip
         {
             get { return _tooltip; }
@@ -70,12 +70,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Gets or sets the indicator color.
         /// </summary>
-        /// <value>
-        /// The indicator color.
-        /// </value>
+        /// <value>The indicator color.</value>
         public string Color
         {
-            get { return _color; }
+            get { return _color ?? Transparent; }
             set
             {
                 if (_color != value)

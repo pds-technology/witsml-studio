@@ -30,13 +30,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
     public class ResourceViewModel : PropertyChangedBase
     {
         /// <summary>The placeholder resource.</summary>
-        public static readonly ResourceViewModel Placeholder = new ResourceViewModel(new Resource() { Name = "loading..." })
+        public static readonly ResourceViewModel Placeholder = new ResourceViewModel(new Resource { Name = "loading..." })
         {
             _isPlaceholder = true
         };
 
         /// <summary>The no data resource.</summary>
-        public static readonly ResourceViewModel NoData = new ResourceViewModel(new Resource() { Name = "(no data)" })
+        public static readonly ResourceViewModel NoData = new ResourceViewModel(new Resource { Name = "(no data)" })
         {
             _isPlaceholder = true
         };
@@ -75,7 +75,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Gets the collection of child resources.
         /// </summary>
         /// <value>The children.</value>
-        public BindableCollection<ResourceViewModel> Children { get; private set; }
+        public BindableCollection<ResourceViewModel> Children { get; }
 
         /// <summary>
         /// Gets the Indicator
@@ -83,13 +83,16 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public IndicatorViewModel Indicator { get; set; }
 
         /// <summary>
+        /// Gets the display name.
+        /// </summary>
+        /// <value>The display name.</value>
+        public string DisplayName => Resource.HasChildren > 0 ? $"{Resource.Name} ({Resource.HasChildren})" : Resource.Name;
+
+        /// <summary>
         /// Gets a value indicating whether this instance has a placeholder element.
         /// </summary>
         /// <value><c>true</c> if this instance has placeholder; otherwise, <c>false</c>.</value>
-        public bool HasPlaceholder
-        {
-            get { return Children.Count == 1 && Children[0]._isPlaceholder; }
-        }
+        public bool HasPlaceholder => Children.Count == 1 && Children[0]._isPlaceholder;
 
         /// <summary>
         /// Gets or sets the action method used to load child resources.
@@ -138,15 +141,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
         }
 
-        /// <summary>
-        /// Removes the children and loads children.
-        /// </summary>
-        public void ClearAndLoadChildren()
-        {
-            Children.Clear();
-            Task.Run(() => MessageId = LoadChildren(Resource.Uri));
-        }
-
         private bool _isSelected;
         /// <summary>
         /// Gets or sets a value indicating whether this instance is selected.
@@ -163,6 +157,15 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                     NotifyOfPropertyChange(() => IsSelected);
                 }
             }
-        }        
+        }
+
+        /// <summary>
+        /// Removes the children and loads children.
+        /// </summary>
+        public void ClearAndLoadChildren()
+        {
+            Children.Clear();
+            Task.Run(() => MessageId = LoadChildren(Resource.Uri));
+        }
     }
 }
