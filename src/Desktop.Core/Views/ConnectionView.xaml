@@ -12,6 +12,7 @@
 
     <Window.Resources>
         <conv:NullToBooleanConverter x:Key="NullToBooleanConverter" />
+        <conv:BooleanInverseConverter x:Key="BooleanInverseConverter" />
         <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
 
@@ -50,7 +51,8 @@
                         <RadioButton Content="Basic" VerticalAlignment="Center" IsChecked="{Binding EditItem.IsAuthenticationBasic}" Margin="0,0,20,0" />
                         <RadioButton Content="Bearer" VerticalAlignment="Center" IsChecked="{Binding EditItem.IsAuthenticationBearer}" Margin="0,0,10,0" />
                         <Button x:Name="GetJsonWebToken"  Content="..." ToolTip="Click to retrieve a JSON Web Token from a Token Provider Service" VerticalAlignment="Center" Margin="0,0,120,0" Width="25" IsEnabled="{Binding EditItem.IsAuthenticationBearer}" />
-                        <CheckBox Content="Accept Invalid Certificates" VerticalAlignment="Center" IsChecked="{Binding EditItem.AcceptInvalidCertificates}" />
+                        <CheckBox Content="Pre-Authenticate" VerticalAlignment="Center" IsChecked="{Binding EditItem.PreAuthenticate}"
+                                  IsEnabled="{Binding IsEtpConnection, Converter={StaticResource BooleanInverseConverter}}" />
                     </StackPanel>
 
                     <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding EditItem.IsAuthenticationBasic, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -127,6 +129,7 @@
                 <Grid Margin="5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="5" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="40" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
@@ -136,8 +139,8 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="SSL Protocols:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                    <StackPanel Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" Margin="5" Orientation="Vertical" VerticalAlignment="Top">
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="SSL Protocols:" Margin="5" VerticalAlignment="Top" HorizontalAlignment="Right" />
+                    <StackPanel Grid.Row="1" Grid.Column="1" Margin="5" Orientation="Vertical" VerticalAlignment="Top">
                         <ListBox ItemsSource="{Binding SecurityProtocols}" Padding="5">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
@@ -146,6 +149,10 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
                     </StackPanel>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <CheckBox Grid.Row="2" Grid.Column="1" Margin="5,0,0,0" Content="Accept Invalid Certificates" VerticalAlignment="Center"
+                              IsChecked="{Binding EditItem.AcceptInvalidCertificates}" />
                 </Grid>
             </TabItem>
 

@@ -59,8 +59,16 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
 
             if (!string.IsNullOrWhiteSpace(connection.Username))
             {
-                proxy.Username = connection.Username;
-                proxy.SetSecurePassword(connection.SecurePassword);
+                if (connection.PreAuthenticate)
+                {
+                    proxy.Headers = connection.GetAuthorizationHeader();
+                    proxy.IsPreAuthenticationEnabled = connection.PreAuthenticate;
+                }
+                else
+                {
+                    proxy.Username = connection.Username;
+                    proxy.SetSecurePassword(connection.SecurePassword);
+                }
             }
 
             return proxy;
@@ -109,9 +117,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
         /// <returns>An <see cref="Energistics.EtpClient"/> instance.</returns>
         public static EtpClient CreateEtpClient(this Connection connection, string applicationName, string applicationVersion)
         {
-            var headers = connection.IsAuthenticationBasic
-                   ? Energistics.Security.Authorization.Basic(connection.Username, connection.Password)
-                   : Energistics.Security.Authorization.Bearer(connection.JsonWebToken);
+            var headers = connection.GetAuthorizationHeader();
 
             connection.UpdateEtpSettings(headers);
             connection.SetServerCertificateValidation();
@@ -125,6 +131,18 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
             }
 
             return client;
+        }
+
+        /// <summary>
+        /// Gets the authorization header for the current connection.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <returns>The authorization header, as a dictionary.</returns>
+        public static IDictionary<string, string> GetAuthorizationHeader(this Connection connection)
+        {
+            return connection.IsAuthenticationBasic
+                   ? Energistics.Security.Authorization.Basic(connection.Username, connection.Password)
+                   : Energistics.Security.Authorization.Bearer(connection.JsonWebToken);
         }
 
         /// <summary>

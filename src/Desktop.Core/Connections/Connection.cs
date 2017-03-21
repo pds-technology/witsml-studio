@@ -16,6 +16,7 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Net;
 using System.Runtime.Serialization;
 using System.Security;
@@ -351,6 +352,28 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
                 {
                     _acceptInvalidCertificates = value;
                     NotifyOfPropertyChange(() => AcceptInvalidCertificates);
+                }
+            }
+        }
+
+        private bool _preAuthenticate;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to pre-authenticate.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if pre-authenticate; otherwise, <c>false</c>.
+        /// </value>
+        [DataMember]
+        public bool PreAuthenticate
+        {
+            get { return _preAuthenticate; }
+            set
+            {
+                if (_preAuthenticate != value)
+                {
+                    _preAuthenticate = value;
+                    NotifyOfPropertyChange(() => PreAuthenticate);
                 }
             }
         }
