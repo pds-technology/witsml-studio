@@ -100,6 +100,20 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
+        /// Adds the content type to the collection of content types.
+        /// </summary>
+        public void Add()
+        {
+            var contentType = Model.StoreNotification.ContentType;
+
+            if (string.IsNullOrWhiteSpace(contentType) || Model.StoreNotification.ObjectTypes.Contains(contentType))
+                return;
+
+            Model.StoreNotification.ObjectTypes.Add(contentType);
+            Model.StoreNotification.ContentType = string.Empty;
+        }
+
+        /// <summary>
         /// Submits a message to an ETP server.
         /// </summary>
         public void SendRequest()
@@ -131,10 +145,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void ClearInputs()
         {
-            var emptyString = string.Empty;
-
-            Model.StoreNotification.Uri = emptyString;
-            Model.StoreNotification.Uuid = emptyString;
+            Model.StoreNotification.Uri = string.Empty;
+            Model.StoreNotification.Uuid = string.Empty;
+            Model.StoreNotification.ContentType = string.Empty;
             Model.StoreNotification.StartTime = DateTime.UtcNow;
             Model.StoreNotification.IncludeObjectData = false;
             Model.StoreNotification.ObjectTypes.Clear();
