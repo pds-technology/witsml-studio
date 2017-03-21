@@ -47,8 +47,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
             Container = container;
 
             var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            //DataFolderPath = $"{appDataPath}\\PDS.WITSMLstudio.Desktop\\{_persistedDataFolderName}";
-            DataFolderPath = $"{appDataPath}\\PDS.Witsml.Studio\\{_persistedDataFolderName}";
+            DataFolderPath = $"{appDataPath}\\PDS.WITSMLstudio\\{_persistedDataFolderName}";
         }
 
         /// <summary>

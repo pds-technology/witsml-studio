@@ -262,14 +262,29 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             if (_windowSettings != null) return;
 
-            if (!Directory.Exists(Runtime.DataFolderPath))
-                Directory.CreateDirectory(Runtime.DataFolderPath);
+            EnsureDataFolder();
 
             var settingsPath = $"{Runtime.DataFolderPath}\\{_windowSettingsFileName}";
             if (!File.Exists(settingsPath)) return;
 
             var json = File.ReadAllText(settingsPath);
             _windowSettings = JsonConvert.DeserializeObject<WindowSettings>(json);
+        }
+
+        private void EnsureDataFolder()
+        {
+            var dataFolder = Runtime.DataFolderPath;
+
+            if (!Directory.Exists(dataFolder))
+            {
+                var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                var oldDataFolderPath = Path.Combine(appDataPath, "PDS.Witsml.Studio");
+
+                if (Directory.Exists(oldDataFolderPath))
+                    Directory.Move(oldDataFolderPath, Directory.GetParent(dataFolder).FullName);
+                else
+                    Directory.CreateDirectory(dataFolder);
+            }
         }
     }
 }
