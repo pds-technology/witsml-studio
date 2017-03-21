@@ -138,25 +138,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
-        /// Determines whether the ChannelDescribe message can be sent for the selected resource.
-        /// </summary>
-        /// <value><c>true</c> if the channels can be described; otherwise, <c>false</c>.</value>
-        public bool CanCopyUriToStreaming
-        {
-            get
-            {
-                var resource = Parent.SelectedResource;
-
-                if (CanExecute && !string.IsNullOrWhiteSpace(resource?.Resource?.Uri))
-                {
-                    return resource.Resource.ChannelSubscribable;
-                }
-
-                return false;
-            }
-        }
-
-        /// <summary>
         /// Refreshes the hierarchy.
         /// </summary>
         public void RefreshHierarchy()
@@ -223,14 +204,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public bool CanCopyUriToClipboard => CanGetObject;
 
         /// <summary>
-        /// Gets a value indicating whether this instance can copy URI to store.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> if this instance can copy URI to store; otherwise, <c>false</c>.
-        /// </value>
-        public bool CanCopyUriToStore => CanGetObject;
-
-        /// <summary>
         /// Copies the URI to clipboard.
         /// </summary>
         public void CopyUriToClipboard()
@@ -242,6 +215,14 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
             Clipboard.SetText(resource.Resource.Uri);
         }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance can copy URI to store.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if this instance can copy URI to store; otherwise, <c>false</c>.
+        /// </value>
+        public bool CanCopyUriToStore => CanGetObject;
 
         /// <summary>
         /// Copies the URI to store.
@@ -261,6 +242,25 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
+        /// Determines whether the ChannelDescribe message can be sent for the selected resource.
+        /// </summary>
+        /// <value><c>true</c> if the channels can be described; otherwise, <c>false</c>.</value>
+        public bool CanCopyUriToStreaming
+        {
+            get
+            {
+                var resource = Parent.SelectedResource;
+
+                if (CanExecute && !string.IsNullOrWhiteSpace(resource?.Resource?.Uri))
+                {
+                    return resource.Resource.ChannelSubscribable;
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Copies the URI to streaming.
         /// </summary>
         public void CopyUriToStreaming()
@@ -272,6 +272,40 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             {
                 Model.Streaming.Uri = resource.Resource.Uri;
                 viewModel.AddUri();
+                Parent.ActivateItem(viewModel);
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the NotificationRequest message can be sent for the selected resource.
+        /// </summary>
+        /// <value><c>true</c> if the object is notifiable; otherwise, <c>false</c>.</value>
+        public bool CanCopyUriToNotification
+        {
+            get
+            {
+                var resource = Parent.SelectedResource;
+
+                if (CanExecute && !string.IsNullOrWhiteSpace(resource?.Resource?.Uri))
+                {
+                    return resource.Resource.ObjectNotifiable;
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Copies the URI to the Notification tab.
+        /// </summary>
+        public void CopyUriToNotification()
+        {
+            var viewModel = Parent.Items.OfType<StoreNotificationViewModel>().FirstOrDefault();
+            var resource = Parent.SelectedResource;
+
+            if (viewModel != null && resource != null)
+            {
+                Model.StoreNotification.Uri = resource.Resource.Uri;
                 Parent.ActivateItem(viewModel);
             }
         }

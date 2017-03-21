@@ -30,7 +30,6 @@ using Energistics.Protocol.ChannelStreaming;
 using Energistics.Protocol.Core;
 using Energistics.Protocol.Discovery;
 using Energistics.Protocol.Store;
-using Energistics.Security;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Properties;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
@@ -39,7 +38,6 @@ using Energistics.Protocol.ChannelDataFrame;
 using Energistics.Protocol.DataArray;
 using Energistics.Protocol.GrowingObject;
 using Energistics.Protocol.StoreNotification;
-using Newtonsoft.Json;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
@@ -272,6 +270,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             Items.Add(new StreamingViewModel(Runtime));
             Items.Add(new HierarchyViewModel(Runtime));
             Items.Add(new StoreViewModel(Runtime));
+            Items.Add(new StoreNotificationViewModel(Runtime));
             Items.Add(new JsonMessageViewModel(Runtime));
         }
         

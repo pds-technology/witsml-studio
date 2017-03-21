@@ -43,6 +43,7 @@
                     <MenuItem Header="Copy URI" cal:Message.Attach="CopyUriToClipboard"/>
                     <MenuItem Header="Copy URI to Store" cal:Message.Attach="CopyUriToStore" />
                     <MenuItem Header="Copy URI to Streaming" cal:Message.Attach="CopyUriToStreaming" />
+                    <MenuItem Header="Copy URI to Notification" cal:Message.Attach="CopyUriToNotification" />
                     <MenuItem Header="Refresh" cal:Message.Attach="RefreshSelected" />
                     <Separator />
                     <MenuItem Header="Refresh All" cal:Message.Attach="RefreshHierarchy" />

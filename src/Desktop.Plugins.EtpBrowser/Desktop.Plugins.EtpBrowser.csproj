@@ -147,6 +147,7 @@
     </Compile>
     <Compile Include="Models\EtpProtocolItem.cs" />
     <Compile Include="Models\EtpSettings.cs" />
+    <Compile Include="Models\StoreNotificationSettings.cs" />
     <Compile Include="Models\StoreSettings.cs" />
     <Compile Include="Models\StreamingSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -167,6 +168,7 @@
     <Compile Include="ViewModels\JsonMessageViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
+    <Compile Include="ViewModels\StoreNotificationViewModel.cs" />
     <Compile Include="ViewModels\StoreViewModel.cs" />
     <Compile Include="ViewModels\StreamingViewModel.cs" />
     <Compile Include="Views\HierarchyView.xaml.cs">
@@ -180,6 +182,9 @@
     </Compile>
     <Compile Include="Views\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StoreNotificationView.xaml.cs">
+      <DependentUpon>StoreNotificationView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\StoreView.xaml.cs">
       <DependentUpon>StoreView.xaml</DependentUpon>
@@ -232,6 +237,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SettingsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\StoreNotificationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -52,6 +52,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
             };
             Store = new StoreSettings();
             StoreFunction = Functions.GetObject;
+            StoreNotification = new StoreNotificationSettings();
             RequestedProtocols = new BindableCollection<EtpProtocolItem>();
             BaseUri = EtpUri.RootUri;
         }
@@ -109,6 +110,25 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
                 {
                     _store = value;
                     NotifyOfPropertyChange(() => Store);
+                }
+            }
+        }
+
+        private StoreNotificationSettings _storeNotification;
+        /// <summary>
+        /// Gets or sets the Store Notification settings.
+        /// </summary>
+        /// <value>The Store Notification settings.</value>
+        [DataMember]
+        public StoreNotificationSettings StoreNotification
+        {
+            get { return _storeNotification; }
+            set
+            {
+                if (!ReferenceEquals(_storeNotification, value))
+                {
+                    _storeNotification = value;
+                    NotifyOfPropertyChange(() => StoreNotification);
                 }
             }
         }
