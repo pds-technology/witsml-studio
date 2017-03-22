@@ -20,7 +20,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Caliburn.Micro;
-using Energistics;
 using Energistics.Common;
 using Energistics.Datatypes;
 using Energistics.Protocol.Core;
@@ -56,13 +55,13 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             EtpProtocols = new BindableCollection<EtpProtocolItem>
             {
                 new EtpProtocolItem(Protocols.ChannelStreaming, "consumer"),
-                new EtpProtocolItem(Protocols.ChannelStreaming, "producer", isSelected: true),
+                new EtpProtocolItem(Protocols.ChannelStreaming, "producer", true),
                 new EtpProtocolItem(Protocols.ChannelDataFrame, "consumer"),
                 new EtpProtocolItem(Protocols.ChannelDataFrame, "producer"),
-                new EtpProtocolItem(Protocols.Discovery, "store", isSelected: true),
-                new EtpProtocolItem(Protocols.Store, "store", isSelected: true),
-                new EtpProtocolItem(Protocols.StoreNotification, "store"),
-                new EtpProtocolItem(Protocols.GrowingObject, "store"),
+                new EtpProtocolItem(Protocols.Discovery, "store", true),
+                new EtpProtocolItem(Protocols.Store, "store", true),
+                new EtpProtocolItem(Protocols.StoreNotification, "store", true),
+                new EtpProtocolItem(Protocols.GrowingObject, "store", true),
                 new EtpProtocolItem(Protocols.DataArray, "store"),
                 new EtpProtocolItem(Protocols.WitsmlSoap, "store", isEnabled: false),
             };
