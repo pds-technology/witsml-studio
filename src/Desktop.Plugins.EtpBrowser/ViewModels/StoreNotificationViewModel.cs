@@ -205,7 +205,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             var request = new NotificationRequestRecord
             {
                 Uri = Model.StoreNotification.Uri,
-                Uuid = Guid.NewGuid().ToString(),
+                Uuid = Model.StoreNotification.Uuid,
                 StartTime = Model.StoreNotification.StartTime.ToUnixTimeMicroseconds(),
                 IncludeObjectData = Model.StoreNotification.IncludeObjectData,
                 ObjectTypes = Model.StoreNotification.ObjectTypes.ToArray()
