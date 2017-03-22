@@ -49,12 +49,12 @@
         </Border>
 
         <Grid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" IsEnabled="{Binding CanExecute}">
-            <StackPanel Orientation="Horizontal" IsEnabled="{Binding Model.Store.Uri, Converter={StaticResource NullToBooleanConverter}}">
+            <StackPanel Orientation="Horizontal">
                 <ComboBox Width="120" Margin="5,0,0,5" VerticalContentAlignment="Center" ToolTip="ETP Store Function" IsEditable="False" 
                           ItemsSource="{Binding Parent.StoreFunctions}"
                           SelectedItem="{Binding Model.StoreFunction}" 
                           cal:Message.Attach="[Event SelectionChanged] = [Action OnStoreFunctionChanged]" />
-                <Button x:Name="SubmitQuery" Content="Execute" Width="70" Margin="5,0,0,5" />
+                <Button x:Name="SubmitQuery" Content="Execute" Width="70" Margin="5,0,0,5" IsEnabled="{Binding Model.Store.Uri, Converter={StaticResource NullToBooleanConverter}}"/>
                 <Button x:Name="ClearInputSettings" Content="Clear" Width="70" Margin="5,0,0,5" />
             </StackPanel>
         </Grid>
