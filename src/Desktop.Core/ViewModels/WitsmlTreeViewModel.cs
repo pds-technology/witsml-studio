@@ -580,7 +580,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             Task.Run(async () =>
             {
                 var etpUri = new EtpUri(uri);
-                var dataObjects = Context.GetGrowingObjectsWithStatus(ObjectTypes.Log, etpUri.Parent, ObjectFolders.All.EqualsIgnoreCase(etpUri.ObjectType) ? null : etpUri.ObjectType);
+                var indexType = ObjectFolders.All.EqualsIgnoreCase(etpUri.ObjectType) ? null : etpUri.ObjectType;
+                var dataObjects = Context.GetGrowingObjectsWithStatus(ObjectTypes.Log, etpUri.Parent, indexType);
 
                 await LoadDataItems(dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri());
 
