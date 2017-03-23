@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:cal="http://www.caliburnproject.org"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:conv="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters;assembly=PDS.WITSMLstudio.Desktop.Core"
              mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="300">
 
@@ -41,12 +42,12 @@
                  Text="{Binding Model.GrowingObject.ContentType, UpdateSourceTrigger=PropertyChanged}" />
 
         <TextBlock Grid.Row="3" Grid.Column="0" Text="Start Index:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
-        <TextBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center" 
-                 Text="{Binding Model.GrowingObject.StartIndex, UpdateSourceTrigger=PropertyChanged}" />
+        <xctk:DoubleUpDown Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
+                           Value="{Binding Model.GrowingObject.StartIndex}" />
 
         <TextBlock Grid.Row="4" Grid.Column="0" Text="End Index:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
-        <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center" 
-                 Text="{Binding Model.GrowingObject.EndIndex, UpdateSourceTrigger=PropertyChanged}" />
+        <xctk:DoubleUpDown Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
+                           Value="{Binding Model.GrowingObject.EndIndex}" />
 
         <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"  Text="Data Object (XML):" Margin="10,5,5,5" HorizontalAlignment="Left" VerticalAlignment="Bottom" />
         <CheckBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Margin="5,0,5,0" Content="Compress Data Object" HorizontalAlignment="Right" VerticalAlignment="Center"

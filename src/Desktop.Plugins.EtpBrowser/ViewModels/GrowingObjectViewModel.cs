@@ -160,8 +160,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             Model.GrowingObject.Uri = string.Empty;
             Model.GrowingObject.Uid = string.Empty;
             Model.GrowingObject.ContentType = string.Empty;
-            Model.GrowingObject.StartIndex = string.Empty;
-            Model.GrowingObject.EndIndex = string.Empty;
+            Model.GrowingObject.StartIndex = null;
+            Model.GrowingObject.EndIndex = null;
             Data.SetText(string.Empty);
             ResetDataEditorBorderColor();
         }

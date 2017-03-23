@@ -85,13 +85,13 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
             }
         }
 
-        private string _startIndex;
+        private double? _startIndex;
         /// <summary>
-        /// Gets or sets the name.
+        /// Gets or sets the start index.
         /// </summary>
-        /// <value>The name.</value>
+        /// <value>The start index.</value>
         [DataMember]
-        public string StartIndex
+        public double? StartIndex
         {
             get { return _startIndex; }
             set
@@ -104,13 +104,13 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
             }
         }
 
-        private string _endIndex;
+        private double? _endIndex;
         /// <summary>
-        /// Gets or sets the name.
+        /// Gets or sets the end index.
         /// </summary>
-        /// <value>The name.</value>
+        /// <value>The end index.</value>
         [DataMember]
-        public string EndIndex
+        public double? EndIndex
         {
             get { return _endIndex; }
             set
