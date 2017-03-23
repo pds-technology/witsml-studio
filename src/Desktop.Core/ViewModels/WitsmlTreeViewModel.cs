@@ -23,6 +23,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using Energistics.DataAccess;
+using Witsml131ReferenceData = Energistics.DataAccess.WITSML131.ReferenceData;
+using Witsml141ReferenceData = Energistics.DataAccess.WITSML141.ReferenceData;
 using Witsml131 = Energistics.DataAccess.WITSML131;
 using Witsml141 = Energistics.DataAccess.WITSML141;
 using Energistics.Datatypes;
@@ -537,12 +539,50 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 var etpUri = new EtpUri(uri);
 
-                var dataObjects = ObjectTypes.IsGrowingDataObject(etpUri.ObjectType) 
-                    ? Context.GetGrowingObjectsWithStatus(etpUri.ObjectType, etpUri) 
-                    : Context.GetWellboreObjects(etpUri.ObjectType, etpUri);
-                
-                await LoadDataItems(dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri(),
-                    ObjectTypes.Log.EqualsIgnoreCase(etpUri.ObjectType) ? -1 : 0);
+                if (ObjectTypes.Log.EqualsIgnoreCase(etpUri.ObjectType))
+                {
+                    var logFolders = new Dictionary<string, string>
+                    {
+                        {
+                            ObjectFolders.Time,
+                            Enum.GetName(typeof(Witsml141ReferenceData.LogIndexType), Witsml141ReferenceData.LogIndexType.datetime)
+                        },
+                        {
+                            ObjectFolders.Depth,
+                            Enum.GetName(typeof(Witsml141ReferenceData.LogIndexType), Witsml141ReferenceData.LogIndexType.measureddepth)
+                        },
+                        {
+                            ObjectFolders.All, ObjectFolders.All
+                        }
+                    };
+
+                    logFolders
+                        .Select(x => ToResourceViewModel(etpUri.Append(x.Value), x.Key, LoadLogObjects))
+                        .ForEach(parent.Children.Add);
+                }
+                else
+                {
+                    var dataObjects = ObjectTypes.IsGrowingDataObject(etpUri.ObjectType)
+                        ? Context.GetGrowingObjectsWithStatus(etpUri.ObjectType, etpUri)
+                        : Context.GetWellboreObjects(etpUri.ObjectType, etpUri);
+
+                    await LoadDataItems(dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri(), 0);
+                }
+
+                Runtime.ShowBusy(false);
+            });
+        }
+
+        private void LoadLogObjects(ResourceViewModel parent, string uri)
+        {
+            Runtime.ShowBusy();
+
+            Task.Run(async () =>
+            {
+                var etpUri = new EtpUri(uri);
+                var dataObjects = Context.GetGrowingObjectsWithStatus(ObjectTypes.Log, etpUri.Parent, ObjectFolders.All.EqualsIgnoreCase(etpUri.ObjectType) ? null : etpUri.ObjectType);
+
+                await LoadDataItems(dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri());
 
                 Runtime.ShowBusy(false);
             });
