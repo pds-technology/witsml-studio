@@ -148,6 +148,7 @@
     <Compile Include="Models\EtpProtocolItem.cs" />
     <Compile Include="Models\EtpSettings.cs" />
     <Compile Include="Models\StoreNotificationSettings.cs" />
+    <Compile Include="Models\GrowingObjectSettings.cs" />
     <Compile Include="Models\StoreSettings.cs" />
     <Compile Include="Models\StreamingSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -163,6 +164,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="ViewModels\GrowingObjectViewModel.cs" />
     <Compile Include="ViewModels\HierarchyViewModel.cs" />
     <Compile Include="ViewModels\ISessionAware.cs" />
     <Compile Include="ViewModels\JsonMessageViewModel.cs" />
@@ -171,6 +173,9 @@
     <Compile Include="ViewModels\StoreNotificationViewModel.cs" />
     <Compile Include="ViewModels\StoreViewModel.cs" />
     <Compile Include="ViewModels\StreamingViewModel.cs" />
+    <Compile Include="Views\GrowingObjectView.xaml.cs">
+      <DependentUpon>GrowingObjectView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\HierarchyView.xaml.cs">
       <DependentUpon>HierarchyView.xaml</DependentUpon>
     </Compile>
@@ -224,6 +229,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Page Include="Views\GrowingObjectView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\HierarchyView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

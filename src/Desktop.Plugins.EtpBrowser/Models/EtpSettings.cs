@@ -53,6 +53,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
             Store = new StoreSettings();
             StoreFunction = Functions.GetObject;
             StoreNotification = new StoreNotificationSettings();
+            GrowingObject = new GrowingObjectSettings();
+            GrowingObjectFunction = Functions.GrowingObjectGet;
             RequestedProtocols = new BindableCollection<EtpProtocolItem>();
             BaseUri = EtpUri.RootUri;
         }
@@ -133,6 +135,25 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
             }
         }
 
+        private GrowingObjectSettings _growingObject;
+        /// <summary>
+        /// Gets or sets the Growing Object settings.
+        /// </summary>
+        /// <value>The Growing Object settings.</value>
+        [DataMember]
+        public GrowingObjectSettings GrowingObject
+        {
+            get { return _growingObject; }
+            set
+            {
+                if (!ReferenceEquals(_growingObject, value))
+                {
+                    _growingObject = value;
+                    NotifyOfPropertyChange(() => GrowingObject);
+                }
+            }
+        }
+
         private string _applicationName;
         /// <summary>
         /// Gets or sets the name of the application.
@@ -204,6 +225,24 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
                 if (!Equals(_storeFunction, value))
                 {
                     _storeFunction = value;
+                }
+            }
+        }
+
+        private Functions _growingObjectFunction;
+        /// <summary>
+        /// Gets or sets the ETP Growing Object function.
+        /// </summary>
+        /// <value>The ETP Growing Object function.</value>
+        [DataMember]
+        public Functions GrowingObjectFunction
+        {
+            get { return _growingObjectFunction; }
+            set
+            {
+                if (!Equals(_growingObjectFunction, value))
+                {
+                    _growingObjectFunction = value;
                 }
             }
         }

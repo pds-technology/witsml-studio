@@ -87,6 +87,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public IEnumerable<Functions> StoreFunctions => new[] { Functions.GetObject, Functions.PutObject, Functions.DeleteObject };
 
         /// <summary>
+        /// Gets the available ETP store functions.
+        /// </summary>
+        public IEnumerable<Functions> GrowingObjectFunctions => new[] { Functions.GrowingObjectGet, Functions.GrowingObjectGetRange, Functions.GrowingObjectPut, Functions.GrowingObjectDelete, Functions.GrowingObjectDeleteRange };
+
+        /// <summary>
         /// Gets the display order of the plug-in when loaded by the main application shell
         /// </summary>
         public int DisplayOrder => Settings.Default.PluginDisplayOrder;
@@ -271,6 +276,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             Items.Add(new HierarchyViewModel(Runtime));
             Items.Add(new StoreViewModel(Runtime));
             Items.Add(new StoreNotificationViewModel(Runtime));
+            Items.Add(new GrowingObjectViewModel(Runtime));
             Items.Add(new JsonMessageViewModel(Runtime));
         }
         
