@@ -247,6 +247,28 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
         /// </summary>
         public SecureString SecureProxyPassword { get; set; }
 
+        private bool _proxyUseDefaultCredentials;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to use default credentials for the web proxy.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if use default credentials; otherwise, <c>false</c>.
+        /// </value>
+        [DataMember]
+        public bool ProxyUseDefaultCredentials
+        {
+            get { return _proxyUseDefaultCredentials; }
+            set
+            {
+                if (_proxyUseDefaultCredentials != value)
+                {
+                    _proxyUseDefaultCredentials = value;
+                    NotifyOfPropertyChange(() => ProxyUseDefaultCredentials);
+                }
+            }
+        }
+
         private string _username;
 
         /// <summary>
@@ -433,7 +455,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
         public override string ToString()
         {
             return $"Uri: {Uri}; Username: {Username}; AuthenticationType: {AuthenticationType}; SecurityProtocol: {SecurityProtocol};" +
-                   $" ProxyHost: {ProxyHost}; ProxyPort: {ProxyPort}; ProxyUsername: {ProxyUsername};" +
+                   $" ProxyHost: {ProxyHost}; ProxyPort: {ProxyPort}; ProxyUsername: {ProxyUsername}; ProxyUseDefaultCredentials: {ProxyUseDefaultCredentials};" +
                    (!string.IsNullOrWhiteSpace(SubProtocol) ? $" SubProtocol: {SubProtocol};" : string.Empty) +
                    (!string.IsNullOrWhiteSpace(EtpEncoding) ? $" EtpEncoding: {EtpEncoding};" : string.Empty);
         }

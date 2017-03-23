@@ -93,6 +93,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
                 proxy.Credentials = new NetworkCredential(connection.ProxyUsername, connection.SecureProxyPassword);
             }
 
+            proxy.UseDefaultCredentials = connection.ProxyUseDefaultCredentials;
+
             return proxy;
         }
 

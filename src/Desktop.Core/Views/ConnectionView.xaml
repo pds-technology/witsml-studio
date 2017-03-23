@@ -100,6 +100,7 @@
                         <RowDefinition Height="40" />
                         <RowDefinition Height="40" />
                         <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
@@ -121,6 +122,10 @@
                     <TextBlock Grid.Row="4" Grid.Column="0" Text="Password:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
                     <PasswordBox Grid.Row="4" Grid.Column="1" Margin="5" Padding="5" PasswordChar="*" VerticalAlignment="Center"
                                  cal:Message.Attach="[Event Loaded] = [Action OnProxyPasswordLoaded($source)]; [Event PasswordChanged] = [Action OnProxyPasswordChanged($source)]" />
+
+                    <TextBlock Grid.Row="5" Grid.Column="0" Text="" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <CheckBox Grid.Row="5" Grid.Column="1" Margin="5,0,0,0" Content="Use Default Credentials" VerticalAlignment="Center"
+                              IsChecked="{Binding EditItem.ProxyUseDefaultCredentials}" />
                 </Grid>
             </TabItem>
 
