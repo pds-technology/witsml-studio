@@ -23,7 +23,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using Energistics.DataAccess;
-using Witsml131ReferenceData = Energistics.DataAccess.WITSML131.ReferenceData;
 using Witsml141ReferenceData = Energistics.DataAccess.WITSML141.ReferenceData;
 using Witsml131 = Energistics.DataAccess.WITSML131;
 using Witsml141 = Energistics.DataAccess.WITSML141;
