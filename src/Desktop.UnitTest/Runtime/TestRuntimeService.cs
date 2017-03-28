@@ -190,5 +190,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         {
             Console.WriteLine("ShowInfo: {0}", message);
         }
+
+        /// <summary>
+        /// Shows the warning.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        public void ShowWarning(string message)
+        {
+            Console.WriteLine("ShowWarning: {0}", message);
+        }
     }
 }

@@ -191,6 +191,7 @@
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
     <Compile Include="Converters\ExpandableListConverterOfT.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Models\HeaderObject.cs" />
     <Compile Include="Models\SecurityProtocolItem.cs" />
     <Compile Include="Models\ListItemPropertyDescriptor.cs" />
     <Compile Include="Models\ListItemPropertyDescriptorOfT.cs" />
@@ -219,6 +220,7 @@
     <Compile Include="ViewModels\IndicatorViewModel.cs" />
     <Compile Include="ViewModels\IPluginViewModel.cs" />
     <Compile Include="ViewModels\IShellViewModel.cs" />
+    <Compile Include="ViewModels\SelectHeaderViewModel.cs" />
     <Compile Include="ViewModels\PropertyGridViewModel.cs" />
     <Compile Include="ViewModels\ResourceViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
@@ -236,6 +238,9 @@
     </Compile>
     <Compile Include="Views\DataGridView.xaml.cs">
       <DependentUpon>DataGridView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SelectHeaderView.xaml.cs">
+      <DependentUpon>SelectHeaderView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PropertyGridView.xaml.cs">
       <DependentUpon>PropertyGridView.xaml</DependentUpon>
@@ -284,6 +289,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\DataGridView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SelectHeaderView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

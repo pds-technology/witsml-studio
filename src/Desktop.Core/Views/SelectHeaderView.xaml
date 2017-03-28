@@ -1,0 +1,69 @@
+﻿<Window x:Class="PDS.WITSMLstudio.Desktop.Core.Views.SelectHeaderView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:cal="http://www.caliburnproject.org"
+             xmlns:converters="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300"
+            MinHeight="350" MinWidth="600">
+    
+    <Window.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+    
+    <Grid Margin="5">
+        
+        <Grid.RowDefinitions>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="40"/>
+            </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Visibility="{Binding IsNoteVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="100" />
+                </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="{Binding Note}"></TextBlock>
+            <TextBlock Grid.Column="1" HorizontalAlignment="Right" Text="{Binding SelectedCount, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+            </Grid>
+        </StackPanel>
+
+        <ListView Grid.Row="1" Margin="5,5,5,10" ItemsSource="{Binding DataObjects}">
+            <ListView.Resources>
+                <Style x:Key="HeaderStyle"  TargetType="{x:Type GridViewColumnHeader}">
+                    <Setter Property="MinWidth" Value="80"/>
+                    <Setter Property="Margin" Value="2"/>
+                    <Setter Property="Background" Value="Bisque"/>
+                </Style>
+            </ListView.Resources>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn HeaderContainerStyle="{StaticResource HeaderStyle}" Width="40">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <CheckBox IsChecked="{Binding IsSelected}" cal:Message.Attach="TotalSelectedHeaderCount"></CheckBox>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Well" DisplayMemberBinding="{Binding WellboreObject.NameWell}" HeaderContainerStyle="{StaticResource HeaderStyle}"></GridViewColumn>
+                    <GridViewColumn Header="Wellbore" DisplayMemberBinding="{Binding WellboreObject.NameWellbore}" HeaderContainerStyle="{StaticResource HeaderStyle}"></GridViewColumn>
+                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding WellboreObject.Name}" HeaderContainerStyle="{StaticResource HeaderStyle}"></GridViewColumn>
+                    <GridViewColumn Header="{Binding StartIndexHeader}" DisplayMemberBinding="{Binding StartIndex}" HeaderContainerStyle="{StaticResource HeaderStyle}"/>
+                    <GridViewColumn Header="{Binding EndIndexHeader}" DisplayMemberBinding="{Binding EndIndex}" HeaderContainerStyle="{StaticResource HeaderStyle}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+        <Button x:Name="Open" Margin="5" Content="Open" Width="80" />
+        <Button x:Name="Cancel" Margin="5" Content="Cancel" Width="80" />
+    </StackPanel>
+        
+    </Grid>
+</Window>

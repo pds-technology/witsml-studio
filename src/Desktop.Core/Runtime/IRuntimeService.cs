@@ -88,6 +88,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         void ShowInfo(string message);
 
         /// <summary>
+        /// Shows the warning.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        void ShowWarning(string message);
+
+        /// <summary>
         /// Shows the dialog.
         /// </summary>
         /// <param name="viewModel">The view model.</param>

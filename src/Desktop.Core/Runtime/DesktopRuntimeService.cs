@@ -215,6 +215,15 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         }
 
         /// <summary>
+        /// Shows the warning.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        public void ShowWarning(string message)
+        {
+            MessageBox.Show(message, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        /// <summary>
         /// Gets the current window location.
         /// </summary>
         /// <value>The current window location.</value>
