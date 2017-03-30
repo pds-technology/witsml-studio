@@ -852,7 +852,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
                 return;
 
             var type = ObjectTypes.GetObjectGroupType(DataObject, Model.WitsmlVersion);
-            var query = Proxy.BuildEmtpyQuery(type, Model.WitsmlVersion);
+            var query = Proxy.BuildEmptyQuery(type, Model.WitsmlVersion);
             XmlQuery.SetText(WitsmlParser.ToXml(query));
         }
 
