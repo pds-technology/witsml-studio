@@ -7,7 +7,7 @@
              xmlns:converters="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
-            MinHeight="350" MinWidth="600">
+             MinHeight="350" MinWidth="600">
     
     <Window.Resources>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -21,33 +21,45 @@
                 <RowDefinition Height="40"/>
             </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Visibility="{Binding IsNoteVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <DockPanel Grid.Row="0" Margin="5,0,5,0" Visibility="{Binding IsNoteVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="20" />
                 </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="{Binding Note}"></TextBlock>
             <TextBlock Grid.Column="1" HorizontalAlignment="Right" Text="{Binding SelectedCount, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
             </Grid>
-        </StackPanel>
+        </DockPanel>
 
         <ListView Grid.Row="1" Margin="5,5,5,10" ItemsSource="{Binding DataObjects}">
             <ListView.Resources>
-                <Style x:Key="HeaderStyle"  TargetType="{x:Type GridViewColumnHeader}">
+                <Style x:Key="HeaderStyle" TargetType="{x:Type GridViewColumnHeader}">
                     <Setter Property="MinWidth" Value="80"/>
                     <Setter Property="Margin" Value="2"/>
+                    <Setter Property="Background" Value="Bisque"/>
+                </Style>
+                <Style x:Key="HeaderCheckboxStyle" TargetType="{x:Type GridViewColumnHeader}">
+                    <Setter Property="MinWidth" Value="40"/>
+                    <Setter Property="Margin" Value="2"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
                     <Setter Property="Background" Value="Bisque"/>
                 </Style>
             </ListView.Resources>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn HeaderContainerStyle="{StaticResource HeaderStyle}" Width="40">
+                    <GridViewColumn HeaderContainerStyle="{StaticResource HeaderCheckboxStyle}">
+                        <GridViewColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <StackPanel HorizontalAlignment="Left" Margin="2,0,0,0">
+                                    <CheckBox IsChecked="False" cal:Message.Attach="[Event Checked] = [Action SelectAllHeaders($source)]; [Event Unchecked] = [Action SelectAllHeaders($source)]" ></CheckBox>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.HeaderTemplate>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <StackPanel>
                                     <CheckBox IsChecked="{Binding IsSelected}" cal:Message.Attach="TotalSelectedHeaderCount"></CheckBox>
-                                </StackPanel>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

@@ -18,6 +18,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Controls;
 using Caliburn.Micro;
 using Energistics.DataAccess;
 using PDS.WITSMLstudio.Desktop.Core.Models;
@@ -158,20 +159,18 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public string EndIndexHeader => ObjectTypes.Log.EqualsIgnoreCase(DataObjects.FirstOrDefault()?.ObjectType) ? "End Index" : "MD Max";
 
         /// <summary>
-        /// Totals the selected header item count.
+        /// Total selected header item count.
         /// </summary>
-        public void TotalSelectedHeaderCount()
-        {
-            var count = 0;
-            DataObjects.ForEach(l =>
-            {
-                if (l.IsSelected)
-                {
-                    count++;
-                }
-            });
+        public void TotalSelectedHeaderCount() => SelectedDataObjectsCount = DataObjects.Count(o => o.IsSelected);
 
-            SelectedDataObjectsCount = count;
+        /// <summary>
+        /// Selects all headers.
+        /// </summary>
+        /// <param name="cb">The checkbox control.</param>
+        public void SelectAllHeaders(CheckBox cb)
+        {            
+            DataObjects.ForEach(o => o.IsSelected = cb.IsChecked.GetValueOrDefault());
+            TotalSelectedHeaderCount();
         }
 
         /// <summary>
@@ -180,13 +179,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public void Open()
         {
             SelectedDataObjects = new List<IWellboreObject>();
-            DataObjects.ForEach(l =>
-            {
-                if (l.IsSelected)
-                {
-                    SelectedDataObjects.Add(l.WellboreObject);
-                }
-            });
+            SelectedDataObjects.AddRange(DataObjects.Where(o=> o.IsSelected).Select(o => o.WellboreObject));
 
             if (SelectedDataObjects.Count > MaxHeaderSelected)
             {
