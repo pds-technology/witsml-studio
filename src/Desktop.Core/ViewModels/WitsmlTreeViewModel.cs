@@ -542,17 +542,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 {
                     var logFolders = new Dictionary<string, string>
                     {
-                        {
-                            ObjectFolders.Time,
-                            Enum.GetName(typeof(Witsml141ReferenceData.LogIndexType), Witsml141ReferenceData.LogIndexType.datetime)
-                        },
-                        {
-                            ObjectFolders.Depth,
-                            Enum.GetName(typeof(Witsml141ReferenceData.LogIndexType), Witsml141ReferenceData.LogIndexType.measureddepth)
-                        },
-                        {
-                            ObjectFolders.All, ObjectFolders.All
-                        }
+                        { ObjectFolders.Time, Witsml141ReferenceData.LogIndexType.datetime.ToString() },
+                        { ObjectFolders.Depth, Witsml141ReferenceData.LogIndexType.measureddepth.ToString() },
+                        { ObjectFolders.All, ObjectFolders.All }
                     };
 
                     logFolders
