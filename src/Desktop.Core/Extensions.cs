@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using PDS.WITSMLstudio.Data.Logs;
 using PDS.WITSMLstudio.Desktop.Core.Models;
 
 namespace PDS.WITSMLstudio.Desktop.Core
