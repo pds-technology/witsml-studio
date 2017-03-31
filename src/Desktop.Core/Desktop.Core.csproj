@@ -192,6 +192,7 @@
     <Compile Include="Converters\ExpandableListConverterOfT.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Models\HeaderObject.cs" />
+    <Compile Include="Models\LogCurveItem.cs" />
     <Compile Include="Models\SecurityProtocolItem.cs" />
     <Compile Include="Models\ListItemPropertyDescriptor.cs" />
     <Compile Include="Models\ListItemPropertyDescriptorOfT.cs" />

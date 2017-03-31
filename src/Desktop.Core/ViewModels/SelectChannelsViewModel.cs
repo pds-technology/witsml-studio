@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Caliburn.Micro;
+using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Framework;
 
@@ -40,20 +41,26 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <param name="availableChannels">The available channels.</param>
         /// <param name="indexChannel">The index channel.</param>
         /// <param name="selectedChannels">The defaulted selected channels.</param>
-        public SelectChannelsViewModel(IRuntimeService runtime, List<string> availableChannels, string indexChannel, List<string> selectedChannels = null)
+        public SelectChannelsViewModel(IRuntimeService runtime, List<LogCurveItem> availableChannels, string indexChannel, List<LogCurveItem> selectedChannels = null)
         {
             Runtime = runtime;
-            IndexChannel = indexChannel;
+            //IndexChannel = indexChannel;
 
             if (selectedChannels == null)
             {
-                selectedChannels = new List<string>();
+                selectedChannels = new List<LogCurveItem>();
             }
 
-            if (!selectedChannels.Contains(IndexChannel))
+            if (!selectedChannels.Any(l => l.ContainsMnemonic(indexChannel)))
             {
+                IndexChannel = availableChannels.FirstOrDefault(a => a.ContainsMnemonic(indexChannel));
                 selectedChannels.Add(IndexChannel);
             }
+            else
+            {
+                IndexChannel = selectedChannels.FirstOrDefault(a => a.ContainsMnemonic(indexChannel));
+            }
+
             availableChannels.ForEach(c => AvailableChannels.Add(c));
             selectedChannels?.ForEach(s => MoveChannel(s, AvailableChannels, SelectedChannels));
             MoveToTop(SelectedChannels, IndexChannel);
@@ -71,7 +78,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <value>
         /// The available channels.
         /// </value>
-        public ObservableCollection<string> AvailableChannels { get; } = new ObservableCollection<string>();
+        public ObservableCollection<LogCurveItem> AvailableChannels { get; } = new ObservableCollection<LogCurveItem>();
 
         /// <summary>
         /// Gets the selected channels.
@@ -79,7 +86,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <value>
         /// The selected channels.
         /// </value>
-        public ObservableCollection<string> SelectedChannels { get; } = new ObservableCollection<string>();
+        public ObservableCollection<LogCurveItem> SelectedChannels { get; } = new ObservableCollection<LogCurveItem>();
 
         /// <summary>
         /// Gets the index channel.
@@ -87,7 +94,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <value>
         /// The index channel.
         /// </value>
-        public string IndexChannel { get; }
+        public LogCurveItem IndexChannel { get; }
 
         /// <summary>
         /// Gets or sets the available channel selected.
@@ -95,7 +102,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <value>
         /// The available channel selected.
         /// </value>
-        public string AvailableChannelSelected { get; set; }
+        public LogCurveItem AvailableChannelSelected { get; set; }
 
         /// <summary>
         /// Gets or sets the index of the available channel selected.
@@ -111,7 +118,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <value>
         /// The selected channel selected.
         /// </value>
-        public string SelectedChannelSelected { get; set; }
+        public LogCurveItem SelectedChannelSelected { get; set; }
 
         /// <summary>
         /// Gets or sets the index of the selected channel selected.
@@ -178,10 +185,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             selected.ForEach(s => MoveChannel(s, SelectedChannels, AvailableChannels));
         }
 
-        private int MoveChannel(string channelSelected, ObservableCollection<string> sourceChannels, ObservableCollection<string> destinationChannels)
+        private int MoveChannel(LogCurveItem channelSelected, ObservableCollection<LogCurveItem> sourceChannels, ObservableCollection<LogCurveItem> destinationChannels)
         {
-            if (string.IsNullOrEmpty(channelSelected)) return -1;
+            //if (string.IsNullOrEmpty(channelSelected)) return -1;
+            if (channelSelected == null) return -1;
 
+            //var sourceChannel = GetLogCurveInfo(channelSelected, sourceChannels);
             var index = sourceChannels.IndexOf(channelSelected);
             if (index < 0) return -1;
 
@@ -195,6 +204,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 ? index 
                 : index - 1;
         }
+
+        //private LogCurveItem GetLogCurveInfo(string mnemonic, ObservableCollection<LogCurveItem> channels)
+        //{
+        //    return channels.FirstOrDefault(c => c.Mnemonic.Equals(mnemonic));
+        //}
 
         /// <summary>
         /// Notifies when SelectedChannelSelected has changed.
@@ -212,7 +226,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             NotifyOfPropertyChange(() => AvailableChannelSelected);
         }
 
-        private void MoveToTop(ObservableCollection<string> channels, string indexChannel)
+        private void MoveToTop(ObservableCollection<LogCurveItem> channels, LogCurveItem indexChannel)
         {
             var index = channels.IndexOf(indexChannel);
             if (index < 0) return;
