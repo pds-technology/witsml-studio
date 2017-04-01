@@ -8,8 +8,8 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:converters="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters"
              mc:Ignorable="d" 
-             d:DesignHeight="350" d:DesignWidth="450"
-             MinHeight="350" MinWidth="450">
+             d:DesignHeight="450" d:DesignWidth="450"
+             MinHeight="450" MinWidth="450" cal:Message.Attach="[Event ContentRendered] = [Action DefaultListViews]" >
     
     <Window.Resources>
         <converters:NullToBooleanConverter x:Key="NullToBooleanConverter" />
@@ -25,6 +25,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="80"/>
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
 
@@ -32,8 +33,30 @@
         <Label Grid.Row="0" Grid.Column="2" Margin="5,0" Content="Selected Channels" VerticalAlignment="Bottom" FontWeight="Bold" />
         
         <DockPanel Grid.Row="1" Grid.Column="0" Margin="5" MinWidth ="120" MinHeight="200" >
-            <ListBox Name="AvailableChannelsList" DockPanel.Dock="Top" Margin="5" ItemsSource="{Binding Path=AvailableChannels}" SelectedIndex="{Binding AvailableChannelSelectedIndex, Mode=TwoWay}" SelectedItem="{Binding AvailableChannelSelected}" cal:Message.Attach="[Event MouseDoubleClick] = [Action SelectChannel]; [Event SelectionChanged] = [Action AvailableChannelSelectionChanged]" />
+            <ListBox Name="AvailableChannelsList" DockPanel.Dock="Top" ItemsSource="{Binding Path=AvailableChannels}" SelectedIndex="{Binding AvailableChannelSelectedIndex, Mode=TwoWay}" SelectedItem="{Binding AvailableChannelSelected}" cal:Message.Attach="[Event MouseDoubleClick] = [Action SelectChannel]; [Event SelectionChanged] = [Action AvailableChannelSelectionChanged]" />
         </DockPanel>
+        
+        <Grid Margin="5" Grid.Row="2" Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0" Padding="2" HorizontalAlignment="Right" Content="Channel:" FontSize="10"/>
+            <Label Grid.Row="0" Grid.Column="1" Padding="2" Content="{Binding AvailableChannelSelected.Mnemonic}" FontSize="10"/>
+            <Label Grid.Row="1" Padding="2" HorizontalAlignment="Right" Content="Uom:" FontSize="10"/>
+            <Label Grid.Row="1" Grid.Column="1" Padding="2" Content="{Binding AvailableChannelSelected.Uom}" FontSize="10"/>
+            <Label Grid.Row="2"  Padding="2" HorizontalAlignment="Right" Content="Min:" FontSize="10"/>
+            <Label Grid.Row="2" Grid.Column="1" Padding="2" Content="{Binding AvailableChannelSelected.StartIndex}" FontSize="10"/>
+            <Label Grid.Row="3" Padding="2" HorizontalAlignment="Right" Content="Max:" FontSize="10"/>
+            <Label Grid.Row="3" Grid.Column="1" Padding="2" Content="{Binding AvailableChannelSelected.EndIndex}" FontSize="10"/>
+        </Grid>
 
         <Grid Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
             <Grid.RowDefinitions>
@@ -55,8 +78,30 @@
         </Grid>
         
         <DockPanel Grid.Row="1" Grid.Column="2" Margin="5" MinWidth="120" MinHeight="200">
-            <ListBox Name="SelectedChannelsList" DockPanel.Dock="Top" Margin="5" ItemsSource="{Binding Path=SelectedChannels}" SelectedIndex="{Binding SelectedChannelSelectedIndex, Mode=TwoWay}" SelectedItem="{Binding SelectedChannelSelected}" cal:Message.Attach="[Event MouseDoubleClick] = [Action UnselectChannel]; [Event SelectionChanged] = [Action SelectedChannelSelectionChanged]" />
+            <ListBox Name="SelectedChannelsList" DockPanel.Dock="Top" ItemsSource="{Binding Path=SelectedChannels}" SelectedIndex="{Binding SelectedChannelSelectedIndex, Mode=TwoWay}" SelectedItem="{Binding SelectedChannelSelected}" cal:Message.Attach="[Event MouseDoubleClick] = [Action UnselectChannel]; [Event SelectionChanged] = [Action SelectedChannelSelectionChanged]" />
         </DockPanel>
+
+        <Grid Margin="5" Grid.Row="2" Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0" Padding="2" HorizontalAlignment="Right" Content="Channel:" FontSize="10"/>
+            <Label Grid.Row="0" Grid.Column="1" Padding="2" Content="{Binding SelectedChannelSelected.Mnemonic}" FontSize="10"/>
+            <Label Grid.Row="1" Padding="2" HorizontalAlignment="Right" Content="Uom:" FontSize="10"/>
+            <Label Grid.Row="1" Grid.Column="1" Padding="2" Content="{Binding SelectedChannelSelected.Uom}" FontSize="10"/>
+            <Label Grid.Row="2"  Padding="2" HorizontalAlignment="Right" Content="Min:" FontSize="10"/>
+            <Label Grid.Row="2" Grid.Column="1" Padding="2" Content="{Binding SelectedChannelSelected.StartIndex}" FontSize="10"/>
+            <Label Grid.Row="3" Padding="2" HorizontalAlignment="Right" Content="Max:" FontSize="10"/>
+            <Label Grid.Row="3" Grid.Column="1" Padding="2" Content="{Binding SelectedChannelSelected.EndIndex}" FontSize="10"/>
+        </Grid>
 
         <Grid Grid.Row="1" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center">
             <Grid.RowDefinitions>
@@ -73,7 +118,7 @@
 
         </Grid>
 
-        <StackPanel Grid.Row="2" Grid.ColumnSpan="4" Margin="5" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="3" Grid.ColumnSpan="4" Margin="5" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button x:Name="Accept" Margin="5" Content="OK" Width="80" IsEnabled="{Binding HasSelected}" />
             <Button x:Name="Cancel" Margin="5" Content="Cancel" Width="80" />
         </StackPanel>
