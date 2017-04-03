@@ -225,6 +225,7 @@
     <Compile Include="ViewModels\PropertyGridViewModel.cs" />
     <Compile Include="ViewModels\ResourceViewModel.cs" />
     <Compile Include="ViewModels\SelectChannelsViewModel.cs" />
+    <Compile Include="ViewModels\SelectLogTemplateViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="ViewModels\TextEditorViewModel.cs" />
     <Compile Include="ViewModels\ViewModelExtensions.cs" />
@@ -249,6 +250,9 @@
     </Compile>
     <Compile Include="Views\SelectChannelsView.xaml.cs">
       <DependentUpon>SelectChannelsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SelectLogTemplateView.xaml.cs">
+      <DependentUpon>SelectLogTemplateView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ShellView.xaml.cs">
       <DependentUpon>ShellView.xaml</DependentUpon>
@@ -306,6 +310,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SelectChannelsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SelectLogTemplateView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
