@@ -26,9 +26,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
     public class SelectLogTemplateViewModel : Screen
-    {
-        private bool _isChannelSelectionManual;
-
+    {            
         /// <summary>
         /// Initializes a new instance of the <see cref="SelectLogTemplateViewModel"/> class.
         /// </summary>
@@ -53,6 +51,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         ///   <c>true</c> if all channels are selected; otherwise, <c>false</c>.
         /// </value>
         public bool IsAllChannelsSelection { get; set; }
+
+        private bool _isChannelSelectionManual;
 
         /// <summary>
         /// Gets or sets a value indicating whether channels are manually entered.

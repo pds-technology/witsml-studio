@@ -26,13 +26,13 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="20" />
                 <RowDefinition Height="20" />
-                <RowDefinition Height="30"/>
+                <RowDefinition Height="35"/>
             </Grid.RowDefinitions>
             <RadioButton Grid.Row="0" IsChecked="{Binding IsAllChannelsSelection, Mode=TwoWay}" GroupName="TemplateOptions" Content="All Channels"></RadioButton>
             <RadioButton Grid.Row="1" IsChecked="{Binding IsChannelSelectionManual, Mode=TwoWay}" GroupName="TemplateOptions" Content="Manually Enter Channels"></RadioButton>
             <StackPanel Grid.Row="2" Margin="20,0,0,0" Orientation="Horizontal" Visibility="{Binding IsChannelSelectionManual, Converter={StaticResource BooleanToVisibilityConverter}}" >
                 <TextBlock Text="Number of Channels:" HorizontalAlignment="Right"></TextBlock>
-                <xctk:IntegerUpDown Margin="10,0,0,0" Minimum="2" Maximum="500" Value="{Binding NumberOfChannels}" Height="25" Width="50" VerticalAlignment="top"/>
+                <xctk:IntegerUpDown Margin="10,0,0,0" Minimum="2" Maximum="500" Value="{Binding NumberOfChannels}" Height="20" Width="50" VerticalAlignment="top"/>
             </StackPanel>
         </Grid>
 
