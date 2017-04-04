@@ -16,11 +16,8 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Controls;
 using Caliburn.Micro;
-using Energistics.DataAccess;
 using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Framework;
@@ -67,81 +64,28 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 NotifyOfPropertyChange(() => DataObjects);
                 NotifyOfPropertyChange(() => StartIndexHeader);
                 NotifyOfPropertyChange(() => EndIndexHeader);
-                NotifyOfPropertyChange(() => IsNoteVisible);
-                NotifyOfPropertyChange(() => SelectedCount);
             }
         }
 
-        private List<IWellboreObject> _selectedDataObjects;
+        private HeaderObject _selectedDataObject;
 
         /// <summary>
-        /// Gets or sets the selected data objects.
+        /// Gets or sets the selected data object.
         /// </summary>
         /// <value>
-        /// The selected data objects.
+        /// The selected data object.
         /// </value>
-        public List<IWellboreObject> SelectedDataObjects
+        public HeaderObject SelectedDataObject
         {
-            get { return _selectedDataObjects; }
+            get { return _selectedDataObject; }
             set
             {
-                if (Equals(value, _selectedDataObjects)) return;
-                _selectedDataObjects = value;
-                NotifyOfPropertyChange(() => SelectedDataObjects);
-                NotifyOfPropertyChange(() => SelectedDataObjectsCount);
+                if (Equals(value, _selectedDataObject)) return;
+                _selectedDataObject = value;
+                NotifyOfPropertyChange(() => SelectedDataObject);
             }
         }
         
-        private int _selectedDataObjectsCount;
-
-        /// <summary>
-        /// Gets or sets the selected data objects count.
-        /// </summary>
-        /// <value>
-        /// The selected data objects count.
-        /// </value>
-        public int SelectedDataObjectsCount
-        {
-            get { return _selectedDataObjectsCount; }
-            set
-            {
-                if (value == _selectedDataObjectsCount) return;
-                _selectedDataObjectsCount = value;
-                NotifyOfPropertyChange(() => SelectedDataObjectsCount);
-                NotifyOfPropertyChange(() => SelectedCount);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the maximum header selected.
-        /// </summary>
-        /// <value>
-        /// The maximum header selected.
-        /// </value>
-        public int MaxHeaderSelected { get; set; }
-
-        /// <summary>
-        /// Gets the note.
-        /// </summary>
-        /// <value> The note. </value>
-        public string Note => $"Note: Select a maximum of {MaxHeaderSelected} to open";
-
-        /// <summary>
-        /// Gets the selected count.
-        /// </summary>
-        /// <value>
-        /// The selected count.
-        /// </value>
-        public string SelectedCount => $"Selected: {SelectedDataObjectsCount}/{DataObjects.Count}";
-
-        /// <summary>
-        /// Gets a value indicating whether note can be displayed.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> if note can be displayed; otherwise, <c>false</c>.
-        /// </value>
-        public bool IsNoteVisible => DataObjects.Count > MaxHeaderSelected;
-
         /// <summary>
         /// Gets or sets the start index header.
         /// </summary>
@@ -159,35 +103,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public string EndIndexHeader => ObjectTypes.Log.EqualsIgnoreCase(DataObjects.FirstOrDefault()?.ObjectType) ? "End Index" : "MD Max";
 
         /// <summary>
-        /// Total selected header item count.
-        /// </summary>
-        public void TotalSelectedHeaderCount() => SelectedDataObjectsCount = DataObjects.Count(o => o.IsSelected);
-
-        /// <summary>
-        /// Selects all headers.
-        /// </summary>
-        /// <param name="cb">The checkbox control.</param>
-        public void SelectAllHeaders(CheckBox cb)
-        {            
-            DataObjects.ForEach(o => o.IsSelected = cb.IsChecked.GetValueOrDefault());
-            TotalSelectedHeaderCount();
-        }
-
-        /// <summary>
-        /// Creates a list of selected objects.
+        /// Close with dialog result true and a selected header.
         /// </summary>
         public void Open()
         {
-            SelectedDataObjects = new List<IWellboreObject>();
-            SelectedDataObjects.AddRange(DataObjects.Where(o=> o.IsSelected).Select(o => o.WellboreObject));
-
-            if (SelectedDataObjects.Count > MaxHeaderSelected)
-            {
-                Runtime.ShowInfo($"Please select a maximum of {MaxHeaderSelected} headers to open.");
-                return;
-            }
-
-            TryClose(SelectedDataObjects.Count > 0);
+            TryClose(true);
         }
 
         /// <summary>

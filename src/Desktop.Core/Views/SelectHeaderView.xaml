@@ -10,72 +10,86 @@
              MinHeight="350" MinWidth="600">
     
     <Window.Resources>
-        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:NullToBooleanConverter x:Key="NullToBooleanConverter" />
+        <CollectionViewSource x:Key="GridSource" Source="{Binding DataObjects}">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="WellboreObject.NameWell"></PropertyGroupDescription>
+                <PropertyGroupDescription PropertyName="WellboreObject.NameWellbore"></PropertyGroupDescription>
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
+        <Style x:Key="GridStyle" TargetType="{x:Type DataGrid}">
+            <Setter Property="ColumnHeaderStyle" Value="{DynamicResource HeaderStyle}"></Setter>
+            <Setter Property="CellStyle" Value="{DynamicResource CellStyle}"></Setter>
+        </Style>
+        <Style x:Key="HeaderStyle" TargetType="{x:Type DataGridColumnHeader}">
+            <!--<Setter Property="MinWidth" Value="100"/>-->
+            <Setter Property="Margin" Value="5"/>
+            <!--<Setter Property="HorizontalAlignment" Value="Center"/>-->
+            <Setter Property ="FontWeight" Value="Bold"/>
+            <!--<Setter Property ="Padding" Value="2"/>-->
+        </Style>
+        <Style x:Key="CellStyle" TargetType="{x:Type DataGridCell}">
+            <Setter Property="Margin" Value="3"/>
+            <!--<Setter Property ="Padding" Value="2"/>-->
+        </Style>
     </Window.Resources>
     
     <Grid Margin="5">
-        
+
         <Grid.RowDefinitions>
-                <RowDefinition Height="20"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="40"/>
-            </Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
 
-        <DockPanel Grid.Row="0" Margin="5,0,5,0" Visibility="{Binding IsNoteVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="100" />
-                    <ColumnDefinition Width="20" />
-                </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="{Binding Note}"></TextBlock>
-            <TextBlock Grid.Column="1" HorizontalAlignment="Right" Text="{Binding SelectedCount, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
-            </Grid>
-        </DockPanel>
+        <DataGrid Grid.Row="0" ItemsSource="{Binding Source={StaticResource GridSource}}" AutoGenerateColumns="False" SelectionMode="Single" 
+                  SelectedItem="{Binding SelectedDataObject}" IsReadOnly="True" AlternatingRowBackground="AliceBlue" GridLinesVisibility="None"
+                  Style="{DynamicResource GridStyle}">
+            
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name" Binding="{Binding WellboreObject.Name}"/>
+                <DataGridTextColumn Header="Start Index" Binding="{Binding StartIndex}"/>
+                <DataGridTextColumn Header="End Index" Binding="{Binding EndIndex}"/>
+                <!--<DataGridTextColumn Header="{Binding StartIndexHeader}" Binding="{Binding StartIndex}" >
+                    <DataGridTextColumn.Header>
+                            <TextBlock Text="{Binding EndIndexHeader, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"></TextBlock>
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>-->
+            </DataGrid.Columns>
 
-        <ListView Grid.Row="1" Margin="5,5,5,10" ItemsSource="{Binding DataObjects}">
-            <ListView.Resources>
-                <Style x:Key="HeaderStyle" TargetType="{x:Type GridViewColumnHeader}">
-                    <Setter Property="MinWidth" Value="80"/>
-                    <Setter Property="Margin" Value="2"/>
-                    <Setter Property="Background" Value="Bisque"/>
-                </Style>
-                <Style x:Key="HeaderCheckboxStyle" TargetType="{x:Type GridViewColumnHeader}">
-                    <Setter Property="MinWidth" Value="40"/>
-                    <Setter Property="Margin" Value="2"/>
-                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                    <Setter Property="Background" Value="Bisque"/>
-                </Style>
-            </ListView.Resources>
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn HeaderContainerStyle="{StaticResource HeaderCheckboxStyle}">
-                        <GridViewColumn.HeaderTemplate>
-                            <DataTemplate>
-                                <StackPanel HorizontalAlignment="Left" Margin="2,0,0,0">
-                                    <CheckBox IsChecked="False" cal:Message.Attach="[Event Checked] = [Action SelectAllHeaders($source)]; [Event Unchecked] = [Action SelectAllHeaders($source)]" ></CheckBox>
-                                </StackPanel>
-                            </DataTemplate>
-                        </GridViewColumn.HeaderTemplate>
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                    <CheckBox IsChecked="{Binding IsSelected}" cal:Message.Attach="TotalSelectedHeaderCount"></CheckBox>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Well" DisplayMemberBinding="{Binding WellboreObject.NameWell}" HeaderContainerStyle="{StaticResource HeaderStyle}"></GridViewColumn>
-                    <GridViewColumn Header="Wellbore" DisplayMemberBinding="{Binding WellboreObject.NameWellbore}" HeaderContainerStyle="{StaticResource HeaderStyle}"></GridViewColumn>
-                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding WellboreObject.Name}" HeaderContainerStyle="{StaticResource HeaderStyle}"></GridViewColumn>
-                    <GridViewColumn Header="{Binding StartIndexHeader}" DisplayMemberBinding="{Binding StartIndex}" HeaderContainerStyle="{StaticResource HeaderStyle}"/>
-                    <GridViewColumn Header="{Binding EndIndexHeader}" DisplayMemberBinding="{Binding EndIndex}" HeaderContainerStyle="{StaticResource HeaderStyle}"/>
-                </GridView>
-            </ListView.View>
-        </ListView>
-
-    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-        <Button x:Name="Open" Margin="5" Content="Open" Width="80" />
-        <Button x:Name="Cancel" Margin="5" Content="Cancel" Width="80" />
-    </StackPanel>
+            <DataGrid.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.ContainerStyle>
+                        <Style TargetType="{x:Type GroupItem}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type GroupItem}">
+                                        <Expander IsExpanded="True">
+                                            <Expander.Header>
+                                                <TextBlock Text="{Binding Name}" FontSize="12"></TextBlock>
+                                            </Expander.Header>
+                                            <ItemsPresenter Margin="15,5,2,5"/>
+                                        </Expander>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </GroupStyle.ContainerStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" Margin="10,0,0,0"></TextBlock>
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </DataGrid.GroupStyle>
+        </DataGrid>
+        
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="Open" Margin="5" Content="Open" Width="80" IsEnabled="{Binding SelectedDataObject, Converter={StaticResource NullToBooleanConverter}}"/>
+            <Button x:Name="Cancel" Margin="5" Content="Cancel" Width="80" />
+        </StackPanel>
         
     </Grid>
 </Window>
+
+
+
