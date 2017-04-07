@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -72,6 +73,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         {
             get { return Container.Resolve<IWindowManager>(); }
         }
+
+        /// <summary>
+        /// Gets or sets the dispatcher thread.
+        /// </summary>
+        /// <value>
+        /// The dispatcher thread.
+        /// </value>
+        public Thread DispatcherThread { get; set;}
 
         /// <summary>
         /// Gets the data folder path.

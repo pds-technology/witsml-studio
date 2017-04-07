@@ -17,6 +17,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -47,6 +48,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// </summary>
         /// <value>The window manager.</value>
         IWindowManager WindowManager { get; }
+
+        /// <summary>
+        /// Gets or sets the dispatcher thread.
+        /// </summary>
+        /// <value>
+        /// The dispatcher thread.
+        /// </value>
+        Thread DispatcherThread { get; set; }
 
         /// <summary>
         /// Gets the data folder path.
@@ -85,7 +94,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// Shows the information message.
         /// </summary>
         /// <param name="message">The message.</param>
-        void ShowInfo(string message);
+        void ShowInfo(string message);       
 
         /// <summary>
         /// Shows the warning.

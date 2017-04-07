@@ -17,6 +17,7 @@
 //-----------------------------------------------------------------------
 
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using Caliburn.Micro;
 using PDS.WITSMLstudio.Framework;
@@ -45,6 +46,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             Notice = new TextEditorViewModel(Runtime, null, true);
             ApplicationTitle = _applicationTitle;
             ApplicationVersion = Application.Current.GetType().GetAssemblyVersion();
+            DocumentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         }
 
         /// <summary>
@@ -66,10 +68,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public TextEditorViewModel Notice { get; }
 
         /// <summary>
-        /// Gets the application title.
+        /// Gets or sets the application title.
         /// </summary>
         /// <value>The application versiontitle.</value>
-        public string ApplicationTitle { get; }
+        public string ApplicationTitle { get; set; }
 
         /// <summary>
         /// Gets the application version.
@@ -78,12 +80,20 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public string ApplicationVersion { get; }
 
         /// <summary>
+        /// Gets or sets the document path.
+        /// </summary>
+        /// <value>
+        /// The document path.
+        /// </value>
+        public string DocumentPath { get; set; }
+ 
+        /// <summary>
         /// Called when initializing.
         /// </summary>
         protected override void OnInitialize()
         {
-            License.SetText(File.ReadAllText("LICENSE.txt"));
-            Notice.SetText(File.ReadAllText("NOTICE.txt"));
+            License.SetText(File.ReadAllText(Path.Combine(DocumentPath, "LICENSE.txt")));
+            Notice.SetText(File.ReadAllText(Path.Combine(DocumentPath, "NOTICE.txt")));            
         }
     }
 }

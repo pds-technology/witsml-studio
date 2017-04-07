@@ -17,6 +17,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 using System.Xml.Linq;
@@ -49,6 +50,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             Language = language;
             IsReadOnly = isReadOnly;
             Document = new TextDocument();
+
+            if (runtime.DispatcherThread != null)
+            {
+                Document.SetOwnerThread(null);
+                Document.SetOwnerThread(runtime.DispatcherThread);
+            }
         }
 
         /// <summary>
