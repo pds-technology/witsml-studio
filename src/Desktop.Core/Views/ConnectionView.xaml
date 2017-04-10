@@ -6,7 +6,7 @@
         xmlns:cal="http://www.caliburnproject.org"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:conv="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters"
-        mc:Ignorable="d" Height="350" Width="600"
+        mc:Ignorable="d" Height="350" Width="600" ResizeMode="CanResizeWithGrip"
         MinHeight="350"
         MinWidth="600">
 
@@ -14,6 +14,11 @@
         <conv:NullToBooleanConverter x:Key="NullToBooleanConverter" />
         <conv:BooleanInverseConverter x:Key="BooleanInverseConverter" />
         <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <Style x:Key="DialogButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="80"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
     </Window.Resources>
 
     <Grid Margin="5">
@@ -217,7 +222,7 @@
             </TabItem>
         </TabControl>
 
-        <Button x:Name="TestConnection" Grid.Row="1" Grid.Column="0" Margin="5" Width="80" Content="Test" HorizontalAlignment="Left"
+        <Button x:Name="TestConnection" Grid.Row="1" Grid.Column="0" Style="{StaticResource DialogButtonStyle}" Content="Test" HorizontalAlignment="Left"
                 IsEnabled="{Binding EditItem.Uri, Converter={StaticResource NullToBooleanConverter}}" />
 
         <StackPanel Grid.Row="1" Margin="90,5,5,5" HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
@@ -231,8 +236,8 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button x:Name="Accept" Margin="5" Content="OK" Width="80" IsEnabled="{Binding EditItem.Uri, Converter={StaticResource NullToBooleanConverter}}" />
-            <Button x:Name="Cancel" Margin="5" Content="Cancel" Width="80" />
+            <Button x:Name="Accept" Style="{StaticResource DialogButtonStyle}" Content="OK" IsEnabled="{Binding EditItem.Uri, Converter={StaticResource NullToBooleanConverter}}" />
+            <Button x:Name="Cancel" Style="{StaticResource DialogButtonStyle}" Content="Cancel" />
         </StackPanel>
     </Grid>
 </Window>
