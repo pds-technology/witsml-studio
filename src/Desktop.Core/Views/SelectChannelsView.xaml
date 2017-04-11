@@ -127,7 +127,5 @@
             <Button x:Name="Accept" Style="{StaticResource DialogButtonStyle}" Content="OK" IsEnabled="{Binding HasSelected}" />
             <Button x:Name="Cancel" Style="{StaticResource DialogButtonStyle}" Content="Cancel" />
         </StackPanel>
-        <StatusBar Grid.Column="3" HorizontalAlignment="Left" Height="100" Margin="174,5,-224,0" Grid.Row="2" Grid.RowSpan="2" VerticalAlignment="Top" Width="100"/>
-
     </Grid>
 </Window>

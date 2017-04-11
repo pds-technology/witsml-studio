@@ -6,7 +6,7 @@
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:converters="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300"
+             d:DesignHeight="300" d:DesignWidth="300" ResizeMode="CanResizeWithGrip"
              MinHeight="350" MinWidth="600">
     
     <Window.Resources>
@@ -32,6 +32,11 @@
             <Setter Property="Margin" Value="3"/>
             <!--<Setter Property ="Padding" Value="2"/>-->
         </Style>
+        <Style x:Key="DialogButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="80"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
     </Window.Resources>
     
     <Grid Margin="5">
@@ -41,7 +46,7 @@
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
 
-        <DataGrid Grid.Row="0" ItemsSource="{Binding Source={StaticResource GridSource}}" AutoGenerateColumns="False" SelectionMode="Single" 
+        <DataGrid Grid.Row="0" Margin="5" ItemsSource="{Binding Source={StaticResource GridSource}}" AutoGenerateColumns="False" SelectionMode="Single" 
                   SelectedItem="{Binding SelectedDataObject}" IsReadOnly="True" AlternatingRowBackground="AliceBlue" GridLinesVisibility="None"
                   Style="{DynamicResource GridStyle}">
             
@@ -84,10 +89,9 @@
         </DataGrid>
         
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button x:Name="Open" Margin="5" Content="Open" Width="80" IsEnabled="{Binding SelectedDataObject, Converter={StaticResource NullToBooleanConverter}}"/>
-            <Button x:Name="Cancel" Margin="5" Content="Cancel" Width="80" />
+            <Button x:Name="Open" Style="{StaticResource DialogButtonStyle}" Content="OK" IsEnabled="{Binding SelectedDataObject, Converter={StaticResource NullToBooleanConverter}}"/>
+            <Button x:Name="Cancel" Style="{StaticResource DialogButtonStyle}" Content="Cancel" />
         </StackPanel>
-        
     </Grid>
 </Window>
 
