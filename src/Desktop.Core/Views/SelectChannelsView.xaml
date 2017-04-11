@@ -8,8 +8,8 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:converters="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters"
              mc:Ignorable="d" 
-             d:DesignHeight="380" d:DesignWidth="450" ResizeMode="CanResizeWithGrip"
-             MinHeight="380" MinWidth="450" cal:Message.Attach="[Event ContentRendered] = [Action DefaultListViews]" >
+             Height="370" Width="450" ResizeMode="CanResizeWithGrip"
+             MinHeight="370" MinWidth="450" cal:Message.Attach="[Event ContentRendered] = [Action DefaultListViews]" >
 
     <Window.Resources>
         <converters:NullToBooleanConverter x:Key="NullToBooleanConverter" />
@@ -28,14 +28,14 @@
         </Grid.ColumnDefinitions>
         
         <Grid.RowDefinitions>
-            <RowDefinition Height="40"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="90"/>
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
 
-        <Label Grid.Row="0" Grid.Column="0" Margin="5,0" Content="Available Channels" VerticalAlignment="Bottom" FontWeight="Bold" />
-        <Label Grid.Row="0" Grid.Column="2" Margin="0" Content="Selected Channels" VerticalAlignment="Bottom" FontWeight="Bold" />
+        <Label Grid.Row="0" Grid.Column="0" Margin="5,0" Content="Available Channels" FontWeight="Bold" />
+        <Label Grid.Row="0" Grid.Column="2" Margin="0" Content="Selected Channels" FontWeight="Bold" />
         
         <DockPanel Grid.Row="1" Grid.Column="0" Margin="10,5,5,5" MinWidth ="120" MinHeight="140" >
             <ListBox Name="AvailableChannelsList" DockPanel.Dock="Top" ItemsSource="{Binding Path=AvailableChannels}" SelectedIndex="{Binding AvailableChannelSelectedIndex, Mode=TwoWay}" SelectedItem="{Binding AvailableChannelSelected}" cal:Message.Attach="[Event MouseDoubleClick] = [Action SelectChannel]; [Event SelectionChanged] = [Action AvailableChannelSelectionChanged]" />
@@ -53,13 +53,13 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0" Padding="2" HorizontalAlignment="Right" Content="Channel:"/>
+            <Label Grid.Row="0" Padding="2" HorizontalAlignment="Right" Content="Mnemonic:"/>
             <Label Grid.Row="0" Grid.Column="1" Padding="2" Content="{Binding AvailableChannelSelected.Mnemonic}"/>
-            <Label Grid.Row="1" Padding="2" HorizontalAlignment="Right" Content="Uom:"/>
+            <Label Grid.Row="1" Padding="2" HorizontalAlignment="Right" Content="Unit:"/>
             <Label Grid.Row="1" Grid.Column="1" Padding="2" Content="{Binding AvailableChannelSelected.Uom}"/>
-            <Label Grid.Row="2"  Padding="2" HorizontalAlignment="Right" Content="Min:"/>
+            <Label Grid.Row="2"  Padding="2" HorizontalAlignment="Right" Content="Min Index:"/>
             <Label Grid.Row="2" Grid.Column="1" Padding="2" Content="{Binding AvailableChannelSelected.StartIndex}"/>
-            <Label Grid.Row="3" Padding="2" HorizontalAlignment="Right" Content="Max:"/>
+            <Label Grid.Row="3" Padding="2" HorizontalAlignment="Right" Content="Max Index:"/>
             <Label Grid.Row="3" Grid.Column="1" Padding="2" Content="{Binding AvailableChannelSelected.EndIndex}"/>
         </Grid>
 
@@ -98,13 +98,13 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0" Padding="2" HorizontalAlignment="Right" Content="Channel:"/>
+            <Label Grid.Row="0" Padding="2" HorizontalAlignment="Right" Content="Mnemonic:"/>
             <Label Grid.Row="0" Grid.Column="1" Padding="2" Content="{Binding SelectedChannelSelected.Mnemonic}"/>
-            <Label Grid.Row="1" Padding="2" HorizontalAlignment="Right" Content="Uom:"/>
+            <Label Grid.Row="1" Padding="2" HorizontalAlignment="Right" Content="Unit:"/>
             <Label Grid.Row="1" Grid.Column="1" Padding="2" Content="{Binding SelectedChannelSelected.Uom}"/>
-            <Label Grid.Row="2"  Padding="2" HorizontalAlignment="Right" Content="Min:"/>
+            <Label Grid.Row="2"  Padding="2" HorizontalAlignment="Right" Content="Min Index:"/>
             <Label Grid.Row="2" Grid.Column="1" Padding="2" Content="{Binding SelectedChannelSelected.StartIndex}"/>
-            <Label Grid.Row="3" Padding="2" HorizontalAlignment="Right" Content="Max:"/>
+            <Label Grid.Row="3" Padding="2" HorizontalAlignment="Right" Content="Max Index:"/>
             <Label Grid.Row="3" Grid.Column="1" Padding="2" Content="{Binding SelectedChannelSelected.EndIndex}"/>
         </Grid>
 
