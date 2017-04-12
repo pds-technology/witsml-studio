@@ -74,10 +74,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public string ApplicationTitle { get; set; }
 
         /// <summary>
-        /// Gets the application version.
+        /// Gets or sets the application version.
         /// </summary>
         /// <value>The application version.</value>
-        public string ApplicationVersion { get; }
+        public string ApplicationVersion { get; set; }
 
         /// <summary>
         /// Gets or sets the document path.
