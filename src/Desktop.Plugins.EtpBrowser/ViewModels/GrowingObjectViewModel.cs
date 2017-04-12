@@ -234,7 +234,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         private void GrowingObjectDeleteRange()
         {
             Parent.Client.Handler<IGrowingObjectCustomer>()
-                .GrowingObjectDeleteRange(Model.GrowingObject.Uri, Model.GrowingObject.StartIndex, Model.GrowingObject.EndIndex);
+                .GrowingObjectDeleteRange(Model.GrowingObject.Uri, Model.GrowingObject.StartIndex, Model.GrowingObject.EndIndex, string.Empty, string.Empty);
         }
     }
 }

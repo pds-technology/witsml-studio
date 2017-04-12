@@ -160,8 +160,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 if (CanExecute && !string.IsNullOrWhiteSpace(resource?.Resource?.Uri))
                 {
                     return resource.Resource.HasChildren != 0 ||
-                           ResourceTypes.Folder.ToString().EqualsIgnoreCase(resource.Resource.ResourceType) ||
-                           ResourceTypes.DecoratorFolder.ToString().EqualsIgnoreCase(resource.Resource.ResourceType);
+                           ResourceTypes.Folder.ToString().EqualsIgnoreCase(resource.Resource.ResourceType);
                 }
 
                 return false;

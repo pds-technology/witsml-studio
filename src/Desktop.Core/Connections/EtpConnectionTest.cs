@@ -81,9 +81,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
 
                 using (var client = connection.CreateEtpClient(applicationName, applicationVersion))
                 {
-                    client.Register<IChannelStreamingConsumer, ChannelStreamingConsumerHandler>();
+                    //client.Register<IChannelStreamingConsumer, ChannelStreamingConsumerHandler>();
                     client.Register<IDiscoveryCustomer, DiscoveryCustomerHandler>();
-                    client.Register<IStoreCustomer, StoreCustomerHandler>();
+                    //client.Register<IStoreCustomer, StoreCustomerHandler>();
 
                     var count = 0;
                     client.Open();
