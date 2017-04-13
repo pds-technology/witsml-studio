@@ -461,7 +461,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             // Handle case when "No Data" Acknowledge message was received
             if (e.Message.Resource != null)
             {
-                viewModel = new ResourceViewModel(e.Message.Resource);
+                viewModel = new ResourceViewModel(Runtime, e.Message.Resource);
                 viewModel.LoadChildren = GetResources;
             }
 

@@ -20,6 +20,7 @@ using System;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using Energistics.Datatypes.Object;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
 namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 {
@@ -30,13 +31,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
     public class ResourceViewModel : PropertyChangedBase
     {
         /// <summary>The placeholder resource.</summary>
-        public static readonly ResourceViewModel Placeholder = new ResourceViewModel(new Resource { Name = "loading..." })
+        public static readonly ResourceViewModel Placeholder = new ResourceViewModel(null, new Resource { Name = "loading..." })
         {
             _isPlaceholder = true
         };
 
         /// <summary>The no data resource.</summary>
-        public static readonly ResourceViewModel NoData = new ResourceViewModel(new Resource { Name = "(no data)" })
+        public static readonly ResourceViewModel NoData = new ResourceViewModel(null, new Resource { Name = "(no data)" })
         {
             _isPlaceholder = true
         };
@@ -46,9 +47,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="ResourceViewModel" /> class.
         /// </summary>
+        /// <param name="runtime">The runtime.</param>
         /// <param name="resource">The resource.</param>
-        public ResourceViewModel(Resource resource)
+        public ResourceViewModel(IRuntimeService runtime, Resource resource)
         {
+            Runtime = runtime;
             Resource = resource;
             Children = new BindableCollection<ResourceViewModel>();
             Indicator = new IndicatorViewModel();
@@ -58,6 +61,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 Children.Add(Placeholder);
             }
         }
+
+        /// <summary>
+        /// Gets the runtime service.
+        /// </summary>
+        /// <value>The runtime service.</value>
+        public IRuntimeService Runtime { get; }
 
         /// <summary>
         /// Gets the resource.
@@ -164,7 +173,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void ClearAndLoadChildren()
         {
-            Children.Clear();
+            Runtime?.Invoke(() => Children.Clear());
             Task.Run(() => MessageId = LoadChildren(Resource.Uri));
         }
     }

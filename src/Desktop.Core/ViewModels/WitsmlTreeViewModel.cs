@@ -658,7 +658,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 HasChildren = children
             };
 
-            var viewModel = new ResourceViewModel(resource);
+            var viewModel = new ResourceViewModel(Runtime, resource);
 
             if (indicator != null)
                 viewModel.Indicator = indicator;
