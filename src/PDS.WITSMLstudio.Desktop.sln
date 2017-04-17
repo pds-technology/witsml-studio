@@ -29,6 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{CF
 		..\NOTICE.txt = ..\NOTICE.txt
 		..\README.md = ..\README.md
 		External\UpdateCopyrightVersion.ps1 = External\UpdateCopyrightVersion.ps1
+		External\UpdatePackageHintPaths.ps1 = External\UpdatePackageHintPaths.ps1
 		External\UpdateProductNamespaces.ps1 = External\UpdateProductNamespaces.ps1
 	EndProjectSection
 EndProject
