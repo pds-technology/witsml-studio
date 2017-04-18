@@ -18,6 +18,7 @@
 
 using System;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using Caliburn.Micro;
 using Energistics.Datatypes.Object;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
@@ -173,7 +174,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void ClearAndLoadChildren()
         {
-            Runtime?.Invoke(() => Children.Clear());
+            Runtime?.Invoke(() => Children.Clear(), DispatcherPriority.Send);
             Task.Run(() => MessageId = LoadChildren(Resource.Uri));
         }
     }
