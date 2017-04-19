@@ -21,6 +21,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Caliburn.Micro;
 using PDS.WITSMLstudio.Desktop.Core.Models;
+using PDS.WITSMLstudio.Desktop.Core.Properties;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Framework;
 
@@ -30,9 +31,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
     /// Manages the selection of data channel names from a list of available channels
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    public class SelectChannelsViewModel : Screen
+    public sealed class SelectChannelsViewModel : Screen
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(SelectChannelsViewModel));
+        private static readonly string _dialogTitlePrefix = Settings.Default.DialogTitlePrefix;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SelectChannelsViewModel" /> class.
@@ -44,6 +46,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public SelectChannelsViewModel(IRuntimeService runtime, List<LogCurveItem> availableChannels, string indexChannel, List<LogCurveItem> selectedChannels = null)
         {
             Runtime = runtime;
+            DisplayName = $"{_dialogTitlePrefix} - Select Channels";
 
             // Create a selectedChannels list if one was not sent in
             if (selectedChannels == null)

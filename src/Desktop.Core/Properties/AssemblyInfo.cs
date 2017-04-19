@@ -36,3 +36,4 @@ using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("PDS.WITSMLstudio.Desktop.UnitTest")]
 [assembly: InternalsVisibleTo("PDS.WITSMLstudio.Desktop.IntegrationTest")]
+[assembly: InternalsVisibleTo("PDS.WITSMLstudio.StoreLink")]

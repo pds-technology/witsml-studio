@@ -42,6 +42,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(ConnectionViewModel));
         private static readonly string _connectionBaseFileName = Settings.Default.ConnectionBaseFileName;
+        private static readonly string _dialogTitlePrefix = Settings.Default.DialogTitlePrefix;
+
         private readonly string[] _ignoredPropertyChanges = { "name" };
         private PasswordBox _passwordControl;
         private PasswordBox _proxyPasswordControl;
@@ -59,7 +61,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             ConnectionType = connectionType;
             ConnectionNames = new string[0];
             IsEtpConnection = connectionType == ConnectionTypes.Etp;
-            DisplayName = $"{ConnectionType.ToString().ToUpper()} Connection";
+            DisplayName = $"{_dialogTitlePrefix} - {ConnectionType.ToString().ToUpper()} Connection";
             CanTestConnection = true;
 
             SecurityProtocols = new BindableCollection<SecurityProtocolItem>

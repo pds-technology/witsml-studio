@@ -33,6 +33,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
     public sealed class AboutViewModel : Screen
     {
         private static readonly string _applicationTitle = Settings.Default.ApplicationTitle;
+        private static readonly string _dialogTitlePrefix = Settings.Default.DialogTitlePrefix;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AboutViewModel" /> class.
@@ -40,7 +41,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <param name="runtime">The runtime service.</param>
         public AboutViewModel(IRuntimeService runtime)
         {
-            DisplayName = "About";
+            DisplayName = $"{_dialogTitlePrefix} - About";
             Runtime = runtime;
             License = new TextEditorViewModel(Runtime, null, true);
             Notice = new TextEditorViewModel(Runtime, null, true);

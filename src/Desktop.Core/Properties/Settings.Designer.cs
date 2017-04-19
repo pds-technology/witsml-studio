@@ -85,5 +85,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.Properties {
                 return ((string)(this["ApplicationTitle"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PDS WITSMLstudio")]
+        public string DialogTitlePrefix {
+            get {
+                return ((string)(this["DialogTitlePrefix"]));
+            }
+        }
     }
 }
