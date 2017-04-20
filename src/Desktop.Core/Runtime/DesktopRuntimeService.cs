@@ -38,6 +38,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
     public class DesktopRuntimeService : IRuntimeService
     {
         private static readonly string _persistedDataFolderName = Settings.Default.PersistedDataFolderName;
+        private static readonly string DialogTitlePrefix = Settings.Default.DialogTitlePrefix;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DesktopRuntimeService"/> class.
@@ -156,7 +157,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// <returns><c>true</c> if the user clicks OK/Yes; otherwise, <c>false</c>.</returns>
         public bool ShowConfirm(string message, MessageBoxButton buttons = MessageBoxButton.OKCancel)
         {
-            var result = MessageBox.Show(GetActiveWindow(), message, "Confirm", buttons, MessageBoxImage.Question);
+            var result = MessageBox.Show(GetActiveWindow(), message, $"{DialogTitlePrefix} - Confirm", buttons, MessageBoxImage.Question);
             return (result == MessageBoxResult.OK || result == MessageBoxResult.Yes);
         }
 
@@ -211,7 +212,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
                 message = string.Format("{0}{2}{2}{1}", message, error.Message, Environment.NewLine);
             }
 #endif
-            MessageBox.Show(GetActiveWindow(), message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(GetActiveWindow(), message, $"{DialogTitlePrefix} - Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         /// <summary>
@@ -220,7 +221,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// <param name="message">The message.</param>
         public void ShowInfo(string message)
         {
-            MessageBox.Show(GetActiveWindow(), message, "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(GetActiveWindow(), message, $"{DialogTitlePrefix} - Information", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         /// <summary>
@@ -229,7 +230,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// <param name="message">The message.</param>
         public void ShowWarning(string message)
         {
-            MessageBox.Show(message, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(message, $"{DialogTitlePrefix} - Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         /// <summary>
