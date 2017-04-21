@@ -438,13 +438,19 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Called when the parent view is ready.
         /// </summary>
-        public void OnViewReady(IEnumerable<string> dataObjects)
+        public void OnViewReady()
+        {
+            if (!Items.Any() && Context != null)
+                LoadWells();
+        }
+
+        /// <summary>
+        /// Clears and sets the data objects.
+        /// </summary>
+        public void SetDataObjects(IEnumerable<string> dataObjects)
         {
             DataObjects.Clear();
             DataObjects.AddRange(dataObjects);
-
-            if (!Items.Any() && Context != null)
-                LoadWells();
         }
 
         /// <summary>
@@ -524,6 +530,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         private void LoadWellboreFolders(ResourceViewModel parent, string uri)
         {
             var etpUri = new EtpUri(uri);
+
+            if (DataObjects.Count < 1)
+            {
+                Runtime.ShowWarning("Wait for the Get Capabilties to complete before expanding the wellbore.");
+                return;
+            }
 
             DataObjects
                 .Select(x => ToResourceViewModel(etpUri.Append(x), x, LoadWellboreObjects))
