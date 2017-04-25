@@ -16,6 +16,7 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Caliburn.Micro;
@@ -32,6 +33,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
     public sealed class TreeViewViewModel : Conductor<IScreen>.Collection.OneActive, IConnectionAware
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(TreeViewViewModel));
+        private readonly string[] _exclude = { MainViewModel.QueryTemplateText, ObjectTypes.Well, ObjectTypes.Wellbore, ObjectTypes.ChangeLog, ObjectTypes.CapServer };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TreeViewViewModel"/> class.
@@ -93,6 +95,15 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
         }
 
         /// <summary>
+        /// Called when data objects changed.
+        /// </summary>
+        /// <param name="dataObjects">The data objects.</param>
+        public void OnDataObjectsChanged(IEnumerable<string> dataObjects)
+        {
+            TreeViewModel.SetDataObjects(dataObjects.Where(x => !_exclude.Contains(x)));
+        }
+
+        /// <summary>
         /// Called when maximum data rows changed.
         /// </summary>
         /// <param name="maxDataRows">The maximum data rows.</param>
@@ -132,8 +143,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
         protected override void OnViewReady(object view)
         {
             base.OnViewReady(view);
-            var exclude = new[] { MainViewModel.QueryTemplateText, ObjectTypes.Well, ObjectTypes.Wellbore, ObjectTypes.ChangeLog, ObjectTypes.CapServer };
-            TreeViewModel.OnViewReady(Parent.Parent.DataObjects.Where(x => !exclude.Contains(x)));
+            
+            TreeViewModel.SetDataObjects(Parent.Parent.DataObjects.Where(x => !_exclude.Contains(x)));
+            TreeViewModel.OnViewReady();
         }
 
         private void LogQuery(Functions function, string objectType, string xmlIn, string optionsIn)

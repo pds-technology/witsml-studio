@@ -16,6 +16,8 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System.Collections.Generic;
+
 namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
 {
     /// <summary>
@@ -28,5 +30,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
         /// </summary>
         /// <param name="version">The WITSML version.</param>
         void OnWitsmlVersionChanged(string version);
+
+        /// <summary>
+        /// Called when data objects changed.
+        /// </summary>
+        /// <param name="dataObjects">The data objects.</param>
+        void OnDataObjectsChanged(IEnumerable<string> dataObjects);
     }
 }

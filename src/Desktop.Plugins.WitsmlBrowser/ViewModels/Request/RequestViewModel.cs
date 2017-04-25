@@ -135,6 +135,16 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
         }
 
         /// <summary>
+        /// Called when the data objects have changed.
+        /// </summary>
+        public void OnDataObjectsChanged(IEnumerable<string> dataObjects)
+        {
+            Items
+                .OfType<IConnectionAware>()
+                .ForEach(x => x.OnDataObjectsChanged(dataObjects));
+        }
+
+        /// <summary>
         /// Called when maximum data rows has changed.
         /// </summary>
         /// <param name="maxDataRows">The maximum data rows.</param>

@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
@@ -64,7 +65,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
 
             Runtime = runtime;
             DisplayName = Settings.Default.PluginDisplayName;
-            DataObjects = new BindableCollection<string>() { QueryTemplateText };
+            DataObjects = new BindableCollection<string> { QueryTemplateText };
+            DataObjects.CollectionChanged += DataObjectsChangedEvent;
             DataObject = QueryTemplateText;
 
             // Create the model for our witsml settings
@@ -307,6 +309,25 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
 
             Runtime.Shell.SetApplicationTitle(this);
             RequestControl.OnWitsmlVersionChanged(version);
+        }
+
+        /// <summary>
+        /// Called when data objects changed.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs"/> instance containing the event data.</param>
+        public void DataObjectsChangedEvent(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RequestControl.OnDataObjectsChanged(DataObjects);
+        }
+
+        /// <summary>
+        /// Called when data objects changed.
+        /// </summary>
+        /// <param name="dataObjects">The data objects.</param>
+        public void OnDataObjectsChanged(IEnumerable<string> dataObjects)
+        {
+            RequestControl.OnDataObjectsChanged(dataObjects);
         }
 
         /// <summary>
