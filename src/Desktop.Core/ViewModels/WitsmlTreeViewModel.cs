@@ -531,12 +531,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             var etpUri = new EtpUri(uri);
 
-            if (DataObjects.Count < 1)
-            {
-                Runtime.ShowWarning("Wait for the Get Capabilties to complete before expanding the wellbore.");
-                return;
-            }
-
             DataObjects
                 .Select(x => ToResourceViewModel(etpUri.Append(x), x, LoadWellboreObjects))
                 .ForEach(parent.Children.Add);

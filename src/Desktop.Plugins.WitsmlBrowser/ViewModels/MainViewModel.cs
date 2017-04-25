@@ -318,7 +318,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
         /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs"/> instance containing the event data.</param>
         public void DataObjectsChangedEvent(object sender, NotifyCollectionChangedEventArgs e)
         {
-            Runtime.Shell.SetApplicationTitle(this);
             RequestControl.OnDataObjectsChanged(DataObjects);
         }
 
