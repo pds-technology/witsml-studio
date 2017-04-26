@@ -53,8 +53,16 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0" Padding="2" HorizontalAlignment="Right" Content="Mnemonic:"/>
-            <Label Grid.Row="0" Grid.Column="1" Padding="2" Content="{Binding AvailableChannelSelected.Mnemonic}"/>
+            <Label Grid.Row="0" Padding="2" HorizontalAlignment="Right" Content="Description:"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Padding="2" TextTrimming="CharacterEllipsis" Text="{Binding AvailableChannelSelected.Description}">
+                <TextBlock.ToolTip>
+                    <ToolTip>
+                        <ToolTip.Content>
+                            <TextBlock Text="{Binding AvailableChannelSelected.Description}"/>
+                        </ToolTip.Content>
+                    </ToolTip>
+                </TextBlock.ToolTip>
+            </TextBlock>
             <Label Grid.Row="1" Padding="2" HorizontalAlignment="Right" Content="Unit:"/>
             <Label Grid.Row="1" Grid.Column="1" Padding="2" Content="{Binding AvailableChannelSelected.Uom}"/>
             <Label Grid.Row="2"  Padding="2" HorizontalAlignment="Right" Content="Min Index:"/>
@@ -98,8 +106,16 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0" Padding="2" HorizontalAlignment="Right" Content="Mnemonic:"/>
-            <Label Grid.Row="0" Grid.Column="1" Padding="2" Content="{Binding SelectedChannelSelected.Mnemonic}"/>
+            <Label Grid.Row="0" Padding="2" HorizontalAlignment="Right" Content="Description:"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Padding="2" TextTrimming="CharacterEllipsis" Text="{Binding SelectedChannelSelected.Description}">
+                <TextBlock.ToolTip>
+                    <ToolTip>
+                        <ToolTip.Content>
+                            <TextBlock Text="{Binding SelectedChannelSelected.Description}"/>
+                        </ToolTip.Content>
+                    </ToolTip>
+                </TextBlock.ToolTip>
+            </TextBlock>
             <Label Grid.Row="1" Padding="2" HorizontalAlignment="Right" Content="Unit:"/>
             <Label Grid.Row="1" Grid.Column="1" Padding="2" Content="{Binding SelectedChannelSelected.Uom}"/>
             <Label Grid.Row="2"  Padding="2" HorizontalAlignment="Right" Content="Min Index:"/>
