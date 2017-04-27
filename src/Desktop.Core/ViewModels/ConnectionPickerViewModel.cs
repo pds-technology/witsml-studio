@@ -162,15 +162,23 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         }
 
         /// <summary>
-        /// Called when an attached view's Loaded event fires.
+        /// Initializes the connections.
         /// </summary>
-        /// <param name="view"></param>
-        protected override void OnViewLoaded(object view)
+        public void InitializeConnections()
         {
             if (Connections.Any()) return;
 
             var connections = LoadConnectionsFromFile();
             InsertConnections(connections, _selectConnectionItem);
+        }
+
+        /// <summary>
+        /// Called when an attached view's Loaded event fires.
+        /// </summary>
+        /// <param name="view"></param>
+        protected override void OnViewLoaded(object view)
+        {
+            InitializeConnections();
         }
 
         private void OnSelectedConnectionChanged(Connection previous)
