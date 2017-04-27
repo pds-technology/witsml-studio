@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows.Data;
 using System.Windows.Input;
 using Caliburn.Micro;
 using Newtonsoft.Json;
@@ -39,6 +40,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         private static readonly Connection _selectConnectionItem = new Connection { Name = "Select Connection..." };
         private static readonly Connection _addNewConnectionItem = new Connection { Name = "(Add New Connection...)" };
         private static readonly string _connectionListBaseFileName = Settings.Default.ConnectionListBaseFileName;
+        private static readonly object _connectionsLock = new object();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConnectionPickerViewModel" /> class.
@@ -70,11 +72,23 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <value>The delegate that will be invoked.</value>
         public Action<Connection> OnConnectionChanged { get; set; }
 
+        private BindableCollection<Connection> _connections;
         /// <summary>
         /// Gets the collection of connections.
         /// </summary>
         /// <value>The collection of connections.</value>
-        public BindableCollection<Connection> Connections { get; } 
+        public BindableCollection<Connection> Connections
+        {
+            get
+            {
+                return _connections;
+            }
+            set
+            {
+                _connections = value;
+                BindingOperations.EnableCollectionSynchronization(_connections, _connectionsLock);
+            }
+        }
 
         private Connection _connection;
 
@@ -113,21 +127,24 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 ConnectionNames = existing
             };
 
-            if (Runtime.ShowDialog(viewModel))
+            Runtime.Invoke(() =>
             {
-                // Ensure connection has a Name specified
-                if (string.IsNullOrWhiteSpace(viewModel.DataItem.Name))
-                    viewModel.DataItem.Name = viewModel.DataItem.Uri;
+                if (Runtime.ShowDialog(viewModel))
+                {
+                    // Ensure connection has a Name specified
+                    if (string.IsNullOrWhiteSpace(viewModel.DataItem.Name))
+                        viewModel.DataItem.Name = viewModel.DataItem.Uri;
 
-                // Initialize collection of new connection items
-                var connections = (connection == null)
-                    ? new[] { viewModel.DataItem }
-                    : new Connection[0];
+                    // Initialize collection of new connection items
+                    var connections = (connection == null)
+                        ? new[] { viewModel.DataItem }
+                        : new Connection[0];
 
-                // Reset Connections list
-                connection = connection ?? viewModel.DataItem;
-                InsertConnections(connections, connection);
-            }
+                    // Reset Connections list
+                    connection = connection ?? viewModel.DataItem;
+                    InsertConnections(connections, connection);
+                }
+            });
         }
 
         /// <summary>
