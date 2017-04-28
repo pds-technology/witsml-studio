@@ -3,10 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:local="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Views"
              xmlns:cal="http://www.caliburnproject.org"
-             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-             xmlns:converters="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters"
+             xmlns:converters="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters"        
              mc:Ignorable="d" 
              Height="370" Width="450" ResizeMode="CanResizeWithGrip"
              MinHeight="370" MinWidth="450" cal:Message.Attach="[Event ContentRendered] = [Action DefaultListViews]" >
@@ -18,6 +18,11 @@
             <Setter Property="Width" Value="80"/>
             <Setter Property="Margin" Value="5"/>
         </Style>
+        <CollectionViewSource x:Key="AvailableChannelsSorted" Source="{Binding AvailableChannels}">
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="Mnemonic"></scm:SortDescription>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -26,7 +31,7 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="50" />
         </Grid.ColumnDefinitions>
-        
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -36,11 +41,11 @@
 
         <Label Grid.Row="0" Grid.Column="0" Margin="5,0" Content="Available Channels" FontWeight="Bold" />
         <Label Grid.Row="0" Grid.Column="2" Margin="0" Content="Selected Channels" FontWeight="Bold" />
-        
+
         <DockPanel Grid.Row="1" Grid.Column="0" Margin="10,5,5,5" MinWidth ="120" MinHeight="140" >
-            <ListBox Name="AvailableChannelsList" DockPanel.Dock="Top" ItemsSource="{Binding Path=AvailableChannels}" SelectedIndex="{Binding AvailableChannelSelectedIndex, Mode=TwoWay}" SelectedItem="{Binding AvailableChannelSelected}" cal:Message.Attach="[Event MouseDoubleClick] = [Action SelectChannel]; [Event SelectionChanged] = [Action AvailableChannelSelectionChanged]" />
+            <ListBox Name="AvailableChannelsList" DockPanel.Dock="Top" ItemsSource="{Binding Source={StaticResource AvailableChannelsSorted}}" SelectedIndex="{Binding AvailableChannelSelectedIndex, Mode=TwoWay}" SelectedItem="{Binding AvailableChannelSelected}" cal:Message.Attach="[Event MouseDoubleClick] = [Action SelectChannel]; [Event SelectionChanged] = [Action AvailableChannelSelectionChanged]" />
         </DockPanel>
-        
+
         <Grid Margin="10,5,5,5" Grid.Row="2" Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -78,7 +83,7 @@
                 <RowDefinition Height="40"/>
                 <RowDefinition Height="40"/>
             </Grid.RowDefinitions>
-            
+
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="40" />
             </Grid.ColumnDefinitions>
@@ -89,7 +94,7 @@
             <Button Grid.Row="3" x:Name="UnselectAllChannels" Margin="5" Content="&lt;&lt;" IsEnabled="{Binding HasSelected}" />
 
         </Grid>
-        
+
         <DockPanel Grid.Row="1" Grid.Column="2" Margin="5,5,0,5" MinWidth="120" MinHeight="140">
             <ListBox Name="SelectedChannelsList" DockPanel.Dock="Top" ItemsSource="{Binding Path=SelectedChannels}" SelectedIndex="{Binding SelectedChannelSelectedIndex, Mode=TwoWay}" SelectedItem="{Binding SelectedChannelSelected}" cal:Message.Attach="[Event MouseDoubleClick] = [Action UnselectChannel]; [Event SelectionChanged] = [Action SelectedChannelSelectionChanged]" />
         </DockPanel>

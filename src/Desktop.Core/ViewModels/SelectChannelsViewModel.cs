@@ -16,6 +16,7 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -183,7 +184,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void SelectAllChannels()
         {
-            var available = AvailableChannels.ToArray();
+            var available = AvailableChannels.ToList();
+            available.Sort((x, y) => string.Compare(x.Mnemonic, y.Mnemonic, StringComparison.InvariantCultureIgnoreCase));
             available.ForEach(a => MoveChannel(a, AvailableChannels, SelectedChannels));
         }
 
