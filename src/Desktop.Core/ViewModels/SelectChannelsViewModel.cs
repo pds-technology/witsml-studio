@@ -176,7 +176,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <param name="args">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
         public void SelectChannel(MouseButtonEventArgs args)
         {
-            if (!(args.OriginalSource is UIElement && ((UIElement)args.OriginalSource).IsMouseOver)) return;
+            if (args == null || !(args.OriginalSource is UIElement && ((UIElement)args.OriginalSource).IsMouseOver)) return;
 
             var sourceIndex = MoveChannel(AvailableChannelSelected, AvailableChannels, SelectedChannels);
             if (sourceIndex < 0) return;
@@ -201,7 +201,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <param name="args">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
         public void UnselectChannel(MouseButtonEventArgs args)
         {
-            if (!(args.OriginalSource is UIElement && ((UIElement)args.OriginalSource).IsMouseOver)) return;
+            if (args == null || !(args.OriginalSource is UIElement && ((UIElement)args.OriginalSource).IsMouseOver)) return;
             if (SelectedChannelSelected.Equals(IndexChannel)) return;
 
             var sourceIndex = MoveChannel(SelectedChannelSelected, SelectedChannels, AvailableChannels);
