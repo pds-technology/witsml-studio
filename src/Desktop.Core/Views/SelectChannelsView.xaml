@@ -43,7 +43,7 @@
         <Label Grid.Row="0" Grid.Column="2" Margin="0" Content="Selected Channels" FontWeight="Bold" />
 
         <DockPanel Grid.Row="1" Grid.Column="0" Margin="10,5,5,5" MinWidth ="120" MinHeight="140" >
-            <ListBox Name="AvailableChannelsList" DockPanel.Dock="Top" ItemsSource="{Binding Source={StaticResource AvailableChannelsSorted}}" SelectedIndex="{Binding AvailableChannelSelectedIndex, Mode=TwoWay}" SelectedItem="{Binding AvailableChannelSelected}" cal:Message.Attach="[Event MouseDoubleClick] = [Action SelectChannel]; [Event SelectionChanged] = [Action AvailableChannelSelectionChanged]" />
+            <ListBox Name="AvailableChannelsList" DockPanel.Dock="Top" ItemsSource="{Binding Source={StaticResource AvailableChannelsSorted}}" SelectedIndex="{Binding AvailableChannelSelectedIndex, Mode=TwoWay}" SelectedItem="{Binding AvailableChannelSelected}" cal:Message.Attach="[Event MouseDoubleClick] = [Action SelectChannel($eventArgs)]; [Event SelectionChanged] = [Action AvailableChannelSelectionChanged]" />
         </DockPanel>
 
         <Grid Margin="10,5,5,5" Grid.Row="2" Grid.Column="0">
@@ -96,7 +96,7 @@
         </Grid>
 
         <DockPanel Grid.Row="1" Grid.Column="2" Margin="5,5,0,5" MinWidth="120" MinHeight="140">
-            <ListBox Name="SelectedChannelsList" DockPanel.Dock="Top" ItemsSource="{Binding Path=SelectedChannels}" SelectedIndex="{Binding SelectedChannelSelectedIndex, Mode=TwoWay}" SelectedItem="{Binding SelectedChannelSelected}" cal:Message.Attach="[Event MouseDoubleClick] = [Action UnselectChannel]; [Event SelectionChanged] = [Action SelectedChannelSelectionChanged]" />
+            <ListBox Name="SelectedChannelsList" DockPanel.Dock="Top" ItemsSource="{Binding Path=SelectedChannels}" SelectedIndex="{Binding SelectedChannelSelectedIndex, Mode=TwoWay}" SelectedItem="{Binding SelectedChannelSelected}" cal:Message.Attach="[Event MouseDoubleClick] = [Action UnselectChannel($eventArgs)]; [Event SelectionChanged] = [Action SelectedChannelSelectionChanged]" />
         </DockPanel>
 
         <Grid Margin="5,5,0,5" Grid.Row="2" Grid.Column="2">

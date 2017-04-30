@@ -20,6 +20,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
+using System.Windows.Input;
 using Caliburn.Micro;
 using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Desktop.Core.Properties;
@@ -171,10 +173,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Selects the channel moving it from Available to Selected
         /// </summary>
-        public void SelectChannel()
+        /// <param name="args">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
+        public void SelectChannel(MouseButtonEventArgs args)
         {
+            if (!(args.OriginalSource is UIElement && ((UIElement)args.OriginalSource).IsMouseOver)) return;
+
             var sourceIndex = MoveChannel(AvailableChannelSelected, AvailableChannels, SelectedChannels);
             if (sourceIndex < 0) return;
+
             AvailableChannelSelectedIndex = sourceIndex;
             NotifyOfPropertyChange(() => AvailableChannelSelectedIndex);
         }
@@ -192,11 +198,15 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Unselects the channel from Selected and moves it to Available.
         /// </summary>
-        public void UnselectChannel()
+        /// <param name="args">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
+        public void UnselectChannel(MouseButtonEventArgs args)
         {
+            if (!(args.OriginalSource is UIElement && ((UIElement)args.OriginalSource).IsMouseOver)) return;
             if (SelectedChannelSelected.Equals(IndexChannel)) return;
+
             var sourceIndex = MoveChannel(SelectedChannelSelected, SelectedChannels, AvailableChannels);
             if (sourceIndex < 0) return;
+
             SelectedChannelSelectedIndex = sourceIndex;
             NotifyOfPropertyChange(() => SelectedChannelSelectedIndex);
         }
