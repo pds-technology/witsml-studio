@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Caliburn.Micro;
 using PDS.WITSMLstudio.Desktop.Core.Models;
@@ -173,10 +174,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Selects the channel moving it from Available to Selected
         /// </summary>
-        /// <param name="args">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
-        public void SelectChannel(MouseButtonEventArgs args)
+        /// <param name="sender">The sender object.</param>
+        /// <param name="e">The <see cref="MouseButtonEventArgs" /> instance containing the event data.</param>
+        public void SelectChannel(object sender, MouseButtonEventArgs e)
         {
-            if (args == null || !(args.OriginalSource is UIElement && ((UIElement)args.OriginalSource).IsMouseOver)) return;
+            var originalSource = e?.OriginalSource;
+            if (sender is ListBox && !(originalSource is UIElement && ((UIElement)originalSource).IsMouseOver)) return;
 
             var sourceIndex = MoveChannel(AvailableChannelSelected, AvailableChannels, SelectedChannels);
             if (sourceIndex < 0) return;
@@ -198,10 +201,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Unselects the channel from Selected and moves it to Available.
         /// </summary>
-        /// <param name="args">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
-        public void UnselectChannel(MouseButtonEventArgs args)
+        /// <param name="sender">The sender object.</param>
+        /// <param name="e">The <see cref="MouseButtonEventArgs" /> instance containing the event data.</param>
+        public void UnselectChannel(object sender, MouseButtonEventArgs e)
         {
-            if (args == null || !(args.OriginalSource is UIElement && ((UIElement)args.OriginalSource).IsMouseOver)) return;
+            var originalSource = e?.OriginalSource;
+            if (sender is ListBox && !(originalSource is UIElement && ((UIElement)originalSource).IsMouseOver)) return;
+
             if (SelectedChannelSelected.Equals(IndexChannel)) return;
 
             var sourceIndex = MoveChannel(SelectedChannelSelected, SelectedChannels, AvailableChannels);
