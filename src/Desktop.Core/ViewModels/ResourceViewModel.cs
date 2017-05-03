@@ -50,12 +50,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         /// <param name="runtime">The runtime.</param>
         /// <param name="resource">The resource.</param>
-        public ResourceViewModel(IRuntimeService runtime, Resource resource)
+        /// <param name="dataContext">The data context.</param>
+        public ResourceViewModel(IRuntimeService runtime, Resource resource, object dataContext = null)
         {
             Runtime = runtime;
             Resource = resource;
             Children = new BindableCollection<ResourceViewModel>();
             Indicator = new IndicatorViewModel();
+            DataContext = dataContext;
 
             if (resource.HasChildren != 0)
             {
@@ -73,7 +75,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Gets the resource.
         /// </summary>
         /// <value>The resource.</value>
-        public Resource Resource { get; private set; }
+        public Resource Resource { get; }
+
+        /// <summary>
+        /// Gets the data context.
+        /// </summary>
+        /// <value>The data context.</value>
+        public object DataContext { get; }
 
         /// <summary>
         /// Gets the message identifier.

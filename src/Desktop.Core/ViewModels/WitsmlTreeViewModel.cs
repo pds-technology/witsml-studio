@@ -23,7 +23,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using Energistics.DataAccess;
-using Witsml141ReferenceData = Energistics.DataAccess.WITSML141.ReferenceData;
 using Witsml131 = Energistics.DataAccess.WITSML131;
 using Witsml141 = Energistics.DataAccess.WITSML141;
 using Energistics.Datatypes;
@@ -548,8 +547,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 {
                     var logFolders = new Dictionary<string, string>
                     {
-                        { ObjectFolders.Time, Witsml141ReferenceData.LogIndexType.datetime.ToString() },
-                        { ObjectFolders.Depth, Witsml141ReferenceData.LogIndexType.measureddepth.ToString() },
+                        { ObjectFolders.Time, Witsml141.ReferenceData.LogIndexType.datetime.ToString() },
+                        { ObjectFolders.Depth, Witsml141.ReferenceData.LogIndexType.measureddepth.ToString() },
                         { ObjectFolders.All, ObjectFolders.All }
                     };
 
@@ -635,6 +634,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
         private ResourceViewModel ToResourceViewModel<T>(T dataObject, Action<ResourceViewModel, string> action, Func<T, EtpUri> getUri, int children = -1) where T : IDataObject
         {
+            //TypeDecorationManager.Register(dataObject.GetType());
+
             var uri = getUri(dataObject);
 
             var indicator = new IndicatorViewModel {Color = "#FF32CD32"};
@@ -651,12 +652,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 indicator.Tooltip = "Growing";
             }
 
-            return ToResourceViewModel(uri, dataObject.Name, action, children, indicator);
+            return ToResourceViewModel(uri, dataObject.Name, action, children, indicator, dataObject);
         }
 
-        private ResourceViewModel ToResourceViewModel(EtpUri uri, string name, Action<ResourceViewModel, string> action, int children = -1, IndicatorViewModel indicator = null)
+        private ResourceViewModel ToResourceViewModel(EtpUri uri, string name, Action<ResourceViewModel, string> action, int children = -1, IndicatorViewModel indicator = null, object dataContext = null)
         {
-            var resource = new Resource()
+            var resource = new Resource
             {
                 Uri = uri,
                 Name = name,
@@ -664,7 +665,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 HasChildren = children
             };
 
-            var viewModel = new ResourceViewModel(Runtime, resource);
+            var viewModel = new ResourceViewModel(Runtime, resource, dataContext);
 
             if (indicator != null)
                 viewModel.Indicator = indicator;
