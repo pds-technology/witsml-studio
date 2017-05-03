@@ -101,8 +101,9 @@
                 <xctk:PropertyDefinition TargetProperties="NameWellbore" DisplayOrder="15" />
                 <!--<xctk:PropertyDefinition TargetProperties="CommonData" DisplayOrder="16" />-->
                 <!-- Well -->
-                <!--<xctk:PropertyDefinition TargetProperties="WellDatum" DisplayOrder="20" />-->
-                <!--<xctk:PropertyDefinition TargetProperties="WellLocation" DisplayOrder="21" />-->
+                <xctk:PropertyDefinition TargetProperties="TimeZone" DisplayOrder="20" />
+                <!--<xctk:PropertyDefinition TargetProperties="WellDatum" DisplayOrder="21" />-->
+                <!--<xctk:PropertyDefinition TargetProperties="WellLocation" DisplayOrder="22" />-->
                 <!-- Wellbore -->
                 <xctk:PropertyDefinition TargetProperties="IsActive" DisplayOrder="30" />
                 <!-- Log -->
