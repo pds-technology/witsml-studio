@@ -79,7 +79,7 @@
 
         <xctk:PropertyGrid
             Grid.Row="1"
-            Margin="0,5,0,-5"
+            Margin="0,5,0,0"
             SelectedObject="{Binding ElementName=Hierarchy, Path=SelectedItem.DataContext}"
             AutoGenerateProperties="False"
             IsCategorized="False"
@@ -111,11 +111,11 @@
                 <xctk:PropertyDefinition TargetProperties="StartDateTimeIndex" DisplayOrder="43" />
                 <xctk:PropertyDefinition TargetProperties="EndDateTimeIndex" DisplayOrder="44" />
                 <!-- MudLog -->
-                <xctk:PropertyDefinition TargetProperties="StartMd" DisplayOrder="50" />
-                <xctk:PropertyDefinition TargetProperties="EndMd" DisplayOrder="51" />
+                <xctk:PropertyDefinition TargetProperties="StartMD" DisplayOrder="50" />
+                <xctk:PropertyDefinition TargetProperties="EndMD" DisplayOrder="51" />
                 <!-- Trajectory -->
-                <xctk:PropertyDefinition TargetProperties="MdMn" DisplayOrder="60" />
-                <xctk:PropertyDefinition TargetProperties="MdMx" DisplayOrder="61" />
+                <xctk:PropertyDefinition TargetProperties="MDMin" DisplayOrder="60" />
+                <xctk:PropertyDefinition TargetProperties="MDMax" DisplayOrder="61" />
                 <!-- Growing Objects -->
                 <xctk:PropertyDefinition TargetProperties="ObjectGrowing" DisplayOrder="70" />
             </xctk:PropertyGrid.PropertyDefinitions>
