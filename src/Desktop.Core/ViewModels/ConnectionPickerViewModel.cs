@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
 using Caliburn.Micro;
@@ -207,14 +208,22 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             if (Connection == _addNewConnectionItem)
             {
-                _connection = previous;
-                NotifyOfPropertyChange(() => Connection);
-                ShowConnectionDialog();
-                return;
+                Task.Delay(100)
+                    .ContinueWith(task =>
+                    {
+                        _connection = previous;
+                        NotifyOfPropertyChange(() => Connection);
+                    })
+                    .ContinueWith(task =>
+                    {
+                        ShowConnectionDialog();
+                    });
             }
-
-            // Invoke delegate that will handle the connection change
-            OnConnectionChanged?.Invoke(Connection);
+            else
+            {
+                // Invoke delegate that will handle the connection change
+                OnConnectionChanged?.Invoke(Connection);
+            }
         }
 
         private void InsertConnections(Connection[] connections, Connection selected, bool force = false)
