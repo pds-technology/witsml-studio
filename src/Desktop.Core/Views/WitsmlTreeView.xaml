@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:vm="clr-namespace:PDS.WITSMLstudio.Desktop.Core.ViewModels"
              xmlns:conv="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
@@ -83,7 +84,7 @@
             SelectedObject="{Binding ElementName=Hierarchy, Path=SelectedItem.DataContext}"
             AutoGenerateProperties="False"
             IsCategorized="False"
-            IsReadOnly="True"
+            IsReadOnly="false"
             ShowAdvancedOptions="False"
             ShowDescriptionByTooltip="False"
             ShowPreview="False"
@@ -91,19 +92,47 @@
             ShowSortOptions="False"
             ShowSummary="False"
             ShowTitle="False">
+            <xctk:PropertyGrid.EditorDefinitions>
+                <xctk:EditorTemplateDefinition>
+                    <xctk:EditorTemplateDefinition.TargetProperties>
+                        <xctk:TargetPropertyType Type="{x:Type sys:String}" />
+                        <sys:String>IsActive</sys:String>
+                        <sys:String>StartIndex</sys:String>
+                        <sys:String>EndIndex</sys:String>
+                        <sys:String>StartDateTimeIndex</sys:String>
+                        <sys:String>EndDateTimeIndex</sys:String>
+                        <sys:String>StartMD</sys:String>
+                        <sys:String>EndMD</sys:String>
+                        <sys:String>MDMin</sys:String>
+                        <sys:String>MDMax</sys:String>
+                        <sys:String>ObjectGrowing</sys:String>
+                        <sys:String>DateTimeCreation</sys:String>
+                        <sys:String>DateTimeLastChange</sys:String>
+                        <sys:String>ItemState</sys:String>
+                    </xctk:EditorTemplateDefinition.TargetProperties>
+                    <xctk:EditorTemplateDefinition.EditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding Value}" IsReadOnly="True" BorderThickness="0"
+                                     cal:Message.Attach="[Event MouseDoubleClick] = [Action OnEditorFocus($source)];
+                                                         [Event GotKeyboardFocus] = [Action OnEditorFocus($source)];
+                                                         [Event PreviewMouseLeftButtonDown] = [Action OnIgnoreMouseButton($source, $eventArgs)]" />
+                        </DataTemplate>
+                    </xctk:EditorTemplateDefinition.EditingTemplate>
+                </xctk:EditorTemplateDefinition>
+            </xctk:PropertyGrid.EditorDefinitions>
+            
             <xctk:PropertyGrid.PropertyDefinitions>
-                <!-- Common -->
+                <!-- IDs -->
                 <xctk:PropertyDefinition TargetProperties="Uid" DisplayOrder="10" />
                 <xctk:PropertyDefinition TargetProperties="Name" DisplayOrder="11" />
                 <xctk:PropertyDefinition TargetProperties="UidWell" DisplayOrder="12" />
                 <xctk:PropertyDefinition TargetProperties="NameWell" DisplayOrder="13" />
                 <xctk:PropertyDefinition TargetProperties="UidWellbore" DisplayOrder="14" />
                 <xctk:PropertyDefinition TargetProperties="NameWellbore" DisplayOrder="15" />
-                <!--<xctk:PropertyDefinition TargetProperties="CommonData" DisplayOrder="16" />-->
                 <!-- Well -->
                 <xctk:PropertyDefinition TargetProperties="TimeZone" DisplayOrder="20" />
-                <!--<xctk:PropertyDefinition TargetProperties="WellDatum" DisplayOrder="21" />-->
-                <!--<xctk:PropertyDefinition TargetProperties="WellLocation" DisplayOrder="22" />-->
+                <!--<xctk:PropertyDefinition TargetProperties="WellDatum" DisplayOrder="21" IsExpandable="True" />-->
+                <!--<xctk:PropertyDefinition TargetProperties="WellLocation" DisplayOrder="22" IsExpandable="True" />-->
                 <!-- Wellbore -->
                 <xctk:PropertyDefinition TargetProperties="IsActive" DisplayOrder="30" />
                 <!-- Log -->
@@ -119,6 +148,10 @@
                 <xctk:PropertyDefinition TargetProperties="MDMax" DisplayOrder="61" />
                 <!-- Growing Objects -->
                 <xctk:PropertyDefinition TargetProperties="ObjectGrowing" DisplayOrder="70" />
+                <!-- Common -->
+                <xctk:PropertyDefinition TargetProperties="DateTimeCreation" DisplayOrder="80" />
+                <xctk:PropertyDefinition TargetProperties="DateTimeLastChange" DisplayOrder="81" />
+                <xctk:PropertyDefinition TargetProperties="ItemState" DisplayOrder="82" />
             </xctk:PropertyGrid.PropertyDefinitions>
         </xctk:PropertyGrid>
 

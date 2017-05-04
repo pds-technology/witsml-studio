@@ -21,6 +21,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Input;
 using Caliburn.Micro;
 using Energistics.DataAccess;
 using Witsml131 = Energistics.DataAccess.WITSML131;
@@ -31,6 +33,7 @@ using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Linq;
 using PDS.WITSMLstudio.Query;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
 namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
@@ -502,6 +505,29 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             //NotifyOfPropertyChange(() => CanDeleteObject);
         }
 
+        /// <summary>
+        /// Called when the editor gets focus.
+        /// </summary>
+        /// <param name="control">The control.</param>
+        public void OnEditorFocus(TextBox control)
+        {
+            control?.SelectAll();
+        }
+
+        /// <summary>
+        /// Called when we want to ignore mouse button clicks.
+        /// </summary>
+        /// <param name="control">The control.</param>
+        /// <param name="e">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
+        public void OnIgnoreMouseButton(TextBox control, MouseButtonEventArgs e)
+        {
+            if (control != null && !control.IsKeyboardFocusWithin)
+            {
+                e.Handled = true;
+                control.Focus();
+            }
+        }
+
         private void LoadWells()
         {
             Runtime.ShowBusy();
@@ -634,8 +660,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
         private ResourceViewModel ToResourceViewModel<T>(T dataObject, Action<ResourceViewModel, string> action, Func<T, EtpUri> getUri, int children = -1) where T : IDataObject
         {
-            //TypeDecorationManager.Register(dataObject.GetType());
-
             var uri = getUri(dataObject);
 
             var indicator = new IndicatorViewModel {Color = "#FF32CD32"};
@@ -652,7 +676,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 indicator.Tooltip = "Growing";
             }
 
-            return ToResourceViewModel(uri, dataObject.Name, action, children, indicator, dataObject);
+            return ToResourceViewModel(uri, dataObject.Name, action, children, indicator, new DataObjectWrapper(dataObject));
         }
 
         private ResourceViewModel ToResourceViewModel(EtpUri uri, string name, Action<ResourceViewModel, string> action, int children = -1, IndicatorViewModel indicator = null, object dataContext = null)

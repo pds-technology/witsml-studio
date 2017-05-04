@@ -191,6 +191,8 @@
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
     <Compile Include="Converters\ExpandableListConverterOfT.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Models\CustomPropertyDescriptor.cs" />
+    <Compile Include="Models\DataObjectWrapper.cs" />
     <Compile Include="Models\LogCurveItem.cs" />
     <Compile Include="Models\SecurityProtocolItem.cs" />
     <Compile Include="Models\ListItemPropertyDescriptor.cs" />
