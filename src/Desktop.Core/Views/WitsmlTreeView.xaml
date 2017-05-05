@@ -96,16 +96,29 @@
                 <xctk:EditorTemplateDefinition>
                     <xctk:EditorTemplateDefinition.TargetProperties>
                         <xctk:TargetPropertyType Type="{x:Type sys:String}" />
+                        <!-- Wellbore -->
                         <sys:String>IsActive</sys:String>
+                        <!-- Log -->
                         <sys:String>StartIndex</sys:String>
                         <sys:String>EndIndex</sys:String>
                         <sys:String>StartDateTimeIndex</sys:String>
                         <sys:String>EndDateTimeIndex</sys:String>
+                        <!-- LogCurveInfo -->
+                        <sys:String>Mnemonic</sys:String>
+                        <sys:String>TypeLogData</sys:String>
+                        <sys:String>MinIndex</sys:String>
+                        <sys:String>MaxIndex</sys:String>
+                        <sys:String>MinDateTimeIndex</sys:String>
+                        <sys:String>MaxDateTimeIndex</sys:String>
+                        <!-- MudLog -->
                         <sys:String>StartMD</sys:String>
                         <sys:String>EndMD</sys:String>
+                        <!-- Trajectory -->
                         <sys:String>MDMin</sys:String>
                         <sys:String>MDMax</sys:String>
+                        <!-- Growing Objects -->
                         <sys:String>ObjectGrowing</sys:String>
+                        <!-- Common -->
                         <sys:String>DateTimeCreation</sys:String>
                         <sys:String>DateTimeLastChange</sys:String>
                         <sys:String>ItemState</sys:String>
@@ -140,6 +153,15 @@
                 <xctk:PropertyDefinition TargetProperties="EndIndex" DisplayOrder="42" />
                 <xctk:PropertyDefinition TargetProperties="StartDateTimeIndex" DisplayOrder="43" />
                 <xctk:PropertyDefinition TargetProperties="EndDateTimeIndex" DisplayOrder="44" />
+                <!-- LogCurveInfo -->
+                <xctk:PropertyDefinition TargetProperties="Mnemonic" DisplayOrder="40" />
+                <xctk:PropertyDefinition TargetProperties="Description" DisplayOrder="41" />
+                <xctk:PropertyDefinition TargetProperties="Unit" DisplayOrder="42" />
+                <xctk:PropertyDefinition TargetProperties="TypeLogData" DisplayOrder="43" />
+                <xctk:PropertyDefinition TargetProperties="MinIndex" DisplayOrder="44" />
+                <xctk:PropertyDefinition TargetProperties="MaxIndex" DisplayOrder="45" />
+                <xctk:PropertyDefinition TargetProperties="MinDateTimeIndex" DisplayOrder="46" />
+                <xctk:PropertyDefinition TargetProperties="MaxDateTimeIndex" DisplayOrder="47" />
                 <!-- MudLog -->
                 <xctk:PropertyDefinition TargetProperties="StartMD" DisplayOrder="50" />
                 <xctk:PropertyDefinition TargetProperties="EndMD" DisplayOrder="51" />

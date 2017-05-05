@@ -634,11 +634,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             var log141 = dataObject as Witsml141.Log;
 
             log131?.LogCurveInfo
-                .Select(x => ToResourceViewModel(x.GetUri(log131), x.Mnemonic, null, 0))
+                .Select(x => ToResourceViewModel(x.GetUri(log131), x.Mnemonic, null, 0, dataContext: new DataObjectWrapper(x)))
                 .ForEach(items.Add);
 
             log141?.LogCurveInfo
-                .Select(x => ToResourceViewModel(x.GetUri(log141), x.Mnemonic.Value, null, 0))
+                .Select(x => ToResourceViewModel(x.GetUri(log141), x.Mnemonic.Value, null, 0, dataContext: new DataObjectWrapper(x)))
                 .ForEach(items.Add);
         }
 
