@@ -302,10 +302,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             // If the selected channel cannot be found in the source list get out
             var index = sourceChannels.IndexOf(channelSelected);
-            if (index < 0) return -1;
 
             // Channel was found in the source list and is removed.
-            sourceChannels.RemoveAt(index);
+            if (index >= 0)
+                sourceChannels.RemoveAt(index);
 
             // Channel is added to the destination list and notifications are sent about changes to both lists
             destinationChannels.Add(channelSelected);

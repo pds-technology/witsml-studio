@@ -34,19 +34,39 @@ namespace PDS.WITSMLstudio.Desktop.Core.Models
         /// <param name="startIndex">The start index.</param>
         /// <param name="endIndex">The end index.</param>
         /// <param name="uom">The uom.</param>
-        public LogCurveItem(string mnemonic, string description, string startIndex, string endIndex, string uom)
+        /// <param name="typeLogData">The type log data.</param>
+        /// <param name="notFound">if set to <c>true</c> if the LogCurveItem represents a LogCurveInfo that was not found.</param>
+        public LogCurveItem(string mnemonic, string description, string startIndex, string endIndex, string uom, string typeLogData, bool notFound = false)
         {
             Mnemonic = mnemonic;
-            Description = description;
+            NotFound = notFound;
+            Description = NotFound ? "Not Found" : description;
             StartIndex = startIndex;
             EndIndex = endIndex;
             Uom = uom;
+            TypeLogData = typeLogData;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LogCurveItem"/> class.
+        /// </summary>
+        /// <param name="mnemonic">The mnemonic.</param>
+        /// <param name="notFound">if set to <c>true</c> if the LogCurveItem represents a LogCurveInfo that was not found.</param>
+        public LogCurveItem(string mnemonic, bool notFound)
+            : this(mnemonic, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, notFound)
+        {
+
         }
 
         /// <summary>
         /// Gets or sets the mnemonic.
         /// </summary>
         public string Mnemonic { get; }
+
+        /// <summary>
+        /// Gets the type log data.
+        /// </summary>
+        public string TypeLogData { get; }
 
         /// <summary>
         /// Gets or sets the mnemonic.
@@ -67,6 +87,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.Models
         /// Gets or sets the end index.
         /// </summary>
         public string EndIndex { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether a corresponding LogCurveInfo was not found.
+        /// </summary>
+        public bool NotFound { get; }
 
         /// <summary>
         /// Returns a <see cref="System.String" /> that represents this LogCurveItem.

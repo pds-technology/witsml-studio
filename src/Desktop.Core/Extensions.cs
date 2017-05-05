@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using Energistics.DataAccess;
 using PDS.WITSMLstudio.Data.Logs;
 using PDS.WITSMLstudio.Desktop.Core.Models;
 
@@ -55,12 +56,20 @@ namespace PDS.WITSMLstudio.Desktop.Core
         /// <returns>LogCurveItem</returns>
         public static LogCurveItem ToLogCurveItem(this Energistics.DataAccess.WITSML131.ComponentSchemas.LogCurveInfo logCurveInfo)
         {
+            var startIndex = logCurveInfo.GetStartIndex();
+            var endIndex = logCurveInfo.GetEndIndex();
+
             return new LogCurveItem(
                 logCurveInfo.Mnemonic, 
-                logCurveInfo.CurveDescription, 
-                logCurveInfo.GetStartIndex()?.ToString() ?? string.Empty, 
-                logCurveInfo.GetEndIndex()?.ToString() ?? string.Empty, 
-                logCurveInfo.Unit);
+                logCurveInfo.CurveDescription,
+                startIndex is Timestamp
+                    ? ((Timestamp)startIndex).ToString("o")
+                    : startIndex?.ToString() ?? string.Empty,
+                endIndex is Timestamp
+                    ? ((Timestamp)endIndex).ToString("o")
+                    : endIndex?.ToString() ?? string.Empty,
+                logCurveInfo.Unit,
+                logCurveInfo.TypeLogData?.ToString("F"));
         }
 
         /// <summary>
@@ -80,12 +89,20 @@ namespace PDS.WITSMLstudio.Desktop.Core
         /// <returns>LogCurveItem</returns>
         public static LogCurveItem ToLogCurveItem(this Energistics.DataAccess.WITSML141.ComponentSchemas.LogCurveInfo logCurveInfo)
         {
+            var startIndex = logCurveInfo.GetStartIndex();
+            var endIndex = logCurveInfo.GetEndIndex();
+
             return new LogCurveItem(
                 logCurveInfo.Mnemonic?.Value,
                 logCurveInfo.CurveDescription,
-                logCurveInfo.GetStartIndex()?.ToString() ?? string.Empty,
-                logCurveInfo.GetEndIndex()?.ToString() ?? string.Empty,
-                logCurveInfo.Unit);
+                startIndex is Timestamp
+                    ? ((Timestamp)startIndex).ToString("o")
+                    : startIndex?.ToString() ?? string.Empty,
+                endIndex is Timestamp
+                    ? ((Timestamp)endIndex).ToString("o")
+                    : endIndex?.ToString() ?? string.Empty,
+                logCurveInfo.Unit,
+                logCurveInfo.TypeLogData?.ToString("F"));
         }
 
         /// <summary>
