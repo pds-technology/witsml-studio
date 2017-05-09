@@ -35,8 +35,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.Models
         /// <param name="endIndex">The end index.</param>
         /// <param name="uom">The uom.</param>
         /// <param name="typeLogData">The type log data.</param>
+        /// <param name="nullValue">The null value.</param>
         /// <param name="notFound">if set to <c>true</c> if the LogCurveItem represents a LogCurveInfo that was not found.</param>
-        public LogCurveItem(string mnemonic, string description, string startIndex, string endIndex, string uom, string typeLogData, bool notFound = false)
+        public LogCurveItem(string mnemonic, string description, string startIndex, string endIndex, string uom, string typeLogData, string nullValue, bool notFound = false)
         {
             Mnemonic = mnemonic;
             NotFound = notFound;
@@ -45,6 +46,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Models
             EndIndex = endIndex;
             Uom = uom;
             TypeLogData = typeLogData;
+            NullValue = nullValue;
         }
 
         /// <summary>
@@ -53,7 +55,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Models
         /// <param name="mnemonic">The mnemonic.</param>
         /// <param name="notFound">if set to <c>true</c> if the LogCurveItem represents a LogCurveInfo that was not found.</param>
         public LogCurveItem(string mnemonic, bool notFound)
-            : this(mnemonic, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, notFound)
+            : this(mnemonic, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, notFound)
         {
 
         }
@@ -67,6 +69,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.Models
         /// Gets the type log data.
         /// </summary>
         public string TypeLogData { get; }
+
+        /// <summary>
+        /// Gets the null value.
+        /// </summary>
+        public string NullValue { get; }
 
         /// <summary>
         /// Gets or sets the mnemonic.

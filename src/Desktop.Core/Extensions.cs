@@ -70,7 +70,8 @@ namespace PDS.WITSMLstudio.Desktop.Core
                     ? ((Timestamp?)endIndex).ToDisplayDateTime()
                     : endIndex?.ToString() ?? string.Empty,
                 logCurveInfo.Unit,
-                logCurveInfo.TypeLogData?.ToString("F"));
+                logCurveInfo.TypeLogData?.ToString("F"),
+                logCurveInfo.NullValue);
         }
 
         /// <summary>
@@ -103,7 +104,8 @@ namespace PDS.WITSMLstudio.Desktop.Core
                     ? ((Timestamp?)endIndex).ToDisplayDateTime()
                     : endIndex?.ToString() ?? string.Empty,
                 logCurveInfo.Unit,
-                logCurveInfo.TypeLogData?.ToString("F"));
+                logCurveInfo.TypeLogData?.ToString("F"),
+                logCurveInfo.NullValue);
         }
 
         /// <summary>
