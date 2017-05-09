@@ -21,6 +21,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using Energistics.DataAccess;
+using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Data.Logs;
 using PDS.WITSMLstudio.Desktop.Core.Models;
 
@@ -63,10 +64,10 @@ namespace PDS.WITSMLstudio.Desktop.Core
                 logCurveInfo.Mnemonic, 
                 logCurveInfo.CurveDescription,
                 startIndex is Timestamp
-                    ? ((Timestamp)startIndex).ToString("o")
+                    ? ((Timestamp)startIndex).ToDisplayDateTime()
                     : startIndex?.ToString() ?? string.Empty,
                 endIndex is Timestamp
-                    ? ((Timestamp)endIndex).ToString("o")
+                    ? ((Timestamp)endIndex).ToDisplayDateTime()
                     : endIndex?.ToString() ?? string.Empty,
                 logCurveInfo.Unit,
                 logCurveInfo.TypeLogData?.ToString("F"));
@@ -96,10 +97,10 @@ namespace PDS.WITSMLstudio.Desktop.Core
                 logCurveInfo.Mnemonic?.Value,
                 logCurveInfo.CurveDescription,
                 startIndex is Timestamp
-                    ? ((Timestamp)startIndex).ToString("o")
+                    ? ((Timestamp)startIndex).ToDisplayDateTime()
                     : startIndex?.ToString() ?? string.Empty,
                 endIndex is Timestamp
-                    ? ((Timestamp)endIndex).ToString("o")
+                    ? ((Timestamp)endIndex).ToDisplayDateTime()
                     : endIndex?.ToString() ?? string.Empty,
                 logCurveInfo.Unit,
                 logCurveInfo.TypeLogData?.ToString("F"));
