@@ -48,10 +48,10 @@
                     <MenuItem Header="Get Header" cal:Message.Attach="GetObjectHeader" />
                     
                     <MenuItem Header="Get Details" IsEnabled="{Binding CanGetObjectIds}" cal:Message.Attach="GetObjectDetailsWithReturnElementsAll"
-                              Visibility="{Binding CanGetObjectHeader, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=true}"/>
+                              Visibility="{Binding CanGetObjectDetails, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=true}"/>
                     
                     <MenuItem Header="Get Details" IsEnabled="{Binding CanGetObjectIds}"
-                              Visibility="{Binding CanGetObjectHeader, Converter={StaticResource BooleanToVisibilityConverter}}">
+                              Visibility="{Binding CanGetObjectDetails, Converter={StaticResource BooleanToVisibilityConverter}}">
                         
                         <MenuItem Header="Return Elements = all" ToolTip="returnElements=all" cal:Message.Attach="GetObjectDetailsWithReturnElementsAll"/>
                         <MenuItem ToolTip="{Binding ObjectDetailsWithRequestLatestTooltip}" cal:Message.Attach="GetObjectDetailsWithRequestLatest">

@@ -222,8 +222,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 var uri = new EtpUri(resource.Resource.Uri);
 
                 return !string.IsNullOrWhiteSpace(uri.ObjectId)
-                       && ObjectTypes.IsGrowingDataObject(uri.ObjectType) 
-                       && uri.Version.Equals(OptionsIn.DataVersion.Version141.Value);
+                       && ObjectTypes.IsGrowingDataObject(uri.ObjectType);
             }
         }
 
@@ -241,6 +240,24 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 Context.GetGrowingObjectHeaderOnly(uri.ObjectType, uri);
                 Runtime.ShowBusy(false);
             });
+        }
+
+        /// <summary>
+        /// Determines whether a GetFromStore request can be sent for the selected item.
+        /// </summary>
+        /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
+        public bool CanGetObjectDetails
+        {
+            get
+            {
+                if (!CanGetObjectHeader)
+                    return false;
+
+                var resource = Items.FindSelected();
+                var uri = new EtpUri(resource.Resource.Uri);
+
+                return uri.Version.Equals(OptionsIn.DataVersion.Version141.Value);
+            }
         }
 
         /// <summary>
@@ -496,6 +513,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             NotifyOfPropertyChange(() => CanGetObjectIds);
             NotifyOfPropertyChange(() => CanGetObjectHeader);
+            NotifyOfPropertyChange(() => CanGetObjectDetails);
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithReturnElementsAll);
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithMaxDataRows);
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithRequestLatest);
