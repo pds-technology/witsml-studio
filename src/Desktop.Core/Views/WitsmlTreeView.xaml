@@ -110,6 +110,7 @@
                         <sys:String>EndIndex</sys:String>
                         <sys:String>StartDateTimeIndex</sys:String>
                         <sys:String>EndDateTimeIndex</sys:String>
+                        <sys:String>Direction</sys:String>
                         <!-- LogCurveInfo -->
                         <sys:String>Mnemonic</sys:String>
                         <sys:String>TypeLogData</sys:String>
@@ -160,6 +161,7 @@
                 <xctk:PropertyDefinition TargetProperties="EndIndex" DisplayOrder="42" />
                 <xctk:PropertyDefinition TargetProperties="StartDateTimeIndex" DisplayOrder="43" />
                 <xctk:PropertyDefinition TargetProperties="EndDateTimeIndex" DisplayOrder="44" />
+                <xctk:PropertyDefinition TargetProperties="Direction" DisplayOrder="45" />
                 <!-- LogCurveInfo -->
                 <xctk:PropertyDefinition TargetProperties="Mnemonic" DisplayOrder="40" />
                 <xctk:PropertyDefinition TargetProperties="Description" DisplayOrder="41" />
