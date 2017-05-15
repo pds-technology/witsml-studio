@@ -16,6 +16,7 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -54,8 +55,9 @@ namespace PDS.WITSMLstudio.Desktop.Core
         /// Converts a 131 LogCurveInfo to a LogCurveItem
         /// </summary>
         /// <param name="logCurveInfo">The log curve information.</param>
+        /// <param name="toOffset">The time span to convert the timestamp to if indexes are time.</param>
         /// <returns>LogCurveItem</returns>
-        public static LogCurveItem ToLogCurveItem(this Energistics.DataAccess.WITSML131.ComponentSchemas.LogCurveInfo logCurveInfo)
+        public static LogCurveItem ToLogCurveItem(this Energistics.DataAccess.WITSML131.ComponentSchemas.LogCurveInfo logCurveInfo, TimeSpan toOffset)
         {
             var startIndex = logCurveInfo.GetStartIndex();
             var endIndex = logCurveInfo.GetEndIndex();
@@ -64,10 +66,10 @@ namespace PDS.WITSMLstudio.Desktop.Core
                 logCurveInfo.Mnemonic, 
                 logCurveInfo.CurveDescription,
                 startIndex is Timestamp
-                    ? ((Timestamp?)startIndex).ToDisplayDateTime()
+                    ? ((Timestamp?)startIndex).ToDisplayDateTime(toOffset)
                     : startIndex?.ToString() ?? string.Empty,
                 endIndex is Timestamp
-                    ? ((Timestamp?)endIndex).ToDisplayDateTime()
+                    ? ((Timestamp?)endIndex).ToDisplayDateTime(toOffset)
                     : endIndex?.ToString() ?? string.Empty,
                 logCurveInfo.Unit,
                 logCurveInfo.TypeLogData?.ToString("F"),
@@ -78,18 +80,20 @@ namespace PDS.WITSMLstudio.Desktop.Core
         /// Converts a list of 131 LogCurveInfos to a list of LogCurveItems.
         /// </summary>
         /// <param name="logCurveInfos">The log curve infos.</param>
+        /// <param name="toOffset">The time span to convert the timestamp to if indexes are time.</param>
         /// <returns>A list of LogCurveItems</returns>
-        public static List<LogCurveItem> ToLogCurveItemList(this List<Energistics.DataAccess.WITSML131.ComponentSchemas.LogCurveInfo> logCurveInfos)
+        public static List<LogCurveItem> ToLogCurveItemList(this List<Energistics.DataAccess.WITSML131.ComponentSchemas.LogCurveInfo> logCurveInfos, TimeSpan toOffset)
         {
-            return logCurveInfos?.Select(l => l.ToLogCurveItem()).ToList() ?? new List<LogCurveItem>();
+            return logCurveInfos?.Select(l => l.ToLogCurveItem(toOffset)).ToList() ?? new List<LogCurveItem>();
         }
 
         /// <summary>
         /// Converts a 141 LogCurveInfo to a LogCurveItem
         /// </summary>
         /// <param name="logCurveInfo">The log curve information.</param>
+        /// <param name="toOffset">The time span to convert the timestamp to if indexes are time.</param>
         /// <returns>LogCurveItem</returns>
-        public static LogCurveItem ToLogCurveItem(this Energistics.DataAccess.WITSML141.ComponentSchemas.LogCurveInfo logCurveInfo)
+        public static LogCurveItem ToLogCurveItem(this Energistics.DataAccess.WITSML141.ComponentSchemas.LogCurveInfo logCurveInfo, TimeSpan toOffset)
         {
             var startIndex = logCurveInfo.GetStartIndex();
             var endIndex = logCurveInfo.GetEndIndex();
@@ -98,10 +102,10 @@ namespace PDS.WITSMLstudio.Desktop.Core
                 logCurveInfo.Mnemonic?.Value,
                 logCurveInfo.CurveDescription,
                 startIndex is Timestamp
-                    ? ((Timestamp?)startIndex).ToDisplayDateTime()
+                    ? ((Timestamp?)startIndex).ToDisplayDateTime(toOffset)
                     : startIndex?.ToString() ?? string.Empty,
                 endIndex is Timestamp
-                    ? ((Timestamp?)endIndex).ToDisplayDateTime()
+                    ? ((Timestamp?)endIndex).ToDisplayDateTime(toOffset)
                     : endIndex?.ToString() ?? string.Empty,
                 logCurveInfo.Unit,
                 logCurveInfo.TypeLogData?.ToString("F"),
@@ -112,10 +116,11 @@ namespace PDS.WITSMLstudio.Desktop.Core
         /// Converts a list of 141 LogCurveInfos to a list of LogCurveItems.
         /// </summary>
         /// <param name="logCurveInfos">The log curve infos.</param>
+        /// <param name="toOffset">The time span to convert the timestamp to if indexes are time.</param>
         /// <returns>A list of LogCurveItems</returns>
-        public static List<LogCurveItem> ToLogCurveItemList(this List<Energistics.DataAccess.WITSML141.ComponentSchemas.LogCurveInfo> logCurveInfos)
+        public static List<LogCurveItem> ToLogCurveItemList(this List<Energistics.DataAccess.WITSML141.ComponentSchemas.LogCurveInfo> logCurveInfos, TimeSpan toOffset)
         {
-            return logCurveInfos?.Select(l => l.ToLogCurveItem()).ToList() ?? new List<LogCurveItem>();
+            return logCurveInfos?.Select(l => l.ToLogCurveItem(toOffset)).ToList() ?? new List<LogCurveItem>();
         }
     }
 }
