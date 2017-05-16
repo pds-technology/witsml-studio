@@ -22,6 +22,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Caliburn.Micro;
@@ -36,6 +37,7 @@ using PDS.WITSMLstudio.Query;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
+using IDataObject = Energistics.DataAccess.IDataObject;
 
 namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 {
@@ -45,6 +47,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
     /// <seealso cref="Caliburn.Micro.Screen" />
     public class WitsmlTreeViewModel : Screen
     {
+        private FrameworkElement _hierarchy;
         private long _messageId;
 
         /// <summary>
@@ -75,6 +78,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         /// <value>The data objects.</value>
         public BindableCollection<string> DataObjects { get; }
+
+        /// <summary>
+        /// Gets or sets an action to execute when the context menu is refreshed.
+        /// </summary>
+        public System.Action OnRefreshContextMenu { get; set; }
 
         private string _wellName;
 
@@ -558,6 +566,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithAllOptions);
             NotifyOfPropertyChange(() => CanRefreshSelected);            
             //NotifyOfPropertyChange(() => CanDeleteObject);
+            OnRefreshContextMenu?.Invoke();
         }
 
         /// <summary>
@@ -581,6 +590,30 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 e.Handled = true;
                 control.Focus();
             }
+        }
+
+        /// <summary>
+        /// Sets the context menu using the supplied user control.
+        /// </summary>
+        /// <param name="control">The control.</param>
+        public void SetContextMenu(FrameworkElement control)
+        {
+            if (_hierarchy == null || control?.ContextMenu == null) return;
+            _hierarchy.ContextMenu = control.ContextMenu;
+            _hierarchy.ContextMenu.DataContext = control.DataContext;
+            control.ContextMenu = null;
+        }
+
+        /// <summary>
+        /// Called when an attached view's Loaded event fires.
+        /// </summary>
+        /// <param name="view">The view.</param>
+        protected override void OnViewLoaded(object view)
+        {
+            base.OnViewLoaded(view);
+
+            var control = view as UserControl;
+            _hierarchy = control?.FindName("Hierarchy") as FrameworkElement;
         }
 
         private void OnWellNameChanged()
