@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -74,6 +75,27 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         /// <value>The data objects.</value>
         public BindableCollection<string> DataObjects { get; }
+
+        private string _wellName;
+
+        /// <summary>
+        /// Gets or sets the name of the well.
+        /// </summary>
+        /// <value>The name of the well.</value>
+        public string WellName
+        {
+            get { return _wellName; }
+            set
+            {
+                if (string.Equals(_wellName, value))
+                    return;
+
+                _wellName = value;
+                NotifyOfPropertyChange(() => WellName);
+                NotifyOfPropertyChange(() => CanClearWellName);
+                OnWellNameChanged();
+            }
+        }
 
         private int? _maxDataRows;
 
@@ -171,6 +193,21 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 _isContextMenuEnabled = value;
                 NotifyOfPropertyChange(() => IsContextMenuEnabled);
             }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance can clear well name.
+        /// </summary>
+        /// <value><c>true</c> if this instance can clear well name; otherwise, <c>false</c>.</value>
+        public bool CanClearWellName => !string.IsNullOrEmpty(WellName);
+
+        /// <summary>
+        /// Clears the name of the well.
+        /// </summary>
+        public void ClearWellName()
+        {
+            WellName = string.Empty;
+            NotifyOfPropertyChange(() => CanClearWellName);
         }
 
         /// <summary>
@@ -543,6 +580,35 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 e.Handled = true;
                 control.Focus();
+            }
+        }
+
+        private void OnWellNameChanged()
+        {
+            var pattern = WellName;
+
+            if (string.IsNullOrEmpty(pattern))
+            {
+                Items.ForEach(x =>
+                {
+                    x.IsVisible = true;
+                });
+            }
+            else if (pattern.StartsWith("/") && pattern.EndsWith("/"))
+            {
+                pattern = pattern.Trim('/');
+
+                Items.ForEach(x =>
+                {
+                    x.IsVisible = Regex.IsMatch(x.Resource.Name, pattern, RegexOptions.IgnoreCase);
+                });
+            }
+            else
+            {
+                Items.ForEach(x =>
+                {
+                    x.IsVisible = x.Resource.Name.IndexOf(pattern, StringComparison.InvariantCultureIgnoreCase) > -1;
+                });
             }
         }
 

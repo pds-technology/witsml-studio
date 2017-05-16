@@ -17,15 +17,30 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="35" />
             <RowDefinition />
             <RowDefinition Height="200" />
         </Grid.RowDefinitions>
 
-        <TreeView x:Name="Hierarchy"  Grid.Row="0" ItemsSource="{Binding Items}" cal:Message.Attach="[Event SelectedItemChanged] = [Action RefreshContextMenu()]">
+        <Grid Grid.Row="0" Margin="0,0,0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="Well Name:" Margin="5,5,10,5" VerticalAlignment="Center" />
+            <TextBox Grid.Column="1" VerticalContentAlignment="Center" Padding="5,0" Text="{Binding WellName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
+            <Button x:Name="ClearWellName" Grid.Column="3" Content="Clear" Width="60" HorizontalAlignment="Right" />
+        </Grid>
+
+        <TreeView x:Name="Hierarchy"  Grid.Row="1" ItemsSource="{Binding Items}" cal:Message.Attach="[Event SelectedItemChanged] = [Action RefreshContextMenu()]">
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                    <Setter Property="Visibility" Value="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
                 </Style>
             </TreeView.ItemContainerStyle>
             <TreeView.Resources>
@@ -80,7 +95,7 @@
         </TreeView>
 
         <xctk:PropertyGrid
-            Grid.Row="1"
+            Grid.Row="2"
             Margin="0,5,0,0"
             SelectedObject="{Binding ElementName=Hierarchy, Path=SelectedItem.DataContext}"
             AutoGenerateProperties="False"

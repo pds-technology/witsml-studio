@@ -58,6 +58,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             Children = new BindableCollection<ResourceViewModel>();
             Indicator = new IndicatorViewModel();
             DataContext = dataContext;
+            IsVisible = true;
 
             if (resource.HasChildren != 0)
             {
@@ -174,6 +175,24 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                     _isSelected = value;
                     NotifyOfPropertyChange(() => IsSelected);
                 }
+            }
+        }
+
+        private bool _isVisible;
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is visible.
+        /// </summary>
+        /// <value><c>true</c> if this instance is visible; otherwise, <c>false</c>.</value>
+        public bool IsVisible
+        {
+            get { return _isVisible; }
+            set
+            {
+                if (_isVisible == value)
+                    return;
+
+                _isVisible = value;
+                NotifyOfPropertyChange(() => IsVisible);
             }
         }
 
