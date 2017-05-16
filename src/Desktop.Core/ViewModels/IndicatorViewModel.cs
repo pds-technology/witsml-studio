@@ -26,7 +26,18 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
     /// <seealso cref="Caliburn.Micro.PropertyChangedBase" />
     public class IndicatorViewModel : PropertyChangedBase
     {
-        private const string Transparent = "Transparent";
+        /// <summary>Transparent</summary>
+        public const string Transparent = "Transparent";
+        /// <summary>Green</summary>
+        public const string Green = "#FF32CD32";
+        /// <summary>Red</summary>
+        public const string Red = "#FFFF0000";
+        /// <summary>Gray</summary>
+        public const string Gray = "#FFC0C0C0";
+        /// <summary>White</summary>
+        public const string White = "#FFFFFFFF";
+        /// <summary>Black</summary>
+        public const string Black = "#FF000000";
 
         private bool _isVisible;
         /// <summary>
@@ -47,7 +58,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         }
 
         private string _tooltip;
-
         /// <summary>
         /// Gets or sets the indicator tootip.
         /// </summary>
@@ -66,11 +76,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         }
 
         private string _color;
-
         /// <summary>
-        /// Gets or sets the indicator color.
+        /// Gets or sets the indicator fill color.
         /// </summary>
-        /// <value>The indicator color.</value>
+        /// <value>The indicator fill color.</value>
         public string Color
         {
             get { return _color ?? Transparent; }
@@ -80,6 +89,24 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 {
                     _color = value;
                     NotifyOfPropertyChange(() => Color);
+                }
+            }
+        }
+
+        private string _outline;
+        /// <summary>
+        /// Gets or sets the indicator outline color.
+        /// </summary>
+        /// <value>The indicator outline color.</value>
+        public string Outline
+        {
+            get { return _outline ?? Transparent; }
+            set
+            {
+                if (_outline != value)
+                {
+                    _outline = value;
+                    NotifyOfPropertyChange(() => Outline);
                 }
             }
         }

@@ -746,18 +746,50 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             var uri = getUri(dataObject);
 
-            var indicator = new IndicatorViewModel {Color = "#FF32CD32"};
+            var indicator = new IndicatorViewModel { Color = IndicatorViewModel.Green, Outline = IndicatorViewModel.Black };
 
             if (ObjectTypes.Wellbore.EqualsIgnoreCase(uri.ObjectType))
             {
-                indicator.IsVisible = dataObject.GetWellboreStatus().GetValueOrDefault();
-                indicator.Tooltip = "Active";
-                
+                indicator.IsVisible = OptionsIn.DataVersion.Version141.Equals(uri.Version);
+
+                if (dataObject.GetWellboreStatus().GetValueOrDefault())
+                {
+                    indicator.Tooltip = "Active";
+                }
+                else
+                {
+                    indicator.Color = IndicatorViewModel.White;
+                    indicator.Outline = IndicatorViewModel.Gray;
+                    indicator.Tooltip = null;
+                }
             }
             else if (ObjectTypes.IsGrowingDataObject(uri.ObjectType))
             {
-                indicator.IsVisible = dataObject.GetObjectGrowingStatus().GetValueOrDefault();
-                indicator.Tooltip = "Growing";
+                var iWellboreObject = dataObject as IWellboreObject;
+                var startIndex = iWellboreObject?.GetStartIndex();
+                var endIndex = iWellboreObject?.GetEndIndex();
+
+                // TODO: Improve empty check using DateTime.MinValue and epoch timestamp
+                var isEmpty = string.IsNullOrWhiteSpace(startIndex) && string.IsNullOrWhiteSpace(endIndex);
+
+                indicator.IsVisible = true;
+
+                if (dataObject.GetObjectGrowingStatus().GetValueOrDefault())
+                {
+                    indicator.Tooltip = "Growing";
+                }
+                else if (isEmpty)
+                {
+                    indicator.Color = IndicatorViewModel.White;
+                    indicator.Outline = IndicatorViewModel.Red;
+                    indicator.Tooltip = "Empty";
+                }
+                else
+                {
+                    indicator.Color = IndicatorViewModel.White;
+                    indicator.Outline = IndicatorViewModel.Gray;
+                    indicator.Tooltip = null;
+                }
             }
 
             return ToResourceViewModel(uri, dataObject.Name, action, children, indicator, new DataObjectWrapper(dataObject));
