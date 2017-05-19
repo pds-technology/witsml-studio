@@ -94,7 +94,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         private Connection _connection;
 
         /// <summary>
-        /// Gets or sets the selectected connection.
+        /// Gets or sets the selected connection.
         /// </summary>
         /// <value>The selected connection.</value>
         public Connection Connection
@@ -110,6 +110,21 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                     Runtime.Invoke(() => OnSelectedConnectionChanged(previous));
                 }
             }
+        }
+
+        /// <summary>
+        /// Sets the specified connection in the drop down list.
+        /// </summary>
+        /// <param name="connectionName">Name of the connection.</param>
+        /// <returns></returns>
+        public bool SelectConnection(string connectionName)
+        {
+            var connection = Connections.FirstOrDefault(c => c.Name.EqualsIgnoreCase(connectionName));
+
+            if (connection == null) return false;
+
+            Connection = connection;
+            return true;
         }
 
         /// <summary>
