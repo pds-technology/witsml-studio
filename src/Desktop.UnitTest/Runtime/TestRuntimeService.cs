@@ -42,6 +42,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// <param name="container">The container.</param>
         public TestRuntimeService(IContainer container)
         {
+            Dispatcher = Dispatcher = Dispatcher.CurrentDispatcher;
             Container = container;
         }
 
@@ -63,12 +64,17 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         public IWindowManager WindowManager { get; set; }
 
         /// <summary>
-        /// Gets or sets the dispatcher thread.
+        /// Gets the dispatcher.
+        /// </summary>
+        public Dispatcher Dispatcher { get; set; }
+
+        /// <summary>
+        /// Gets the dispatcher thread.
         /// </summary>
         /// <value>
         /// The dispatcher thread.
         /// </value>
-        public Thread DispatcherThread { get; set; }
+        public Thread DispatcherThread => Dispatcher.Thread;
 
         /// <summary>
         /// Gets the data folder path.

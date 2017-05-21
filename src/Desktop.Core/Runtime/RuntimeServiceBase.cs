@@ -46,7 +46,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
             Container = container;
             Dispatcher = Dispatcher.CurrentDispatcher;
 
-
             var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             DataFolderPath = $"{appDataPath}\\PDS.WITSMLstudio\\{PersistedDataFolderName}";
         }
@@ -54,25 +53,19 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// <summary>
         /// Gets a reference to the composition container used for dependency injection.
         /// </summary>
-        public IContainer Container { get; private set; }
+        public IContainer Container { get; }
 
         /// <summary>
         /// Gets a reference the root application shell.
         /// </summary>
         /// <value>The application shell.</value>
-        public virtual IShellViewModel Shell
-        {
-            get { return Application.Current.MainWindow?.DataContext as IShellViewModel; }
-        }
+        public virtual IShellViewModel Shell => Application.Current.MainWindow?.DataContext as IShellViewModel;
 
         /// <summary>
         /// Gets a reference to a Caliburn WindowManager.
         /// </summary>
         /// <value>The window manager.</value>
-        public IWindowManager WindowManager
-        {
-            get { return Container.Resolve<IWindowManager>(); }
-        }
+        public IWindowManager WindowManager => Container.Resolve<IWindowManager>();
 
         /// <summary>
         /// Gets the dispatcher.
@@ -85,7 +78,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// <value>
         /// The dispatcher thread.
         /// </value>
-        public Thread DispatcherThread { get { return Dispatcher.Thread; } }
+        public Thread DispatcherThread => Dispatcher.Thread;
 
         /// <summary>
         /// Folder name for persisted data.
