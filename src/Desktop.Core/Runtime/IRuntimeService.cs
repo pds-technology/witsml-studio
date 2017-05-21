@@ -50,12 +50,17 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         IWindowManager WindowManager { get; }
 
         /// <summary>
-        /// Gets or sets the dispatcher thread.
+        /// Gets the dispatcher.
+        /// </summary>
+        Dispatcher Dispatcher { get; }
+
+        /// <summary>
+        /// Gets the dispatcher thread.
         /// </summary>
         /// <value>
         /// The dispatcher thread.
         /// </value>
-        Thread DispatcherThread { get; set; }
+        Thread DispatcherThread { get; }
 
         /// <summary>
         /// Gets the data folder path.

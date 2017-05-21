@@ -209,6 +209,7 @@
     <Compile Include="Providers\LoggingSoapExtension.cs" />
     <Compile Include="Runtime\DesktopRuntimeService.cs" />
     <Compile Include="Runtime\IRuntimeService.cs" />
+    <Compile Include="Runtime\RuntimeServiceBase.cs" />
     <Compile Include="Runtime\Win32WindowHandle.cs" />
     <Compile Include="SaveWindowState\WindowSettings.cs" />
     <Compile Include="SaveWindowState\Point.cs" />
