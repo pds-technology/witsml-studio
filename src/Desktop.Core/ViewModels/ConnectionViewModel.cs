@@ -228,7 +228,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 DataItem = new Connection()
             };
 
-            if (Runtime.ShowDialog(viewModel, 10, 10)) 
+            if (Runtime.ShowDialog(viewModel, this, 10, 10)) 
             {
                 EditItem.JsonWebToken = viewModel.DataItem.JsonWebToken;
             }

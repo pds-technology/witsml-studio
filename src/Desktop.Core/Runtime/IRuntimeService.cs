@@ -24,6 +24,7 @@ using System.Windows.Threading;
 using Caliburn.Micro;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
+using System.Collections.Generic;
 
 namespace PDS.WITSMLstudio.Desktop.Core.Runtime
 {
@@ -111,17 +112,20 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// Shows the dialog.
         /// </summary>
         /// <param name="viewModel">The view model.</param>
+        /// <param name="additionalSettings">Additional settings for the dialog.</param>
         /// <returns>The view model dialog's result.</returns>
-        bool ShowDialog(object viewModel);
+        bool ShowDialog(object viewModel, IDictionary<string, object> additionalSettings = null);
 
         /// <summary>
-        /// Shows the dialog at a manually specfied location.
+        /// Shows the dialog at a manually specfied location offset from the specified parent screen.
         /// </summary>
         /// <param name="viewModel">The view model.</param>
+        /// <param name="parent">The parent screen.</param>
         /// <param name="leftOffset">The position of the window's left edge</param>
         /// <param name="topOffset">The position of the window's top edge</param>
+        /// <param name="additionalSettings">Additional settings for the dialog.</param>
         /// <returns>The view model dialog's result.</returns>
-        bool ShowDialog(object viewModel, int leftOffset, int topOffset);
+        bool ShowDialog(object viewModel, Screen parent, int leftOffset, int topOffset, IDictionary<string, object> additionalSettings = null);
 
         /// <summary>
         /// Invokes the specified action on the UI thread.

@@ -18,11 +18,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Caliburn.Micro;
 using PDS.WITSMLstudio.Framework;
@@ -37,6 +37,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
     /// <seealso cref="PDS.WITSMLstudio.Desktop.Core.Runtime.IRuntimeService" />
     public abstract class RuntimeServiceBase : IRuntimeService
     {
+        private readonly BitmapFrame _icon;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeServiceBase"/> class.
         /// </summary>
@@ -48,6 +50,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
 
             var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             DataFolderPath = $"{appDataPath}\\PDS.WITSMLstudio\\{PersistedDataFolderName}";
+
+            // Load the application icon.
+            FrameworkElement fe = new FrameworkElement(); // Force initialization of pack URI support
+            var resourceStream = Application.GetResourceStream(new Uri("pack://application:,,,/PDS.WITSMLstudio.Desktop.Core;component/Images/WitsmlStudio.ico", UriKind.RelativeOrAbsolute));
+            _icon = BitmapFrame.Create(resourceStream.Stream);
         }
 
         /// <summary>
@@ -165,7 +172,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// <returns><c>true</c> if the user clicks OK/Yes; otherwise, <c>false</c>.</returns>
         public virtual bool ShowConfirm(string message, MessageBoxButton buttons = MessageBoxButton.OKCancel)
         {
-            var result = MessageBox.Show(GetActiveWindow(), message, $"{DialogTitlePrefix} - Confirm", buttons, MessageBoxImage.Question);
+            var result = MessageBox.Show(message, $"{DialogTitlePrefix} - Confirm", buttons, MessageBoxImage.Question);
             return (result == MessageBoxResult.OK || result == MessageBoxResult.Yes);
         }
 
@@ -173,38 +180,35 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// Shows the dialog.
         /// </summary>
         /// <param name="viewModel">The view model.</param>
+        /// <param name="additionalSettings">Additional settings for the dialog.</param>
         /// <returns>The view model dialog's result.</returns>
-        public virtual bool ShowDialog(object viewModel)
+        public virtual bool ShowDialog(object viewModel, IDictionary<string, object> additionalSettings = null)
         {
-            var settings = new Dictionary<string, object>()
-            {
-                { "WindowStartupLocation", WindowStartupLocation.CenterOwner }
-            };
-
-            return WindowManager.ShowDialog(viewModel, null, settings).GetValueOrDefault();
+            var settings = DialogSettings.Create().Centered().WithIcon(_icon).Merge(additionalSettings);
+            
+            return ShowDialogCore(viewModel, settings);
         }
 
         /// <summary>
-        /// Shows the dialog at a manually specfied location.
+        /// Shows the dialog at a manually specfied location offset from the specified parent screen.
         /// </summary>
         /// <param name="viewModel">The view model.</param>
+        /// <param name="parent">The parent screen.</param>
         /// <param name="leftOffset">The position of the window's left edge</param>
         /// <param name="topOffset">The position of the window's top edge</param>
+        /// <param name="additionalSettings">Additional settings for the dialog.</param>
         /// <returns>The view model dialog's result.</returns>
-        public virtual bool ShowDialog(object viewModel, int leftOffset, int topOffset)
+        public virtual bool ShowDialog(object viewModel, Screen parent, int leftOffset, int topOffset, IDictionary<string, object> additionalSettings = null)
         {
-            var screenCoordinates = GetActiveWindowLocation();
+            var window = parent.GetView(ViewAware.DefaultContext) as Window;
+            var screenCoordinates = new Point(window?.Left ?? 0.0, window?.Top ?? 0.0);
+
             screenCoordinates.X += leftOffset;
             screenCoordinates.Y += topOffset;
 
-            var settings = new Dictionary<string, object>()
-            {
-                { "WindowStartupLocation", WindowStartupLocation.Manual },
-                { "Left", screenCoordinates.X },
-                { "Top", screenCoordinates.Y }
-            };
+            var settings = DialogSettings.Create().AtLocation(screenCoordinates.X, screenCoordinates.Y).WithIcon(_icon).Merge(additionalSettings);
 
-            return WindowManager.ShowDialog(viewModel, null, settings).GetValueOrDefault();
+            return ShowDialogCore(viewModel, settings);
         }
 
         /// <summary>
@@ -220,7 +224,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
                 message = string.Format("{0}{2}{2}{1}", message, error.Message, Environment.NewLine);
             }
 #endif
-            MessageBox.Show(GetActiveWindow(), message, $"{DialogTitlePrefix} - Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(message, $"{DialogTitlePrefix} - Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         /// <summary>
@@ -229,7 +233,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// <param name="message">The message.</param>
         public virtual void ShowInfo(string message)
         {
-            MessageBox.Show(GetActiveWindow(), message, $"{DialogTitlePrefix} - Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(message, $"{DialogTitlePrefix} - Information", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         /// <summary>
@@ -238,29 +242,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// <param name="message">The message.</param>
         public virtual void ShowWarning(string message)
         {
-            MessageBox.Show(GetActiveWindow(), message, $"{DialogTitlePrefix} - Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
-
-        /// <summary>
-        /// Gets the current window location.
-        /// </summary>
-        /// <value>The current window location.</value>
-        public virtual Point GetActiveWindowLocation()
-        {
-            //return new Point();
-            var currentWindow = GetActiveWindow();
-            return currentWindow == null
-                ? new Point()
-                : new Point(currentWindow.Left, currentWindow.Top);
-        }
-
-        /// <summary>
-        /// Gets the active window.
-        /// </summary>
-        /// <value>The active window.</value>
-        public Window GetActiveWindow()
-        {
-            return SafeExecute(() => Application.Current?.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive));
+            MessageBox.Show(message, $"{DialogTitlePrefix} - Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         /// <summary>
@@ -287,6 +269,17 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
                 return func();
             else
                 return Invoke(func, priority);
+        }
+
+        /// <summary>
+        /// Shows the dialog.
+        /// </summary>
+        /// <param name="viewModel">The view model.</param>
+        /// <param name="settings">Settings for the dialog.</param>
+        /// <returns>The view model dialog's result.</returns>
+        private bool ShowDialogCore(object viewModel, IDictionary<string, object> settings)
+        {
+            return SafeExecute(() => WindowManager.ShowDialog(viewModel, null, settings).GetValueOrDefault());
         }
     }
 }
