@@ -46,7 +46,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             License = new TextEditorViewModel(Runtime, null, true);
             Notice = new TextEditorViewModel(Runtime, null, true);
             ApplicationTitle = _applicationTitle;
-            ApplicationVersion = Application.Current.GetType().GetAssemblyVersion();
+            ApplicationVersion = Application.Current?.GetType().GetAssemblyVersion();
             DocumentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         }
 
