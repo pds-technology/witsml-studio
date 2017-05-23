@@ -46,7 +46,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             License = new TextEditorViewModel(Runtime, null, true);
             Notice = new TextEditorViewModel(Runtime, null, true);
             ApplicationTitle = _applicationTitle;
-            ApplicationVersion = Application.Current?.GetType().GetAssemblyVersion();
             DocumentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         }
 
@@ -69,16 +68,16 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public TextEditorViewModel Notice { get; }
 
         /// <summary>
+        /// Gets the application version.
+        /// </summary>
+        /// <value>The application version.</value>
+        public string ApplicationVersion => Runtime.ApplicationVersion;
+
+        /// <summary>
         /// Gets or sets the application title.
         /// </summary>
         /// <value>The application versiontitle.</value>
         public string ApplicationTitle { get; set; }
-
-        /// <summary>
-        /// Gets or sets the application version.
-        /// </summary>
-        /// <value>The application version.</value>
-        public string ApplicationVersion { get; set; }
 
         /// <summary>
         /// Gets or sets the document path.
