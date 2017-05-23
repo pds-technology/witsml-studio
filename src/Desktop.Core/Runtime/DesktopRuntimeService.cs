@@ -16,12 +16,7 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
-using System;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Threading;
 using PDS.WITSMLstudio.Framework;
-using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 
 namespace PDS.WITSMLstudio.Desktop.Core.Runtime
 {
