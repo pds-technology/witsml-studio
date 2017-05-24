@@ -64,14 +64,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         Thread DispatcherThread { get; }
 
         /// <summary>
-        /// Gets the application version.
-        /// </summary>
-        /// <value>
-        /// The application version.
-        /// </value>
-        string ApplicationVersion { get; }
-
-        /// <summary>
         /// Gets the data folder path.
         /// </summary>
         /// <value>The data folder path.</value>

@@ -18,11 +18,10 @@
 
 using System.IO;
 using System.Reflection;
-using System.Windows;
 using Caliburn.Micro;
-using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Properties;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
+using System.Deployment.Application;
 
 namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 {
@@ -71,7 +70,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Gets the application version.
         /// </summary>
         /// <value>The application version.</value>
-        public string ApplicationVersion => Runtime.ApplicationVersion;
+        public string ApplicationVersion => ApplicationDeployment.IsNetworkDeployed
+            ? ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString()
+            : Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
         /// <summary>
         /// Gets or sets the application title.
