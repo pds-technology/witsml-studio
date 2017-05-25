@@ -17,6 +17,7 @@
 //-----------------------------------------------------------------------
 
 using Caliburn.Micro;
+using PDS.WITSMLstudio.Framework;
 
 namespace PDS.WITSMLstudio.Desktop.Core.Models
 {
@@ -122,7 +123,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Models
         {
             var objLogCurveItem = obj as LogCurveItem;
 
-            return objLogCurveItem != null && objLogCurveItem.Mnemonic.Equals(Mnemonic);
+            return objLogCurveItem != null && objLogCurveItem.Mnemonic.EqualsIgnoreCase(Mnemonic);
         }
 
         /// <summary>
@@ -145,7 +146,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Models
         /// </returns>
         public bool ContainsMnemonic(string mnemonic)
         {
-            return Mnemonic.Equals(mnemonic);
+            return Mnemonic.EqualsIgnoreCase(mnemonic);
         }
     }
 }
