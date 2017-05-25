@@ -653,6 +653,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 var wells = Context.GetAllWells();
                 await LoadDataItems(wells, Items, LoadWellbores, x => x.GetUri());
+
+                // Apply well name filter
+                if (!string.IsNullOrWhiteSpace(WellName))
+                    OnWellNameChanged();
+
                 Runtime.ShowBusy(false);
             });
         }
