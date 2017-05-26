@@ -113,38 +113,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.Models
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="System.Object" />, is equal to this instance.
-        /// </summary>
-        /// <param name="obj">The <see cref="System.Object" /> to compare with this instance.</param>
-        /// <returns>
-        ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
-        /// </returns>
-        public override bool Equals(object obj)
-        {
-            var objLogCurveItem = obj as LogCurveItem;
-
-            return objLogCurveItem != null && objLogCurveItem.Mnemonic.EqualsIgnoreCase(Mnemonic);
-        }
-
-        /// <summary>
-        /// Returns a hash code for this instance.
-        /// </summary>
-        /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
-        /// </returns>
-        public override int GetHashCode()
-        {
-            return Mnemonic.GetHashCode();
-        }
-
-        /// <summary>
-        /// Determines whether the specified mnemonic contains mnemonic.
+        /// Determines whether the specified mnemonic equals mnemonic.
         /// </summary>
         /// <param name="mnemonic">The mnemonic.</param>
         /// <returns>
-        ///   <c>true</c> if the specified mnemonic contains mnemonic; otherwise, <c>false</c>.
+        ///   <c>true</c> if the specified mnemonic equals mnemonic; otherwise, <c>false</c>.
         /// </returns>
-        public bool ContainsMnemonic(string mnemonic)
+        public bool Equals(string mnemonic)
         {
             return Mnemonic.EqualsIgnoreCase(mnemonic);
         }

@@ -60,17 +60,19 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             // If the selectedChannels list does not contain the index channel 
             //... then find it in the availableChannels and add it to the selectedChannels
-            if (!selectedChannels.Any(l => l.ContainsMnemonic(indexChannel)))
+            if (!selectedChannels.Any(l => l.Equals(indexChannel)))
             {
-                IndexChannel = availableChannels.FirstOrDefault(a => a.ContainsMnemonic(indexChannel));
+                IndexChannel = availableChannels.FirstOrDefault(a => a.Equals(indexChannel));
                 selectedChannels.Add(IndexChannel);
             }
 
             // Get the IndexChannel LogCurveItem from the selectedChannels
-            IndexChannel = selectedChannels.FirstOrDefault(a => a.ContainsMnemonic(indexChannel));
+            IndexChannel = selectedChannels.FirstOrDefault(a => a.Equals(indexChannel));
 
             availableChannels.ForEach(c => AvailableChannels.Add(c));
-            selectedChannels?.ForEach(s => MoveChannel(s, AvailableChannels, SelectedChannels));
+            SelectedChannels = new ObservableCollection<LogCurveItem>(selectedChannels);
+
+            RemoveSelectedFromAvailableChannels();
             MoveToTop(SelectedChannels, IndexChannel);
         }
 
@@ -181,7 +183,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             var originalSource = e?.OriginalSource;
             if (sender is ListBox && !(originalSource is UIElement && ((UIElement)originalSource).IsMouseOver)) return;
 
-            var sourceIndex = MoveChannel(AvailableChannelSelected, AvailableChannels, SelectedChannels);
+            var sourceIndex = MoveChannel(AvailableChannelSelected, AvailableChannels, SelectedChannels, AvailableChannelSelectedIndex);
             if (sourceIndex < 0) return;
 
             AvailableChannelSelectedIndex = sourceIndex;
@@ -193,8 +195,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void SelectAllChannels()
         {
-            var available = AvailableChannels.ToList();
-            available.Sort((x, y) => string.Compare(x.Mnemonic, y.Mnemonic, StringComparison.InvariantCultureIgnoreCase));
+            var available = AvailableChannels.ToList().OrderBy(c => c.Mnemonic);
             available.ForEach(a => MoveChannel(a, AvailableChannels, SelectedChannels));
         }
 
@@ -208,9 +209,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             var originalSource = e?.OriginalSource;
             if (sender is ListBox && !(originalSource is UIElement && ((UIElement)originalSource).IsMouseOver)) return;
 
-            if (SelectedChannelSelected.Equals(IndexChannel)) return;
+            if (SelectedChannelSelectedIndex == 0 && SelectedChannelSelected.Equals(IndexChannel.Mnemonic)) return;
 
-            var sourceIndex = MoveChannel(SelectedChannelSelected, SelectedChannels, AvailableChannels);
+            var sourceIndex = MoveChannel(SelectedChannelSelected, SelectedChannels, AvailableChannels, SelectedChannelSelectedIndex);
             if (sourceIndex < 0) return;
 
             SelectedChannelSelectedIndex = sourceIndex;
@@ -222,7 +223,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void UnselectAllChannels()
         {
-            var selected = SelectedChannels.Where(s => !s.Equals(IndexChannel)).ToArray();
+            var indexChannel = SelectedChannels.FirstOrDefault(s => s.Equals(IndexChannel.Mnemonic));
+            var selected = new List<LogCurveItem>(SelectedChannels);
+
+            if (indexChannel != null)
+                selected.Remove(indexChannel);
+
             selected.ForEach(s => MoveChannel(s, SelectedChannels, AvailableChannels));
         }
 
@@ -269,7 +275,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             if (selectedIndex + 1 < SelectedChannels.Count)
             {
                 var itemToMoveDown = SelectedChannels[selectedIndex];
-                if (itemToMoveDown.Equals(IndexChannel)) return;
+                if (selectedIndex == 0 && itemToMoveDown.Equals(IndexChannel.Mnemonic)) return;
                 SelectedChannels.RemoveAt(selectedIndex);
                 SelectedChannels.Insert(selectedIndex + 1, itemToMoveDown);
                 SelectedChannelSelectedIndex = selectedIndex + 1;
@@ -295,27 +301,40 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             TryClose(true);
         }
 
-        private int MoveChannel(LogCurveItem channelSelected, ObservableCollection<LogCurveItem> sourceChannels, ObservableCollection<LogCurveItem> destinationChannels)
+        private void RemoveSelectedFromAvailableChannels()
         {
-            // If there's no channel selected get out
-            if (channelSelected == null) return -1;
+            if (SelectedChannels.Count == 0) return;
 
+            var alreadySelectedCurves = new List<LogCurveItem>();
+            AvailableChannels.ForEach(a =>
+            {
+                if (SelectedChannels.FirstOrDefault(sc => sc.Mnemonic.EqualsIgnoreCase(a.Mnemonic)) != null)
+                    alreadySelectedCurves.Add(a);
+            });
+            alreadySelectedCurves.ForEach(r => AvailableChannels.Remove(r));
+        }
+
+        private int MoveChannel(LogCurveItem logCurveItem, ObservableCollection<LogCurveItem> sourceChannels, ObservableCollection<LogCurveItem> destinationChannels, int selectedIndex = -1)
+        {
             // If the selected channel cannot be found in the source list get out
-            var index = sourceChannels.IndexOf(channelSelected);
+            var channelSelectedIndex = -1;
 
             // Channel was found in the source list and is removed.
-            if (index >= 0)
-                sourceChannels.RemoveAt(index);
+            if (sourceChannels.Contains(logCurveItem))
+            {
+                channelSelectedIndex = selectedIndex == -1 ? sourceChannels.IndexOf(logCurveItem) : selectedIndex;
+                sourceChannels.Remove(logCurveItem);
+            }
 
             // Channel is added to the destination list and notifications are sent about changes to both lists
-            destinationChannels.Add(channelSelected);
+            destinationChannels.Add(logCurveItem);
             NotifyOfPropertyChange(() => HasSelected);
             NotifyOfPropertyChange(() => HasAvailable);
 
             // Return the index of the channel removed if the list has that many items, otherwise return the index above the channel
-            return index <= (sourceChannels.Count - 1)
-                ? index
-                : index - 1;
+            return channelSelectedIndex <= (sourceChannels.Count - 1)
+                ? channelSelectedIndex
+                : channelSelectedIndex - 1;
         }
 
         private void MoveToTop(ObservableCollection<LogCurveItem> channels, LogCurveItem indexChannel)

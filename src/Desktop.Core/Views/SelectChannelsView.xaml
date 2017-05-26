@@ -43,7 +43,11 @@
         <Label Grid.Row="0" Grid.Column="2" Margin="0" Content="Selected Channels" FontWeight="Bold" />
 
         <DockPanel Grid.Row="1" Grid.Column="0" Margin="10,5,5,5" MinWidth ="120" MinHeight="140" >
-            <ListBox Name="AvailableChannelsList" DockPanel.Dock="Top" ItemsSource="{Binding Source={StaticResource AvailableChannelsSorted}}" SelectedIndex="{Binding AvailableChannelSelectedIndex, Mode=TwoWay}" SelectedItem="{Binding AvailableChannelSelected}" cal:Message.Attach="[Event MouseDoubleClick] = [Action SelectChannel($source, $eventArgs)]; [Event SelectionChanged] = [Action AvailableChannelSelectionChanged]" />
+            <ListBox Name="AvailableChannelsList" DockPanel.Dock="Top" 
+                     ItemsSource="{Binding Source={StaticResource AvailableChannelsSorted}}" 
+                     SelectedIndex="{Binding AvailableChannelSelectedIndex, Mode=TwoWay}" 
+                     SelectedItem="{Binding AvailableChannelSelected}" 
+                     cal:Message.Attach="[Event MouseDoubleClick] = [Action SelectChannel($source, $eventArgs)]; [Event SelectionChanged] = [Action AvailableChannelSelectionChanged]" />
         </DockPanel>
 
         <Grid Margin="10,5,5,5" Grid.Row="2" Grid.Column="0">
@@ -105,14 +109,17 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Row="0" x:Name="SelectAllChannels" Margin="5" Content="&gt;&gt;" IsEnabled="{Binding HasAvailable}" />
-            <Button Grid.Row="1" x:Name="SelectChannel" Margin="5" Content="&gt;" IsEnabled="{Binding AvailableChannelSelected, Converter={StaticResource NullToBooleanConverter}}" />
-            <Button Grid.Row="2" x:Name="UnselectChannel" Margin="5" Content="&lt;" IsEnabled="{Binding SelectedChannelSelected, Converter={StaticResource NullToBooleanConverter}}" />
+            <Button Grid.Row="1" x:Name="SelectChannel" Margin="5" Content="&gt;"/>
+            <Button Grid.Row="2" x:Name="UnselectChannel" Margin="5" Content="&lt;"/>
             <Button Grid.Row="3" x:Name="UnselectAllChannels" Margin="5" Content="&lt;&lt;" IsEnabled="{Binding HasSelected}" />
 
         </Grid>
 
         <DockPanel Grid.Row="1" Grid.Column="2" Margin="5,5,0,5" MinWidth="120" MinHeight="140">
-            <ListBox Name="SelectedChannelsList" DockPanel.Dock="Top" ItemsSource="{Binding Path=SelectedChannels}" SelectedIndex="{Binding SelectedChannelSelectedIndex, Mode=TwoWay}" SelectedItem="{Binding SelectedChannelSelected}" cal:Message.Attach="[Event MouseDoubleClick] = [Action UnselectChannel($source, $eventArgs)]; [Event SelectionChanged] = [Action SelectedChannelSelectionChanged]" />
+            <ListBox Name="SelectedChannelsList" DockPanel.Dock="Top" ItemsSource="{Binding Path=SelectedChannels}" 
+                     SelectedIndex="{Binding SelectedChannelSelectedIndex, Mode=TwoWay}" 
+                     SelectedItem="{Binding SelectedChannelSelected}" 
+                     cal:Message.Attach="[Event MouseDoubleClick] = [Action UnselectChannel($source, $eventArgs)]; [Event SelectionChanged] = [Action SelectedChannelSelectionChanged]" />
         </DockPanel>
 
         <Grid Margin="5,5,0,5" Grid.Row="2" Grid.Column="2">
@@ -171,8 +178,8 @@
                 <ColumnDefinition Width="40" />
             </Grid.ColumnDefinitions>
 
-            <Button x:Name="MoveUp" Margin="5" Content="↑" IsEnabled="{Binding SelectedChannelSelected, Converter={StaticResource NullToBooleanConverter}}" />
-            <Button Grid.Row="1" x:Name="MoveDown" Margin="5" Content="↓" IsEnabled="{Binding SelectedChannelSelected, Converter={StaticResource NullToBooleanConverter}}" />
+            <Button x:Name="MoveUp" Margin="5" Content="↑"/>
+            <Button Grid.Row="1" x:Name="MoveDown" Margin="5" Content="↓"/>
 
         </Grid>
 
