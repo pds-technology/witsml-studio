@@ -49,6 +49,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
     {
         private FrameworkElement _hierarchy;
         private long _messageId;
+        private HashSet<EtpUri> _growingObjects = new HashSet<EtpUri>();
+        private HashSet<EtpUri> _activeWellbores = new HashSet<EtpUri>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WitsmlTreeViewModel"/> class.
@@ -496,7 +498,18 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             Context = new WitsmlQueryContext(connection.CreateProxy(version), version);
 
+            Clear();
+        }
+
+        /// <summary>
+        /// Clears data from the view.
+        /// </summary>
+        public void Clear()
+        {
+            DataObjects.Clear();
             Items.Clear();
+            _activeWellbores.Clear();
+            _growingObjects.Clear();
         }
 
         /// <summary>
@@ -513,7 +526,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void SetDataObjects(IEnumerable<string> dataObjects)
         {
-            DataObjects.Clear();
+            Clear();
             DataObjects.AddRange(dataObjects);
         }
 
@@ -522,7 +535,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void RefreshHierarchy()
         {
-            Items.Clear();
+            Clear();
             LoadWells();
         }
 
@@ -651,6 +664,16 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             Task.Run(async () =>
             {
+                var wellbores = Context.GetActiveWellbores(EtpUri.RootUri);
+                var mudLogs = Context.GetGrowingObjects("mudLog", EtpUri.RootUri);
+                var trajectories = Context.GetGrowingObjects("trajectory", EtpUri.RootUri);
+                var logs = Context.GetGrowingObjects("log", EtpUri.RootUri);
+
+                _activeWellbores.UnionWith(wellbores.Select(x => x.GetUri()));
+                _growingObjects.UnionWith(mudLogs.Select(x => x.GetUri()));
+                _growingObjects.UnionWith(trajectories.Select(x => x.GetUri()));
+                _growingObjects.UnionWith(logs.Select(x => x.GetUri()));
+
                 var wells = Context.GetAllWells();
                 await LoadDataItems(wells, Items, LoadWellbores, x => x.GetUri());
 
@@ -784,53 +807,177 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             var uri = getUri(dataObject);
 
-            var indicator = new IndicatorViewModel { Color = IndicatorViewModel.Green, Outline = IndicatorViewModel.Black };
+            var indicator = new IndicatorViewModel();
 
-            if (ObjectTypes.Wellbore.EqualsIgnoreCase(uri.ObjectType))
+            if (ObjectTypes.Well.EqualsIgnoreCase(uri.ObjectType))
             {
-                indicator.IsVisible = OptionsIn.DataVersion.Version141.Equals(uri.Version);
-
-                if (dataObject.GetWellboreStatus().GetValueOrDefault())
-                {
-                    indicator.Tooltip = "Active";
-                }
-                else
-                {
-                    indicator.Color = IndicatorViewModel.White;
-                    indicator.Outline = IndicatorViewModel.Gray;
-                    indicator.Tooltip = null;
-                }
+                UpdateWellIndicator(getUri(dataObject), indicator);
+            }
+            else if (ObjectTypes.Wellbore.EqualsIgnoreCase(uri.ObjectType))
+            {
+                UpdateWellboreActiveStatus((IWellObject)dataObject);
+                UpdateWellboreIndicator(getUri(dataObject), indicator);
             }
             else if (ObjectTypes.IsGrowingDataObject(uri.ObjectType))
             {
-                var iWellboreObject = dataObject as IWellboreObject;
-                var startIndex = iWellboreObject?.GetStartIndex();
-                var endIndex = iWellboreObject?.GetEndIndex();
-
-                // TODO: Improve empty check using DateTime.MinValue and epoch timestamp
-                var isEmpty = string.IsNullOrWhiteSpace(startIndex) && string.IsNullOrWhiteSpace(endIndex);
-
-                indicator.IsVisible = true;
-
-                if (dataObject.GetObjectGrowingStatus().GetValueOrDefault())
-                {
-                    indicator.Tooltip = "Growing";
-                }
-                else if (isEmpty)
-                {
-                    indicator.Color = IndicatorViewModel.White;
-                    indicator.Outline = IndicatorViewModel.Red;
-                    indicator.Tooltip = "Empty";
-                }
-                else
-                {
-                    indicator.Color = IndicatorViewModel.White;
-                    indicator.Outline = IndicatorViewModel.Gray;
-                    indicator.Tooltip = null;
-                }
+                UpdateGrowingObjectGrowingStatus((IWellboreObject)dataObject);
+                UpdateGrowingObjectIndicator((IWellboreObject)dataObject, indicator);
             }
 
             return ToResourceViewModel(uri, dataObject.Name, action, children, indicator, new DataObjectWrapper(dataObject));
+        }
+
+        private void UpdateWellboreActiveStatus(IWellObject wellbore)
+        {
+            bool? active = wellbore.GetWellboreStatus();
+            if (active == null)
+                return;
+
+            var wellboreUri = wellbore.GetUri();
+            bool updateWell = false;
+            if (active.Value && !_activeWellbores.Contains(wellboreUri))
+            {
+                _activeWellbores.Add(wellboreUri);
+                updateWell = true;
+            }
+            else if (!active.Value && _activeWellbores.Contains(wellboreUri))
+            {
+                _activeWellbores.Remove(wellboreUri);
+                updateWell = true;
+            }
+
+            if (updateWell)
+            {
+                foreach (var vm in Items)
+                {
+                    if (vm.Resource.Uri == wellboreUri.Parent)
+                        UpdateWellIndicator(wellboreUri.Parent, vm.Indicator);
+                }
+            }
+        }
+
+        private void UpdateGrowingObjectGrowingStatus(IWellboreObject growingObject)
+        {
+            bool? growing = growingObject.GetObjectGrowingStatus();
+            if (growing == null)
+                return;
+
+            var growingObjectUri = growingObject.GetUri();
+            bool updateParents = false;
+            if (growing.Value && !_growingObjects.Contains(growingObjectUri))
+            {
+                _growingObjects.Add(growingObjectUri);
+                updateParents = true;
+            }
+            else if (!growing.Value && _growingObjects.Contains(growingObjectUri))
+            {
+                _growingObjects.Remove(growingObjectUri);
+                updateParents = true;
+            }
+
+            if (updateParents)
+            {
+                var wellboreUri = growingObjectUri.Parent;
+                var wellUri = wellboreUri.Parent;
+
+                foreach (var wellVM in Items)
+                {
+                    if (wellVM.Resource.Uri == wellUri)
+                        UpdateWellIndicator(wellUri, wellVM.Indicator);
+
+                    foreach (var wellboreVM in wellVM.Children)
+                    {
+                        if (wellboreVM.Resource.Uri == wellboreUri)
+                            UpdateWellboreIndicator(wellboreUri, wellboreVM.Indicator);
+                    }
+                }
+            }
+        }
+
+        private void UpdateWellIndicator(EtpUri wellUri, IndicatorViewModel indicator)
+        {
+            indicator.IsVisible = true;
+
+            bool growing = _growingObjects.Any(o => o.Parent.Parent == wellUri);
+            bool active = _activeWellbores.Any(o => o.Parent == wellUri);
+
+            string tooltip = null;
+            if (growing && active)
+                tooltip = "Active and Growing";
+            else if (active)
+                tooltip = "Active";
+            else if (growing)
+                tooltip = "Growing";
+
+            if (growing || active)
+            {
+                indicator.Color = IndicatorViewModel.Green;
+                indicator.Outline = IndicatorViewModel.Black;
+            }
+            else
+            {
+                indicator.Color = IndicatorViewModel.White;
+                indicator.Outline = IndicatorViewModel.Gray;
+            }
+            indicator.Tooltip = tooltip;
+        }
+
+        private void UpdateWellboreIndicator(EtpUri wellboreUri, IndicatorViewModel indicator)
+        {
+            bool active = _activeWellbores.Contains(wellboreUri);
+            bool growing = _growingObjects.Any(o => o.Parent == wellboreUri);
+
+            indicator.IsVisible = true;
+
+            string tooltip = null;
+            if (growing && active)
+                tooltip = "Active and Growing";
+            else if (active)
+                tooltip = "Active";
+            else if (growing)
+                tooltip = "Growing";
+
+            if (growing || active)
+            {
+                indicator.Color = IndicatorViewModel.Green;
+                indicator.Outline = IndicatorViewModel.Black;
+            }
+            else
+            {
+                indicator.Color = IndicatorViewModel.White;
+                indicator.Outline = IndicatorViewModel.Gray;
+            }
+            indicator.Tooltip = tooltip;
+        }
+
+        private void UpdateGrowingObjectIndicator(IWellboreObject growingObject, IndicatorViewModel indicator)
+        {
+            var startIndex = growingObject.GetStartIndex();
+            var endIndex = growingObject.GetEndIndex();
+
+            // TODO: Improve empty check using DateTime.MinValue and epoch timestamp
+            var isEmpty = string.IsNullOrWhiteSpace(startIndex) && string.IsNullOrWhiteSpace(endIndex);
+
+            indicator.IsVisible = true;
+
+            if (growingObject.GetObjectGrowingStatus().GetValueOrDefault())
+            {
+                indicator.Color = IndicatorViewModel.Green;
+                indicator.Outline = IndicatorViewModel.Black;
+                indicator.Tooltip = "Growing";
+            }
+            else if (isEmpty)
+            {
+                indicator.Color = IndicatorViewModel.White;
+                indicator.Outline = IndicatorViewModel.Red;
+                indicator.Tooltip = "Empty";
+            }
+            else
+            {
+                indicator.Color = IndicatorViewModel.White;
+                indicator.Outline = IndicatorViewModel.Gray;
+                indicator.Tooltip = null;
+            }
         }
 
         private ResourceViewModel ToResourceViewModel(EtpUri uri, string name, Action<ResourceViewModel, string> action, int children = -1, IndicatorViewModel indicator = null, object dataContext = null)
