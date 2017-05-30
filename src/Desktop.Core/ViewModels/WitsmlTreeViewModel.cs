@@ -86,7 +86,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public System.Action OnRefreshContextMenu { get; set; }
 
-        private string _wellName;
+        private string _wellName = string.Empty;
 
         /// <summary>
         /// Gets or sets the name of the well.
@@ -97,13 +97,33 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             get { return _wellName; }
             set
             {
+                if (value == null) value = string.Empty;
+
                 if (string.Equals(_wellName, value))
                     return;
 
                 _wellName = value;
                 NotifyOfPropertyChange(() => WellName);
                 NotifyOfPropertyChange(() => CanClearWellName);
-                OnWellNameChanged();
+                UpdateWellVisibility();
+            }
+        }
+
+        private bool _showOnlyActiveWells;
+
+        /// <summary>
+        /// Gets or sets whether to show only active wells in 
+        /// </summary>
+        public bool ShowOnlyActiveWells
+        {
+            get { return _showOnlyActiveWells; }
+            set
+            {
+                if (_showOnlyActiveWells == value) return;
+
+                _showOnlyActiveWells = value;
+                NotifyOfPropertyChange(() => ShowOnlyActiveWells);
+                UpdateWellVisibility();
             }
         }
 
@@ -629,33 +649,19 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             _hierarchy = control?.FindName("Hierarchy") as FrameworkElement;
         }
 
-        private void OnWellNameChanged()
+        private void UpdateWellVisibility()
         {
-            var pattern = WellName;
+            var pattern = WellName ?? string.Empty;
 
-            if (string.IsNullOrEmpty(pattern))
-            {
-                Items.ForEach(x =>
-                {
-                    x.IsVisible = true;
-                });
-            }
-            else if (pattern.StartsWith("/") && pattern.EndsWith("/"))
-            {
+            if (pattern.StartsWith("/") && pattern.EndsWith("/"))
                 pattern = pattern.Trim('/');
 
-                Items.ForEach(x =>
-                {
-                    x.IsVisible = Regex.IsMatch(x.Resource.Name, pattern, RegexOptions.IgnoreCase);
-                });
-            }
-            else
+            Items.ForEach(x =>
             {
-                Items.ForEach(x =>
-                {
-                    x.IsVisible = x.Resource.Name.IndexOf(pattern, StringComparison.InvariantCultureIgnoreCase) > -1;
-                });
-            }
+                bool active = !ShowOnlyActiveWells || x.IsActive;
+                bool matches = Regex.IsMatch(x.Resource.Name, pattern, RegexOptions.IgnoreCase);
+                x.IsVisible = active && matches;
+            });
         }
 
         private void LoadWells()
@@ -679,7 +685,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
                 // Apply well name filter
                 if (!string.IsNullOrWhiteSpace(WellName))
-                    OnWellNameChanged();
+                    UpdateWellVisibility();
 
                 Runtime.ShowBusy(false);
             });
@@ -808,23 +814,24 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             var uri = getUri(dataObject);
 
             var indicator = new IndicatorViewModel();
+            var resourceViewModel = ToResourceViewModel(uri, dataObject.Name, action, children, indicator, new DataObjectWrapper(dataObject));
 
             if (ObjectTypes.Well.EqualsIgnoreCase(uri.ObjectType))
             {
-                UpdateWellIndicator(getUri(dataObject), indicator);
+                UpdateWellIndicator(getUri(dataObject), resourceViewModel);
             }
             else if (ObjectTypes.Wellbore.EqualsIgnoreCase(uri.ObjectType))
             {
                 UpdateWellboreActiveStatus((IWellObject)dataObject);
-                UpdateWellboreIndicator(getUri(dataObject), indicator);
+                UpdateWellboreIndicator(getUri(dataObject), resourceViewModel);
             }
             else if (ObjectTypes.IsGrowingDataObject(uri.ObjectType))
             {
                 UpdateGrowingObjectGrowingStatus((IWellboreObject)dataObject);
-                UpdateGrowingObjectIndicator((IWellboreObject)dataObject, indicator);
+                UpdateGrowingObjectIndicator((IWellboreObject)dataObject, resourceViewModel);
             }
 
-            return ToResourceViewModel(uri, dataObject.Name, action, children, indicator, new DataObjectWrapper(dataObject));
+            return resourceViewModel;
         }
 
         private void UpdateWellboreActiveStatus(IWellObject wellbore)
@@ -851,7 +858,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 foreach (var vm in Items)
                 {
                     if (vm.Resource.Uri == wellboreUri.Parent)
-                        UpdateWellIndicator(wellboreUri.Parent, vm.Indicator);
+                        UpdateWellIndicator(wellboreUri.Parent, vm);
                 }
             }
         }
@@ -883,19 +890,23 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 foreach (var wellVM in Items)
                 {
                     if (wellVM.Resource.Uri == wellUri)
-                        UpdateWellIndicator(wellUri, wellVM.Indicator);
+                        UpdateWellIndicator(wellUri, wellVM);
 
                     foreach (var wellboreVM in wellVM.Children)
                     {
                         if (wellboreVM.Resource.Uri == wellboreUri)
-                            UpdateWellboreIndicator(wellboreUri, wellboreVM.Indicator);
+                        {
+
+                            UpdateWellboreIndicator(wellboreUri, wellboreVM);
+                        }
                     }
                 }
             }
         }
 
-        private void UpdateWellIndicator(EtpUri wellUri, IndicatorViewModel indicator)
+        private void UpdateWellIndicator(EtpUri wellUri, ResourceViewModel resourceViewModel)
         {
+            var indicator = resourceViewModel.Indicator;
             indicator.IsVisible = true;
 
             bool growing = _growingObjects.Any(o => o.Parent.Parent == wellUri);
@@ -913,20 +924,23 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 indicator.Color = IndicatorViewModel.Green;
                 indicator.Outline = IndicatorViewModel.Black;
+                resourceViewModel.IsActive = true;
             }
             else
             {
                 indicator.Color = IndicatorViewModel.White;
                 indicator.Outline = IndicatorViewModel.Gray;
+                resourceViewModel.IsActive = false;
             }
             indicator.Tooltip = tooltip;
         }
 
-        private void UpdateWellboreIndicator(EtpUri wellboreUri, IndicatorViewModel indicator)
+        private void UpdateWellboreIndicator(EtpUri wellboreUri, ResourceViewModel resourceViewModel)
         {
             bool active = _activeWellbores.Contains(wellboreUri);
             bool growing = _growingObjects.Any(o => o.Parent == wellboreUri);
 
+            var indicator = resourceViewModel.Indicator;
             indicator.IsVisible = true;
 
             string tooltip = null;
@@ -941,16 +955,18 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 indicator.Color = IndicatorViewModel.Green;
                 indicator.Outline = IndicatorViewModel.Black;
+                resourceViewModel.IsActive = true;
             }
             else
             {
                 indicator.Color = IndicatorViewModel.White;
                 indicator.Outline = IndicatorViewModel.Gray;
+                resourceViewModel.IsActive = false;
             }
             indicator.Tooltip = tooltip;
         }
 
-        private void UpdateGrowingObjectIndicator(IWellboreObject growingObject, IndicatorViewModel indicator)
+        private void UpdateGrowingObjectIndicator(IWellboreObject growingObject, ResourceViewModel resourceViewModel)
         {
             var startIndex = growingObject.GetStartIndex();
             var endIndex = growingObject.GetEndIndex();
@@ -958,6 +974,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             // TODO: Improve empty check using DateTime.MinValue and epoch timestamp
             var isEmpty = string.IsNullOrWhiteSpace(startIndex) && string.IsNullOrWhiteSpace(endIndex);
 
+            var indicator = resourceViewModel.Indicator;
             indicator.IsVisible = true;
 
             if (growingObject.GetObjectGrowingStatus().GetValueOrDefault())
@@ -965,18 +982,21 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 indicator.Color = IndicatorViewModel.Green;
                 indicator.Outline = IndicatorViewModel.Black;
                 indicator.Tooltip = "Growing";
+                resourceViewModel.IsActive = true;
             }
             else if (isEmpty)
             {
                 indicator.Color = IndicatorViewModel.White;
                 indicator.Outline = IndicatorViewModel.Red;
                 indicator.Tooltip = "Empty";
+                resourceViewModel.IsActive = false;
             }
             else
             {
                 indicator.Color = IndicatorViewModel.White;
                 indicator.Outline = IndicatorViewModel.Gray;
                 indicator.Tooltip = null;
+                resourceViewModel.IsActive = false;
             }
         }
 

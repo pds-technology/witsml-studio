@@ -97,6 +97,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public BindableCollection<ResourceViewModel> Children { get; }
 
         /// <summary>
+        /// Indicates whether this resource is active or not.
+        /// </summary>
+        public bool IsActive { get; set; }
+
+        /// <summary>
         /// Gets the Indicator
         /// </summary>
         public IndicatorViewModel Indicator { get; set; }
