@@ -179,7 +179,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Gets the Indicator
         /// </summary>
-        public IndicatorViewModel Indicator { get; };
+        public IndicatorViewModel Indicator { get; }
 
         /// <summary>
         /// Gets the display name.
