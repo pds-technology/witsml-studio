@@ -734,11 +734,21 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             Task.Run(async () =>
             {
-                var wellbores = Context.GetActiveWellbores(EtpUri.RootUri);
-                var mudLogs = Context.GetGrowingObjects(ObjectTypes.MudLog, EtpUri.RootUri);
-                var trajectories = Context.GetGrowingObjects(ObjectTypes.Trajectory, EtpUri.RootUri);
-                var logs = Context.GetGrowingObjects(ObjectTypes.Log, EtpUri.RootUri);
-                var rigs = Context.GetWellboreObjectIds(ObjectTypes.Rig, EtpUri.RootUri);
+                IEnumerable<IWellObject> wellbores = null;
+                IEnumerable<IWellboreObject> mudLogs = null;
+                IEnumerable<IWellboreObject> trajectories = null;
+                IEnumerable<IWellboreObject> logs = null;
+                IEnumerable<IWellboreObject> rigs = null;
+                IEnumerable<IDataObject> wells = null;
+
+                var wellsTask = Task.Run(() => wells = Context.GetAllWells());
+                var wellboresTask = Task.Run(() => wellbores = Context.GetActiveWellbores(EtpUri.RootUri));
+                var mudLogsTask = Task.Run(() => mudLogs = Context.GetGrowingObjects(ObjectTypes.MudLog, EtpUri.RootUri));
+                var wellboreTask = Task.Run(() => trajectories = Context.GetGrowingObjects(ObjectTypes.Trajectory, EtpUri.RootUri));
+                var logsTask = Task.Run(() => logs = Context.GetGrowingObjects(ObjectTypes.Log, EtpUri.RootUri));
+                var rigsTask = Task.Run(() => rigs = Context.GetWellboreObjectIds(ObjectTypes.Rig, EtpUri.RootUri));
+
+                await Task.WhenAll(wellsTask, wellboresTask, mudLogsTask, logsTask, rigsTask);
 
                 lock (_indicatorLock)
                 {
@@ -761,7 +771,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                     RigNames.AddRange(_rigs.Keys.OrderBy(x => x));
                 }
                                
-                var wells = Context.GetAllWells();
                 await LoadDataItems(wells, Items, LoadWellbores, x => x.GetUri());
 
                 // Apply well name filter
