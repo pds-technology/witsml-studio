@@ -54,6 +54,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         private readonly object _indicatorLock = new object();
         private HashSet<EtpUri> _growingObjects = new HashSet<EtpUri>();
         private HashSet<EtpUri> _activeWellbores = new HashSet<EtpUri>();
+        private Dictionary<string, HashSet<string>> _rigs = new Dictionary<string, HashSet<string>>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WitsmlTreeViewModel"/> class.
@@ -64,6 +65,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             Runtime = runtime;
             Items = new BindableCollection<ResourceViewModel>();
             DataObjects = new BindableCollection<string>();
+            RigNames = new BindableCollection<string>();
         }
 
         /// <summary>
@@ -83,6 +85,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         /// <value>The data objects.</value>
         public BindableCollection<string> DataObjects { get; }
+
+        /// <summary>
+        /// Gets the collection of rig names.
+        /// </summary>
+        public BindableCollection<string> RigNames { get; }
 
         /// <summary>
         /// Gets or sets an action to execute when the context menu is refreshed.
@@ -108,6 +115,30 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 _wellName = value;
                 NotifyOfPropertyChange(() => WellName);
                 NotifyOfPropertyChange(() => CanClearWellName);
+                UpdateWellVisibility();
+            }
+        }
+
+
+        private string _selectedRigName = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the name of the rig.
+        /// </summary>
+        /// <value>The name of the rig.</value>
+        public string SelectedRigName
+        {
+            get { return _selectedRigName; }
+            set
+            {
+                if (value == null) value = string.Empty;
+
+                if (string.Equals(_selectedRigName, value))
+                    return;
+
+                _selectedRigName = value;
+                NotifyOfPropertyChange(() => SelectedRigName);
+                NotifyOfPropertyChange(() => CanClearSelectedRigName);
                 UpdateWellVisibility();
             }
         }
@@ -241,6 +272,21 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             WellName = string.Empty;
             NotifyOfPropertyChange(() => CanClearWellName);
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance can clear rig name.
+        /// </summary>
+        /// <value><c>true</c> if this instance can clear rig name; otherwise, <c>false</c>.</value>
+        public bool CanClearSelectedRigName => !string.IsNullOrEmpty(SelectedRigName);
+
+        /// <summary>
+        /// Clears the name of the rig.
+        /// </summary>
+        public void ClearSelectedRigName()
+        {
+            SelectedRigName = string.Empty;
+            NotifyOfPropertyChange(() => CanClearSelectedRigName);
         }
 
         /// <summary>
@@ -529,13 +575,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void Clear()
         {
-            DataObjects.Clear();
             Items.Clear();
 
             lock (_indicatorLock)
             {
                 _activeWellbores.Clear();
                 _growingObjects.Clear();
+                _rigs.Clear();
+                RigNames.Clear();
             }
         }
 
@@ -553,7 +600,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void SetDataObjects(IEnumerable<string> dataObjects)
         {
-            Clear();
+            DataObjects.Clear();
             DataObjects.AddRange(dataObjects);
         }
 
@@ -662,12 +709,22 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             if (pattern.StartsWith("/") && pattern.EndsWith("/"))
                 pattern = pattern.Trim('/');
+            else
+                pattern = Regex.Escape(pattern);
+
+            HashSet<string> wellUids;
+            _rigs.TryGetValue(SelectedRigName ?? string.Empty, out wellUids);
 
             Items.ForEach(x =>
             {
                 bool active = !ShowOnlyActiveWells || x.IsActiveOrGrowing;
-                bool matches = Regex.IsMatch(x.Resource.Name, pattern, RegexOptions.IgnoreCase);
-                x.IsVisible = active && matches;
+                bool matchesWell = Regex.IsMatch(x.Resource.Name, pattern, RegexOptions.IgnoreCase);
+
+                bool matchesRig = true;
+                if (wellUids != null && x.DataObject != null)
+                    matchesRig = wellUids.Contains(x.DataObject.Uid);
+                
+                x.IsVisible = active && matchesWell && matchesRig;
             });
         }
 
@@ -678,9 +735,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             Task.Run(async () =>
             {
                 var wellbores = Context.GetActiveWellbores(EtpUri.RootUri);
-                var mudLogs = Context.GetGrowingObjects("mudLog", EtpUri.RootUri);
-                var trajectories = Context.GetGrowingObjects("trajectory", EtpUri.RootUri);
-                var logs = Context.GetGrowingObjects("log", EtpUri.RootUri);
+                var mudLogs = Context.GetGrowingObjects(ObjectTypes.MudLog, EtpUri.RootUri);
+                var trajectories = Context.GetGrowingObjects(ObjectTypes.Trajectory, EtpUri.RootUri);
+                var logs = Context.GetGrowingObjects(ObjectTypes.Log, EtpUri.RootUri);
+                var rigs = Context.GetWellboreObjectIds(ObjectTypes.Rig, EtpUri.RootUri);
 
                 lock (_indicatorLock)
                 {
@@ -688,8 +746,21 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                     _growingObjects.UnionWith(mudLogs.Select(x => x.GetUri()));
                     _growingObjects.UnionWith(trajectories.Select(x => x.GetUri()));
                     _growingObjects.UnionWith(logs.Select(x => x.GetUri()));
-                }
+                    _rigs.Add(string.Empty, null);
+                    rigs.ForEach(x =>
+                    {
+                        HashSet<string> uids;
+                        if (!_rigs.TryGetValue(x.Name, out uids))
+                        {
+                            uids = new HashSet<string>();
+                            _rigs.Add(x.Name, uids);
+                        }
 
+                        uids.Add(x.UidWell);
+                    });
+                    RigNames.AddRange(_rigs.Keys.OrderBy(x => x));
+                }
+                               
                 var wells = Context.GetAllWells();
                 await LoadDataItems(wells, Items, LoadWellbores, x => x.GetUri());
 
@@ -698,6 +769,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
                 Runtime.ShowBusy(false);
             });
+
+            NotifyOfPropertyChange(() => RigNames);
         }
 
         private void LoadWellbores(ResourceViewModel parent, string uri)

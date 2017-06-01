@@ -9,7 +9,7 @@
              xmlns:vm="clr-namespace:PDS.WITSMLstudio.Desktop.Core.ViewModels"
              xmlns:conv="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters"
              xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes;assembly=Xceed.Wpf.Toolkit"
-             mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
+             mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="300">
 
     <UserControl.Resources>
         <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -19,13 +19,14 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="35" />
             <RowDefinition Height="35" />
+            <RowDefinition Height="35" />
             <RowDefinition />
             <RowDefinition Height="200" />
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Margin="0,0,0,5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="75" />
                 <ColumnDefinition />
                 <ColumnDefinition Width="5" />
                 <ColumnDefinition Width="Auto" />
@@ -37,10 +38,23 @@
         </Grid>
 
         <Grid Grid.Row="1" Margin="0,0,0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="Rig Name:" Margin="5,5,10,5" VerticalAlignment="Center" />
+            <ComboBox Grid.Column="1" VerticalContentAlignment="Center" Padding="5,0" ItemsSource="{Binding RigNames}" SelectedItem="{Binding SelectedRigName}" IsEditable="True" />
+            <Button x:Name="ClearSelectedRigName" Grid.Column="3" Content="Clear" Width="60" HorizontalAlignment="Right" />
+        </Grid>
+
+        <Grid Grid.Row="2" Margin="0,0,0,5">
             <CheckBox IsChecked="{Binding ShowOnlyActiveWells}" Grid.Column="0" Content="Show Only Active Wells" Margin="5,5,10,5" VerticalAlignment="Center" />
         </Grid>
 
-        <TreeView x:Name="Hierarchy"  Grid.Row="2" ItemsSource="{Binding Items}" cal:Message.Attach="[Event SelectedItemChanged] = [Action RefreshContextMenu()]">
+        <TreeView x:Name="Hierarchy"  Grid.Row="3" ItemsSource="{Binding Items}" cal:Message.Attach="[Event SelectedItemChanged] = [Action RefreshContextMenu()]">
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
@@ -102,7 +116,7 @@
         </TreeView>
 
         <xctk:PropertyGrid
-            Grid.Row="3"
+            Grid.Row="4"
             Margin="0,5,0,0"
             SelectedObject="{Binding ElementName=Hierarchy, Path=SelectedItem.DataContext}"
             AutoGenerateProperties="False"
@@ -208,7 +222,7 @@
             </xctk:PropertyGrid.PropertyDefinitions>
         </xctk:PropertyGrid>
 
-        <GridSplitter Grid.Row="3" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="Transparent" />
+        <GridSplitter Grid.Row="4" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="Transparent" />
 
     </Grid>
 </UserControl>
