@@ -723,13 +723,15 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             var pattern = WellName ?? string.Empty;
 
-            if (pattern.StartsWith("/") && pattern.EndsWith("/"))
+            // Treat well name patterns like /pattern/ as regular expressions but other patterns as literal strings
+            if (pattern.StartsWith("/") && pattern.EndsWith("/") && pattern.Length >= 2)
                 pattern = pattern.Trim('/');
             else
                 pattern = Regex.Escape(pattern);
 
             HashSet<string> wellUids;
-            _rigs.TryGetValue(SelectedRigName ?? string.Empty, out wellUids);
+            lock (_indicatorLock)
+                _rigs.TryGetValue(SelectedRigName ?? string.Empty, out wellUids);
 
             Items.ForEach(x =>
             {
