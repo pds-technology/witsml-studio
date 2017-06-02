@@ -51,7 +51,12 @@
         </Grid>
 
         <Grid Grid.Row="2" Margin="0,0,0,5">
-            <CheckBox IsChecked="{Binding ShowOnlyActiveWells}" Grid.Column="0" Content="Show Only Active Wells" Margin="5,5,10,5" VerticalAlignment="Center" />
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <CheckBox Grid.Column="1" Content="Show Only Active Wells" Padding="{Binding CheckBoxPadding}" VerticalAlignment="Center" IsChecked="{Binding ShowOnlyActiveWells}" />
         </Grid>
 
         <TreeView x:Name="Hierarchy"  Grid.Row="3" ItemsSource="{Binding Items}" cal:Message.Attach="[Event SelectedItemChanged] = [Action RefreshContextMenu()]">

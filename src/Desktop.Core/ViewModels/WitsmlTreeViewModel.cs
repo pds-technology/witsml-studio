@@ -38,7 +38,6 @@ using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using IDataObject = Energistics.DataAccess.IDataObject;
-using System.Collections.Concurrent;
 
 namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 {
@@ -256,6 +255,23 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 if (_isContextMenuEnabled == value) return;
                 _isContextMenuEnabled = value;
                 NotifyOfPropertyChange(() => IsContextMenuEnabled);
+            }
+        }
+
+        private Thickness _checkBoxPadding = new Thickness(5, 0, 0, 0);
+
+        /// <summary>
+        /// Gets or sets the CheckBox padding.
+        /// </summary>
+        /// <value>The CheckBox padding.</value>
+        public Thickness CheckBoxPadding
+        {
+            get { return _checkBoxPadding; }
+            set
+            {
+                if (_checkBoxPadding == value) return;
+                _checkBoxPadding = value;
+                NotifyOfPropertyChange(() => CheckBoxPadding);
             }
         }
 
@@ -721,8 +737,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 bool matchesWell = Regex.IsMatch(x.Resource.Name, pattern, RegexOptions.IgnoreCase);
 
                 bool matchesRig = true;
-                if (wellUids != null && x.DataObject != null)
-                    matchesRig = wellUids.Contains(x.DataObject.Uid);
+                IDataObject dataObject = x.GetDataObject();
+                if (wellUids != null && dataObject != null)
+                    matchesRig = wellUids.Contains(dataObject.Uid);
                 
                 x.IsVisible = active && matchesWell && matchesRig;
             });
@@ -744,11 +761,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 var wellsTask = Task.Run(() => wells = Context.GetAllWells());
                 var wellboresTask = Task.Run(() => wellbores = Context.GetActiveWellbores(EtpUri.RootUri));
                 var mudLogsTask = Task.Run(() => mudLogs = Context.GetGrowingObjects(ObjectTypes.MudLog, EtpUri.RootUri));
-                var wellboreTask = Task.Run(() => trajectories = Context.GetGrowingObjects(ObjectTypes.Trajectory, EtpUri.RootUri));
+                var trajectoryTask = Task.Run(() => trajectories = Context.GetGrowingObjects(ObjectTypes.Trajectory, EtpUri.RootUri));
                 var logsTask = Task.Run(() => logs = Context.GetGrowingObjects(ObjectTypes.Log, EtpUri.RootUri));
                 var rigsTask = Task.Run(() => rigs = Context.GetWellboreObjectIds(ObjectTypes.Rig, EtpUri.RootUri));
 
-                await Task.WhenAll(wellsTask, wellboresTask, mudLogsTask, logsTask, rigsTask);
+                await Task.WhenAll(wellsTask, wellboresTask, mudLogsTask, trajectoryTask, logsTask, rigsTask);
 
                 lock (_indicatorLock)
                 {
@@ -876,11 +893,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             var log141 = dataObject as Witsml141.Log;
 
             log131?.LogCurveInfo
-                .Select(x => ToResourceViewModel(x.GetUri(log131), x.Mnemonic, null, 0, null, new DataObjectWrapper(x)))
+                .Select(x => ToResourceViewModel(x.GetUri(log131), x.Mnemonic, null, 0, new DataObjectWrapper(x)))
                 .ForEach(items.Add);
 
             log141?.LogCurveInfo
-                .Select(x => ToResourceViewModel(x.GetUri(log141), x.Mnemonic.Value, null, 0, null, new DataObjectWrapper(x)))
+                .Select(x => ToResourceViewModel(x.GetUri(log141), x.Mnemonic.Value, null, 0, new DataObjectWrapper(x)))
                 .ForEach(items.Add);
         }
 
@@ -904,7 +921,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             var uri = getUri(dataObject);
 
-            var resourceViewModel = ToResourceViewModel(uri, dataObject.Name, action, children, dataObject, new DataObjectWrapper(dataObject));
+            var resourceViewModel = ToResourceViewModel(uri, dataObject.Name, action, children, new DataObjectWrapper(dataObject));
 
             if (ObjectTypes.Well.EqualsIgnoreCase(uri.ObjectType))
             {
@@ -924,7 +941,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
         private void UpdateWellboreActiveStatus(ResourceViewModel wellboreVM)
         {
-            var wellbore = wellboreVM.WellObject;
+            var wellbore = wellboreVM.GetWellObject();
 
             bool? active = wellbore.GetWellboreStatus();
             if (active == null)
@@ -959,7 +976,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
         private void UpdateGrowingObjectGrowingStatus(ResourceViewModel growingObjectVM)
         {
-            var growingObject = growingObjectVM.WellboreObject;
+            var growingObject = growingObjectVM.GetWellboreObject();
 
             bool? growing = growingObject.GetObjectGrowingStatus();
             bool? empty = growingObject.IsGrowingObjectEmpty();
@@ -992,7 +1009,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             if (updateParents)
             {
                 var wellboreVM = growingObjectVM.Parent;
-                while (wellboreVM != null && wellboreVM.WellObject == null && wellboreVM.Parent != null)
+                while (wellboreVM != null && wellboreVM.GetWellObject() == null && wellboreVM.Parent != null)
                     wellboreVM = wellboreVM.Parent;
 
                 if (wellboreVM != null)
@@ -1036,11 +1053,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
         private void UpdateGrowingObjectIndicator(ResourceViewModel growingObjectVM)
         {
-            growingObjectVM.IsEmpty = growingObjectVM.WellboreObject.IsGrowingObjectEmpty().GetValueOrDefault();
-            growingObjectVM.IsGrowing = growingObjectVM.WellboreObject.GetObjectGrowingStatus().GetValueOrDefault();
+            var wellbore = growingObjectVM.GetWellboreObject();
+            growingObjectVM.IsEmpty = wellbore?.IsGrowingObjectEmpty().GetValueOrDefault();
+            growingObjectVM.IsGrowing = wellbore?.GetObjectGrowingStatus().GetValueOrDefault();
         }
 
-        private ResourceViewModel ToResourceViewModel(EtpUri uri, string name, Action<ResourceViewModel, string> action, int children = -1, IDataObject dataObject = null, object dataContext = null)
+        private ResourceViewModel ToResourceViewModel(EtpUri uri, string name, Action<ResourceViewModel, string> action, int children = -1, object dataContext = null)
         {
             var resource = new Resource
             {
@@ -1050,7 +1068,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 HasChildren = children
             };
 
-            var viewModel = new ResourceViewModel(Runtime, resource, dataObject, dataContext);
+            var viewModel = new ResourceViewModel(Runtime, resource, dataContext);
 
             if (children != 0 && action != null)
             {

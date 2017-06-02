@@ -16,14 +16,12 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
-using Caliburn.Micro;
-using Energistics.DataAccess;
-using Energistics.Datatypes.Object;
-using PDS.WITSMLstudio.Desktop.Core.Models;
-using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using Caliburn.Micro;
+using Energistics.Datatypes.Object;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
 namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 {
@@ -52,15 +50,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         /// <param name="runtime">The runtime.</param>
         /// <param name="resource">The resource.</param>
-        /// <param name="dataObject">The data object.</param>
         /// <param name="dataContext">The data context.</param>
-        public ResourceViewModel(IRuntimeService runtime, Resource resource, IDataObject dataObject = null, object dataContext = null)
+        public ResourceViewModel(IRuntimeService runtime, Resource resource, object dataContext = null)
         {
             Runtime = runtime;
             Resource = resource;
             Children = new BindableCollection<ResourceViewModel>();
             Indicator = new IndicatorViewModel();
-            DataObject = dataObject;
             DataContext = dataContext;
             IsVisible = true;
 
@@ -91,21 +87,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public object DataContext { get; }
 
         /// <summary>
-        /// Gets the DataContext as an <see cref="IDataObject"/> if possible.
-        /// </summary>
-        public IDataObject DataObject { get; }
-
-        /// <summary>
-        /// Gets the DataContext as an <see cref="IWellObject"/> if possible.
-        /// </summary>
-        public IWellObject WellObject { get { return DataObject as IWellObject; } }
-
-        /// <summary>
-        /// Gets the DataContext as an <see cref="IWellboreObject"/> if possible.
-        /// </summary>
-        public IWellboreObject WellboreObject { get { return DataObject as IWellboreObject; } }
-
-        /// <summary>
         /// Gets the message identifier.
         /// </summary>
         /// <value>The message identifier.</value>
@@ -117,69 +98,16 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <value>The children.</value>
         public BindableCollection<ResourceViewModel> Children { get; }
 
-        private bool? _isActive;
-
-        /// <summary>
-        /// Indicates whether this resource is active or not.
-        /// </summary>
-        public bool? IsActive
-        {
-            get { return _isActive; }
-            set
-            {
-                if (_isActive == value) return;
-
-                _isActive = value;
-                NotifyOfPropertyChange(() => IsActive);
-                UpdateIndicator();
-            }
-        }
-
-        private bool? _isGrowing;
-
-        /// <summary>
-        /// Indicates whether this resource is growing or not.
-        /// </summary>
-        public bool? IsGrowing
-        {
-            get { return _isGrowing; }
-            set
-            {
-                if (_isGrowing == value) return;
-
-                _isGrowing = value;
-                NotifyOfPropertyChange(() => _isGrowing);
-                UpdateIndicator();
-            }
-        }
-
-        private bool? _isEmpty;
-
-        /// <summary>
-        /// Indicates whether this resource is empty or not.
-        /// </summary>
-        public bool? IsEmpty
-        {
-            get { return _isEmpty; }
-            set
-            {
-                if (_isEmpty == value) return;
-
-                _isEmpty = value;
-                NotifyOfPropertyChange(() => _isEmpty);
-                UpdateIndicator();
-            }
-        }
-
-        /// <summary>
-        /// Indicates whether this resource is active or growing
-        /// </summary>
-        public bool IsActiveOrGrowing { get { return (IsActive ?? false) || (IsGrowing ?? false); } }
-
         /// <summary>
         /// Gets the Indicator
         /// </summary>
         public IndicatorViewModel Indicator { get; }
+
+        /// <summary>
+        /// Gets or sets the action method used to load child resources.
+        /// </summary>
+        /// <value>The load children.</value>
+        public Func<string, long> LoadChildren { get; set; }
 
         /// <summary>
         /// Gets the display name.
@@ -194,10 +122,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public bool HasPlaceholder => Children.Count == 1 && Children[0]._isPlaceholder;
 
         /// <summary>
-        /// Gets or sets the action method used to load child resources.
+        /// Indicates whether this resource is active or growing
         /// </summary>
-        /// <value>The load children.</value>
-        public Func<string, long> LoadChildren { get; set; }
+        public bool IsActiveOrGrowing => (IsActive ?? false) || (IsGrowing ?? false);
 
         private ResourceViewModel _parent;
         /// <summary>
@@ -273,6 +200,59 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
                 _isVisible = value;
                 NotifyOfPropertyChange(() => IsVisible);
+            }
+        }
+
+        private bool? _isActive;
+        /// <summary>
+        /// Indicates whether this resource is active or not.
+        /// </summary>
+        public bool? IsActive
+        {
+            get { return _isActive; }
+            set
+            {
+                if (_isActive == value) return;
+
+                _isActive = value;
+                NotifyOfPropertyChange(() => IsActive);
+                NotifyOfPropertyChange(() => IsActiveOrGrowing);
+                UpdateIndicator();
+            }
+        }
+
+        private bool? _isGrowing;
+        /// <summary>
+        /// Indicates whether this resource is growing or not.
+        /// </summary>
+        public bool? IsGrowing
+        {
+            get { return _isGrowing; }
+            set
+            {
+                if (_isGrowing == value) return;
+
+                _isGrowing = value;
+                NotifyOfPropertyChange(() => IsGrowing);
+                NotifyOfPropertyChange(() => IsActiveOrGrowing);
+                UpdateIndicator();
+            }
+        }
+
+        private bool? _isEmpty;
+        /// <summary>
+        /// Indicates whether this resource is empty or not.
+        /// </summary>
+        public bool? IsEmpty
+        {
+            get { return _isEmpty; }
+            set
+            {
+                if (_isEmpty == value) return;
+
+                _isEmpty = value;
+                NotifyOfPropertyChange(() => IsEmpty);
+                UpdateIndicator();
             }
         }
 

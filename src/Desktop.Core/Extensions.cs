@@ -19,12 +19,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
 using System.Windows.Media;
 using Energistics.DataAccess;
+using Witsml131 = Energistics.DataAccess.WITSML131;
+using Witsml141 = Energistics.DataAccess.WITSML141;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Data.Logs;
 using PDS.WITSMLstudio.Desktop.Core.Models;
+using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 
 namespace PDS.WITSMLstudio.Desktop.Core
 {
@@ -39,7 +41,7 @@ namespace PDS.WITSMLstudio.Desktop.Core
         /// <typeparam name="T">The parent type.</typeparam>
         /// <param name="child">The child.</param>
         /// <returns>The first matching parent element of the specified type.</returns>
-        public static T FindParent<T>(this DependencyObject child) where T : DependencyObject
+        public static T FindParent<T>(this System.Windows.DependencyObject child) where T : System.Windows.DependencyObject
         {
             if (child == null) return null;
 
@@ -57,7 +59,7 @@ namespace PDS.WITSMLstudio.Desktop.Core
         /// <param name="logCurveInfo">The log curve information.</param>
         /// <param name="toOffset">The time span to convert the timestamp to if indexes are time.</param>
         /// <returns>LogCurveItem</returns>
-        public static LogCurveItem ToLogCurveItem(this Energistics.DataAccess.WITSML131.ComponentSchemas.LogCurveInfo logCurveInfo, TimeSpan toOffset)
+        public static LogCurveItem ToLogCurveItem(this Witsml131.ComponentSchemas.LogCurveInfo logCurveInfo, TimeSpan toOffset)
         {
             var startIndex = logCurveInfo.GetStartIndex();
             var endIndex = logCurveInfo.GetEndIndex();
@@ -82,7 +84,7 @@ namespace PDS.WITSMLstudio.Desktop.Core
         /// <param name="logCurveInfos">The log curve infos.</param>
         /// <param name="toOffset">The time span to convert the timestamp to if indexes are time.</param>
         /// <returns>A list of LogCurveItems</returns>
-        public static List<LogCurveItem> ToLogCurveItemList(this List<Energistics.DataAccess.WITSML131.ComponentSchemas.LogCurveInfo> logCurveInfos, TimeSpan toOffset)
+        public static List<LogCurveItem> ToLogCurveItemList(this List<Witsml131.ComponentSchemas.LogCurveInfo> logCurveInfos, TimeSpan toOffset)
         {
             return logCurveInfos?.Select(l => l.ToLogCurveItem(toOffset)).ToList() ?? new List<LogCurveItem>();
         }
@@ -93,7 +95,7 @@ namespace PDS.WITSMLstudio.Desktop.Core
         /// <param name="logCurveInfo">The log curve information.</param>
         /// <param name="toOffset">The time span to convert the timestamp to if indexes are time.</param>
         /// <returns>LogCurveItem</returns>
-        public static LogCurveItem ToLogCurveItem(this Energistics.DataAccess.WITSML141.ComponentSchemas.LogCurveInfo logCurveInfo, TimeSpan toOffset)
+        public static LogCurveItem ToLogCurveItem(this Witsml141.ComponentSchemas.LogCurveInfo logCurveInfo, TimeSpan toOffset)
         {
             var startIndex = logCurveInfo.GetStartIndex();
             var endIndex = logCurveInfo.GetEndIndex();
@@ -118,9 +120,40 @@ namespace PDS.WITSMLstudio.Desktop.Core
         /// <param name="logCurveInfos">The log curve infos.</param>
         /// <param name="toOffset">The time span to convert the timestamp to if indexes are time.</param>
         /// <returns>A list of LogCurveItems</returns>
-        public static List<LogCurveItem> ToLogCurveItemList(this List<Energistics.DataAccess.WITSML141.ComponentSchemas.LogCurveInfo> logCurveInfos, TimeSpan toOffset)
+        public static List<LogCurveItem> ToLogCurveItemList(this List<Witsml141.ComponentSchemas.LogCurveInfo> logCurveInfos, TimeSpan toOffset)
         {
             return logCurveInfos?.Select(l => l.ToLogCurveItem(toOffset)).ToList() ?? new List<LogCurveItem>();
+        }
+
+        /// <summary>
+        /// Gets the data object represented by the resource view model.
+        /// </summary>
+        /// <param name="resourceViewModel">The resource view model.</param>
+        /// <returns>The data object instance.</returns>
+        public static IDataObject GetDataObject(this ResourceViewModel resourceViewModel)
+        {
+            var dataContext = resourceViewModel.DataContext as DataObjectWrapper;
+            return dataContext?.Instance as IDataObject;
+        }
+
+        /// <summary>
+        /// Gets the well object represented by the resource view model.
+        /// </summary>
+        /// <param name="resourceViewModel">The resource view model.</param>
+        /// <returns>The well object instance.</returns>
+        public static IWellObject GetWellObject(this ResourceViewModel resourceViewModel)
+        {
+            return resourceViewModel.GetDataObject() as IWellObject;
+        }
+
+        /// <summary>
+        /// Gets the wellbore object represented by the resource view model.
+        /// </summary>
+        /// <param name="resourceViewModel">The resource view model.</param>
+        /// <returns>The wellbore object instance.</returns>
+        public static IWellboreObject GetWellboreObject(this ResourceViewModel resourceViewModel)
+        {
+            return resourceViewModel.GetDataObject() as IWellboreObject;
         }
     }
 }

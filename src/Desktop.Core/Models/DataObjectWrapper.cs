@@ -20,9 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
 using Energistics.DataAccess;
-using Energistics.DataAccess.Validation;
 using PDS.WITSMLstudio.Framework;
 
 namespace PDS.WITSMLstudio.Desktop.Core.Models
@@ -34,7 +32,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.Models
     public sealed class DataObjectWrapper : ICustomTypeDescriptor
     {
         private readonly Type _type;
-        private readonly object _instance;
         private PropertyDescriptorCollection _properties;
 
         /// <summary>
@@ -43,9 +40,15 @@ namespace PDS.WITSMLstudio.Desktop.Core.Models
         /// <param name="instance">The instance.</param>
         public DataObjectWrapper(object instance)
         {
-            _instance = instance;
+            Instance = instance;
             _type = instance?.GetType();
         }
+
+        /// <summary>
+        /// Gets the data object instance.
+        /// </summary>
+        /// <value>The data object instance.</value>
+        public object Instance { get; }
 
         /// <summary>
         /// Returns a collection of custom attributes for this instance of a component.
@@ -72,8 +75,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Models
         /// <returns>The name of the object, or null if the object does not have a name.</returns>
         public string GetComponentName()
         {
-            //return TypeDescriptor.GetComponentName(_instance);
-            return (_instance as IDataObject)?.Name;
+            //return TypeDescriptor.GetComponentName(Instance);
+            return (Instance as IDataObject)?.Name;
         }
 
         /// <summary>
@@ -156,7 +159,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Models
 
             // Root elements
             properties
-                .Select(x => new CustomPropertyDescriptor(_instance, x.Name))
+                .Select(x => new CustomPropertyDescriptor(Instance, x.Name))
                 .ForEach(descriptors.Add);
 
             // Nested elements
@@ -165,7 +168,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Models
                 .Where(x => x.Name == "CommonData")
                 .Select(x => new
                 {
-                    Owner = x.GetValue(_instance),
+                    Owner = x.GetValue(Instance),
                     Properties = x.PropertyType.GetProperties()
                 })
                 .SelectMany(x => x.Properties.Select(p => new CustomPropertyDescriptor(x.Owner, p.Name)))
@@ -176,7 +179,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Models
             //    .Where(x => x.GetCustomAttribute<RecurringElementAttribute>() != null)
             //    .Select(x => new
             //    {
-            //        Owner = ((IList)x.GetValue(_instance)).Cast<object>().FirstOrDefault(),
+            //        Owner = ((IList)x.GetValue(Instance)).Cast<object>().FirstOrDefault(),
             //        Properties = x.PropertyType.GetGenericArguments().First().GetProperties()
             //    })
             //    .SelectMany(x => x.Properties.Select(p => new CustomPropertyDescriptor(x.Owner, p.Name)))
@@ -204,7 +207,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Models
         public object GetPropertyOwner(PropertyDescriptor propertyDescriptor)
         {
             var property = propertyDescriptor as CustomPropertyDescriptor;
-            return property?.Owner ?? _instance;
+            return property?.Owner ?? Instance;
         }
     }
 }
