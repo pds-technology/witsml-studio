@@ -796,9 +796,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 UpdateWellVisibility();
 
                 Runtime.ShowBusy(false);
-            });
 
-            NotifyOfPropertyChange(() => RigNames);
+                NotifyOfPropertyChange(() => RigNames);
+            });
         }
 
         private void LoadWellbores(ResourceViewModel parent, string uri)
