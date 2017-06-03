@@ -931,38 +931,48 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
             else if (ObjectTypes.Wellbore.EqualsIgnoreCase(uri.ObjectType))
             {
-                UpdateWellboreActiveStatus(resourceViewModel);
+                UpdateWellboreIndicator(resourceViewModel);
             }
             else if (ObjectTypes.IsGrowingDataObject(uri.ObjectType))
             {
-                UpdateGrowingObjectGrowingStatus(resourceViewModel);
+                UpdateGrowingObjectIndicator(resourceViewModel);
             }
 
             return resourceViewModel;
         }
 
-        private void UpdateWellboreActiveStatus(ResourceViewModel wellboreVM)
+        private void UpdateWellboreIndicator(ResourceViewModel wellboreVM)
         {
             var wellbore = wellboreVM.GetWellObject();
 
+            bool growing;
+            var wellboreUri = wellbore.GetUri();
             bool? active = wellbore.GetWellboreStatus();
-            if (active == null)
-                return;
+            lock (_indicatorLock)
+            {
+                growing = _growingObjects.Any(o => o.Parent == wellboreVM.Resource.Uri);
+            }
 
-            if (active != wellboreVM.IsActive)
-                UpdateWellboreIndicator(wellboreVM);
+            wellboreVM.IsGrowing = growing;
+            wellboreVM.IsActive = active;
 
+            if (active != null)
+                UpdateWellboreParents(wellboreVM, wellbore, active.Value);
+        }
+
+        private void UpdateWellboreParents(ResourceViewModel wellboreVM, IWellObject wellbore, bool active)
+        {
             var wellboreUri = wellbore.GetUri();
             bool updateWell = false;
 
             lock (_indicatorLock)
             {
-                if (active.Value && !_activeWellbores.Contains(wellboreUri))
+                if (active && !_activeWellbores.Contains(wellboreUri))
                 {
                     _activeWellbores.Add(wellboreUri);
                     updateWell = true;
                 }
-                else if (!active.Value && _activeWellbores.Contains(wellboreUri))
+                else if (!active && _activeWellbores.Contains(wellboreUri))
                 {
                     _activeWellbores.Remove(wellboreUri);
                     updateWell = true;
@@ -974,9 +984,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 if (wellboreVM.Parent != null)
                     UpdateWellIndicator(wellboreVM.Parent);
             }
-        }
 
-        private void UpdateGrowingObjectGrowingStatus(ResourceViewModel growingObjectVM)
+        }
+        private void UpdateGrowingObjectIndicator(ResourceViewModel growingObjectVM)
         {
             var growingObject = growingObjectVM.GetWellboreObject();
 
@@ -985,23 +995,27 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             if (growing == null && empty == null)
                 return;
 
-            if ((growing.HasValue && growing != growingObjectVM.IsGrowing) || (empty.HasValue && empty != growingObjectVM.IsEmpty))
-                UpdateGrowingObjectIndicator(growingObjectVM);
+            growingObjectVM.IsGrowing = growing.GetValueOrDefault();
+            growingObjectVM.IsEmpty = empty.GetValueOrDefault();
 
-            if (growing == null)
-                return;
+            if (growing != null)
+                UpdateGrowingObjectParents(growingObjectVM, growingObject, growing.Value);
 
+        }
+
+        private void UpdateGrowingObjectParents(ResourceViewModel growingObjectVM, IWellboreObject growingObject, bool growing)
+        {
             var growingObjectUri = growingObject.GetUri();
             bool updateParents = false;
 
             lock (_indicatorLock)
             {
-                if (growing.Value && !_growingObjects.Contains(growingObjectUri))
+                if (growing && !_growingObjects.Contains(growingObjectUri))
                 {
                     _growingObjects.Add(growingObjectUri);
                     updateParents = true;
                 }
-                else if (!growing.Value && _growingObjects.Contains(growingObjectUri))
+                else if (!growing && _growingObjects.Contains(growingObjectUri))
                 {
                     _growingObjects.Remove(growingObjectUri);
                     updateParents = true;
@@ -1027,7 +1041,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         private void UpdateWellIndicator(ResourceViewModel wellVM)
         {
             var indicator = wellVM.Indicator;
-            indicator.IsVisible = true;
 
             lock (_indicatorLock)
             {
@@ -1037,27 +1050,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 wellVM.IsGrowing = growing;
                 wellVM.IsActive = active;
             }
-        }
-
-        private void UpdateWellboreIndicator(ResourceViewModel wellboreVM)
-        {
-            var wellboreUri = new EtpUri(wellboreVM.Resource.Uri);
-
-            lock (_indicatorLock)
-            {
-                bool active = _activeWellbores.Contains(wellboreUri);
-                bool growing = _growingObjects.Any(o => o.Parent == wellboreVM.Resource.Uri);
-
-                wellboreVM.IsGrowing = growing;
-                wellboreVM.IsActive = active;
-            }
-        }
-
-        private void UpdateGrowingObjectIndicator(ResourceViewModel growingObjectVM)
-        {
-            var wellbore = growingObjectVM.GetWellboreObject();
-            growingObjectVM.IsEmpty = wellbore?.IsGrowingObjectEmpty().GetValueOrDefault();
-            growingObjectVM.IsGrowing = wellbore?.GetObjectGrowingStatus().GetValueOrDefault();
         }
 
         private ResourceViewModel ToResourceViewModel(EtpUri uri, string name, Action<ResourceViewModel, string> action, int children = -1, object dataContext = null)
