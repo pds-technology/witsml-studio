@@ -117,7 +117,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// public void Invoke(System.Action action, DispatcherPriority priority = DispatcherPriority.Normal)
         public virtual void Invoke(System.Action action, DispatcherPriority priority = DispatcherPriority.Normal)
         {
-            Dispatcher.BeginInvoke(action, priority);
+            SafeExecute(action, priority);
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// <returns>The result of the callback.</returns>
         public virtual T Invoke<T>(Func<T> callback, DispatcherPriority priority = DispatcherPriority.Normal)
         {
-            return Dispatcher.Invoke(callback, priority);
+            return SafeExecute(callback, priority);
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// <returns>An awaitable <see cref="Task" />.</returns>
         public virtual async Task InvokeAsync(System.Action action, DispatcherPriority priority = DispatcherPriority.Normal)
         {
-            await Dispatcher.BeginInvoke(action, priority);
+            await Dispatcher.InvokeAsync(action, priority);
         }
 
         /// <summary>
@@ -255,7 +255,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
             if (Dispatcher.CheckAccess())
                 action();
             else
-                Invoke(action, priority);
+                Dispatcher.Invoke(action, priority);
         }
 
         /// <summary>
@@ -268,7 +268,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
             if (Dispatcher.CheckAccess())
                 return func();
             else
-                return Invoke(func, priority);
+                return Dispatcher.Invoke(func, priority);
         }
 
         /// <summary>
