@@ -117,7 +117,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// public void Invoke(System.Action action, DispatcherPriority priority = DispatcherPriority.Normal)
         public virtual void Invoke(System.Action action, DispatcherPriority priority = DispatcherPriority.Normal)
         {
-            SafeExecute(action, priority);
+            if (Dispatcher.CheckAccess())
+                action();
+            else
+                Dispatcher.Invoke(action, priority);
         }
 
         /// <summary>
@@ -129,7 +132,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// <returns>The result of the callback.</returns>
         public virtual T Invoke<T>(Func<T> callback, DispatcherPriority priority = DispatcherPriority.Normal)
         {
-            return SafeExecute(callback, priority);
+            if (Dispatcher.CheckAccess())
+                return callback();
+            else
+                return Dispatcher.Invoke(callback, priority);
         }
 
         /// <summary>
@@ -246,32 +252,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         }
 
         /// <summary>
-        /// Safely executes an <see cref="System.Action"/> that needs to be executed on the UI thread.
-        /// </summary>
-        /// <param name="action">The action to execute.</param>
-        /// <param name="priority">The priority to execute the action at if not already on the UI thread.</param>
-        public void SafeExecute(System.Action action, DispatcherPriority priority = DispatcherPriority.Normal)
-        {
-            if (Dispatcher.CheckAccess())
-                action();
-            else
-                Dispatcher.Invoke(action, priority);
-        }
-
-        /// <summary>
-        /// Safely executes an <see cref="System.Func{T}"/> that needs to be executed on the UI thread.
-        /// </summary>
-        /// <param name="func">The function to execute.</param>
-        /// <param name="priority">The priority to execute the action at if not already on the UI thread.</param>
-        public T SafeExecute<T>(Func<T> func, DispatcherPriority priority = DispatcherPriority.Normal)
-        {
-            if (Dispatcher.CheckAccess())
-                return func();
-            else
-                return Dispatcher.Invoke(func, priority);
-        }
-
-        /// <summary>
         /// Shows the dialog.
         /// </summary>
         /// <param name="viewModel">The view model.</param>
@@ -279,7 +259,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// <returns>The view model dialog's result.</returns>
         private bool ShowDialogCore(object viewModel, IDictionary<string, object> settings)
         {
-            return SafeExecute(() => WindowManager.ShowDialog(viewModel, null, settings).GetValueOrDefault());
+            return Invoke(() => WindowManager.ShowDialog(viewModel, null, settings).GetValueOrDefault());
         }
     }
 }
