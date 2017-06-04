@@ -575,12 +575,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <param name="version">The WITSML version.</param>
         public void CreateContext(Connection connection, WMLSVersion version)
         {
-            if (Context != null)
-            {
-                Context.LogQuery = null;
-                Context.LogResponse = null;
-            }
-
             Context = new WitsmlQueryContext(connection.CreateProxy(version), version);
 
             Clear();
