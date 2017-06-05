@@ -589,11 +589,22 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             lock (_indicatorLock)
             {
-                _activeWellbores.Clear();
-                _growingObjects.Clear();
-                _rigs.Clear();
-                RigNames.Clear();
+                ClearData();
             }
+        }
+
+        /// <summary>
+        /// Clears internal data used for indicators and filtering.
+        /// </summary>
+        /// <remarks>
+        /// Must be called from inside a lock on _indicatorLock
+        /// </remarks>
+        private void ClearData()
+        {
+            _activeWellbores.Clear();
+            _growingObjects.Clear();
+            _rigs.Clear();
+            RigNames.Clear();
         }
 
         /// <summary>
@@ -765,6 +776,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
                 lock (_indicatorLock)
                 {
+                    ClearData();
                     _activeWellbores.UnionWith(wellbores.Select(x => x.GetUri()));
                     _growingObjects.UnionWith(mudLogs.Select(x => x.GetUri()));
                     _growingObjects.UnionWith(trajectories.Select(x => x.GetUri()));
