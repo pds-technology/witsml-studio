@@ -216,11 +216,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
         private void OnSelectedConnectionChanged(Connection previous)
         {
+            if (Connection == null) return;
             if (Connection == _selectConnectionItem) return;
-
-            // If previous connection was disposed
-            if (previous == null) return;
-
             if (Connection == _addNewConnectionItem)
             {
                 Task.Delay(100)
