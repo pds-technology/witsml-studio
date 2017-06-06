@@ -765,12 +765,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 IEnumerable<IWellboreObject> rigs = null;
                 IEnumerable<IDataObject> wells = null;
 
-                var wellsTask = Task.Run(() => wells = Context.GetAllWells());
-                var wellboresTask = Task.Run(() => wellbores = Context.GetActiveWellbores(EtpUri.RootUri));
-                var mudLogsTask = Task.Run(() => mudLogs = Context.GetGrowingObjects(ObjectTypes.MudLog, EtpUri.RootUri));
-                var trajectoryTask = Task.Run(() => trajectories = Context.GetGrowingObjects(ObjectTypes.Trajectory, EtpUri.RootUri));
-                var logsTask = Task.Run(() => logs = Context.GetGrowingObjects(ObjectTypes.Log, EtpUri.RootUri));
-                var rigsTask = Task.Run(() => rigs = Context.GetWellboreObjectIds(ObjectTypes.Rig, EtpUri.RootUri));
+                var wellsTask = Task.Run(() => wells = Context.GetAllWells().ToList());
+                var wellboresTask = Task.Run(() => wellbores = Context.GetActiveWellbores(EtpUri.RootUri).ToList());
+                var mudLogsTask = Task.Run(() => mudLogs = Context.GetGrowingObjects(ObjectTypes.MudLog, EtpUri.RootUri).ToList());
+                var trajectoryTask = Task.Run(() => trajectories = Context.GetGrowingObjects(ObjectTypes.Trajectory, EtpUri.RootUri).ToList());
+                var logsTask = Task.Run(() => logs = Context.GetGrowingObjects(ObjectTypes.Log, EtpUri.RootUri).ToList());
+                var rigsTask = Task.Run(() => rigs = Context.GetWellboreObjectIds(ObjectTypes.Rig, EtpUri.RootUri).ToList());
 
                 await Task.WhenAll(wellsTask, wellboresTask, mudLogsTask, trajectoryTask, logsTask, rigsTask);
 
@@ -795,8 +795,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                     });
                     RigNames.AddRange(_rigs.Keys.OrderBy(x => x));
                 }
-                               
-                await LoadDataItems(wells, Items, LoadWellbores, x => x.GetUri());
+
+                await LoadDataItems(null, wells, Items, LoadWellbores, x => x.GetUri());
 
                 // Apply well name filter
                 UpdateWellVisibility();
@@ -807,6 +807,37 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             });
         }
 
+        private void UpdateResourceViewModelIndicators(IEnumerable<ResourceViewModel> resourceViewModels)
+        {
+            foreach (var resourceViewModel in resourceViewModels)
+            {
+                UpdateResourceViewModelIndicators(resourceViewModel.Children);
+
+                UpdateResourceViewModelIndicator(resourceViewModel);
+            }
+        }
+
+        private void UpdateResourceViewModelIndicator(ResourceViewModel resourceViewModel)
+        {
+            if (string.IsNullOrEmpty(resourceViewModel.Resource.Uri))
+                return;
+
+            var uri = new EtpUri(resourceViewModel.Resource.Uri);
+
+            if (ObjectTypes.Well.EqualsIgnoreCase(uri.ObjectType))
+            {
+                UpdateWellIndicator(resourceViewModel);
+            }
+            else if (ObjectTypes.Wellbore.EqualsIgnoreCase(uri.ObjectType))
+            {
+                UpdateWellboreIndicator(resourceViewModel);
+            }
+            else if (ObjectTypes.IsGrowingDataObject(uri.ObjectType))
+            {
+                UpdateGrowingObjectIndicator(resourceViewModel);
+            }
+        }
+
         private void LoadWellbores(ResourceViewModel parent, string uri)
         {
             Runtime.ShowBusy();
@@ -814,7 +845,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             Task.Run(async () =>
             {
                 var wellbores = Context.GetWellbores(new EtpUri(uri));
-                await LoadDataItems(wellbores, parent.Children, LoadWellboreFolders, x => x.GetUri());
+                await LoadDataItems(parent, wellbores, parent.Children, LoadWellboreFolders, x => x.GetUri());
                 Runtime.ShowBusy(false);
             });
         }
@@ -824,7 +855,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             var etpUri = new EtpUri(uri);
 
             DataObjects
-                .Select(x => ToResourceViewModel(etpUri.Append(x), x, LoadWellboreObjects))
+                .Select(x => ToResourceViewModel(parent, etpUri.Append(x), x, LoadWellboreObjects))
                 .ForEach(parent.Children.Add);
         }
 
@@ -846,7 +877,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                     };
 
                     logFolders
-                        .Select(x => ToResourceViewModel(etpUri.Append(x.Value), x.Key, LoadLogObjects))
+                        .Select(x => ToResourceViewModel(parent, etpUri.Append(x.Value), x.Key, LoadLogObjects))
                         .ForEach(parent.Children.Add);
                 }
                 else
@@ -855,7 +886,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                         ? Context.GetGrowingObjectsWithStatus(etpUri.ObjectType, etpUri)
                         : Context.GetWellboreObjects(etpUri.ObjectType, etpUri);
 
-                    await LoadDataItems(dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri(), 0);
+                    await LoadDataItems(parent, dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri(), 0);
                 }
 
                 Runtime.ShowBusy(false);
@@ -872,7 +903,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 var indexType = ObjectFolders.All.EqualsIgnoreCase(etpUri.ObjectType) ? null : etpUri.ObjectType;
                 var dataObjects = Context.GetGrowingObjectsWithStatus(ObjectTypes.Log, etpUri.Parent, indexType);
 
-                await LoadDataItems(dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri());
+                await LoadDataItems(parent, dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri());
 
                 Runtime.ShowBusy(false);
             });
@@ -888,28 +919,29 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 var dataObject = Context.GetGrowingObjectHeaderOnly(etpUri.ObjectType, etpUri);
 
                 if (ObjectTypes.Log.EqualsIgnoreCase(etpUri.ObjectType))
-                    LoadLogCurveInfo(parent.Children, dataObject);
+                    LoadLogCurveInfo(parent, parent.Children, dataObject);
 
                 await Task.Yield();
                 Runtime.ShowBusy(false);
             });
         }
 
-        private void LoadLogCurveInfo(IList<ResourceViewModel> items, IWellboreObject dataObject)
+        private void LoadLogCurveInfo(ResourceViewModel parent, IList<ResourceViewModel> items, IWellboreObject dataObject)
         {
             var log131 = dataObject as Witsml131.Log;
             var log141 = dataObject as Witsml141.Log;
 
             log131?.LogCurveInfo
-                .Select(x => ToResourceViewModel(x.GetUri(log131), x.Mnemonic, null, 0, new DataObjectWrapper(x)))
+                .Select(x => ToResourceViewModel(parent, x.GetUri(log131), x.Mnemonic, null, 0, new DataObjectWrapper(x)))
                 .ForEach(items.Add);
 
             log141?.LogCurveInfo
-                .Select(x => ToResourceViewModel(x.GetUri(log141), x.Mnemonic.Value, null, 0, new DataObjectWrapper(x)))
+                .Select(x => ToResourceViewModel(parent, x.GetUri(log141), x.Mnemonic.Value, null, 0, new DataObjectWrapper(x)))
                 .ForEach(items.Add);
         }
 
         private async Task LoadDataItems<T>(
+            ResourceViewModel parent,
             IEnumerable<T> dataObjects,
             IList<ResourceViewModel> items,
             Action<ResourceViewModel, string> action,
@@ -920,29 +952,18 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             await Runtime.InvokeAsync(() =>
             {
                 dataObjects
-                    .Select(x => ToResourceViewModel(x, action, getUri, children))
+                    .Select(x => ToResourceViewModel(parent, x, action, getUri, children))
                     .ForEach(items.Add);
             });
         }
 
-        private ResourceViewModel ToResourceViewModel<T>(T dataObject, Action<ResourceViewModel, string> action, Func<T, EtpUri> getUri, int children = -1) where T : IDataObject
+        private ResourceViewModel ToResourceViewModel<T>(ResourceViewModel parent, T dataObject, Action<ResourceViewModel, string> action, Func<T, EtpUri> getUri, int children = -1) where T : IDataObject
         {
             var uri = getUri(dataObject);
 
-            var resourceViewModel = ToResourceViewModel(uri, dataObject.Name, action, children, new DataObjectWrapper(dataObject));
+            var resourceViewModel = ToResourceViewModel(parent, uri, dataObject.Name, action, children, new DataObjectWrapper(dataObject));
 
-            if (ObjectTypes.Well.EqualsIgnoreCase(uri.ObjectType))
-            {
-                UpdateWellIndicator(resourceViewModel);
-            }
-            else if (ObjectTypes.Wellbore.EqualsIgnoreCase(uri.ObjectType))
-            {
-                UpdateWellboreIndicator(resourceViewModel);
-            }
-            else if (ObjectTypes.IsGrowingDataObject(uri.ObjectType))
-            {
-                UpdateGrowingObjectIndicator(resourceViewModel);
-            }
+            UpdateResourceViewModelIndicator(resourceViewModel);
 
             return resourceViewModel;
         }
@@ -1058,7 +1079,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
         }
 
-        private ResourceViewModel ToResourceViewModel(EtpUri uri, string name, Action<ResourceViewModel, string> action, int children = -1, object dataContext = null)
+        private ResourceViewModel ToResourceViewModel(ResourceViewModel parent, EtpUri uri, string name, Action<ResourceViewModel, string> action, int children = -1, object dataContext = null)
         {
             var resource = new Resource
             {
@@ -1069,6 +1090,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             };
 
             var viewModel = new ResourceViewModel(Runtime, resource, dataContext);
+            viewModel.Parent = parent;
 
             if (children != 0 && action != null)
             {
