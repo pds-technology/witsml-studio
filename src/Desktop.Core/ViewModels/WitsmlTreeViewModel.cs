@@ -475,7 +475,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         private RigsMonitor RigsMonitor
         {
-            get => _rigsMonitor;
+            get { return _rigsMonitor; }
             set
             {
                 lock (_lock)
@@ -494,6 +494,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 }
             }
         }
+
         /// <summary>
         /// Updates the properties.
         /// </summary>
