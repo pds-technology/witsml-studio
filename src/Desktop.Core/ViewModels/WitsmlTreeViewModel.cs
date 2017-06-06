@@ -21,9 +21,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using Caliburn.Micro;
 using Energistics.DataAccess;
@@ -45,15 +47,19 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
     /// Manages the display and interaction of the WITSML hierarchy view.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    public class WitsmlTreeViewModel : Screen
+    public class WitsmlTreeViewModel : Screen, IDisposable
     {
         private FrameworkElement _hierarchy;
         private long _messageId;
 
-        private readonly object _indicatorLock = new object();
+        private readonly object _lock = new object();
+        private readonly object _loadLock = new object();
+        private bool _cleared;
+        private bool _loading;
+        private CancellationTokenSource _tokenSource;
+
         private HashSet<EtpUri> _growingObjects = new HashSet<EtpUri>();
         private HashSet<EtpUri> _activeWellbores = new HashSet<EtpUri>();
-        private Dictionary<string, HashSet<string>> _rigs = new Dictionary<string, HashSet<string>>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WitsmlTreeViewModel"/> class.
@@ -65,6 +71,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             Items = new BindableCollection<ResourceViewModel>();
             DataObjects = new BindableCollection<string>();
             RigNames = new BindableCollection<string>();
+
+            BindingOperations.EnableCollectionSynchronization(Items, _lock);
         }
 
         /// <summary>
@@ -231,12 +239,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public IWitsmlContext Context
         {
             get { return _context; }
-            set
+            private set
             {
                 if (_context != value)
                 {
                     _context = value;
                     NotifyOfPropertyChange(() => Context);
+
+                    UpdateFromContext();
                 }
             }
         }
@@ -313,7 +323,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             get
             {
-                var resource = Items.FindSelected();
+                var resource = Items.FindSelected(_lock);
                 if (resource == null) return false;
 
                 var uri = new EtpUri(resource.Resource.Uri);
@@ -329,7 +339,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void GetObjectIds()
         {
-            var resource = Items.FindSelected();
+            var resource = Items.FindSelected(_lock);
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
@@ -348,7 +358,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             get
             {
-                var resource = Items.FindSelected();
+                var resource = Items.FindSelected(_lock);
                 if (resource == null) return false;
 
                 var uri = new EtpUri(resource.Resource.Uri);
@@ -363,7 +373,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void GetObjectHeader()
         {
-            var resource = Items.FindSelected();
+            var resource = Items.FindSelected(_lock);
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
@@ -385,7 +395,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 if (!CanGetObjectHeader)
                     return false;
 
-                var resource = Items.FindSelected();
+                var resource = Items.FindSelected(_lock);
                 var uri = new EtpUri(resource.Resource.Uri);
 
                 return uri.Version.Equals(OptionsIn.DataVersion.Version141.Value);
@@ -458,6 +468,32 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
         }
 
+        private RigsMonitor _rigsMonitor;
+
+        /// <summary>
+        /// The rigs monitor.
+        /// </summary>
+        private RigsMonitor RigsMonitor
+        {
+            get => _rigsMonitor;
+            set
+            {
+                lock (_lock)
+                {
+                    if (_rigsMonitor == value) return;
+
+                    if (_rigsMonitor != null)
+                        _rigsMonitor.RigsChanged -= OnRigsMonitorRigsChanged;
+
+                    _rigsMonitor = value;
+
+                    if (_rigsMonitor != null)
+                        _rigsMonitor.RigsChanged += OnRigsMonitorRigsChanged;
+
+                    UpdateFromRigsMonitor();
+                }
+            }
+        }
         /// <summary>
         /// Updates the properties.
         /// </summary>
@@ -477,7 +513,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <param name="optionIn"></param>
         public void GetObjectDetails(params OptionsIn[] optionIn)
         {
-            var resource = Items.FindSelected();
+            var resource = Items.FindSelected(_lock);
             var uri = new EtpUri(resource.Resource.Uri);
 
             // For 131 always perform requested for details
@@ -576,8 +612,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public void CreateContext(Connection connection, WMLSVersion version)
         {
             Context = new WitsmlQueryContext(connection.CreateProxy(version), version);
-
-            Clear();
         }
 
         /// <summary>
@@ -585,26 +619,27 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void Clear()
         {
-            Items.Clear();
-
-            lock (_indicatorLock)
+            lock (_lock)
             {
-                ClearData();
-            }
-        }
+                if (_cleared) return;
 
-        /// <summary>
-        /// Clears internal data used for indicators and filtering.
-        /// </summary>
-        /// <remarks>
-        /// Must be called from inside a lock on _indicatorLock
-        /// </remarks>
-        private void ClearData()
-        {
-            _activeWellbores.Clear();
-            _growingObjects.Clear();
-            _rigs.Clear();
-            RigNames.Clear();
+                _cleared = true;
+
+                Items.Clear();
+
+                _activeWellbores.Clear();
+                _growingObjects.Clear();
+
+                UpdateRigsMonitor();
+
+                if (_loading)
+                {
+                    _loading = false;
+                    _tokenSource.Cancel();
+                    _tokenSource.Dispose();
+                    _tokenSource = null;
+                }
+            }
         }
 
         /// <summary>
@@ -612,8 +647,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void OnViewReady()
         {
-            if (!Items.Any() && Context != null)
-                LoadWells();
+            lock (_lock)
+            {
+                if (!Items.Any() && Context != null)
+                    LoadWells();
+            }
         }
 
         /// <summary>
@@ -650,7 +688,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void RefreshSelected()
         {
-            var resource = Items.FindSelected();
+            var resource = Items.FindSelected(_lock);
             // Return if there is nothing currently selected
             if (resource == null) return;
 
@@ -724,87 +762,176 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             _hierarchy = control?.FindName("Hierarchy") as FrameworkElement;
         }
 
+        /// <summary>
+        /// Called when deactivating.
+        /// </summary>
+        /// <param name="close">Inidicates whether this instance will be closed.</param>
+        protected override void OnDeactivate(bool close)
+        {
+            if (close)
+            {
+                Dispose(true);
+            }
+
+            base.OnDeactivate(close);
+        }
+
+        /// <summary>
+        /// Updates the tree view when the context changes.
+        /// </summary>
+        private void UpdateFromContext()
+        {
+            Clear();
+            UpdateRigsMonitor();
+        }
+
+        /// <summary>
+        /// Updates the rigs monitor when needed.
+        /// </summary>
+        private void UpdateRigsMonitor()
+        {
+            lock (_lock)
+            {
+                if (Context == null || _cleared)
+                    RigsMonitor = null;
+                else if (_loading)
+                    RigsMonitor = new RigsMonitor(Runtime, Context);
+            }
+        }
+
+        private void OnRigsMonitorRigsChanged(object sender, EventArgs e)
+        {
+            UpdateFromRigsMonitor();
+        }
+
+        /// <summary>
+        /// Updates the tree view when the rigs monitor object has changed.
+        /// </summary>
+        private void UpdateFromRigsMonitor()
+        {
+            lock (_lock)
+            {
+                RigNames.Clear();
+
+                if (RigsMonitor != null)
+                    RigNames.AddRange(RigsMonitor.RigNames);
+
+                NotifyOfPropertyChange(() => RigNames);
+            }
+        }
+
+        /// <summary>
+        /// Updates the well visibility.
+        /// </summary>
         private void UpdateWellVisibility()
         {
-            var pattern = WellName ?? string.Empty;
-
-            // Treat well name patterns like /pattern/ as regular expressions but other patterns as literal strings
-            if (pattern.StartsWith("/") && pattern.EndsWith("/") && pattern.Length >= 2)
-                pattern = pattern.Trim('/');
-            else
-                pattern = Regex.Escape(pattern);
-
-            HashSet<string> wellUids;
-            lock (_indicatorLock)
-                _rigs.TryGetValue(SelectedRigName ?? string.Empty, out wellUids);
-
-            Items.ForEach(x =>
+            lock (_lock)
             {
-                bool active = !ShowOnlyActiveWells || x.IsActiveOrGrowing;
-                bool matchesWell = Regex.IsMatch(x.Resource.Name, pattern, RegexOptions.IgnoreCase);
+                var pattern = WellName ?? string.Empty;
 
-                bool matchesRig = true;
-                IDataObject dataObject = x.GetDataObject();
-                if (wellUids != null && dataObject != null)
-                    matchesRig = wellUids.Contains(dataObject.Uid);
-                
-                x.IsVisible = active && matchesWell && matchesRig;
-            });
+                // Treat well name patterns like /pattern/ as regular expressions but other patterns as literal strings
+                if (pattern.StartsWith("/") && pattern.EndsWith("/") && pattern.Length >= 2)
+                    pattern = pattern.Trim('/');
+                else
+                    pattern = Regex.Escape(pattern);
+
+                HashSet<string> wellUids = null;
+                if (RigsMonitor != null)
+                    wellUids = RigsMonitor.GetWellUids(SelectedRigName);
+
+                Items.ForEach(x =>
+                {
+                    bool active = !ShowOnlyActiveWells || x.IsActiveOrGrowing;
+                    bool matchesWell = Regex.IsMatch(x.Resource.Name, pattern, RegexOptions.IgnoreCase);
+
+                    bool matchesRig = true;
+                    IDataObject dataObject = x.GetDataObject();
+                    if (wellUids != null && dataObject != null)
+                        matchesRig = wellUids.Contains(dataObject.Uid);
+
+                    x.IsVisible = active && matchesWell && matchesRig;
+                });
+            }
         }
 
         private void LoadWells()
         {
-            Runtime.ShowBusy();
-
-            Task.Run(async () =>
+            lock (_lock)
             {
-                IEnumerable<IWellObject> wellbores = null;
-                IEnumerable<IWellboreObject> mudLogs = null;
-                IEnumerable<IWellboreObject> trajectories = null;
-                IEnumerable<IWellboreObject> logs = null;
-                IEnumerable<IWellboreObject> rigs = null;
-                IEnumerable<IDataObject> wells = null;
-
-                var wellsTask = Task.Run(() => wells = Context.GetAllWells().ToList());
-                var wellboresTask = Task.Run(() => wellbores = Context.GetActiveWellbores(EtpUri.RootUri).ToList());
-                var mudLogsTask = Task.Run(() => mudLogs = Context.GetGrowingObjects(ObjectTypes.MudLog, EtpUri.RootUri).ToList());
-                var trajectoryTask = Task.Run(() => trajectories = Context.GetGrowingObjects(ObjectTypes.Trajectory, EtpUri.RootUri).ToList());
-                var logsTask = Task.Run(() => logs = Context.GetGrowingObjects(ObjectTypes.Log, EtpUri.RootUri).ToList());
-                var rigsTask = Task.Run(() => rigs = Context.GetWellboreObjectIds(ObjectTypes.Rig, EtpUri.RootUri).ToList());
-
-                await Task.WhenAll(wellsTask, wellboresTask, mudLogsTask, trajectoryTask, logsTask, rigsTask);
-
-                lock (_indicatorLock)
+                if (_loading)
                 {
-                    ClearData();
-                    _activeWellbores.UnionWith(wellbores.Select(x => x.GetUri()));
-                    _growingObjects.UnionWith(mudLogs.Select(x => x.GetUri()));
-                    _growingObjects.UnionWith(trajectories.Select(x => x.GetUri()));
-                    _growingObjects.UnionWith(logs.Select(x => x.GetUri()));
-                    _rigs.Add(string.Empty, null);
-                    rigs.ForEach(x =>
-                    {
-                        HashSet<string> uids;
-                        if (!_rigs.TryGetValue(x.Name, out uids))
-                        {
-                            uids = new HashSet<string>();
-                            _rigs.Add(x.Name, uids);
-                        }
-
-                        uids.Add(x.UidWell);
-                    });
-                    RigNames.AddRange(_rigs.Keys.OrderBy(x => x));
+                    _tokenSource.Cancel();
+                    _tokenSource.Dispose();
                 }
 
-                await LoadDataItems(null, wells, Items, LoadWellbores, x => x.GetUri());
+                _loading = true;
+                _cleared = false;
+                _tokenSource = new CancellationTokenSource();
+                var token = _tokenSource.Token;
+
+                Runtime.ShowBusy();
+
+                Task.Run(() =>
+                {
+                    LoadWellCore(token);
+                    Runtime.ShowBusy(false);
+                });
+            }
+        }
+
+        private async void LoadWellCore(CancellationToken token)
+        {
+            IEnumerable<IWellObject> wellbores = null;
+            IEnumerable<IWellboreObject> mudLogs = null;
+            IEnumerable<IWellboreObject> trajectories = null;
+            IEnumerable<IWellboreObject> logs = null;
+            IEnumerable<IDataObject> wells = null;
+
+            var wellsTask = Task.Run(() => wells = Context.GetAllWells().ToList());
+            var wellboresTask = Task.Run(() => wellbores = Context.GetActiveWellbores(EtpUri.RootUri).ToList());
+            var mudLogsTask = Task.Run(() => mudLogs =
+                Context.GetGrowingObjects(ObjectTypes.MudLog, EtpUri.RootUri).ToList());
+            var trajectoryTask = Task.Run(() => trajectories =
+                Context.GetGrowingObjects(ObjectTypes.Trajectory, EtpUri.RootUri).ToList());
+            var logsTask = Task.Run(() => logs = Context.GetGrowingObjects(ObjectTypes.Log, EtpUri.RootUri)
+                .ToList());
+
+            UpdateRigsMonitor();
+
+            await Task.WhenAll(wellsTask, wellboresTask, mudLogsTask, trajectoryTask, logsTask);
+
+            lock (_lock)
+            {
+                if (token.IsCancellationRequested)
+                    return;
+
+                _activeWellbores.UnionWith(wellbores.Select(x => x.GetUri()));
+                _growingObjects.UnionWith(mudLogs.Select(x => x.GetUri()));
+                _growingObjects.UnionWith(trajectories.Select(x => x.GetUri()));
+                _growingObjects.UnionWith(logs.Select(x => x.GetUri()));
+            }
+
+            lock (_loadLock)
+            {
+                lock (_lock)
+                {
+                    if (token.IsCancellationRequested)
+                        return;
+                }
+
+                LoadDataItems(null, wells, Items, LoadWellbores, x => x.GetUri());
 
                 // Apply well name filter
                 UpdateWellVisibility();
 
-                Runtime.ShowBusy(false);
+                lock (_lock)
+                {
+                    _loading = false;
+                    _tokenSource?.Dispose();
+                    _tokenSource = null;
+                }
+            }
 
-                NotifyOfPropertyChange(() => RigNames);
-            });
         }
 
         private void UpdateResourceViewModelIndicators(IEnumerable<ResourceViewModel> resourceViewModels)
@@ -842,10 +969,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             Runtime.ShowBusy();
 
-            Task.Run(async () =>
+            Task.Run(() =>
             {
                 var wellbores = Context.GetWellbores(new EtpUri(uri));
-                await LoadDataItems(parent, wellbores, parent.Children, LoadWellboreFolders, x => x.GetUri());
+                LoadDataItems(parent, wellbores, parent.Children, LoadWellboreFolders, x => x.GetUri());
                 Runtime.ShowBusy(false);
             });
         }
@@ -863,7 +990,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             Runtime.ShowBusy();
 
-            Task.Run(async () =>
+            Task.Run(() =>
             {
                 var etpUri = new EtpUri(uri);
 
@@ -886,7 +1013,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                         ? Context.GetGrowingObjectsWithStatus(etpUri.ObjectType, etpUri)
                         : Context.GetWellboreObjects(etpUri.ObjectType, etpUri);
 
-                    await LoadDataItems(parent, dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri(), 0);
+                    LoadDataItems(parent, dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri(), 0);
                 }
 
                 Runtime.ShowBusy(false);
@@ -897,13 +1024,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             Runtime.ShowBusy();
 
-            Task.Run(async () =>
+            Task.Run(() =>
             {
                 var etpUri = new EtpUri(uri);
                 var indexType = ObjectFolders.All.EqualsIgnoreCase(etpUri.ObjectType) ? null : etpUri.ObjectType;
                 var dataObjects = Context.GetGrowingObjectsWithStatus(ObjectTypes.Log, etpUri.Parent, indexType);
 
-                await LoadDataItems(parent, dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri());
+                LoadDataItems(parent, dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri());
 
                 Runtime.ShowBusy(false);
             });
@@ -940,7 +1067,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 .ForEach(items.Add);
         }
 
-        private async Task LoadDataItems<T>(
+        private void LoadDataItems<T>(
             ResourceViewModel parent,
             IEnumerable<T> dataObjects,
             IList<ResourceViewModel> items,
@@ -949,7 +1076,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             int children = -1)
             where T : IDataObject
         {
-            await Runtime.InvokeAsync(() =>
+            Runtime.Invoke(() =>
             {
                 dataObjects
                     .Select(x => ToResourceViewModel(parent, x, action, getUri, children))
@@ -975,7 +1102,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             bool growing;
             var wellboreUri = wellbore.GetUri();
             bool? active = wellbore.GetWellboreStatus();
-            lock (_indicatorLock)
+            lock (_lock)
             {
                 growing = _growingObjects.Any(o => o.Parent == wellboreVM.Resource.Uri);
             }
@@ -992,7 +1119,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             var wellboreUri = wellbore.GetUri();
             bool updateWell = false;
 
-            lock (_indicatorLock)
+            lock (_lock)
             {
                 if (active && !_activeWellbores.Contains(wellboreUri))
                 {
@@ -1035,7 +1162,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             var growingObjectUri = growingObject.GetUri();
             bool updateParents = false;
 
-            lock (_indicatorLock)
+            lock (_lock)
             {
                 if (growing && !_growingObjects.Contains(growingObjectUri))
                 {
@@ -1069,7 +1196,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             var indicator = wellVM.Indicator;
 
-            lock (_indicatorLock)
+            lock (_lock)
             {
                 bool growing = _growingObjects.Any(o => o.Parent.Parent == wellVM.Resource.Uri);
                 bool active = _activeWellbores.Any(o => o.Parent == wellVM.Resource.Uri);
@@ -1103,5 +1230,42 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             return viewModel;
         }
+
+        #region IDisposable Support
+        private bool _disposedValue = false; // To detect redundant calls
+
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    lock (_lock)
+                    {
+                        if (_loading)
+                            _tokenSource.Cancel();
+
+                        _tokenSource?.Dispose();
+                        _tokenSource = null;
+                    }
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+        }
+        #endregion
     }
 }

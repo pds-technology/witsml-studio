@@ -59,6 +59,20 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         }
 
         /// <summary>
+        /// Finds the selected resource.
+        /// </summary>
+        /// <param name="resources">The resources.</param>
+        /// <param name="lockObject">The lock object.</param>
+        /// <returns>
+        /// A <see cref="ResourceViewModel" /> instance.
+        /// </returns>
+        public static ResourceViewModel FindSelected(this IList<ResourceViewModel> resources, object lockObject)
+        {
+            lock (lockObject)
+                return resources.FindSelected();
+        }
+
+        /// <summary>
         /// Finds a resource by evaluating the specified predicate on each item in the collection.
         /// </summary>
         /// <param name="resources">The resources.</param>
