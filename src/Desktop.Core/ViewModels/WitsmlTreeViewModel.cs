@@ -168,68 +168,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
         }
 
-        private int? _maxDataRows;
-
-        /// <summary>
-        /// Gets or sets the maximum data rows.
-        /// </summary>
-        /// <value>The maximum data rows.</value>
-        public int? MaxDataRows
-        {
-            get { return _maxDataRows; }
-            set
-            {
-                if (_maxDataRows != value)
-                {
-                    _maxDataRows = value;
-                    NotifyOfPropertyChange(() => MaxDataRows);
-                    UpdateGetObjectDetailsProperties();                    
-                }
-            }
-        }
-
-        private int? _requestLatestValues;
-
-        /// <summary>
-        /// Gets or sets the number of latest values for the request(growing object only).
-        /// </summary>
-        /// The number of latest values for the request.
-        public int? RequestLatestValues
-        {
-            get { return _requestLatestValues; }
-            set
-            {
-                if (_requestLatestValues != value)
-                {
-                    _requestLatestValues = value;
-                    NotifyOfPropertyChange(() => RequestLatestValues);
-                    UpdateGetObjectDetailsProperties();                    
-                }
-            }
-        }
-
-        private string _extraOptionsIn;
-
-        /// <summary>
-        /// Gets or sets the extra options in.
-        /// </summary>
-        /// <value>
-        /// The extra options in.
-        /// </value>
-        public string ExtraOptionsIn
-        {
-            get { return _extraOptionsIn; }
-            set
-            {
-                if (_extraOptionsIn != value)
-                {
-                    _extraOptionsIn = value;
-                    NotifyOfPropertyChange(() => ExtraOptionsIn);
-                    NotifyOfPropertyChange(() => CanGetObjectDetailsWithExtraOptionsIn);
-                }
-            }
-        }
-
         private IWitsmlContext _context;
 
         /// <summary>
@@ -248,23 +186,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
                     UpdateFromContext();
                 }
-            }
-        }
-
-        private bool _isContextMenuEnabled;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the context menu is enabled.
-        /// </summary>
-        /// <value><c>true</c> if the context menu is enabled; otherwise, <c>false</c>.</value>
-        public bool IsContextMenuEnabled
-        {
-            get { return _isContextMenuEnabled; }
-            set
-            {
-                if (_isContextMenuEnabled == value) return;
-                _isContextMenuEnabled = value;
-                NotifyOfPropertyChange(() => IsContextMenuEnabled);
             }
         }
 
@@ -313,6 +234,114 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             SelectedRigName = string.Empty;
             NotifyOfPropertyChange(() => CanClearSelectedRigName);
+        }
+
+        private RigsMonitor _rigsMonitor;
+
+        /// <summary>
+        /// The rigs monitor.
+        /// </summary>
+        private RigsMonitor RigsMonitor
+        {
+            get { return _rigsMonitor; }
+            set
+            {
+                lock (_lock)
+                {
+                    if (_rigsMonitor == value) return;
+
+                    if (_rigsMonitor != null)
+                        _rigsMonitor.RigsChanged -= OnRigsMonitorRigsChanged;
+
+                    _rigsMonitor = value;
+
+                    if (_rigsMonitor != null)
+                        _rigsMonitor.RigsChanged += OnRigsMonitorRigsChanged;
+
+                    UpdateFromRigsMonitor();
+                }
+            }
+        }
+
+        #region Context Menu
+
+        private bool _isContextMenuEnabled;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the context menu is enabled.
+        /// </summary>
+        /// <value><c>true</c> if the context menu is enabled; otherwise, <c>false</c>.</value>
+        public bool IsContextMenuEnabled
+        {
+            get { return _isContextMenuEnabled; }
+            set
+            {
+                if (_isContextMenuEnabled == value) return;
+                _isContextMenuEnabled = value;
+                NotifyOfPropertyChange(() => IsContextMenuEnabled);
+            }
+        }
+
+        private int? _maxDataRows;
+
+        /// <summary>
+        /// Gets or sets the maximum data rows.
+        /// </summary>
+        /// <value>The maximum data rows.</value>
+        public int? MaxDataRows
+        {
+            get { return _maxDataRows; }
+            set
+            {
+                if (_maxDataRows != value)
+                {
+                    _maxDataRows = value;
+                    NotifyOfPropertyChange(() => MaxDataRows);
+                    UpdateGetObjectDetailsProperties();
+                }
+            }
+        }
+
+        private int? _requestLatestValues;
+
+        /// <summary>
+        /// Gets or sets the number of latest values for the request(growing object only).
+        /// </summary>
+        /// The number of latest values for the request.
+        public int? RequestLatestValues
+        {
+            get { return _requestLatestValues; }
+            set
+            {
+                if (_requestLatestValues != value)
+                {
+                    _requestLatestValues = value;
+                    NotifyOfPropertyChange(() => RequestLatestValues);
+                    UpdateGetObjectDetailsProperties();
+                }
+            }
+        }
+
+        private string _extraOptionsIn;
+
+        /// <summary>
+        /// Gets or sets the extra options in.
+        /// </summary>
+        /// <value>
+        /// The extra options in.
+        /// </value>
+        public string ExtraOptionsIn
+        {
+            get { return _extraOptionsIn; }
+            set
+            {
+                if (_extraOptionsIn != value)
+                {
+                    _extraOptionsIn = value;
+                    NotifyOfPropertyChange(() => ExtraOptionsIn);
+                    NotifyOfPropertyChange(() => CanGetObjectDetailsWithExtraOptionsIn);
+                }
+            }
         }
 
         /// <summary>
@@ -468,33 +497,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
         }
 
-        private RigsMonitor _rigsMonitor;
-
-        /// <summary>
-        /// The rigs monitor.
-        /// </summary>
-        private RigsMonitor RigsMonitor
-        {
-            get { return _rigsMonitor; }
-            set
-            {
-                lock (_lock)
-                {
-                    if (_rigsMonitor == value) return;
-
-                    if (_rigsMonitor != null)
-                        _rigsMonitor.RigsChanged -= OnRigsMonitorRigsChanged;
-
-                    _rigsMonitor = value;
-
-                    if (_rigsMonitor != null)
-                        _rigsMonitor.RigsChanged += OnRigsMonitorRigsChanged;
-
-                    UpdateFromRigsMonitor();
-                }
-            }
-        }
-
         /// <summary>
         /// Updates the properties.
         /// </summary>
@@ -604,6 +606,63 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 GetObjectDetails(optionsIn.ToArray());
             }
         }
+        
+        /// <summary>
+        /// Gets a value indicating whether this selected node can be refreshed.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if this instance can be refreshed; otherwise, <c>false</c>.
+        /// </value>
+        public bool CanRefreshSelected
+        {
+            get { return CanGetObjectIds; }
+        }
+
+        /// <summary>
+        /// Refreshes the selected item.
+        /// </summary>
+        public void RefreshSelected()
+        {
+            var resource = Items.FindSelected(_lock);
+            // Return if there is nothing currently selected
+            if (resource == null) return;
+
+            resource.ClearAndLoadChildren();
+            // Expand the node if it wasn't previously
+            resource.IsExpanded = true;
+        }
+
+        /// <summary>
+        /// Refreshes the context menu.
+        /// </summary>
+        public void RefreshContextMenu()
+        {
+            NotifyOfPropertyChange(() => CanGetObjectIds);
+            NotifyOfPropertyChange(() => CanGetObjectHeader);
+            NotifyOfPropertyChange(() => CanGetObjectDetails);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsWithReturnElementsAll);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsWithMaxDataRows);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsWithRequestLatest);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsWithExtraOptionsIn);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsWithAllOptions);
+            NotifyOfPropertyChange(() => CanRefreshSelected);
+            //NotifyOfPropertyChange(() => CanDeleteObject);
+            OnRefreshContextMenu?.Invoke();
+        }
+        
+        /// <summary>
+        /// Sets the context menu using the supplied user control.
+        /// </summary>
+        /// <param name="control">The control.</param>
+        public void SetContextMenu(FrameworkElement control)
+        {
+            if (_hierarchy == null || control?.ContextMenu == null) return;
+            _hierarchy.ContextMenu = control.ContextMenu;
+            _hierarchy.ContextMenu.DataContext = control.DataContext;
+            control.ContextMenu = null;
+        }
+
+        #endregion
 
         /// <summary>
         /// Creates a WITSML proxy for the specified version.
@@ -674,49 +733,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         }
 
         /// <summary>
-        /// Gets a value indicating whether this selected node can be refreshed.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> if this instance can be refreshed; otherwise, <c>false</c>.
-        /// </value>
-        public bool CanRefreshSelected
-        {
-            get { return CanGetObjectIds; }
-        }
-
-        /// <summary>
-        /// Refreshes the selected item.
-        /// </summary>
-        public void RefreshSelected()
-        {
-            var resource = Items.FindSelected(_lock);
-            // Return if there is nothing currently selected
-            if (resource == null) return;
-
-            resource.ClearAndLoadChildren();
-            // Expand the node if it wasn't previously
-            resource.IsExpanded = true;
-        }
-
-        /// <summary>
-        /// Refreshes the context menu.
-        /// </summary>
-        public void RefreshContextMenu()
-        {
-            NotifyOfPropertyChange(() => CanGetObjectIds);
-            NotifyOfPropertyChange(() => CanGetObjectHeader);
-            NotifyOfPropertyChange(() => CanGetObjectDetails);
-            NotifyOfPropertyChange(() => CanGetObjectDetailsWithReturnElementsAll);
-            NotifyOfPropertyChange(() => CanGetObjectDetailsWithMaxDataRows);
-            NotifyOfPropertyChange(() => CanGetObjectDetailsWithRequestLatest);
-            NotifyOfPropertyChange(() => CanGetObjectDetailsWithExtraOptionsIn);
-            NotifyOfPropertyChange(() => CanGetObjectDetailsWithAllOptions);
-            NotifyOfPropertyChange(() => CanRefreshSelected);            
-            //NotifyOfPropertyChange(() => CanDeleteObject);
-            OnRefreshContextMenu?.Invoke();
-        }
-
-        /// <summary>
         /// Called when the editor gets focus.
         /// </summary>
         /// <param name="control">The control.</param>
@@ -737,18 +753,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 e.Handled = true;
                 control.Focus();
             }
-        }
-
-        /// <summary>
-        /// Sets the context menu using the supplied user control.
-        /// </summary>
-        /// <param name="control">The control.</param>
-        public void SetContextMenu(FrameworkElement control)
-        {
-            if (_hierarchy == null || control?.ContextMenu == null) return;
-            _hierarchy.ContextMenu = control.ContextMenu;
-            _hierarchy.ContextMenu.DataContext = control.DataContext;
-            control.ContextMenu = null;
         }
 
         /// <summary>
@@ -1250,7 +1254,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                         if (_loading)
                             _tokenSource.Cancel();
 
-                        _tokenSource?.Dispose();
+                        if (_tokenSource != null)
+                            _tokenSource.Dispose();
+
                         _tokenSource = null;
                     }
                 }
