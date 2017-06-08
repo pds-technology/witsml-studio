@@ -55,11 +55,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         private readonly object _lock = new object();
         private readonly object _loadLock = new object();
         private bool _cleared;
-        private bool _loading;
         private CancellationTokenSource _tokenSource;
 
-        private HashSet<EtpUri> _growingObjects = new HashSet<EtpUri>();
-        private HashSet<EtpUri> _activeWellbores = new HashSet<EtpUri>();
+        private readonly HashSet<EtpUri> _growingObjects = new HashSet<EtpUri>();
+        private readonly HashSet<EtpUri> _activeWellbores = new HashSet<EtpUri>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WitsmlTreeViewModel"/> class.
@@ -186,6 +185,25 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
                     UpdateFromContext();
                 }
+            }
+        }
+
+        private bool _loading;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="WitsmlTreeViewModel"/> is loading.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if loading; otherwise, <c>false</c>.
+        /// </value>
+        public bool Loading
+        {
+            get { return _loading; }
+            set
+            {
+                if (_loading == value) return;
+                _loading = value;
+                NotifyOfPropertyChange(() => Loading);
             }
         }
 
@@ -692,9 +710,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
                 UpdateRigsMonitor();
 
-                if (_loading)
+                if (Loading)
                 {
-                    _loading = false;
+                    Loading = false;
                     _tokenSource.Cancel();
                     _tokenSource.Dispose();
                     _tokenSource = null;
@@ -799,7 +817,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 if (Context == null || _cleared)
                     RigsMonitor = null;
-                else if (_loading)
+                else if (Loading)
                     RigsMonitor = new RigsMonitor(Runtime, Context);
             }
         }
@@ -863,13 +881,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             lock (_lock)
             {
-                if (_loading)
+                if (Loading)
                 {
                     _tokenSource.Cancel();
                     _tokenSource.Dispose();
                 }
 
-                _loading = true;
+                Loading = true;
                 _cleared = false;
                 _tokenSource = new CancellationTokenSource();
                 var token = _tokenSource.Token;
@@ -931,12 +949,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
                 lock (_lock)
                 {
-                    _loading = false;
+                    Loading = false;
                     _tokenSource?.Dispose();
                     _tokenSource = null;
                 }
             }
-
         }
 
         private void UpdateResourceViewModelIndicators(IEnumerable<ResourceViewModel> resourceViewModels)
@@ -1251,7 +1268,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 {
                     lock (_lock)
                     {
-                        if (_loading)
+                        if (Loading)
                             _tokenSource.Cancel();
 
                         if (_tokenSource != null)

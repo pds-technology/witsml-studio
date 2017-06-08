@@ -13,6 +13,7 @@
 
     <UserControl.Resources>
         <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <conv:BooleanInverseConverter x:Key="BooleanInverseConverter" />
     </UserControl.Resources>
 
     <Grid>
@@ -33,7 +34,9 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Column="0" Text="Well Name:" Margin="5,5,10,5" VerticalAlignment="Center" />
-            <TextBox Grid.Column="1" VerticalContentAlignment="Center" Padding="5,0" Text="{Binding WellName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
+            <TextBox Grid.Column="1" VerticalContentAlignment="Center" Padding="5,0"
+                     Text="{Binding WellName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=500}"
+                     IsEnabled="{Binding Loading, Converter={StaticResource BooleanInverseConverter}}" />
             <Button x:Name="ClearWellName" Grid.Column="3" Content="Clear" Width="60" HorizontalAlignment="Right" />
         </Grid>
 
@@ -46,7 +49,9 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Column="0" Text="Rig Name:" Margin="5,5,10,5" VerticalAlignment="Center" />
-            <ComboBox Grid.Column="1" VerticalContentAlignment="Center" Padding="5,0" ItemsSource="{Binding RigNames}" SelectedItem="{Binding SelectedRigName}" IsEditable="True" />
+            <ComboBox Grid.Column="1" VerticalContentAlignment="Center" Padding="5,0" IsEditable="True" 
+                      ItemsSource="{Binding RigNames}" SelectedItem="{Binding SelectedRigName}" 
+                      IsEnabled="{Binding Loading, Converter={StaticResource BooleanInverseConverter}}" />
             <Button x:Name="ClearSelectedRigName" Grid.Column="3" Content="Clear" Width="60" HorizontalAlignment="Right" />
         </Grid>
 
