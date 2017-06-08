@@ -514,11 +514,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 return;
 
             var appender = _log.Logger.Repository.GetAppenders()[0] as FileAppender;
-            if (appender == null)
-                return;
+            if (appender == null) return;
 
-            var path = appender.File;
-            Process.Start(@"notepad.exe", path);
+            Process.Start(appender.File);
         }
     }
 }
