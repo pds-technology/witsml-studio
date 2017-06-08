@@ -876,15 +876,15 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
                 Runtime.ShowBusy();
 
-                Task.Run(() =>
+                Task.Run(async () =>
                 {
-                    LoadWellCore(token);
+                    await LoadWellCore(token);
                     Runtime.ShowBusy(false);
                 });
             }
         }
 
-        private async void LoadWellCore(CancellationToken token)
+        private async Task LoadWellCore(CancellationToken token)
         {
             IEnumerable<IWellObject> wellbores = null;
             IEnumerable<IWellboreObject> mudLogs = null;
