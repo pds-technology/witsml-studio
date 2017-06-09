@@ -201,8 +201,15 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             if (Connections.Any()) return;
 
+            var viewModel = new ConnectionViewModel(Runtime, ConnectionType);
+            var connection = viewModel.OpenConnectionFile();
             var connections = LoadConnectionsFromFile();
-            InsertConnections(connections, _selectConnectionItem);
+
+            // Auto-connect to previous connection, if possible
+            connection = connections.FirstOrDefault(x => x.Name == connection?.Name)
+                         ?? _selectConnectionItem;
+
+            InsertConnections(connections, connection);
         }
 
         /// <summary>
@@ -233,6 +240,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
             else
             {
+                // Save selected connection to file to enable auto-connect
+                var viewModel = new ConnectionViewModel(Runtime, ConnectionType);
+                viewModel.SaveConnectionFile(Connection);
+
                 // Invoke delegate that will handle the connection change
                 OnConnectionChanged?.Invoke(Connection);
             }
