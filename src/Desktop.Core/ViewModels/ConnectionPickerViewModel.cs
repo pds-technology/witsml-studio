@@ -68,6 +68,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public ConnectionTypes ConnectionType { get; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether auto connect is enabled.
+        /// </summary>
+        /// <value><c>true</c> if auto connect is enabled; otherwise, <c>false</c>.</value>
+        public bool AutoConnectEnabled { get; set; }
+
+        /// <summary>
         /// Gets or sets the delegate that will be invoked when the selected connection changes.
         /// </summary>
         /// <value>The delegate that will be invoked.</value>
@@ -195,19 +201,23 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         }
 
         /// <summary>
+        /// Automatically connects using the previously used connection settings.
+        /// </summary>
+        public void AutoConnect()
+        {
+            if (Connection != _selectConnectionItem) return;
+            Connection = GetAutoConnection();
+        }
+
+        /// <summary>
         /// Initializes the connections.
         /// </summary>
         public void InitializeConnections()
         {
             if (Connections.Any()) return;
 
-            var viewModel = new ConnectionViewModel(Runtime, ConnectionType);
-            var connection = viewModel.OpenConnectionFile();
             var connections = LoadConnectionsFromFile();
-
-            // Auto-connect to previous connection, if possible
-            connection = connections.FirstOrDefault(x => x.Name == connection?.Name)
-                         ?? _selectConnectionItem;
+            var connection = GetAutoConnection(connections);
 
             InsertConnections(connections, connection);
         }
@@ -316,6 +326,21 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 x.Password = x.Password.Decrypt();
                 x.ProxyPassword = x.ProxyPassword.Decrypt();
             });
+        }
+
+        private Connection GetAutoConnection(IEnumerable<Connection> connections = null)
+        {
+            if (!AutoConnectEnabled)
+                return _selectConnectionItem;
+
+            var viewModel = new ConnectionViewModel(Runtime, ConnectionType);
+            var connection = viewModel.OpenConnectionFile();
+
+            connections = connections ?? Connections;
+
+            // Auto-connect to previous connection, if possible
+            return connections.FirstOrDefault(x => x.Name == connection?.Name)
+                   ?? _selectConnectionItem;
         }
 
         /// <summary>

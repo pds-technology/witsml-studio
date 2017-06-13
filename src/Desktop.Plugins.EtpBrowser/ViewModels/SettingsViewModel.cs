@@ -49,6 +49,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
             ConnectionPicker = new ConnectionPickerViewModel(runtime, ConnectionTypes.Etp)
             {
+                AutoConnectEnabled = true,
                 OnConnectionChanged = OnConnectionChanged
             };
 

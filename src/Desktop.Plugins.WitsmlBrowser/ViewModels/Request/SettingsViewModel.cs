@@ -49,6 +49,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
             WitsmlVersions = new BindableCollection<string>();
             ConnectionPicker = new ConnectionPickerViewModel(runtime, ConnectionTypes.Witsml)
             {
+                AutoConnectEnabled = true,
                 OnConnectionChanged = OnConnectionChanged
             };
         }
