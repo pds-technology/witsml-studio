@@ -218,5 +218,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         {
             Console.WriteLine("ShowWarning: {0}", message);
         }
+
+        /// <summary>
+        /// Checks for the existance of the data folder and creates it if necessary.
+        /// </summary>
+        public virtual void EnsureDataFolder()
+        {
+            Console.WriteLine($"Data Folder Path: {DataFolderPath}");
+        }
     }
 }

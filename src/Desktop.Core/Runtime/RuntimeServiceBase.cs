@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -249,6 +250,25 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         public virtual void ShowWarning(string message)
         {
             MessageBox.Show(message, $"{DialogTitlePrefix} - Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        /// <summary>
+        /// Checks for the existance of the data folder and creates it if necessary.
+        /// </summary>
+        public virtual void EnsureDataFolder()
+        {
+            var dataFolder = DataFolderPath;
+
+            if (!Directory.Exists(dataFolder))
+            {
+                var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                var oldDataFolderPath = Path.Combine(appDataPath, "PDS.Witsml.Studio");
+
+                if (Directory.Exists(oldDataFolderPath))
+                    Directory.Move(oldDataFolderPath, Directory.GetParent(dataFolder).FullName);
+                else
+                    Directory.CreateDirectory(dataFolder);
+            }
         }
 
         /// <summary>

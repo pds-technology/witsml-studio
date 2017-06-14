@@ -309,7 +309,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
         private void SaveConnectionsToFile(List<Connection> connections)
         {
-            EnsureDataFolder();
+            Runtime.EnsureDataFolder();
             var fileName = GetConnectionFileName();
             //_log.DebugFormat("Persisting Connection to '{0}'", filename);
 
@@ -350,15 +350,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         internal string GetConnectionFileName()
         {
             return $"{Runtime.DataFolderPath}\\{ConnectionType}{_connectionListBaseFileName}";
-        }
-
-        /// <summary>
-        /// Checks for the existance of the data folder and creates it if necessary.
-        /// </summary>
-        private void EnsureDataFolder()
-        {
-            var directory = new DirectoryInfo(Runtime.DataFolderPath);
-            Directory.CreateDirectory(directory.FullName);
         }
     }
 }

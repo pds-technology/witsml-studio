@@ -159,5 +159,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// <param name="priority">The priority.</param>
         /// <returns>An awaitable <see cref="Task{T}"/>.</returns>
         Task<T> InvokeAsync<T>(Func<T> callback, DispatcherPriority priority = DispatcherPriority.Normal);
+
+        /// <summary>
+        /// Checks for the existance of the data folder and creates it if necessary.
+        /// </summary>
+        void EnsureDataFolder();
     }
 }

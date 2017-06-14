@@ -396,7 +396,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <param name="connection">The connection instance being saved.</param>
         internal void SaveConnectionFile(Connection connection)
         {
-            EnsureDataFolder();
+            Runtime.EnsureDataFolder();
             string filename = GetConnectionFilename();
             _log.DebugFormat("Persisting Connection to '{0}'", filename);
             connection.Password = connection.Password.Encrypt();
@@ -471,18 +471,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             base.OnActivate();
             InitializeEditItem();
-        }
-
-        /// <summary>
-        /// Checks for the existance of the data folder and creates it if necessary.
-        /// </summary>
-        private void EnsureDataFolder()
-        {
-            var dataFolder = Runtime.DataFolderPath;
-            if (!Directory.Exists(dataFolder))
-            {
-                Directory.CreateDirectory(dataFolder);
-            }
         }
 
         /// <summary>
