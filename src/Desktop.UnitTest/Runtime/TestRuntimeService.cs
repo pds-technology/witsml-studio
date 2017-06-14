@@ -17,6 +17,8 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -25,7 +27,6 @@ using Caliburn.Micro;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Properties;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
-using System.Collections.Generic;
 
 namespace PDS.WITSMLstudio.Desktop.Core.Runtime
 {
@@ -224,7 +225,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// </summary>
         public virtual void EnsureDataFolder()
         {
-            Console.WriteLine($"Data Folder Path: {DataFolderPath}");
+            var dataFolder = DataFolderPath;
+            if (!Directory.Exists(dataFolder))
+            {
+                Directory.CreateDirectory(dataFolder);
+            }
         }
     }
 }
