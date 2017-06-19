@@ -18,9 +18,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Media;
 using Energistics.DataAccess;
+using log4net.Appender;
 using Witsml131 = Energistics.DataAccess.WITSML131;
 using Witsml141 = Energistics.DataAccess.WITSML141;
 using PDS.WITSMLstudio.Framework;
@@ -154,6 +156,21 @@ namespace PDS.WITSMLstudio.Desktop.Core
         public static IWellboreObject GetWellboreObject(this ResourceViewModel resourceViewModel)
         {
             return resourceViewModel.GetDataObject() as IWellboreObject;
+        }
+
+        /// <summary>
+        /// Opens the log file.
+        /// </summary>
+        /// <param name="log">The log.</param>
+        public static void OpenLogFile(this log4net.ILog log)
+        {
+            if (log.Logger.Repository.GetAppenders().Length == 0)
+                return;
+
+            var appender = log.Logger.Repository.GetAppenders()[0] as FileAppender;
+            if (appender == null) return;
+
+            Process.Start(appender.File);
         }
     }
 }

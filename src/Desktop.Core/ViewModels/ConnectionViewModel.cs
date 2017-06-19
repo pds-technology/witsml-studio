@@ -498,13 +498,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void OpenLogFile()
         {
-            if (_log.Logger.Repository.GetAppenders().Length == 0)
-                return;
-
-            var appender = _log.Logger.Repository.GetAppenders()[0] as FileAppender;
-            if (appender == null) return;
-
-            Process.Start(appender.File);
+            _log.OpenLogFile();
         }
     }
 }
