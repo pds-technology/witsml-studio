@@ -1122,8 +1122,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             var wellbore = wellboreVM.GetWellObject();
 
             bool growing;
-            var wellboreUri = wellbore.GetUri();
-            bool? active = wellbore.GetWellboreStatus();
+            var active = wellbore.GetWellboreStatus();
             lock (_lock)
             {
                 growing = _growingObjects.Any(o => o.Parent == wellboreVM.Resource.Uri);
@@ -1139,7 +1138,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         private void UpdateWellboreParents(ResourceViewModel wellboreVM, IWellObject wellbore, bool active)
         {
             var wellboreUri = wellbore.GetUri();
-            bool updateWell = false;
+            var updateWell = false;
 
             lock (_lock)
             {
@@ -1166,8 +1165,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             var growingObject = growingObjectVM.GetWellboreObject();
 
-            bool? growing = growingObject.GetObjectGrowingStatus();
-            bool? empty = growingObject.IsGrowingObjectEmpty();
+            var growing = growingObject.GetObjectGrowingStatus();
+            var empty = growingObject.IsGrowingObjectEmpty();
             if (growing == null && empty == null)
                 return;
 
@@ -1182,7 +1181,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         private void UpdateGrowingObjectParents(ResourceViewModel growingObjectVM, IWellboreObject growingObject, bool growing)
         {
             var growingObjectUri = growingObject.GetUri();
-            bool updateParents = false;
+            var updateParents = false;
 
             lock (_lock)
             {
@@ -1216,12 +1215,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
         private void UpdateWellIndicator(ResourceViewModel wellVM)
         {
-            var indicator = wellVM.Indicator;
-
             lock (_lock)
             {
-                bool growing = _growingObjects.Any(o => o.Parent.Parent == wellVM.Resource.Uri);
-                bool active = _activeWellbores.Any(o => o.Parent == wellVM.Resource.Uri);
+                var growing = _growingObjects.Any(o => o.Parent.Parent == wellVM.Resource.Uri);
+                var active = _activeWellbores.Any(o => o.Parent == wellVM.Resource.Uri);
 
                 wellVM.IsGrowing = growing;
                 wellVM.IsActive = active;
@@ -1238,8 +1235,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 HasChildren = children
             };
 
-            var viewModel = new ResourceViewModel(Runtime, resource, dataContext);
-            viewModel.Parent = parent;
+            var viewModel = new ResourceViewModel(Runtime, resource, dataContext) {Parent = parent};
 
             if (children != 0 && action != null)
             {
