@@ -864,11 +864,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
                 Items.ForEach(x =>
                 {
-                    bool active = !ShowOnlyActiveWells || x.IsActiveOrGrowing;
-                    bool matchesWell = Regex.IsMatch(x.Resource.Name, pattern, RegexOptions.IgnoreCase);
+                    var active = !ShowOnlyActiveWells || x.IsActiveOrGrowing;
+                    var matchesWell = Regex.IsMatch(x.Resource.Name, pattern, RegexOptions.IgnoreCase);
 
-                    bool matchesRig = true;
-                    IDataObject dataObject = x.GetDataObject();
+                    var matchesRig = true;
+                    var dataObject = x.GetDataObject();
                     if (wellUids != null && dataObject != null)
                         matchesRig = wellUids.Contains(dataObject.Uid);
 
