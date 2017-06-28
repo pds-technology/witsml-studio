@@ -47,7 +47,7 @@
             </StackPanel>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                <ComboBox Width="100" Margin="0,5,5,5" VerticalContentAlignment="Center" ToolTip="Minimum Query Templates" IsEditable="False"
+                <ComboBox Width="100" Margin="0,5,5,5" VerticalContentAlignment="Center" ToolTip="Query Templates" IsEditable="False"
                           ItemsSource="{Binding Parent.Parent.DataObjects}"
                           SelectedItem="{Binding Parent.Parent.DataObject}" />
 

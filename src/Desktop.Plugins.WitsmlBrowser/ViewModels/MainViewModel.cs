@@ -36,6 +36,7 @@ using PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Result;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 using PDS.WITSMLstudio.Desktop.Core.Providers;
+using PDS.WITSMLstudio.Query;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
 {
@@ -872,9 +873,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
             if (DataObject == null || DataObject == QueryTemplateText)
                 return;
 
-            var type = ObjectTypes.GetObjectGroupType(DataObject, Model.WitsmlVersion);
-            var query = Proxy.BuildEmptyQuery(type, Model.WitsmlVersion);
-            XmlQuery.SetText(WitsmlParser.ToXml(query));
+            var template = QueryTemplates.GetTemplate(DataObject, Model.WitsmlVersion, Model.ReturnElementType);
+            XmlQuery.SetText(template.ToString(SaveOptions.OmitDuplicateNamespaces));
+
+            // Reset drop down list
+            Runtime.InvokeAsync(() => DataObject = QueryTemplateText);
         }
 
         /// <summary>
