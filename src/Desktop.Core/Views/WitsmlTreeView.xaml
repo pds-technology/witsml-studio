@@ -51,8 +51,8 @@
             <TextBlock Grid.Column="0" Text="Rig Name:" Margin="5,5,10,5" VerticalAlignment="Center" />
             <ComboBox Grid.Column="1" VerticalContentAlignment="Center" Padding="5,0" IsEditable="True" 
                       ItemsSource="{Binding RigNames}" SelectedItem="{Binding SelectedRigName}" 
-                      IsEnabled="{Binding Loading, Converter={StaticResource BooleanInverseConverter}}" />
-            <Button x:Name="ClearSelectedRigName" Grid.Column="3" Content="Clear" Width="60" HorizontalAlignment="Right" />
+                      IsEnabled="{Binding CanUseRigFilter}" />
+            <Button x:Name="ClearSelectedRigName" Grid.Column="3" Content="Clear" Width="60" HorizontalAlignment="Right" IsEnabled="{Binding CanUseRigFilter}" />
         </Grid>
 
         <Grid Grid.Row="2" Margin="0,0,0,5">
@@ -61,7 +61,7 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <CheckBox Grid.Column="1" Content="Show Only Active Wells" Padding="{Binding CheckBoxPadding}" VerticalAlignment="Center" IsChecked="{Binding ShowOnlyActiveWells}" />
+            <CheckBox Grid.Column="1" Content="Show Only Active Wells" Padding="{Binding CheckBoxPadding}" VerticalAlignment="Center" IsEnabled="{Binding CanUseActiveWellsFilter}" IsChecked="{Binding ShowOnlyActiveWells}" />
         </Grid>
 
         <TreeView x:Name="Hierarchy"  Grid.Row="3" ItemsSource="{Binding Items}" cal:Message.Attach="[Event SelectedItemChanged] = [Action RefreshContextMenu()]">

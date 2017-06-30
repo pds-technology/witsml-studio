@@ -103,7 +103,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Models
         /// </summary>
         private void QueryRigsAsync()
         {
-            var rigs = Context.GetWellboreObjectIds(ObjectTypes.Rig, EtpUri.RootUri).ToList();
+            var rigs = Context.GetDataObjectsWithoutResponseLogging(ObjectTypes.Rig, EtpUri.RootUri).ToList();
 
             lock (_lock)
             {

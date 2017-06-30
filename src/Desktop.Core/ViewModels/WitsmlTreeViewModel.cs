@@ -239,6 +239,42 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             NotifyOfPropertyChange(() => CanClearWellName);
         }
 
+        private bool _canUseActiveWellsFilter;
+        /// <summary>
+        /// Gets a value indicating whether this instance can use active wells filter.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance can use active wells filter; otherwise, <c>false</c>.
+        /// </value>
+        public bool CanUseActiveWellsFilter
+        {
+            get { return _canUseActiveWellsFilter; }
+            set
+            {
+                if (_canUseActiveWellsFilter == value) return;
+                _canUseActiveWellsFilter = value;
+                NotifyOfPropertyChange(() => CanClearWellName);
+            }
+        }
+
+        private bool _canUseRigFilter;
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance can use rig filter.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance can use rig filter; otherwise, <c>false</c>.
+        /// </value>
+        public bool CanUseRigFilter
+        {
+            get { return _canUseRigFilter; }
+            set
+            {
+                if (_canUseRigFilter == value) return;
+                _canUseRigFilter = value;
+                NotifyOfPropertyChange(() => CanUseRigFilter);
+            }
+        }
+        
         /// <summary>
         /// Gets a value indicating whether this instance can clear rig name.
         /// </summary>
@@ -707,7 +743,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
                 _activeWellbores.Clear();
                 _growingObjects.Clear();
-
+                CanUseActiveWellsFilter = false;
+                CanUseRigFilter = false;
                 UpdateRigsMonitor();
 
                 if (Loading)
@@ -817,7 +854,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 if (Context == null || _cleared)
                     RigsMonitor = null;
-                else if (Loading)
+                else
                     RigsMonitor = new RigsMonitor(Runtime, Context);
             }
         }
@@ -837,7 +874,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 RigNames.Clear();
 
                 if (RigsMonitor != null)
+                {
+                    CanUseRigFilter = RigsMonitor.RigNames.Count > 0;
                     RigNames.AddRange(RigsMonitor.RigNames);
+                }
 
                 NotifyOfPropertyChange(() => RigNames);
             }
@@ -898,41 +938,18 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 {
                     await LoadWellCore(token);
                     Runtime.ShowBusy(false);
-                });
+                }, token).ContinueWith(prevTask =>
+                {
+                    // Find active and growing objects
+                    Task.Run(() => GetActiveAndGrowingObjects(), token);
+                }, token);
             }
         }
 
         private async Task LoadWellCore(CancellationToken token)
         {
-            IEnumerable<IWellObject> wellbores = null;
-            IEnumerable<IWellboreObject> mudLogs = null;
-            IEnumerable<IWellboreObject> trajectories = null;
-            IEnumerable<IWellboreObject> logs = null;
             IEnumerable<IDataObject> wells = null;
-
-            var wellsTask = Task.Run(() => wells = Context.GetAllWells().ToList());
-            var wellboresTask = Task.Run(() => wellbores = Context.GetActiveWellbores(EtpUri.RootUri).ToList());
-            var mudLogsTask = Task.Run(() => mudLogs =
-                Context.GetGrowingObjects(ObjectTypes.MudLog, EtpUri.RootUri).ToList());
-            var trajectoryTask = Task.Run(() => trajectories =
-                Context.GetGrowingObjects(ObjectTypes.Trajectory, EtpUri.RootUri).ToList());
-            var logsTask = Task.Run(() => logs = Context.GetGrowingObjects(ObjectTypes.Log, EtpUri.RootUri)
-                .ToList());
-
-            UpdateRigsMonitor();
-
-            await Task.WhenAll(wellsTask, wellboresTask, mudLogsTask, trajectoryTask, logsTask);
-
-            lock (_lock)
-            {
-                if (token.IsCancellationRequested)
-                    return;
-
-                _activeWellbores.UnionWith(wellbores.Select(x => x.GetUri()));
-                _growingObjects.UnionWith(mudLogs.Select(x => x.GetUri()));
-                _growingObjects.UnionWith(trajectories.Select(x => x.GetUri()));
-                _growingObjects.UnionWith(logs.Select(x => x.GetUri()));
-            }
+            await Task.Run(() => wells = Context.GetAllWells().ToList(), token);
 
             lock (_loadLock)
             {
@@ -944,26 +961,140 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
                 LoadDataItems(null, wells, Items, LoadWellbores, x => x.GetUri());
 
-                // Apply well name filter
-                UpdateWellVisibility();
-
                 lock (_lock)
                 {
                     Loading = false;
-                    _tokenSource?.Dispose();
-                    _tokenSource = null;
                 }
+
+                // Apply well name filter
+                UpdateWellVisibility();
             }
         }
 
-        private void UpdateResourceViewModelIndicators(IEnumerable<ResourceViewModel> resourceViewModels)
+        private async void GetActiveAndGrowingObjects()
         {
-            foreach (var resourceViewModel in resourceViewModels)
+            List<IWellObject> wellbores = null;
+            await Task.Run(() =>
             {
-                UpdateResourceViewModelIndicators(resourceViewModel.Children);
+                try
+                {
+                    wellbores = Context.GetActiveWellbores(EtpUri.RootUri).ToList();
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+            });
 
-                UpdateResourceViewModelIndicator(resourceViewModel);
-            }
+            // Run async query for rigs
+            UpdateRigsMonitor();
+
+            // If query was unable to find wellbores do not atempt data objects
+            if (wellbores == null)
+                return;
+
+            // Do not trust server to filter out non growing objects
+            wellbores.RemoveAll(x => !x.GetObjectGrowingStatus().GetValueOrDefault());
+
+            _activeWellbores.UnionWith(wellbores.Select(x => x.GetUri()));
+
+            // Update the indicator for active wellbores
+            if (_activeWellbores.Count > 0)
+                UpdateResourceViewModelIndicators();
+
+            await GetGrowingLogs();
+
+            // Update the indicator for wells and wellbores that have growing data objects
+            if (_growingObjects.Count > 0)
+                UpdateResourceViewModelIndicators();
+        }
+
+        private void UpdateResourceViewModelIndicators()
+        {
+            CanUseActiveWellsFilter = true;
+            Runtime.Invoke(() =>
+            {
+                Items.ForEach(UpdateResourceViewModelIndicator);
+            });
+        }
+
+        private async Task GetGrowingLogs()
+        {
+            List<IWellboreObject> logs = null;
+            await Task.Run(() =>
+            {
+                try
+                {
+                    logs = Context.GetGrowingObjects(ObjectTypes.Log, EtpUri.RootUri).ToList();
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+            });
+
+            if (logs == null)
+                return;
+
+            RemoveNonGrowingObjects(logs);
+
+            _growingObjects.UnionWith(logs.Select(x => x.GetUri()));
+
+            await GetGrowingMudLogs();
+        }
+
+        private async Task GetGrowingMudLogs()
+        {
+            List<IWellboreObject> mudLogs = null;
+            await Task.Run(() =>
+            {
+                try
+                {
+                    mudLogs = Context.GetGrowingObjects(ObjectTypes.MudLog, EtpUri.RootUri).ToList();
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+            });
+
+            if (mudLogs == null)
+                return;
+
+            RemoveNonGrowingObjects(mudLogs);
+
+            _growingObjects.UnionWith(mudLogs.Select(x => x.GetUri()));
+
+            await GetGrowingTrajectories();
+        }
+
+        private async Task GetGrowingTrajectories()
+        {
+            List<IWellboreObject> trajectories = null;
+            await Task.Run(() =>
+            {
+                try
+                {
+                    trajectories = Context.GetGrowingObjects(ObjectTypes.Trajectory, EtpUri.RootUri).ToList();
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+            });
+
+            if (trajectories == null)
+                return;
+
+            RemoveNonGrowingObjects(trajectories);
+
+            _growingObjects.UnionWith(trajectories.Select(x => x.GetUri()));
+        }
+
+        private static void RemoveNonGrowingObjects(List<IWellboreObject> logs)
+        {
+            // Do not trust server to filter out non growing objects
+            logs.RemoveAll(x => !x.GetObjectGrowingStatus().GetValueOrDefault());
         }
 
         private void UpdateResourceViewModelIndicator(ResourceViewModel resourceViewModel)
