@@ -16,7 +16,6 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
 using System.Net;
 using System.Runtime.Serialization;
 using System.Security;
