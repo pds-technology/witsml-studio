@@ -1184,40 +1184,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 var dataObjects = Context.GetGrowingObjectsWithStatus(ObjectTypes.Log, etpUri.Parent, indexType).ToList();
 
                 if (dataObjects.Any() && !string.IsNullOrEmpty(indexType))
-                    dataObjects = FilterLogsByIndexType(dataObjects, indexType);
+                    dataObjects.RemoveAll(l => !l.HasSpecifiedIndexType(indexType));
 
                 LoadDataItems(parent, dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri());
 
                 Runtime.ShowBusy(false);
             });
-        }
-
-        private static List<IWellboreObject> FilterLogsByIndexType(IList<IWellboreObject> logs, string indexType)
-        {
-            var filteredList = new List<IWellboreObject>();
-            var firstLog = logs.FirstOrDefault();
-            var is131 = firstLog is Witsml131.Log;
-            var is141 = firstLog is Witsml141.Log;
-
-            logs.ForEach(dataObject =>
-            {
-                if (is131)
-                {
-                    var log131 = dataObject as Witsml131.Log;
-
-                    if (log131 != null && log131.IndexType.ToString().EqualsIgnoreCase(indexType))
-                        filteredList.Add(log131);
-                }
-                else if (is141)
-                {
-                    var log141 = dataObject as Witsml141.Log;
-
-                    if (log141 != null && log141.IndexType.ToString().EqualsIgnoreCase(indexType))
-                        filteredList.Add(log141);
-                }
-            });
-
-            return filteredList;
         }
 
         private void LoadGrowingObjectChildren(ResourceViewModel parent, string uri)
