@@ -978,7 +978,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 try
                 {
-                    wellbores = Context.GetActiveWellbores(EtpUri.RootUri).ToList();
+                    wellbores = Context.GetActiveWellbores(EtpUri.RootUri, false).ToList();
                 }
                 catch (Exception)
                 {
@@ -1025,7 +1025,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 try
                 {
-                    logs = Context.GetGrowingObjects(ObjectTypes.Log, EtpUri.RootUri).ToList();
+                    logs = Context.GetGrowingObjects(ObjectTypes.Log, EtpUri.RootUri, false).ToList();
                 }
                 catch (Exception)
                 {
@@ -1050,7 +1050,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 try
                 {
-                    mudLogs = Context.GetGrowingObjects(ObjectTypes.MudLog, EtpUri.RootUri).ToList();
+                    mudLogs = Context.GetGrowingObjects(ObjectTypes.MudLog, EtpUri.RootUri, false).ToList();
                 }
                 catch (Exception)
                 {
@@ -1075,7 +1075,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 try
                 {
-                    trajectories = Context.GetGrowingObjects(ObjectTypes.Trajectory, EtpUri.RootUri).ToList();
+                    trajectories = Context.GetGrowingObjects(ObjectTypes.Trajectory, EtpUri.RootUri, false).ToList();
                 }
                 catch (Exception)
                 {
