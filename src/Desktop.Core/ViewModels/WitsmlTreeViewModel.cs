@@ -27,6 +27,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Xml.Linq;
 using Caliburn.Micro;
 using Energistics.DataAccess;
 using Witsml131 = Energistics.DataAccess.WITSML131;
@@ -973,6 +974,19 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
         private async void GetActiveAndGrowingObjects()
         {
+            // Get the server capabilities
+            var suppportedObjects = Context.GetSupportedGetFromStoreObjects();
+
+            // If the server doesn't support wellbores do not search for any data object
+            if (!suppportedObjects.Any() || !suppportedObjects.ContainsIgnoreCase("wellbore"))
+                return;
+
+            // Run async query for rigs
+            if (suppportedObjects.ContainsIgnoreCase("rig"))
+            {
+                UpdateRigsMonitor();
+            }
+
             List<IWellObject> wellbores = null;
             await Task.Run(() =>
             {
@@ -985,9 +999,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                     // ignored
                 }
             });
-
-            // Run async query for rigs
-            UpdateRigsMonitor();
 
             // If query was unable to find wellbores do not atempt data objects
             if (wellbores == null)
@@ -1002,7 +1013,22 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             if (_activeWellbores.Count > 0)
                 UpdateResourceViewModelIndicators();
 
-            await GetGrowingLogs();
+            // Only get objects that are supported by the server
+            if (suppportedObjects.ContainsIgnoreCase("log"))
+            {
+                if (await GetGrowingLogs())
+                    return;
+            }
+            if (suppportedObjects.ContainsIgnoreCase("mudlog"))
+            {
+                if (await GetGrowingMudLogs())
+                    return;
+            }
+            if (suppportedObjects.ContainsIgnoreCase("trajectory"))
+            {
+                if (await GetGrowingTrajectories())
+                    return;
+            }
 
             // Update the indicator for wells and wellbores that have growing data objects
             if (_growingObjects.Count > 0)
@@ -1018,7 +1044,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             });
         }
 
-        private async Task GetGrowingLogs()
+        private async Task<bool> GetGrowingLogs()
         {
             List<IWellboreObject> logs = null;
             await Task.Run(() =>
@@ -1034,16 +1060,16 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             });
 
             if (logs == null)
-                return;
+                return true;
 
             RemoveNonGrowingObjects(logs);
 
             _growingObjects.UnionWith(logs.Select(x => x.GetUri()));
 
-            await GetGrowingMudLogs();
+            return false;
         }
 
-        private async Task GetGrowingMudLogs()
+        private async Task<bool> GetGrowingMudLogs()
         {
             List<IWellboreObject> mudLogs = null;
             await Task.Run(() =>
@@ -1059,16 +1085,16 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             });
 
             if (mudLogs == null)
-                return;
+                return true;
 
             RemoveNonGrowingObjects(mudLogs);
 
             _growingObjects.UnionWith(mudLogs.Select(x => x.GetUri()));
 
-            await GetGrowingTrajectories();
+            return false;
         }
 
-        private async Task GetGrowingTrajectories()
+        private async Task<bool> GetGrowingTrajectories()
         {
             List<IWellboreObject> trajectories = null;
             await Task.Run(() =>
@@ -1084,11 +1110,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             });
 
             if (trajectories == null)
-                return;
+                return true;
 
             RemoveNonGrowingObjects(trajectories);
 
             _growingObjects.UnionWith(trajectories.Select(x => x.GetUri()));
+
+            return false;
         }
 
         private static void RemoveNonGrowingObjects(List<IWellboreObject> logs)
