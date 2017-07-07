@@ -275,7 +275,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 NotifyOfPropertyChange(() => CanUseRigFilter);
             }
         }
-        
+
         /// <summary>
         /// Gets a value indicating whether this instance can clear rig name.
         /// </summary>
@@ -661,7 +661,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 GetObjectDetails(optionsIn.ToArray());
             }
         }
-        
+
         /// <summary>
         /// Gets a value indicating whether this selected node can be refreshed.
         /// </summary>
@@ -704,7 +704,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             //NotifyOfPropertyChange(() => CanDeleteObject);
             OnRefreshContextMenu?.Invoke();
         }
-        
+
         /// <summary>
         /// Sets the context menu using the supplied user control.
         /// </summary>
@@ -1209,7 +1209,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 var etpUri = new EtpUri(uri);
                 var indexType = ObjectFolders.All.EqualsIgnoreCase(etpUri.ObjectType) ? null : etpUri.ObjectType;
-                var dataObjects = Context.GetGrowingObjectsWithStatus(ObjectTypes.Log, etpUri.Parent, indexType);
+                var dataObjects = Context.GetGrowingObjectsWithStatus(ObjectTypes.Log, etpUri.Parent, indexType).ToList();
+
+                if (dataObjects.Any() && !string.IsNullOrEmpty(indexType))
+                    dataObjects.RemoveAll(l => !l.HasSpecifiedIndexType(indexType));
 
                 LoadDataItems(parent, dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri());
 
