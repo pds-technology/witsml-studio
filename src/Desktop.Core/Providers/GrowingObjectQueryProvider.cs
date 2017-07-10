@@ -82,7 +82,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Providers
                 return UpdateTrajectoryQuery(queryDoc, resultDoc);
 
             return string.Empty;
-        }        
+        }
 
         private string UpdateLogDataQuery(XDocument queryDoc, XDocument resultDoc)
         {
@@ -92,7 +92,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Providers
             var queryLog = queryDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
             var resultLog = resultDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
 
-            var fields = new List<string> {"indexType", "direction"};
+            var fields = new List<string> { "indexType", "direction" };
+            var optionalFields = new List<string> { "logData" };
 
             if (queryLog == null || resultLog == null)
                 return string.Empty;
@@ -129,7 +130,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Providers
                 }
 
                 endIndex.Value = string.Empty;
-                queryLog.Elements().Where(e => !fields.Contains(e.Name.LocalName)).Remove();
+                queryLog.Elements().Where(e => !fields.Contains(e.Name.LocalName) && !optionalFields.Contains(e.Name.LocalName)).Remove();
                 QueryIn = queryDoc.ToString();
                 return QueryIn;
             }
@@ -152,7 +153,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Providers
                 queryLog.AddFirst(new XElement(ns + "startDateTimeIndex", endDateTimeIndex.Value));
 
             endDateTimeIndex.Value = string.Empty;
-            queryLog.Elements().Where(e => !fields.Contains(e.Name.LocalName)).Remove();
+            queryLog.Elements().Where(e => !fields.Contains(e.Name.LocalName) && !optionalFields.Contains(e.Name.LocalName)).Remove();
             QueryIn = queryDoc.ToString();
             return QueryIn;
         }
