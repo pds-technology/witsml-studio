@@ -1,4 +1,4 @@
-              PDS Open Source WITSML™ Product License Agreement
+ï»¿              PDS Open Source WITSMLâ„¢ Product License Agreement
      http://www.pds.group/WITSMLstudio/OpenSource/ProductLicenseAgreement
 
    This Product License Agreement between Licensee and PDS Americas LLC
@@ -78,7 +78,7 @@
           each Derivative Work, to include the following notification visibly
           and prominently:
 
-             "This product uses open source WITSML™ technology developed by PDS"
+             "This product uses open source WITSMLâ„¢ technology developed by PDS"
 
       (d) Title. Title, ownership and all intellectual property rights in and to
           the Product shall remain with PDS Americas LLC and/or its suppliers.
