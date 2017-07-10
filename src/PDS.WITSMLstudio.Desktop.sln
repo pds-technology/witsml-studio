@@ -26,11 +26,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{CF
 	ProjectSection(SolutionItems) = preProject
 		External\GlobalAssemblyInfo.cs = External\GlobalAssemblyInfo.cs
 		External\index.htm = External\index.htm
+		..\LICENSE.txt = ..\LICENSE.txt
 		..\NOTICE.txt = ..\NOTICE.txt
 		..\README.md = ..\README.md
-		External\UpdateCopyrightVersion.ps1 = External\UpdateCopyrightVersion.ps1
 		External\UpdatePackageHintPaths.ps1 = External\UpdatePackageHintPaths.ps1
-		External\UpdateProductNamespaces.ps1 = External\UpdateProductNamespaces.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PDS.WITSMLstudio", "PDS.WITSMLstudio", "{2B7ADB7E-EF7C-4FBD-ADFB-CA0EF611F82C}"
