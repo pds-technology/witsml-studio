@@ -254,7 +254,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 if (_canUseActiveWellsFilter == value) return;
                 _canUseActiveWellsFilter = value;
-                NotifyOfPropertyChange(() => CanClearWellName);
+                NotifyOfPropertyChange(() => CanUseActiveWellsFilter);
             }
         }
 
