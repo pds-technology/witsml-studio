@@ -978,11 +978,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             var suppportedObjects = Context.GetSupportedGetFromStoreObjects();
 
             // If the server doesn't support wellbores do not search for any data object
-            if (!suppportedObjects.Any() || !suppportedObjects.ContainsIgnoreCase("wellbore"))
+            if (!suppportedObjects.Any() || !suppportedObjects.ContainsIgnoreCase(ObjectTypes.Wellbore))
                 return;
 
             // Run async query for rigs
-            if (suppportedObjects.ContainsIgnoreCase("rig"))
+            if (suppportedObjects.ContainsIgnoreCase(ObjectTypes.Rig))
             {
                 UpdateRigsMonitor();
             }
@@ -1014,19 +1014,19 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 UpdateResourceViewModelIndicators();
 
             // Only get objects that are supported by the server
-            if (suppportedObjects.ContainsIgnoreCase("log"))
+            if (suppportedObjects.ContainsIgnoreCase(ObjectTypes.Log))
             {
-                if (await GetGrowingLogs())
+                if (!await GetGrowingLogs())
                     return;
             }
-            if (suppportedObjects.ContainsIgnoreCase("mudlog"))
+            if (suppportedObjects.ContainsIgnoreCase(ObjectTypes.MudLog))
             {
-                if (await GetGrowingMudLogs())
+                if (!await GetGrowingMudLogs())
                     return;
             }
-            if (suppportedObjects.ContainsIgnoreCase("trajectory"))
+            if (suppportedObjects.ContainsIgnoreCase(ObjectTypes.Trajectory))
             {
-                if (await GetGrowingTrajectories())
+                if (!await GetGrowingTrajectories())
                     return;
             }
 
@@ -1060,13 +1060,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             });
 
             if (logs == null)
-                return true;
+                return false;
 
             RemoveNonGrowingObjects(logs);
 
             _growingObjects.UnionWith(logs.Select(x => x.GetUri()));
 
-            return false;
+            return true;
         }
 
         private async Task<bool> GetGrowingMudLogs()
@@ -1085,13 +1085,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             });
 
             if (mudLogs == null)
-                return true;
+                return false;
 
             RemoveNonGrowingObjects(mudLogs);
 
             _growingObjects.UnionWith(mudLogs.Select(x => x.GetUri()));
 
-            return false;
+            return true;
         }
 
         private async Task<bool> GetGrowingTrajectories()
@@ -1110,13 +1110,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             });
 
             if (trajectories == null)
-                return true;
+                return false;
 
             RemoveNonGrowingObjects(trajectories);
 
             _growingObjects.UnionWith(trajectories.Select(x => x.GetUri()));
 
-            return false;
+            return true;
         }
 
         private static void RemoveNonGrowingObjects(List<IWellboreObject> logs)
