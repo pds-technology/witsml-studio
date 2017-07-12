@@ -86,8 +86,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.Providers
 
         private string UpdateLogDataQuery(XDocument queryDoc, XDocument resultDoc)
         {
-            XElement queryEnd;
-
             var ns = queryDoc.Root?.GetDefaultNamespace();
             var queryLog = queryDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
             var resultLog = resultDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
@@ -98,11 +96,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Providers
             if (queryLog == null || resultLog == null)
                 return string.Empty;
 
-            fields.ForEach(x =>
-            {
-                if (queryLog.Elements().All(e => e.Name.LocalName != x))
-                    queryLog.Add(new XElement(ns + x));
-            });
+            // Add direction if it does not exist
+            AddElementIfNonexistent(ns, queryLog, "direction");
 
             var endIndex = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endIndex");
             if (endIndex != null)
@@ -110,24 +105,15 @@ namespace PDS.WITSMLstudio.Desktop.Core.Providers
                 fields.Add("startIndex");
                 fields.Add("endIndex");
 
-                queryEnd = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endIndex");
-                if (queryEnd == null)
-                    queryLog.AddFirst(new XElement(ns + "endIndex"));
+                AddElementIfNonexistent(ns, queryLog, "endIndex");
+                AddElementIfNonexistent(ns, queryLog, "startIndex");
 
                 var startIndex = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "startIndex");
                 if (startIndex != null)
-                {
                     startIndex.Value = endIndex.Value;
-                }
-                else
-                {
-                    var startIndexElement = new XElement(ns + "startIndex", endIndex.Value);
-                    foreach (var attribute in endIndex.Attributes())
-                    {
-                        startIndexElement.SetAttributeValue(attribute.Name, attribute.Value);
-                    }
-                    queryLog.AddFirst(startIndexElement);
-                }
+
+                // Add indexType if it doesn't exist
+                AddElementIfNonexistent(ns, queryLog, "indexType");
 
                 endIndex.Value = string.Empty;
                 queryLog.Elements().Where(e => !fields.Contains(e.Name.LocalName) && !optionalFields.Contains(e.Name.LocalName)).Remove();
@@ -142,20 +128,26 @@ namespace PDS.WITSMLstudio.Desktop.Core.Providers
             fields.Add("startDateTimeIndex");
             fields.Add("endDateTimeIndex");
 
-            queryEnd = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endDateTimeIndex");
-            if (queryEnd == null)
-                queryLog.AddFirst(new XElement(ns + "endDateTimeIndex"));
+            AddElementIfNonexistent(ns, queryLog, "startDateTimeIndex");
+            AddElementIfNonexistent(ns, queryLog, "endDateTimeIndex");
 
             var startDateTimeIndex = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "startDateTimeIndex");
             if (startDateTimeIndex != null)
                 startDateTimeIndex.Value = endDateTimeIndex.Value;
-            else
-                queryLog.AddFirst(new XElement(ns + "startDateTimeIndex", endDateTimeIndex.Value));
+
+            // Add indexType if it doesn't exist
+            AddElementIfNonexistent(ns, queryLog, "indexType");
 
             endDateTimeIndex.Value = string.Empty;
             queryLog.Elements().Where(e => !fields.Contains(e.Name.LocalName) && !optionalFields.Contains(e.Name.LocalName)).Remove();
             QueryIn = queryDoc.ToString();
             return QueryIn;
+        }
+
+        private static void AddElementIfNonexistent(XNamespace ns, XElement queryLog, string elementName)
+        {
+            if (queryLog.Elements().All(e => e.Name.LocalName != elementName))
+                queryLog.AddFirst(new XElement(ns + elementName));
         }
 
         private string UpdateTrajectoryQuery(XDocument queryDoc, XDocument resultDoc)
