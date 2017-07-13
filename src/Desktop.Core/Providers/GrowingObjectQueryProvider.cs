@@ -87,11 +87,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.Providers
         private string UpdateLogDataQuery(XDocument queryDoc, XDocument resultDoc)
         {
             var ns = queryDoc.Root?.GetDefaultNamespace();
-            var queryLog = queryDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
-            var resultLog = resultDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == "log");
+            var queryLog = queryDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == ObjectTypes.Log);
+            var resultLog = resultDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == ObjectTypes.Log);
 
-            var fields = new List<string> { "indexType", "direction" };
-            var optionalFields = new List<string> { "logData" };
+            var fields = new List<string> { "indexType", "direction", "logData" };
+            const string startIndex = "startIndex";
+            const string endIndex = "endIndex";
 
             if (queryLog == null || resultLog == null)
                 return string.Empty;
@@ -99,47 +100,50 @@ namespace PDS.WITSMLstudio.Desktop.Core.Providers
             // Add direction if it does not exist
             AddElement(ns, queryLog, "direction");
 
-            var endIndex = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endIndex");
-            if (endIndex != null)
+            var endIndexResult = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == endIndex);
+            if (endIndexResult != null)
             {
-                fields.Add("startIndex");
-                fields.Add("endIndex");
+                fields.Add(startIndex);
+                fields.Add(endIndex);
 
-                AddElement(ns, queryLog, "endIndex");
-                AddElement(ns, queryLog, "startIndex");
+                AddElement(ns, queryLog, endIndex);
+                AddElement(ns, queryLog, startIndex, endIndexResult.Attributes());
 
-                var startIndex = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "startIndex");
-                if (startIndex != null)
-                    startIndex.Value = endIndex.Value;
+                var startIndexQuery = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == startIndex);
+                if (startIndexQuery != null)
+                    startIndexQuery.Value = endIndexResult.Value;
 
                 // Add indexType if it doesn't exist
                 AddElement(ns, queryLog, "indexType");
 
-                endIndex.Value = string.Empty;
-                queryLog.Elements().Where(e => !fields.Contains(e.Name.LocalName) && !optionalFields.Contains(e.Name.LocalName)).Remove();
+                endIndexResult.Value = string.Empty;
+                queryLog.Elements().Where(e => !fields.Contains(e.Name.LocalName)).Remove();
                 QueryIn = queryDoc.ToString();
                 return QueryIn;
             }
 
-            var endDateTimeIndex = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == "endDateTimeIndex");
-            if (endDateTimeIndex == null)
+            const string startDateTimeIndex = "startDateTimeIndex";
+            const string endDateTimeIndex = "endDateTimeIndex";
+
+            var endDateTimeIndexResult = resultLog.Elements().FirstOrDefault(e => e.Name.LocalName == endDateTimeIndex);
+            if (endDateTimeIndexResult == null)
                 return string.Empty;
 
-            fields.Add("startDateTimeIndex");
-            fields.Add("endDateTimeIndex");
+            fields.Add(startDateTimeIndex);
+            fields.Add(endDateTimeIndex);
 
-            AddElement(ns, queryLog, "startDateTimeIndex");
-            AddElement(ns, queryLog, "endDateTimeIndex");
+            AddElement(ns, queryLog, startDateTimeIndex);
+            AddElement(ns, queryLog, endDateTimeIndex);
 
-            var startDateTimeIndex = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == "startDateTimeIndex");
-            if (startDateTimeIndex != null)
-                startDateTimeIndex.Value = endDateTimeIndex.Value;
+            var startDateTimeIndexQuery = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == startDateTimeIndex);
+            if (startDateTimeIndexQuery != null)
+                startDateTimeIndexQuery.Value = endDateTimeIndexResult.Value;
 
             // Add indexType if it doesn't exist
             AddElement(ns, queryLog, "indexType");
 
-            endDateTimeIndex.Value = string.Empty;
-            queryLog.Elements().Where(e => !fields.Contains(e.Name.LocalName) && !optionalFields.Contains(e.Name.LocalName)).Remove();
+            endDateTimeIndexResult.Value = string.Empty;
+            queryLog.Elements().Where(e => !fields.Contains(e.Name.LocalName)).Remove();
             QueryIn = queryDoc.ToString();
             return QueryIn;
         }
@@ -150,8 +154,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Providers
             const string mdMx = "mdMx";
 
             var ns = queryDoc.Root?.GetDefaultNamespace();
-            var queryLog = queryDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == "trajectory");
-            var resultLog = resultDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == "trajectory");
+            var queryLog = queryDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == ObjectTypes.Trajectory);
+            var resultLog = resultDoc.Root?.Elements().FirstOrDefault(e => e.Name.LocalName == ObjectTypes.Trajectory);
 
             var fields = new List<string>();
 
@@ -164,18 +168,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.Providers
                 fields.Add(mdMn);
                 fields.Add(mdMx);
 
-                AddElement(ns, queryLog, mdMx, "uom");
-                AddElement(ns, queryLog, mdMn, "uom");
+                AddElement(ns, queryLog, mdMx);
+                AddElement(ns, queryLog, mdMn, mdMaxResult.Attributes());
 
                 var mdMinQuery = queryLog.Elements().FirstOrDefault(e => e.Name.LocalName == mdMn);
                 if (mdMinQuery != null)
-                {
-                    foreach (var attribute in mdMaxResult.Attributes())
-                    {
-                        mdMinQuery.SetAttributeValue(attribute.Name, attribute.Value);
-                    }
                     mdMinQuery.Value = mdMaxResult.Value;
-                }
               
                 mdMaxResult.Value = string.Empty;
                 queryLog.Elements().Where(e => !fields.Contains(e.Name.LocalName)).Remove();
@@ -185,14 +183,16 @@ namespace PDS.WITSMLstudio.Desktop.Core.Providers
             return QueryIn;
         }
 
-        private static void AddElement(XNamespace ns, XElement queryLog, string elementName, string attributeName = "")
+        private static void AddElement(XNamespace ns, XElement queryLog, string elementName, IEnumerable<XAttribute> attributes = null)
         {
             if (queryLog.Elements().Any(e => e.Name.LocalName == elementName))
                 return;
 
-            queryLog.AddFirst(string.IsNullOrWhiteSpace(attributeName)
-                ? new XElement(ns + elementName)
-                : new XElement(ns + elementName, new XAttribute(attributeName, "")));
+            var newElement = new XElement(ns + elementName);
+
+            attributes?.ForEach(x => newElement.SetAttributeValue(x.Name, x.Value));
+
+            queryLog.AddFirst(newElement);
         }
     }
 }
