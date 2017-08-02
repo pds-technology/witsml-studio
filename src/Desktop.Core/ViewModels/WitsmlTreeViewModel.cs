@@ -744,6 +744,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
                 _activeWellbores.Clear();
                 _growingObjects.Clear();
+                ShowOnlyActiveWells = false;
                 CanUseActiveWellsFilter = false;
                 CanUseRigFilter = false;
                 UpdateRigsMonitor();
