@@ -121,13 +121,16 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Sets the specified connection in the drop down list.
         /// </summary>
-        /// <param name="connectionName">Name of the connection.</param>
+        /// <param name="connectionNameOrUri">The connection name or URI.</param>
         /// <returns></returns>
-        public bool SelectConnection(string connectionName)
+        public bool SelectConnection(string connectionNameOrUri)
         {
-            var connection = Connections.FirstOrDefault(c => c.Name.EqualsIgnoreCase(connectionName));
+            var connection = 
+                Connections.FirstOrDefault(c => c.Name.EqualsIgnoreCase(connectionNameOrUri)) ??
+                Connections.FirstOrDefault(c => c.Uri.EqualsIgnoreCase(connectionNameOrUri));
 
-            if (connection == null) return false;
+            if (connection == null)
+                return false;
 
             Connection = connection;
             return true;
