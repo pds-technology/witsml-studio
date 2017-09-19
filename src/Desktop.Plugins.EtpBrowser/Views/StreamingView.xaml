@@ -43,8 +43,7 @@
 
         <TextBlock Grid.Row="2" Grid.Column="0" Text="URI:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
         <TextBox Text="{Binding Model.Streaming.Uri}" Grid.Column="1" Grid.Row="2" Margin="5" Padding="5" VerticalContentAlignment="Center" />
-        <Button x:Name="AddUri" Grid.Row="2" Grid.Column="2" Margin="5" Content="Add" Width="40" HorizontalAlignment="Right" 
-                IsEnabled="{Binding IsSimpleStreamer, Converter={StaticResource BooleanInverseConverter}}" />
+        <Button x:Name="AddUri" Grid.Row="2" Grid.Column="2" Margin="5" Content="Add" Width="40" HorizontalAlignment="Right" />
 
         <TextBlock Grid.Row="3" Grid.Column="0" Text="URI List:" Margin="10,5,5,5" HorizontalAlignment="Left" VerticalAlignment="Bottom" />
         

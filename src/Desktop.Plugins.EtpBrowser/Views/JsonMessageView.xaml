@@ -45,8 +45,7 @@
         </Border>
 
         <StackPanel Grid.Row="4" Margin="5,0,5,5" Orientation="Horizontal" IsEnabled="{Binding CanExecute}">
-            <Button x:Name="SendMessage" Content="Send Message" Margin="0,0,5,0" Width="100"
-                    IsEnabled="{Binding ElementName=MessageTypes, Path=SelectedItem.Value, Converter={StaticResource NullToBooleanConverter}}"/>
+            <Button x:Name="SendMessage" Content="Send Message" Margin="0,0,5,0" Width="100" />
         </StackPanel>
     </Grid>
 </UserControl>

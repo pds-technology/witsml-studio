@@ -19,7 +19,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Caliburn.Micro;
@@ -87,120 +86,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <value>The channel streaming information.</value>
         public IList<ChannelStreamingInfo> ChannelStreamingInfos { get; }
 
-        private bool _isSimpleStreamer;
-        /// <summary>
-        /// Gets or sets a value indicating whether the Channel Streaming Producer is a simple streamer.
-        /// </summary>
-        /// <value><c>true</c> if the Channel Streaming Producer is a simple streamer; otherwise, <c>false</c>.</value>
-        [DataMember]
-        public bool IsSimpleStreamer
-        {
-            get { return _isSimpleStreamer; }
-            set
-            {
-                if (_isSimpleStreamer != value)
-                {
-                    _isSimpleStreamer = value;
-                    NotifyOfPropertyChange(() => IsSimpleStreamer);
-                }
-            }
-        }
-
-        private bool _canStart;
-        /// <summary>
-        /// Gets or sets a value indicating whether a Channel Streaming session can be started.
-        /// </summary>
-        /// <value><c>true</c> if a Channel Streaming session can be started; otherwise, <c>false</c>.</value>
-        [DataMember]
-        public bool CanStart
-        {
-            get { return _canStart; }
-            set
-            {
-                if (_canStart != value)
-                {
-                    _canStart = value;
-                    NotifyOfPropertyChange(() => CanStart);
-                }
-            }
-        }
-
-        private bool _canDescribe;
-        /// <summary>
-        /// Gets or sets a value indicating whether a Channels session can be described.
-        /// </summary>
-        /// <value><c>true</c> if a Channels session can be described; otherwise, <c>false</c>.</value>
-        [DataMember]
-        public bool CanDescribe
-        {
-            get { return _canDescribe; }
-            set
-            {
-                if (_canDescribe != value)
-                {
-                    _canDescribe = value;
-                    NotifyOfPropertyChange(() => CanDescribe);
-                }
-            }
-        }
-
-        private bool _canStartStreaming;
-        /// <summary>
-        /// Gets or sets a value indicating whether Channel Streaming can be started.
-        /// </summary>
-        /// <value><c>true</c> if Channel Streaming can be started; otherwise, <c>false</c>.</value>
-        [DataMember]
-        public bool CanStartStreaming
-        {
-            get { return _canStartStreaming; }
-            set
-            {
-                if (_canStartStreaming != value)
-                {
-                    _canStartStreaming = value;
-                    NotifyOfPropertyChange(() => CanStartStreaming);
-                }
-            }
-        }
-
-        private bool _canStopStreaming;
-        /// <summary>
-        /// Gets or sets a value indicating whether Channel Streaming can be stopped.
-        /// </summary>
-        /// <value><c>true</c> if Channel Streaming can be stopped; otherwise, <c>false</c>.</value>
-        [DataMember]
-        public bool CanStopStreaming
-        {
-            get { return _canStopStreaming; }
-            set
-            {
-                if (_canStopStreaming != value)
-                {
-                    _canStopStreaming = value;
-                    NotifyOfPropertyChange(() => CanStopStreaming);
-                }
-            }
-        }
-
-        private bool _canRequestRange;
-        /// <summary>
-        /// Gets or sets a value indicating whether Channel Range Request can be made.
-        /// </summary>
-        /// <value><c>true</c> if Channel Range Request can be made; otherwise, <c>false</c>.</value>
-        [DataMember]
-        public bool CanRequestRange
-        {
-            get { return _canRequestRange; }
-            set
-            {
-                if (_canRequestRange != value)
-                {
-                    _canRequestRange = value;
-                    NotifyOfPropertyChange(() => CanRequestRange);
-                }
-            }
-        }
-
         /// <summary>
         /// Sets the type of channel streaming.
         /// </summary>
@@ -208,7 +93,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public void SetStreamingType(string type)
         {
             Model.Streaming.StreamingType = type;
-            UpdateCanRequestRange();
         }
 
         /// <summary>
@@ -218,12 +102,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             var uri = Model.Streaming.Uri;
 
-            if (IsSimpleStreamer || string.IsNullOrWhiteSpace(uri) || Model.Streaming.Uris.Contains(uri))
+            if (string.IsNullOrWhiteSpace(uri) || Model.Streaming.Uris.Contains(uri))
                 return;
 
             Model.Streaming.Uris.Add(uri);
             Model.Streaming.Uri = string.Empty;
-            UpdateCanDescribe();
         }
 
         /// <summary>
@@ -238,7 +121,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             if (e.Key == Key.Delete && index > -1)
             {
                 Model.Streaming.Uris.RemoveAt(index);
-                UpdateCanDescribe();
             }
         }
 
@@ -250,10 +132,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             Parent.Client.Handler<IChannelStreamingConsumer>()
                 .Start(Model.Streaming.MaxDataItems, Model.Streaming.MaxMessageRate);
 
-            CanStart = false;
             //Channels.Clear();
             //ChannelStreamingInfos.Clear();
-            //UpdateCanDescribe();
             LogStartSession();
         }
 
@@ -279,22 +159,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
             Parent.Client.Handler<IChannelStreamingConsumer>()
                 .ChannelStreamingStart(ChannelStreamingInfos);
-
-            //CanDescribe = false;
-            CanStartStreaming = false;
-            CanStopStreaming = true;
-            CanRequestRange = false;
-        }
-
-        /// <summary>
-        /// Determines whether this instance is streaming.
-        /// </summary>
-        /// <returns>
-        ///   <c>true</c> if this instance is streaming; otherwise, <c>false</c>.
-        /// </returns>
-        private bool IsStreaming()
-        {
-            return !CanStartStreaming && CanStopStreaming;
         }
 
         /// <summary>
@@ -308,11 +172,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
             Parent.Client.Handler<IChannelStreamingConsumer>()
                 .ChannelStreamingStop(channelIds);
-
-            CanStartStreaming = true;
-            CanStopStreaming = false;
-            UpdateCanRequestRange();
-            //UpdateCanDescribe();
         }
 
         /// <summary>
@@ -329,11 +188,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
             Parent.Client.Handler<IChannelStreamingConsumer>()
                 .ChannelRangeRequest(new[] { rangeInfo });
-
-            //CanDescribe = false;
-            CanStartStreaming = false;
-            CanStopStreaming = true;
-            CanRequestRange = false;
         }
 
         /// <summary>
@@ -353,22 +207,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             if (e.Message.SupportedProtocols.All(x => x.Protocol != (int) Protocols.ChannelStreaming))
                 return;
 
-            var protocol = e.Message.SupportedProtocols
-                .First(x => x.Protocol == (int)Protocols.ChannelStreaming);
-
-            IsSimpleStreamer = protocol.ProtocolCapabilities
-                .Where(x => x.Key.EqualsIgnoreCase(ChannelStreamingProducerHandler.SimpleStreamer))
-                .Select(x => x.Value.Item)
-                .OfType<bool>()
-                .FirstOrDefault();
-
             var handler = Parent.Client.Handler<IChannelStreamingConsumer>();
             handler.OnChannelMetadata += OnChannelMetadata;
             handler.OnChannelData += OnChannelData;
-
-            CanStart = true;
-            CanStopStreaming = false;
-            UpdateCanDescribe();
 
             Channels.Clear();
             ChannelStreamingInfos.Clear();
@@ -384,13 +225,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             var handler = Parent.Client.Handler<IChannelStreamingConsumer>();
             handler.OnChannelMetadata -= OnChannelMetadata;
             handler.OnChannelData -= OnChannelData;
-
-            IsSimpleStreamer = false;
-            CanStart = false;
-            CanDescribe = false;
-            CanStartStreaming = false;
-            CanStopStreaming = false;
-            CanRequestRange = false;
         }
 
         private void OnChannelMetadata(object sender, ProtocolEventArgs<ChannelMetadata> e)
@@ -414,13 +248,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             if (e.Header.MessageFlags != (int)MessageFlags.MultiPart)
             {
                 LogChannelMetadata(Channels);
-
-                if (!IsStreaming())
-                {
-                    CanStartStreaming = !IsSimpleStreamer;
-                    CanStopStreaming = IsSimpleStreamer;
-                    UpdateCanRequestRange();
-                }
             }
         }
 
@@ -484,20 +311,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 .FirstOrDefault()?
                 .Indexes.FirstOrDefault()?
                 .Scale ?? 0; // Default to no scale of no index is found.;
-        }
-        
-        private void UpdateCanRequestRange()
-        {
-            CanRequestRange = CanStartStreaming && 
-                !IsSimpleStreamer && 
-                ChannelStreamingInfos.Any() &&
-                ("TimeIndex".EqualsIgnoreCase(Model.Streaming.StreamingType) ||
-                "DepthIndex".EqualsIgnoreCase(Model.Streaming.StreamingType));
-        }
-
-        private void UpdateCanDescribe()
-        {
-            CanDescribe = !IsSimpleStreamer && (CanStopStreaming || CanStart) && Model.Streaming.Uris.Any();
         }
 
         private void LogStartSession()
