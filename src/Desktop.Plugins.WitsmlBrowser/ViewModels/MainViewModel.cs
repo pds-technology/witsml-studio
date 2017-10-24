@@ -1049,7 +1049,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
         /// <param name="message">The SOAP message.</param>
         void ISoapMessageHandler.LogRequest(string action, string message)
         {
-            LogSoapMessage("Request", action, message);
+            if(GetModel().LogSoapMessages)
+                LogSoapMessage("Request", action, message);
         }
 
         /// <summary>
@@ -1059,7 +1060,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
         /// <param name="message">The SOAP message.</param>
         void ISoapMessageHandler.LogResponse(string action, string message)
         {
-            LogSoapMessage("Response", action, message);
+            if (GetModel().LogSoapMessages)
+                LogSoapMessage("Response", action, message);
         }
 
         /// <summary>

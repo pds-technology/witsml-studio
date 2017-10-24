@@ -147,6 +147,7 @@
                     <RowDefinition Height="{Binding Source={StaticResource TextBoxRowHeight}}" />
                     <RowDefinition Height="{Binding Source={StaticResource TextBoxRowHeight}}" />
                     <RowDefinition Height="{Binding Source={StaticResource CheckBoxRowHeight}}" />
+                    <RowDefinition Height="{Binding Source={StaticResource CheckBoxRowHeight}}" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="{Binding Source={StaticResource LabelWidth}}"/>
@@ -165,6 +166,9 @@
                 <StackPanel Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="5,0" Orientation="Horizontal">
                     <CheckBox Content="Save Results to Disk" VerticalAlignment="Center" IsChecked="{Binding Model.IsSaveQueryResponse}" />
                     <CheckBox Content="Split Files by Data Object" VerticalAlignment="Center" Margin="30,0,0,0" IsChecked="{Binding Model.IsSplitResults}" />
+                </StackPanel>
+                <StackPanel Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5,0" Orientation="Horizontal">
+                    <CheckBox Content="Log Soap Messages" VerticalAlignment="Center" IsChecked="{Binding Model.LogSoapMessages}" />
                 </StackPanel>
             </Grid>
         </Grid>

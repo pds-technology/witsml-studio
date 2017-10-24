@@ -27,6 +27,7 @@ using Energistics.DataAccess.WITSML141.ReferenceData;
 using Energistics.Datatypes.ChannelData;
 using PDS.WITSMLstudio.Data.Logs;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
+using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 {
@@ -42,8 +43,15 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 
         public Log141Generator Generator { get; private set; }
 
-        public override async Task Start(Models.Simulation model, CancellationToken token, int interval = 5000)
+        private TextEditorViewModel _messages;
+
+        private int _counter;
+
+        public override async Task Start(Models.Simulation model, CancellationToken token, TextEditorViewModel messages, int interval = 5000)
         {
+            _messages = messages;
+            _counter = 0;
+
             var generator = new Log141Generator();
             var index = 0d;
 
@@ -65,8 +73,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
                 {
                     break;
                 }
-
-                var result = Connection.Read(new LogList() { Log = logList }, OptionsIn.ReturnElements.HeaderOnly);
+                _counter++;
+                var result = Connection.Read(new LogList { Log = logList }, OptionsIn.ReturnElements.HeaderOnly);
 
                 if (!result.Log.Any())
                 {
@@ -88,7 +96,15 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
                 result.Log[0].LogData[0].MnemonicList = ToList(result.Log[0], x => x.Mnemonic.Value);
                 result.Log[0].LogData[0].UnitList = ToList(result.Log[0], x => x.Unit);
 
-                Connection.Update(result);
+                try
+                {
+                    Connection.Update(result);
+                    Log($"Update #{_counter} was sucessful");
+                }
+                catch (Exception ex)
+                {
+                    Log(ex.Message);
+                }
 
                 await Task.Delay(interval);
             }
@@ -101,13 +117,32 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 
         private LogCurveInfo ToLogCurveInfo(ChannelMetadataRecord channel)
         {
-            return new LogCurveInfo()
+            return new LogCurveInfo
             {
                 Mnemonic = new ShortNameStruct(channel.ChannelName),
+                Uid = channel.ChannelName,
                 Unit = channel.Uom,
-                CurveDescription = channel.Description,
-                TypeLogData = LogDataType.@double,
+                CurveDescription = string.IsNullOrWhiteSpace(channel.Description)
+                    ? channel.ChannelName
+                    : channel.Description,
+                TypeLogData = LogDataType.@double
             };
+        }
+
+        private void Log(string message, params object[] values)
+        {
+            Log(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff - ") + string.Format(message, values));
+        }
+
+        private void Log(string message)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            _messages.Append(string.Concat(
+                message.StartsWith("{") ? string.Empty : "// ",
+                message,
+                Environment.NewLine));
         }
     }
 }

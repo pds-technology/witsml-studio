@@ -26,6 +26,7 @@ using Energistics.DataAccess.WITSML131.ReferenceData;
 using Energistics.Datatypes.ChannelData;
 using PDS.WITSMLstudio.Data.Logs;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
+using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 {
@@ -41,8 +42,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 
         public Log131Generator Generator { get; private set; }
 
-        public override async Task Start(Models.Simulation model, CancellationToken token, int interval = 5000)
+        private TextEditorViewModel _messages;
+
+        public override async Task Start(Models.Simulation model, CancellationToken token, TextEditorViewModel messages, int interval = 5000)
         {
+            _messages = messages;
+
             var generator = new Log131Generator();
             var index = 0d;
 

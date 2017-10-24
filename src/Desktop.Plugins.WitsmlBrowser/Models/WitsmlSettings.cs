@@ -172,6 +172,27 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.Models
             }
         }
 
+        private bool _logSoapMessages = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to log SOAP messages.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if logging SOAP messages; otherwise, <c>false</c>.
+        /// </value>
+        public bool LogSoapMessages
+        {
+            get { return _logSoapMessages; }
+            set
+            {
+                if (_logSoapMessages != value)
+                {
+                    _logSoapMessages = value;
+                    NotifyOfPropertyChange(() => LogSoapMessages);
+                }
+            }
+        }
+
         private string _outputPath;
 
         /// <summary>

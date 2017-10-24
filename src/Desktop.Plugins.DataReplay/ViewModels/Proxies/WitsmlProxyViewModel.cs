@@ -20,6 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energistics.DataAccess;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 {
@@ -35,6 +36,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 
         public WMLSVersion Version { get; private set; }
 
-        public abstract Task Start(Models.Simulation model, CancellationToken token, int interval = 5000);
+        public abstract Task Start(Models.Simulation model, CancellationToken token, TextEditorViewModel messages, int interval = 5000);
     }
 }
