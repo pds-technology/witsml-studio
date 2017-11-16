@@ -255,6 +255,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             if (item != null && success)
             {
                 SetApplicationTitle(item);
+                item.ActivateEmbeddedItem();
             }
         }
 

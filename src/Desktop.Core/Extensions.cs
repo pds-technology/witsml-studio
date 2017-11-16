@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Media;
+using Caliburn.Micro;
 using Energistics.DataAccess;
 using log4net.Appender;
 using Witsml131 = Energistics.DataAccess.WITSML131;
@@ -53,6 +54,16 @@ namespace PDS.WITSMLstudio.Desktop.Core
 
             return parentObject as T
                 ?? FindParent<T>(parentObject);
+        }
+
+        /// <summary>
+        /// Activates an embedded item managed by an <see cref="IConductor"/> and hosted within a tab control.
+        /// </summary>
+        /// <param name="screen">The screen.</param>
+        public static void ActivateEmbeddedItem(this IScreen screen)
+        {
+            var conductor = screen as IConductActiveItem;
+            conductor?.ActivateItem(conductor.ActiveItem);
         }
 
         /// <summary>
