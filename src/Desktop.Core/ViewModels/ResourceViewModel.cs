@@ -259,10 +259,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Removes the children and loads children.
         /// </summary>
-        public void ClearAndLoadChildren()
+        public Task ClearAndLoadChildren()
         {
             Runtime?.Invoke(() => Children.Clear(), DispatcherPriority.Send);
-            Task.Run(() => MessageId = LoadChildren(Resource.Uri));
+            return Task.Run(() => MessageId = LoadChildren(Resource.Uri));
         }
 
         private void UpdateIndicator()
