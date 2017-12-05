@@ -27,7 +27,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Xml.Linq;
 using Caliburn.Micro;
 using Energistics.DataAccess;
 using Witsml131 = Energistics.DataAccess.WITSML131;
@@ -1147,11 +1146,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
         }
 
-        private void LoadWellbores(ResourceViewModel parent, string uri)
+        private Task LoadWellbores(ResourceViewModel parent, string uri)
         {
             Runtime.ShowBusy();
 
-            Task.Run(() =>
+            return Task.Run(() =>
             {
                 var wellbores = Context.GetWellbores(new EtpUri(uri));
                 LoadDataItems(parent, wellbores, parent.Children, LoadWellboreFolders, x => x.GetUri());
@@ -1159,20 +1158,27 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             });
         }
 
-        private void LoadWellboreFolders(ResourceViewModel parent, string uri)
-        {
-            var etpUri = new EtpUri(uri);
-
-            DataObjects
-                .Select(x => ToResourceViewModel(parent, etpUri.Append(x), x, LoadWellboreObjects))
-                .ForEach(parent.Children.Add);
-        }
-
-        private void LoadWellboreObjects(ResourceViewModel parent, string uri)
+        private Task LoadWellboreFolders(ResourceViewModel parent, string uri)
         {
             Runtime.ShowBusy();
 
-            Task.Run(() =>
+            return Task.Run(() =>
+            {
+                var etpUri = new EtpUri(uri);
+
+                DataObjects
+                    .Select(x => ToResourceViewModel(parent, etpUri.Append(x), x, LoadWellboreObjects))
+                    .ForEach(parent.Children.Add);
+
+                Runtime.ShowBusy(false);
+            });
+        }
+
+        private Task LoadWellboreObjects(ResourceViewModel parent, string uri)
+        {
+            Runtime.ShowBusy();
+
+            return Task.Run(() =>
             {
                 var etpUri = new EtpUri(uri);
 
@@ -1202,11 +1208,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             });
         }
 
-        private void LoadLogObjects(ResourceViewModel parent, string uri)
+        private Task LoadLogObjects(ResourceViewModel parent, string uri)
         {
             Runtime.ShowBusy();
 
-            Task.Run(() =>
+            return Task.Run(() =>
             {
                 var etpUri = new EtpUri(uri);
                 var indexType = ObjectFolders.All.EqualsIgnoreCase(etpUri.ObjectType) ? null : etpUri.ObjectType;
@@ -1221,11 +1227,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             });
         }
 
-        private void LoadGrowingObjectChildren(ResourceViewModel parent, string uri)
+        private Task LoadGrowingObjectChildren(ResourceViewModel parent, string uri)
         {
             Runtime.ShowBusy();
 
-            Task.Run(async () =>
+            return Task.Run(async () =>
             {
                 var etpUri = new EtpUri(uri);
                 var dataObject = Context.GetGrowingObjectHeaderOnly(etpUri.ObjectType, etpUri);
@@ -1256,7 +1262,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             ResourceViewModel parent,
             IEnumerable<T> dataObjects,
             IList<ResourceViewModel> items,
-            Action<ResourceViewModel, string> action,
+            Func<ResourceViewModel, string, Task> action,
             Func<T, EtpUri> getUri,
             int children = -1)
             where T : IDataObject
@@ -1269,7 +1275,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             });
         }
 
-        private ResourceViewModel ToResourceViewModel<T>(ResourceViewModel parent, T dataObject, Action<ResourceViewModel, string> action, Func<T, EtpUri> getUri, int children = -1) where T : IDataObject
+        private ResourceViewModel ToResourceViewModel<T>(ResourceViewModel parent, T dataObject, Func<ResourceViewModel, string, Task> action, Func<T, EtpUri> getUri, int children = -1) where T : IDataObject
         {
             var uri = getUri(dataObject);
 
@@ -1388,7 +1394,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
         }
 
-        private ResourceViewModel ToResourceViewModel(ResourceViewModel parent, EtpUri uri, string name, Action<ResourceViewModel, string> action, int children = -1, object dataContext = null)
+        private ResourceViewModel ToResourceViewModel(ResourceViewModel parent, EtpUri uri, string name, Func<ResourceViewModel, string, Task> action, int children = -1, object dataContext = null)
         {
             var resource = new Resource
             {
@@ -1402,9 +1408,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             if (children != 0 && action != null)
             {
-                viewModel.LoadChildren = x =>
+                viewModel.LoadChildren = async x =>
                 {
-                    action(viewModel, x);
+                    await action(viewModel, x);
                     return _messageId++;
                 };
             }

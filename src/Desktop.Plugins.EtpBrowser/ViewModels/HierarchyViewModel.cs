@@ -325,7 +325,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             if (e.Message.SupportedProtocols.All(x => x.Protocol != (int)Protocols.Discovery))
                 return;
-            Parent.GetResources(Model?.BaseUri);
+            
+            //Parent.GetResources(Model?.BaseUri);
             CanExecute = true;
             RefreshContextMenu();
         }

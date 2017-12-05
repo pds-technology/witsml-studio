@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Avro.Specific;
 using Caliburn.Micro;
 using Energistics;
@@ -207,10 +208,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         /// <param name="uri">The URI.</param>
         /// <returns>The message identifier.</returns>
-        public long GetResources(string uri)
+        public Task<long> GetResources(string uri)
         {
-            return Client.Handler<IDiscoveryCustomer>()
+            var result = Client.Handler<IDiscoveryCustomer>()
                 .GetResources(uri);
+
+            return Task.FromResult(result);
         }
 
         /// <summary>

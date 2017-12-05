@@ -107,7 +107,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Gets or sets the action method used to load child resources.
         /// </summary>
         /// <value>The load children.</value>
-        public Func<string, long> LoadChildren { get; set; }
+        public Func<string, Task<long>> LoadChildren { get; set; }
 
         /// <summary>
         /// Gets the display name.
@@ -262,7 +262,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public Task ClearAndLoadChildren()
         {
             Runtime?.Invoke(() => Children.Clear(), DispatcherPriority.Send);
-            return Task.Run(() => MessageId = LoadChildren(Resource.Uri));
+            return Task.Run(async () => MessageId = await LoadChildren(Resource.Uri));
         }
 
         private void UpdateIndicator()
