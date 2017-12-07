@@ -1418,7 +1418,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             if (children != 0 && action != null)
             {
-                viewModel.LoadChildren = async x =>
+                viewModel.LoadChildren = async (x, y) =>
                 {
                     await action(viewModel, x);
                     return _messageId++;

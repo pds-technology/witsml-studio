@@ -107,7 +107,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Gets or sets the action method used to load child resources.
         /// </summary>
         /// <value>The load children.</value>
-        public Func<string, Task<long>> LoadChildren { get; set; }
+        public Func<string, ResourceViewModel, Task<long>> LoadChildren { get; set; }
 
         /// <summary>
         /// Gets the display name.
@@ -240,6 +240,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         }
 
         private bool? _isEmpty;
+
         /// <summary>
         /// Indicates whether this resource is empty or not.
         /// </summary>
@@ -256,13 +257,49 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
         }
 
+        private bool _isEditable;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is editable.
+        /// </summary>
+        /// <value><c>true</c> if this instance is editable; otherwise, <c>false</c>.</value>
+        public bool IsEditable
+        {
+            get { return _isEditable; }
+            set
+            {
+                if (_isEditable == value)
+                    return;
+
+                _isEditable = value;
+                NotifyOfPropertyChange(() => IsEditable);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the editable name.
+        /// </summary>
+        /// <value>
+        /// The editable name.
+        /// </value>
+        public string EditableName
+        {
+            get { return DisplayName; }
+            set
+            {
+                if (value == EditableName) return;
+                Resource.Name = value;
+                NotifyOfPropertyChange(() => EditableName);
+            }
+        }
+
         /// <summary>
         /// Removes the children and loads children.
         /// </summary>
         public Task ClearAndLoadChildren()
         {
             Runtime?.Invoke(() => Children.Clear(), DispatcherPriority.Send);
-            return Task.Run(async () => MessageId = await LoadChildren(Resource.Uri));
+            return Task.Run(async () => MessageId = await LoadChildren(Resource.Uri, null));
         }
 
         private void UpdateIndicator()

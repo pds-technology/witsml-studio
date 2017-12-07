@@ -207,8 +207,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// Gets the resources using the Discovery protocol.
         /// </summary>
         /// <param name="uri">The URI.</param>
+        /// <param name="parent">The parent.</param>
         /// <returns>The message identifier.</returns>
-        public Task<long> GetResources(string uri)
+        public Task<long> GetResources(string uri, ResourceViewModel parent = null)
         {
             var result = Client.Handler<IDiscoveryCustomer>()
                 .GetResources(uri);
