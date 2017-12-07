@@ -98,6 +98,16 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public BindableCollection<string> RigNames { get; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether to the show property grid.
+        /// </summary>
+        public bool ShowPropertyGrid { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the height of the property grid.
+        /// </summary>
+        public int PropertyGridHeight { get; set; } = 200;
+
+        /// <summary>
         /// Gets or sets an action to execute when the context menu is refreshed.
         /// </summary>
         public System.Action OnRefreshContextMenu { get; set; }

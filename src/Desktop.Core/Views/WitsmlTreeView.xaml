@@ -22,7 +22,7 @@
             <RowDefinition Height="35" />
             <RowDefinition Height="35" />
             <RowDefinition />
-            <RowDefinition Height="200" />
+            <RowDefinition Height="{Binding PropertyGridHeight}" />
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Margin="0,0,0,5">
@@ -138,7 +138,8 @@
             ShowSearchBox="False"
             ShowSortOptions="False"
             ShowSummary="False"
-            ShowTitle="False">
+            ShowTitle="False"
+            Visibility="{Binding ShowPropertyGrid, Converter={StaticResource BooleanToVisibilityConverter}}">
 
             <xctk:PropertyGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static themes:ResourceKeys.ButtonMouseOverBackgroundKey}" Color="White" />
@@ -159,6 +160,7 @@
                         <sys:String>Direction</sys:String>
                         <!-- LogCurveInfo -->
                         <sys:String>Mnemonic</sys:String>
+                        <sys:String>MnemAlias</sys:String>
                         <sys:String>TypeLogData</sys:String>
                         <sys:String>MinIndex</sys:String>
                         <sys:String>MaxIndex</sys:String>
@@ -210,13 +212,14 @@
                 <xctk:PropertyDefinition TargetProperties="Direction" DisplayOrder="45" />
                 <!-- LogCurveInfo -->
                 <xctk:PropertyDefinition TargetProperties="Mnemonic" DisplayOrder="40" />
-                <xctk:PropertyDefinition TargetProperties="Description" DisplayOrder="41" />
-                <xctk:PropertyDefinition TargetProperties="Unit" DisplayOrder="42" />
-                <xctk:PropertyDefinition TargetProperties="TypeLogData" DisplayOrder="43" />
-                <xctk:PropertyDefinition TargetProperties="MinIndex" DisplayOrder="44" />
-                <xctk:PropertyDefinition TargetProperties="MaxIndex" DisplayOrder="45" />
-                <xctk:PropertyDefinition TargetProperties="MinDateTimeIndex" DisplayOrder="46" />
-                <xctk:PropertyDefinition TargetProperties="MaxDateTimeIndex" DisplayOrder="47" />
+                <xctk:PropertyDefinition TargetProperties="MnemAlias" DisplayOrder="41" />
+                <xctk:PropertyDefinition TargetProperties="Description" DisplayOrder="42" />
+                <xctk:PropertyDefinition TargetProperties="Unit" DisplayOrder="43" />
+                <xctk:PropertyDefinition TargetProperties="TypeLogData" DisplayOrder="44" />
+                <xctk:PropertyDefinition TargetProperties="MinIndex" DisplayOrder="45" />
+                <xctk:PropertyDefinition TargetProperties="MaxIndex" DisplayOrder="46" />
+                <xctk:PropertyDefinition TargetProperties="MinDateTimeIndex" DisplayOrder="47" />
+                <xctk:PropertyDefinition TargetProperties="MaxDateTimeIndex" DisplayOrder="48" />
                 <!-- MudLog -->
                 <xctk:PropertyDefinition TargetProperties="StartMD" DisplayOrder="50" />
                 <xctk:PropertyDefinition TargetProperties="EndMD" DisplayOrder="51" />
