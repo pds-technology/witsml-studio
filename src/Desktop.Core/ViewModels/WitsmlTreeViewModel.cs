@@ -112,6 +112,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public System.Action OnRefreshContextMenu { get; set; }
 
+        /// <summary>
+        /// Gets or sets the on load children completed action.
+        /// </summary>
+        public Action<IList<ResourceViewModel>> OnLoadChildrenCompleted { get; set; }
+
         private string _wellName = string.Empty;
 
         /// <summary>
@@ -1421,6 +1426,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 viewModel.LoadChildren = async (x, y) =>
                 {
                     await action(viewModel, x);
+                    OnLoadChildrenCompleted?.Invoke(viewModel.Children);
                     return _messageId++;
                 };
             }
