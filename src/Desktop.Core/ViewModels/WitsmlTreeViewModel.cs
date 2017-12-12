@@ -115,7 +115,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Gets or sets the on load children completed action.
         /// </summary>
-        public Action<IList<ResourceViewModel>> OnLoadChildrenCompleted { get; set; }
+        public Func<ResourceViewModel, Task> OnLoadChildrenCompleted { get; set; }
 
         private string _wellName = string.Empty;
 
@@ -1426,7 +1426,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 viewModel.LoadChildren = async (x, y) =>
                 {
                     await action(viewModel, x);
-                    OnLoadChildrenCompleted?.Invoke(viewModel.Children);
+
+                    if (OnLoadChildrenCompleted != null)
+                        await OnLoadChildrenCompleted(viewModel);
+
                     return _messageId++;
                 };
             }
