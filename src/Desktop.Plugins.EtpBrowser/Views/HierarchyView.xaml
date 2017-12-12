@@ -6,7 +6,8 @@
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:conv="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters;assembly=PDS.WITSMLstudio.Desktop.Core"
              xmlns:vm="clr-namespace:PDS.WITSMLstudio.Desktop.Core.ViewModels;assembly=PDS.WITSMLstudio.Desktop.Core"
-             mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="300">
+             mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="300"
+             FocusManager.FocusedElement="{x:Reference BaseUriInput}">
     <UserControl.Resources>
         <conv:NullToBooleanConverter x:Key="NullToBooleanConverter" />
     </UserControl.Resources>
@@ -22,7 +23,7 @@
         </Grid.RowDefinitions>
         
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Base URI:" Margin="10,0,5,10" HorizontalAlignment="Right" VerticalAlignment="Center" />
-        <TextBox Text="{Binding Model.BaseUri}" Grid.Column="1" Grid.Row="0" Margin="5,0,0,10" Padding="5" VerticalContentAlignment="Center">
+        <TextBox Grid.Row="0" Grid.Column="1" Margin="5,0,0,10" Padding="5" VerticalContentAlignment="Center" Text="{Binding Model.BaseUri}" x:Name="BaseUriInput">
             <TextBox.InputBindings>
                 <KeyBinding Key="Enter" Command="{Binding GetBaseUriCommand}" />
             </TextBox.InputBindings>

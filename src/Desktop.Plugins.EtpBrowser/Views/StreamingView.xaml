@@ -7,7 +7,8 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:local="clr-namespace:PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Views"
              xmlns:conv="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters;assembly=PDS.WITSMLstudio.Desktop.Core"
-             mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="300">
+             mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="300"
+             FocusManager.FocusedElement="{x:Reference MaxDataItemsInput}">
 
     <UserControl.Resources>
         <conv:BooleanInverseConverter x:Key="BooleanInverseConverter" />
@@ -34,7 +35,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Max Data Items:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
-        <xctk:IntegerUpDown Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
+        <xctk:IntegerUpDown Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center" x:Name="MaxDataItemsInput"
                             Value="{Binding Model.Streaming.MaxDataItems}" Minimum="0" Maximum="10000000" Increment="1000"/>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Max Msg Rate:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />

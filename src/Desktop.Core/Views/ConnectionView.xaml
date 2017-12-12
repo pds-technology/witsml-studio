@@ -5,10 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:cal="http://www.caliburnproject.org"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:cmd="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Commands"
         xmlns:conv="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters"
-        mc:Ignorable="d" Height="350" Width="600" ResizeMode="CanResizeWithGrip"
-        MinHeight="350"
-        MinWidth="600">
+        mc:Ignorable="d" Height="350" Width="600"
+        MinHeight="350" MinWidth="600"
+        FocusManager.FocusedElement="{x:Reference NameTextBox}"
+        cmd:KeyCommands.CloseOnEscape="True"
+        ResizeMode="CanResizeWithGrip">
 
     <Window.Resources>
         <conv:NullToBooleanConverter x:Key="NullToBooleanConverter" />
@@ -46,7 +49,7 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Name:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                    <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Name}" VerticalAlignment="Center" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Name}" VerticalAlignment="Center" x:Name="NameTextBox" />
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="URL:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
                     <TextBox Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Uri, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />

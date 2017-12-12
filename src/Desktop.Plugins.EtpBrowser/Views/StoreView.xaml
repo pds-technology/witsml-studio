@@ -7,7 +7,8 @@
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:app="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Behaviors;assembly=PDS.WITSMLstudio.Desktop.Core"
              xmlns:conv="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters;assembly=PDS.WITSMLstudio.Desktop.Core"
-             mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="300">
+             mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="300"
+             FocusManager.FocusedElement="{x:Reference StoreUriInput}">
     
     <UserControl.Resources>
         <conv:NullToBooleanConverter x:Key="NullToBooleanConverter" />
@@ -30,7 +31,8 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="0" Text="URI:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
-        <TextBox Text="{Binding Model.Store.Uri, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center" />
+        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
+                 x:Name="StoreUriInput" Text="{Binding Model.Store.Uri, UpdateSourceTrigger=PropertyChanged}" />
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="UUID:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
         <TextBox Text="{Binding Model.Store.Uuid, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsInputSettingEditable}" Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" VerticalContentAlignment="Center" />

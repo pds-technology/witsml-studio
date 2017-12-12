@@ -2,8 +2,11 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:cal="http://www.caliburnproject.org"
+        xmlns:cmd="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Commands"
         Width="745" MinWidth="745"
-        Height="480" MinHeight="480" ResizeMode="CanResizeWithGrip">
+        Height="480" MinHeight="480"
+        cmd:KeyCommands.CloseOnEscape="True"
+        ResizeMode="CanResizeWithGrip">
 
     <Window.Resources>
         <Style x:Key="DialogButtonStyle" TargetType="{x:Type Button}">

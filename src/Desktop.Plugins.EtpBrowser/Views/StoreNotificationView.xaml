@@ -6,7 +6,8 @@
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:conv="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters;assembly=PDS.WITSMLstudio.Desktop.Core"
-             mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="300">
+             mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="300"
+             FocusManager.FocusedElement="{x:Reference StoreNotificationUriInput}">
 
     <UserControl.Resources>
         <conv:NullToBooleanConverter x:Key="NullToBooleanConverter" />
@@ -30,7 +31,7 @@
 
         <TextBlock Grid.Row="0" Grid.Column="0" Text="URI:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
         <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
-                 Text="{Binding Model.StoreNotification.Uri, UpdateSourceTrigger=PropertyChanged}" />
+                 x:Name="StoreNotificationUriInput" Text="{Binding Model.StoreNotification.Uri, UpdateSourceTrigger=PropertyChanged}" />
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="UUID:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
         <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" VerticalContentAlignment="Center"
