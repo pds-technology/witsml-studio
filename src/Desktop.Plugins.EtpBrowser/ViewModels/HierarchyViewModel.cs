@@ -19,10 +19,12 @@
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Windows;
+using System.Windows.Input;
 using Caliburn.Micro;
 using Energistics.Common;
 using Energistics.Datatypes;
 using Energistics.Protocol.Core;
+using PDS.WITSMLstudio.Desktop.Core.Commands;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
@@ -43,6 +45,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             Runtime = runtime;
             DisplayName = string.Format("{0:D} - {0}", Protocols.Discovery);
+            GetBaseUriCommand = new DelegateCommand(x => GetBaseUri(), x => CanExecute);
         }
 
         /// <summary>
@@ -67,6 +70,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         /// <value>The runtime service.</value>
         public IRuntimeService Runtime { get; private set; }
+
+        /// <summary>
+        /// Gets the GetBaseUri command.
+        /// </summary>
+        public ICommand GetBaseUriCommand { get; }
 
         private bool _canExecute;
 
