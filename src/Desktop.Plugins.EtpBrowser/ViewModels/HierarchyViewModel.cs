@@ -93,7 +93,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void GetBaseUri()
         {
-            Parent.OnConnectionChanged(true, false);
+            //Parent.OnConnectionChanged(true, false);
+            Parent.GetResources(Model?.BaseUri);
         }
 
         /// <summary>
@@ -326,7 +327,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             if (e.Message.SupportedProtocols.All(x => x.Protocol != (int)Protocols.Discovery))
                 return;
             
-            Parent.GetResources(Model?.BaseUri);
             CanExecute = true;
             RefreshContextMenu();
         }

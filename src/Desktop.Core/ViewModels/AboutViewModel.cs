@@ -72,7 +72,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <value>The application version.</value>
         public string ApplicationVersion => ApplicationDeployment.IsNetworkDeployed
             ? ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString()
-            : Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            : Assembly.GetEntryAssembly().GetName().Version.ToString();
 
         /// <summary>
         /// Gets or sets the application title.

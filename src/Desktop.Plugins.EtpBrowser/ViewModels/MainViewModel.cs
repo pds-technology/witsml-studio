@@ -256,7 +256,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             {
                 resource.Parent.Children.Remove(resource);
             } 
-
         }
 
         /// <summary>
@@ -353,8 +352,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             {
                 InitEtpClient();
             }
-            if(updateTitle)
+
+            if (updateTitle)
+            {
                 Runtime.Shell.SetApplicationTitle(this);
+            }
         }
 
         /// <summary>
