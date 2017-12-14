@@ -29,10 +29,10 @@ using System.Windows.Data;
 using System.Windows.Input;
 using Caliburn.Micro;
 using Energistics.DataAccess;
-using Witsml131 = Energistics.DataAccess.WITSML131;
 using Witsml141 = Energistics.DataAccess.WITSML141;
 using Energistics.Datatypes;
 using Energistics.Datatypes.Object;
+using PDS.WITSMLstudio.Adapters;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Linq;
 using PDS.WITSMLstudio.Query;
@@ -1285,16 +1285,25 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
         private void LoadLogCurveInfo(ResourceViewModel parent, IList<ResourceViewModel> items, IWellboreObject dataObject)
         {
-            var log131 = dataObject as Witsml131.Log;
-            var log141 = dataObject as Witsml141.Log;
+            var log = new Log(dataObject);
+            var logUri = dataObject.GetUri();
 
-            log131?.LogCurveInfo
-                .Select(x => ToResourceViewModel(parent, x.GetUri(log131), x.Mnemonic, null, 0, new DataObjectWrapper(x)))
-                .ForEach(items.Add);
+            var logCurves = log.GetLogCurves();
+            var indexCurve = logCurves
+                .Where(x => x.Mnemonic.EqualsIgnoreCase(log.IndexCurve))
+                .ToArray();
 
-            log141?.LogCurveInfo
-                .Select(x => ToResourceViewModel(parent, x.GetUri(log141), x.Mnemonic.Value, null, 0, new DataObjectWrapper(x)))
+            indexCurve
+                .Union(logCurves
+                .Except(indexCurve)
+                .OrderBy(x => x.Mnemonic))
+                .Select(x => ToResourceViewModel(parent, GetLogCurveInfoUri(logUri, x), x.Mnemonic, null, 0, new DataObjectWrapper(x.WrappedLogCurveInfo)))
                 .ForEach(items.Add);
+        }
+
+        private EtpUri GetLogCurveInfoUri(EtpUri logUri, LogCurveInfo logCurveInfo)
+        {
+            return logUri.Append(ObjectTypes.LogCurveInfo, logCurveInfo.Mnemonic);
         }
 
         private void LoadDataItems<T>(
