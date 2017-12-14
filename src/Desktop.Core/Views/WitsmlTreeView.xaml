@@ -79,12 +79,12 @@
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        
+
                         <Ellipse Grid.Column="0" Height="10" Width="10" Margin="0,0,5,0" VerticalAlignment="Center" StrokeThickness="1"
-                                 Fill="{Binding Indicator.Color}" Stroke="{Binding Indicator.Outline}" ToolTip="{Binding Indicator.Tooltip}"
+                                 Fill="{Binding Indicator.Color}" Stroke="{Binding Indicator.Outline}" ToolTip="{Binding ToolTip}"
                                  Visibility="{Binding Indicator.IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                        
-                        <TextBlock Grid.Column="1" Text="{Binding DisplayName}" VerticalAlignment="Center" />
+
+                        <TextBlock Grid.Column="1" Text="{Binding DisplayName}" ToolTip="{Binding ToolTip}" VerticalAlignment="Center" />
                     </Grid>
                 </HierarchicalDataTemplate>
             </TreeView.Resources>

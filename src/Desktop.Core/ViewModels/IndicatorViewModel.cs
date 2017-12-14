@@ -56,25 +56,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 }
             }
         }
-
-        private string _tooltip;
-        /// <summary>
-        /// Gets or sets the indicator tootip.
-        /// </summary>
-        /// <value>The indicator tooltip.</value>
-        public string Tooltip
-        {
-            get { return _tooltip; }
-            set
-            {
-                if (_tooltip != value)
-                {
-                    _tooltip = value;
-                    NotifyOfPropertyChange(() => Tooltip);
-                }
-            }
-        }
-
+        
         private string _color;
         /// <summary>
         /// Gets or sets the indicator fill color.

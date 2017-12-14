@@ -293,6 +293,22 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
         }
 
+        private string _toolTip;
+
+        /// <summary>
+        /// Gets or sets the tool tip.
+        /// </summary>
+        public string ToolTip
+        {
+            get { return _toolTip; }
+            set
+            {
+                if (value == _toolTip) return;
+                _toolTip = value;
+                NotifyOfPropertyChange(() => ToolTip);
+            }
+        }
+
         /// <summary>
         /// Removes the children and loads children.
         /// </summary>
@@ -305,15 +321,15 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         private void UpdateIndicator()
         {
             if ((IsGrowing ?? false) && (IsActive ?? false))
-                Indicator.Tooltip = "Active and Growing";
+                ToolTip = "Active and Growing";
             else if (IsActive ?? false)
-                Indicator.Tooltip = "Active";
+                ToolTip = "Active";
             else if (IsGrowing ?? false)
-                Indicator.Tooltip = "Growing";
+                ToolTip = "Growing";
             else if (IsEmpty ?? false)
-                Indicator.Tooltip = "Empty";
+                ToolTip = "Empty";
             else
-                Indicator.Tooltip = null;
+                ToolTip = null;
 
             if (IsActiveOrGrowing)
             {
