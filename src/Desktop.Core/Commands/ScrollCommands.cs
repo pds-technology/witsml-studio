@@ -4,15 +4,15 @@ using System.Windows.Controls;
 namespace PDS.WITSMLstudio.Desktop.Core.Commands
 {
     /// <summary>
-    /// Provides attached properties for enabling common <see cref="DataGrid"/> commands.
+    /// Provides attached properties for enabling common scrolling commands.
     /// </summary>
-    public static class GridCommands
+    public static class ScrollCommands
     {
         /// <summary>
         /// The AutoScrollIntoView attached property.
         /// </summary>
         public static readonly DependencyProperty AutoScrollIntoViewProperty = DependencyProperty.RegisterAttached(
-            "AutoScrollIntoView", typeof(bool), typeof(GridCommands), new FrameworkPropertyMetadata(false, AutoScrollIntoViewChanged));
+            "AutoScrollIntoView", typeof(bool), typeof(ScrollCommands), new FrameworkPropertyMetadata(false, AutoScrollIntoViewChanged));
 
         /// <summary>
         /// Gets the value of the AutoScrollIntoView attached property.
@@ -42,30 +42,47 @@ namespace PDS.WITSMLstudio.Desktop.Core.Commands
         private static void AutoScrollIntoViewChanged(DependencyObject instance, DependencyPropertyChangedEventArgs e)
         {
             var dataGrid = instance as DataGrid;
-            if (dataGrid == null) return;
-
-            if ((bool) e.NewValue)
+            if (dataGrid != null)
             {
-                dataGrid.SelectionChanged += OnSelectionChanged;
+                if ((bool)e.NewValue)
+                    dataGrid.SelectionChanged += OnDataGridSelectionChanged;
+                else
+                    dataGrid.SelectionChanged -= OnDataGridSelectionChanged;
             }
-            else
+
+            var treeView = instance as TreeView;
+            if (treeView != null)
             {
-                dataGrid.SelectionChanged -= OnSelectionChanged;
+                if ((bool)e.NewValue)
+                    treeView.AddHandler(TreeViewItem.SelectedEvent, new RoutedEventHandler(OnTreeViewItemSelected));
+                else
+                    treeView.RemoveHandler(TreeViewItem.SelectedEvent, new RoutedEventHandler(OnTreeViewItemSelected));
             }
         }
 
         /// <summary>
-        /// Called when the SelectedChanged event is raised.
+        /// Called when the DataGrid's SelectedChanged event is raised.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="SelectionChangedEventArgs"/> instance containing the event data.</param>
-        private static void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private static void OnDataGridSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var dataGrid = sender as DataGrid;
             if (dataGrid?.SelectedItem == null) return;
 
             dataGrid.ScrollIntoView(dataGrid.SelectedItem);
             dataGrid.CurrentItem = dataGrid.SelectedItem;
+        }
+
+        /// <summary>
+        /// Called when the TreeViewItem's Selected event is raised.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        private static void OnTreeViewItemSelected(object sender, RoutedEventArgs e)
+        {
+            var treeViewItem = e.OriginalSource as TreeViewItem;
+            treeViewItem?.BringIntoView();
         }
     }
 }

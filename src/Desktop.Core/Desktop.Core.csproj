@@ -182,7 +182,7 @@
     </Compile>
     <Compile Include="Behaviors\DropDownButtonBehavior.cs" />
     <Compile Include="Commands\DelegateCommand.cs" />
-    <Compile Include="Commands\GridCommands.cs" />
+    <Compile Include="Commands\ScrollCommands.cs" />
     <Compile Include="Commands\InputCommands.cs" />
     <Compile Include="Commands\KeyCommands.cs" />
     <Compile Include="Connections\AuthenticationTypes.cs" />
