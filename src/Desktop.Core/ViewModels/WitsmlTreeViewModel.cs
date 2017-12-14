@@ -115,7 +115,30 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Gets or sets the on load children completed action.
         /// </summary>
-        public Func<ResourceViewModel, Task> OnLoadChildrenCompleted { get; set; }
+        public Func<ResourceViewModel, IList<ResourceViewModel>, Task> OnLoadChildrenCompleted { get; set; }
+
+        /// <summary>
+        /// Gets an <see cref="EtpUri"/> for the selected URI.
+        /// </summary>
+        public EtpUri SelectedEtpUri { get; private set; }
+
+        private string _selectedUri;
+
+        /// <summary>
+        /// Gets or sets the selected URI.
+        /// </summary>
+        /// <value>The selected URI.</value>
+        public string SelectedUri
+        {
+            get { return _selectedUri; }
+            set
+            {
+                if (value == _selectedUri) return;
+                _selectedUri = value;
+                SelectedEtpUri = new EtpUri(SelectedUri);
+                NotifyOfPropertyChange(() => SelectedUri);
+            }
+        }
 
         private string _wellName = string.Empty;
 
@@ -954,7 +977,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 {
                     await LoadWellCore(token);
                     Runtime.ShowBusy(false);
-                }, token).ContinueWith(prevTask =>
+                }, token)
+                .ContinueWith(prevTask =>
                 {
                     // Find active and growing objects
                     Task.Run(() => GetActiveAndGrowingObjects(), token);
@@ -1287,6 +1311,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 dataObjects
                     .Select(x => ToResourceViewModel(parent, x, action, getUri, children))
                     .ForEach(items.Add);
+
+                if (parent == null)
+                {
+                    OnLoadChildrenCompleted?.Invoke(null, items);
+                }
             });
         }
 
@@ -1343,8 +1372,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 if (wellboreVM.Parent != null)
                     UpdateWellIndicator(wellboreVM.Parent);
             }
-
         }
+
         private void UpdateGrowingObjectIndicator(ResourceViewModel growingObjectVM)
         {
             var growingObject = growingObjectVM.GetWellboreObject();
@@ -1359,7 +1388,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             if (growing != null)
                 UpdateGrowingObjectParents(growingObjectVM, growingObject, growing.Value);
-
         }
 
         private void UpdateGrowingObjectParents(ResourceViewModel growingObjectVM, IWellboreObject growingObject, bool growing)
@@ -1428,7 +1456,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                     await action(viewModel, x);
 
                     if (OnLoadChildrenCompleted != null)
-                        await OnLoadChildrenCompleted(viewModel);
+                        await OnLoadChildrenCompleted(viewModel, viewModel.Children);
 
                     return _messageId++;
                 };
