@@ -113,6 +113,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public System.Action OnRefreshContextMenu { get; set; }
 
         /// <summary>
+        /// Gets or sets the delegate to invoke when the selected item is changed.
+        /// </summary>
+        public Action<ResourceViewModel, EtpUri> OnSelectedChanged { get; set; }
+
+        /// <summary>
         /// Gets or sets the on load children completed action.
         /// </summary>
         public Func<ResourceViewModel, IList<ResourceViewModel>, Task> OnLoadChildrenCompleted { get; set; }
@@ -739,7 +744,17 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithAllOptions);
             NotifyOfPropertyChange(() => CanRefreshSelected);
             //NotifyOfPropertyChange(() => CanDeleteObject);
-            OnRefreshContextMenu?.Invoke();
+            OnRefreshContextMenu?.Invoke(); // TODO: OnRefreshContextMenu is only being used by the Excel Plugin.  
+                                            // TODO:... It could be changed to use OnSelectedChange so this can be removed.
+
+            if (OnSelectedChanged == null) return;
+
+            var selectedResource = Items.FindSelected();
+            var uri = selectedResource?.Resource.Uri;
+            if (!string.IsNullOrWhiteSpace(uri))
+            {
+                OnSelectedChanged(selectedResource, new EtpUri(uri));
+            }
         }
 
         /// <summary>
