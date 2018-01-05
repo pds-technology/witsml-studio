@@ -53,6 +53,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         private long _messageId;
 
         private readonly object _lock = new object();
+        private readonly object _itemsLock = new object();
+        private readonly object _dataObjectsLock = new object();
+        private readonly object _rigNamesLock = new object();
+        private readonly object _growingObjectsLock = new object();
+        private readonly object _activeWellboresLock = new object();
         private readonly object _loadLock = new object();
         private bool _cleared;
         private CancellationTokenSource _tokenSource;
@@ -71,7 +76,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             DataObjects = new BindableCollection<string>();
             RigNames = new BindableCollection<string>();
 
-            BindingOperations.EnableCollectionSynchronization(Items, _lock);
+            BindingOperations.EnableCollectionSynchronization(Items, _itemsLock);
+            BindingOperations.EnableCollectionSynchronization(DataObjects, _dataObjectsLock);
+            BindingOperations.EnableCollectionSynchronization(RigNames, _rigNamesLock);
         }
 
         /// <summary>
@@ -449,7 +456,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             get
             {
-                var resource = Items.FindSelected(_lock);
+                var resource = Items.FindSelected(_itemsLock);
                 if (resource == null) return false;
 
                 var uri = new EtpUri(resource.Resource.Uri);
@@ -465,7 +472,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void GetObjectIds()
         {
-            var resource = Items.FindSelected(_lock);
+            var resource = Items.FindSelected(_itemsLock);
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
@@ -484,7 +491,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             get
             {
-                var resource = Items.FindSelected(_lock);
+                var resource = Items.FindSelected(_itemsLock);
                 if (resource == null) return false;
 
                 var uri = new EtpUri(resource.Resource.Uri);
@@ -499,7 +506,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void GetObjectHeader()
         {
-            var resource = Items.FindSelected(_lock);
+            var resource = Items.FindSelected(_itemsLock);
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
@@ -521,7 +528,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 if (!CanGetObjectHeader)
                     return false;
 
-                var resource = Items.FindSelected(_lock);
+                var resource = Items.FindSelected(_itemsLock);
                 var uri = new EtpUri(resource.Resource.Uri);
 
                 return uri.Version.Equals(OptionsIn.DataVersion.Version141.Value);
@@ -613,7 +620,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <param name="optionIn"></param>
         public void GetObjectDetails(params OptionsIn[] optionIn)
         {
-            var resource = Items.FindSelected(_lock);
+            var resource = Items.FindSelected(_itemsLock);
             var uri = new EtpUri(resource.Resource.Uri);
 
             // For 131 always perform requested for details
@@ -720,7 +727,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void RefreshSelected()
         {
-            var resource = Items.FindSelected(_lock);
+            var resource = Items.FindSelected(_itemsLock);
             // Return if there is nothing currently selected
             if (resource == null) return;
 
@@ -749,7 +756,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             if (OnSelectedChanged == null) return;
 
-            var selectedResource = Items.FindSelected();
+            var selectedResource = Items.FindSelected(_itemsLock);
             var uri = selectedResource?.Resource.Uri;
             if (!string.IsNullOrWhiteSpace(uri))
             {
@@ -794,8 +801,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
                 Items.Clear();
 
-                _activeWellbores.Clear();
-                _growingObjects.Clear();
+                lock (_activeWellboresLock)
+                {
+                    _activeWellbores.Clear();
+                }
+                lock (_growingObjectsLock)
+                {
+                    _growingObjects.Clear();
+                }
                 ShowOnlyActiveWells = false;
                 CanUseActiveWellsFilter = false;
                 CanUseRigFilter = false;
@@ -818,7 +831,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             lock (_lock)
             {
-                if (!Items.Any() && Context != null)
+                bool hasItems;
+                lock (_itemsLock)
+                {
+                    hasItems = Items.Any();
+                }
+
+                if (!hasItems && Context != null)
                     LoadWells();
             }
         }
@@ -923,18 +942,15 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         private void UpdateFromRigsMonitor()
         {
-            lock (_lock)
+            RigNames.Clear();
+
+            if (RigsMonitor != null)
             {
-                RigNames.Clear();
-
-                if (RigsMonitor != null)
-                {
-                    CanUseRigFilter = RigsMonitor.RigNames.Count > 0;
-                    RigNames.AddRange(RigsMonitor.RigNames);
-                }
-
-                NotifyOfPropertyChange(() => RigNames);
+                CanUseRigFilter = RigsMonitor.RigNames.Count > 0;
+                RigNames.AddRange(RigsMonitor.RigNames);
             }
+
+            NotifyOfPropertyChange(() => RigNames);
         }
 
         /// <summary>
@@ -956,18 +972,21 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 if (RigsMonitor != null)
                     wellUids = RigsMonitor.GetWellUids(SelectedRigName);
 
-                Items.ForEach(x =>
+                lock (_itemsLock)
                 {
-                    var active = !ShowOnlyActiveWells || x.IsActiveOrGrowing;
-                    var matchesWell = Regex.IsMatch(x.Resource.Name, pattern, RegexOptions.IgnoreCase);
+                    Items.ForEach(x =>
+                    {
+                        var active = !ShowOnlyActiveWells || x.IsActiveOrGrowing;
+                        var matchesWell = Regex.IsMatch(x.Resource.Name, pattern, RegexOptions.IgnoreCase);
 
-                    var matchesRig = true;
-                    var dataObject = x.GetDataObject();
-                    if (wellUids != null && dataObject != null)
-                        matchesRig = wellUids.Contains(dataObject.Uid);
+                        var matchesRig = true;
+                        var dataObject = x.GetDataObject();
+                        if (wellUids != null && dataObject != null)
+                            matchesRig = wellUids.Contains(dataObject.Uid);
 
-                    x.IsVisible = active && matchesWell && matchesRig;
-                });
+                        x.IsVisible = active && matchesWell && matchesRig;
+                    });
+                }
             }
         }
 
@@ -1061,7 +1080,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             // Do not trust server to filter out non growing objects
             wellbores.RemoveAll(x => !x.GetObjectGrowingStatus().GetValueOrDefault());
 
-            _activeWellbores.UnionWith(wellbores.Select(x => x.GetUri()));
+            lock (_activeWellboresLock)
+            {
+                _activeWellbores.UnionWith(wellbores.Select(x => x.GetUri()));
+            }
 
             // Update the indicator for active wellbores
             if (_activeWellbores.Count > 0)
@@ -1094,7 +1116,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             CanUseActiveWellsFilter = true;
             Runtime.Invoke(() =>
             {
-                Items.ForEach(UpdateResourceViewModelIndicator);
+                lock (_itemsLock)
+                {
+                    Items.ForEach(UpdateResourceViewModelIndicator);
+                }
             });
         }
 
@@ -1118,7 +1143,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             RemoveNonGrowingObjects(logs);
 
-            _growingObjects.UnionWith(logs.Select(x => x.GetUri()));
+            lock (_growingObjectsLock)
+            {
+                _growingObjects.UnionWith(logs.Select(x => x.GetUri()));
+            }
 
             return true;
         }
@@ -1143,7 +1171,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             RemoveNonGrowingObjects(mudLogs);
 
-            _growingObjects.UnionWith(mudLogs.Select(x => x.GetUri()));
+            lock (_growingObjectsLock)
+            {
+                _growingObjects.UnionWith(mudLogs.Select(x => x.GetUri()));
+            }
 
             return true;
         }
@@ -1168,7 +1199,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             RemoveNonGrowingObjects(trajectories);
 
-            _growingObjects.UnionWith(trajectories.Select(x => x.GetUri()));
+            lock (_growingObjectsLock)
+            {
+                _growingObjects.UnionWith(trajectories.Select(x => x.GetUri()));
+            }
 
             return true;
         }
@@ -1220,9 +1254,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 var etpUri = new EtpUri(uri);
 
-                DataObjects
-                    .Select(x => ToResourceViewModel(parent, etpUri.Append(x), x, LoadWellboreObjects))
-                    .ForEach(parent.Children.Add);
+                lock (_dataObjectsLock)
+                {
+                    DataObjects
+                        .Select(x => ToResourceViewModel(parent, etpUri.Append(x), x, LoadWellboreObjects))
+                        .ForEach(parent.Children.Add);
+                }
 
                 Runtime.ShowBusy(false);
             });
@@ -1360,7 +1397,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             bool growing;
             var active = wellbore.GetWellboreStatus();
-            lock (_lock)
+            lock (_growingObjectsLock)
             {
                 growing = _growingObjects.Any(o => o.Parent == wellboreVM.Resource.Uri);
             }
@@ -1377,7 +1414,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             var wellboreUri = wellbore.GetUri();
             var updateWell = false;
 
-            lock (_lock)
+            lock (_activeWellboresLock)
             {
                 if (active && !_activeWellbores.Contains(wellboreUri))
                 {
@@ -1419,7 +1456,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             var growingObjectUri = growingObject.GetUri();
             var updateParents = false;
 
-            lock (_lock)
+            lock (_growingObjectsLock)
             {
                 if (growing && !_growingObjects.Contains(growingObjectUri))
                 {
@@ -1451,12 +1488,16 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
         private void UpdateWellIndicator(ResourceViewModel wellVM)
         {
-            lock (_lock)
+            lock (_growingObjectsLock)
             {
                 var growing = _growingObjects.Any(o => o.Parent.Parent == wellVM.Resource.Uri);
-                var active = _activeWellbores.Any(o => o.Parent == wellVM.Resource.Uri);
 
                 wellVM.IsGrowing = growing;
+            }
+            lock (_activeWellboresLock)
+            {
+                var active = _activeWellbores.Any(o => o.Parent == wellVM.Resource.Uri);
+
                 wellVM.IsActive = active;
             }
         }
