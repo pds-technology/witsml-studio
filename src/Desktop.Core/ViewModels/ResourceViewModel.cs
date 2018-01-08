@@ -104,6 +104,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public IndicatorViewModel Indicator { get; }
 
         /// <summary>
+        /// Gets or sets the action to execute when indicator is updated.
+        /// </summary>
+        public System.Action OnUpdateIndicator { get; set; }
+
+        /// <summary>
         /// Gets or sets the action method used to load child resources.
         /// </summary>
         /// <value>The load children.</value>
@@ -318,7 +323,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             return Task.Run(async () => MessageId = await LoadChildren(Resource.Uri, null));
         }
 
-        private void UpdateIndicator()
+        /// <summary>
+        /// Updates the indicator.
+        /// </summary>
+        public void UpdateIndicator()
         {
             if ((IsGrowing ?? false) && (IsActive ?? false))
                 ToolTip = "Active and Growing";
@@ -348,6 +356,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
 
             Indicator.IsVisible = IsActive.HasValue || IsGrowing.HasValue || IsEmpty.HasValue;
+
+            OnUpdateIndicator?.Invoke();
         }
     }
 }
