@@ -294,6 +294,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 if (value == EditableName) return;
                 Resource.Name = value;
+                NotifyOfPropertyChange(() => DisplayName);
                 NotifyOfPropertyChange(() => EditableName);
             }
         }
