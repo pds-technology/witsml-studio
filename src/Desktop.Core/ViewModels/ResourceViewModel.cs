@@ -149,6 +149,24 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
         }
 
+        private int _hasChildren;
+
+        /// <summary>
+        /// Gets or sets whether the parent has children.
+        /// </summary>
+        public int HasChildren
+        {
+            get { return Resource.HasChildren; }
+            set
+            {
+                if (value == _hasChildren) return;
+                _hasChildren = value;
+                Resource.HasChildren = value;
+                NotifyOfPropertyChange(() => HasChildren);
+                NotifyOfPropertyChange(() => DisplayName);
+            }
+        }
+
         private bool _isExpanded;
         /// <summary>
         /// Gets or sets a value indicating whether this instance is expanded.
@@ -281,6 +299,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
         }
 
+        private string _editableName;
+
         /// <summary>
         /// Gets or sets the editable name.
         /// </summary>
@@ -289,12 +309,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </value>
         public string EditableName
         {
-            get { return DisplayName; }
+            get { return _editableName ?? Resource.Name; }
             set
             {
-                if (value == EditableName) return;
+                if (value == _editableName) return;
+                _editableName = value;
                 Resource.Name = value;
-                NotifyOfPropertyChange(() => DisplayName);
                 NotifyOfPropertyChange(() => EditableName);
             }
         }
