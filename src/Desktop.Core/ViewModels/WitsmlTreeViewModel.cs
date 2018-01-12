@@ -175,6 +175,22 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
         }
 
+        private bool _canFilter = true;
+
+        /// <summary>
+        /// Gets a value indicating whether this instance can filter by well name.
+        /// </summary>
+        public bool CanFilter
+        {
+            get { return _canFilter && !Loading; }
+            set
+            {
+                if (_canFilter == value) return;
+
+                _canFilter = value;
+                NotifyOfPropertyChange(() => CanFilter);
+            }
+        }
 
         private string _selectedRigName = string.Empty;
 
