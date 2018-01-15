@@ -269,6 +269,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 if (_loading == value) return;
                 _loading = value;
+                NotifyOfPropertyChange(() => CanFilter);
                 NotifyOfPropertyChange(() => Loading);
             }
         }
@@ -998,8 +999,70 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                             matchesRig = wellUids.Contains(dataObject.Uid);
 
                         x.IsVisible = active && matchesWell && matchesRig;
+
+                        if (x.IsVisible) return;
+                        
+                        x.IsSelected = false;
                     });
                 }
+            }
+
+            UnselectWellbores();
+            UnselectDataObjects();
+        }
+
+        private void UnselectWellbores()
+        {
+            lock (_lock)
+            {
+                var selectedWellbores = 
+                    Items
+                        .Where(well => !well.IsVisible)
+                        .SelectMany(well => well.Children)
+                        .Where(wellbore => wellbore.IsSelected);
+
+                selectedWellbores.ForEach(wellbore => wellbore.IsSelected = false);
+            }
+        }
+
+        private void UnselectDataObjects()
+        {
+            lock (_lock)
+            {
+                var dataTypeFolders = 
+                Items
+                    .Where(well => !well.IsVisible) // Non-Visible Wells
+                    .SelectMany(well => well.Children) // Wellbores
+                    .SelectMany(wellbores => wellbores.Children)
+                    .ToArray(); // datatype folders
+
+                var selectedNonLogDataTypes = 
+                    dataTypeFolders
+                        .Where(folder => !ObjectTypes.Log.Equals(folder.DisplayName)) // Non-Log datatype folders
+                        .SelectMany(folder => folder.Children) // data objects
+                        .Where(dataObjects => dataObjects.IsSelected) // Selected data objects
+                        .ForEach(dataObject => dataObject.IsSelected = false);
+
+                // Unselect selected non-log data objects
+                selectedNonLogDataTypes.ForEach(dataObject => dataObject.IsSelected = false);
+
+                var logs = 
+                    dataTypeFolders
+                        .Where(folder => ObjectTypes.Log.Equals(folder.DisplayName)) // Non-Log datatype folders
+                        .SelectMany(logFolder => logFolder.Children) // log sub-folders
+                        .SelectMany(subFolder => subFolder.Children)
+                        .ToArray(); // Logs
+
+                // Unselected, selected logs
+                logs
+                    .Where(log => log.IsSelected) // Selected logs
+                    .ForEach(dataObject => dataObject.IsSelected = false);
+
+                // Unselect selected mnemonics
+                logs
+                    .SelectMany(log => log.Children)
+                    .Where(mnemonic => mnemonic.IsSelected)
+                    .ForEach(channel => channel.IsSelected = false);
             }
         }
 
