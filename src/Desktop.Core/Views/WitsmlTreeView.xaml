@@ -53,6 +53,7 @@
             <TextBlock Grid.Column="0" Text="Rig Name:" Margin="5,5,10,5" VerticalAlignment="Center" />
             <ComboBox Grid.Column="1" VerticalContentAlignment="Center" Padding="5,0" IsEditable="True" 
                       ItemsSource="{Binding RigNames}" SelectedItem="{Binding SelectedRigName}" 
+                      Text="{Binding SelectedRigName}"
                       IsEnabled="{Binding CanUseRigFilter}" />
             <Button x:Name="ClearSelectedRigName" Grid.Column="3" Content="Clear" Width="60" HorizontalAlignment="Right" IsEnabled="{Binding CanUseRigFilter}" />
         </Grid>
