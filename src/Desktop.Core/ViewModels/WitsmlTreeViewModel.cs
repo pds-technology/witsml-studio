@@ -1521,7 +1521,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 return;
 
             growingObjectVM.IsGrowing = growing.GetValueOrDefault();
-            growingObjectVM.IsEmpty = empty.GetValueOrDefault();
+            growingObjectVM.IsEmpty = empty ?? true;
 
             if (growing != null)
                 UpdateGrowingObjectParents(growingObjectVM, growingObject, growing.Value);
