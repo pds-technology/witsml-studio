@@ -13,6 +13,7 @@
 
     <UserControl.Resources>
         <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <conv:BooleanToVisibilityMultiConverter x:Key="BooleanToVisibilityMultiConverter" />
         <conv:NullToBooleanConverter x:Key="NullToBooleanConverter" />
         <conv:BooleanInverseConverter x:Key="BooleanInverseConverter" />
     </UserControl.Resources>
@@ -93,29 +94,31 @@
             </TreeView.Resources>
             <TreeView.ContextMenu>
                 <ContextMenu Visibility="{Binding IsContextMenuEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    
-                    <ContextMenu.Resources>
-                        <Style TargetType="MenuItem" x:Key="MenuItemVisibilityTrigger">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ShowOnlyRefreshMenuOptions}" Value="True">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ContextMenu.Resources>
-                    
-                    <MenuItem Header="Get IDs" cal:Message.Attach="GetObjectIds" Style="{StaticResource MenuItemVisibilityTrigger}"/>
-                    
-                    <MenuItem Header="Get Header" cal:Message.Attach="GetObjectHeader" Style="{StaticResource MenuItemVisibilityTrigger}"/>
-                    
-                    <MenuItem Header="Get Details" IsEnabled="{Binding CanGetObjectIds}" cal:Message.Attach="GetObjectDetailsWithReturnElementsAll"
-                              Style="{StaticResource MenuItemVisibilityTrigger}"
-                              Visibility="{Binding CanGetObjectDetails, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                    
-                    <MenuItem Header="Get Details" IsEnabled="{Binding CanGetObjectIds}"
-                              Style="{StaticResource MenuItemVisibilityTrigger}"
-                              Visibility="{Binding CanGetObjectDetailsOptions, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        
+
+                    <MenuItem Header="Get IDs" cal:Message.Attach="GetObjectIds" 
+                              Visibility="{Binding ShowOnlyRefreshMenuOptions, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=true}"/>
+
+                    <MenuItem Header="Get Header" cal:Message.Attach="GetObjectHeader" 
+                              Visibility="{Binding ShowOnlyRefreshMenuOptions, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=true}"/>
+
+                    <MenuItem Header="Get Details" IsEnabled="{Binding CanGetObjectIds}" cal:Message.Attach="GetObjectDetailsWithReturnElementsAll">
+                        <MenuItem.Visibility>
+                            <MultiBinding Converter="{StaticResource BooleanToVisibilityMultiConverter}">
+                                <Binding Path="CanGetObjectDetails" Converter="{StaticResource BooleanInverseConverter}"/>
+                                <Binding Path="ShowOnlyRefreshMenuOptions" Converter="{StaticResource BooleanInverseConverter}"/>
+                            </MultiBinding>
+                        </MenuItem.Visibility>
+                    </MenuItem>
+
+                    <MenuItem Header="Get Details" IsEnabled="{Binding CanGetObjectIds}">
+
+                        <MenuItem.Visibility>
+                            <MultiBinding Converter="{StaticResource BooleanToVisibilityMultiConverter}">
+                                <Binding Path="CanGetObjectDetails"/>
+                                <Binding Path="ShowOnlyRefreshMenuOptions" Converter="{StaticResource BooleanInverseConverter}"/>
+                            </MultiBinding>
+                        </MenuItem.Visibility>
+
                         <MenuItem Header="Return Elements = all" ToolTip="returnElements=all" cal:Message.Attach="GetObjectDetailsWithReturnElementsAll"/>
                         <MenuItem ToolTip="{Binding ObjectDetailsWithRequestLatestTooltip}" cal:Message.Attach="GetObjectDetailsWithRequestLatest">
                             <MenuItem.HeaderTemplate>
@@ -128,18 +131,15 @@
                                 </DataTemplate>
                             </MenuItem.HeaderTemplate>
                         </MenuItem>
-                        
+
                         <MenuItem Header="+ Max Data Rows" ToolTip="{Binding ObjectDetailsWithMaxDataRowsTooltip}" cal:Message.Attach="GetObjectDetailsWithMaxDataRows"/>
                         <MenuItem Header="All of the Above" ToolTip="{Binding ObjectDetailsWithAllOptionsTooltip}" cal:Message.Attach="GetObjectDetailsWithAllOptions"/>
                         <MenuItem Header="Custom Options In" ToolTip="{Binding ExtraOptionsIn}" cal:Message.Attach="GetObjectDetailsWithExtraOptionsIn"/>
                     </MenuItem>
 
-                    <MenuItem Header="Refresh" cal:Message.Attach="RefreshSelected"/>
-
-                    <!--<MenuItem Header="Delete" cal:Message.Attach="DeleteObject" IsEnabled="False" Style="{StaticResource MenuItemVisibilityTrigger}"/>-->
-
-                    <Separator Visibility="{Binding ShowOnlyRefreshMenuOptions, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter='True'}"/>
-                    
+                    <MenuItem Header="Refresh" cal:Message.Attach="RefreshSelected" />
+                    <!--<MenuItem Header="Delete" cal:Message.Attach="DeleteObject" IsEnabled="False" />-->
+                    <Separator Visibility="{Binding ShowOnlyRefreshMenuOptions, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=true}"/>
                     <MenuItem Header="Refresh All" cal:Message.Attach="RefreshHierarchy" />
                 </ContextMenu>
             </TreeView.ContextMenu>
@@ -209,7 +209,7 @@
                     </xctk:EditorTemplateDefinition.EditingTemplate>
                 </xctk:EditorTemplateDefinition>
             </xctk:PropertyGrid.EditorDefinitions>
-            
+
             <xctk:PropertyGrid.PropertyDefinitions>
                 <!-- IDs -->
                 <xctk:PropertyDefinition TargetProperties="Uid" DisplayOrder="10" />

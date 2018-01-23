@@ -195,6 +195,7 @@
     <Compile Include="Connections\WitsmlConnectionTest.cs" />
     <Compile Include="Converters\BooleanInverseConverter.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Converters\BooleanToVisibilityMultiConverter.cs" />
     <Compile Include="Converters\EnumToDescriptionConverter.cs" />
     <Compile Include="Converters\ExpandableListConverter.cs" />
     <Compile Include="Converters\NullToBooleanConverter.cs" />

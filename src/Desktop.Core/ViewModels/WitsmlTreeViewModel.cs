@@ -553,25 +553,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Determines whether a GetFromStore request can be sent for the selected item.
         /// </summary>
+        /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
         public bool CanGetObjectDetails
-        {
-            get
-            {
-                var resource = Items.FindSelected(_itemsLock);
-
-                if (resource == null) return false;
-
-                var uri = new EtpUri(resource.Resource.Uri);
-                
-                return !CanGetObjectHeader && !uri.Version.Equals(OptionsIn.DataVersion.Version131.Value) || 
-                    CanGetObjectHeader && uri.Version.Equals(OptionsIn.DataVersion.Version131.Value);
-            }
-        }
-
-        /// <summary>
-        /// Determines whether a GetFromStore request can be sent for the selected item.
-        /// </summary>
-        public bool CanGetObjectDetailsOptions
         {
             get
             {
@@ -727,7 +710,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             if (CanGetObjectHeader)
             {
-                var optionsIn = new List<OptionsIn> {OptionsIn.ReturnElements.All};
+                var optionsIn = new List<OptionsIn> { OptionsIn.ReturnElements.All };
                 if (MaxDataRows.HasValue)
                     optionsIn.Add(OptionsIn.MaxReturnNodes.Eq(MaxDataRows.Value));
                 if (RequestLatestValues.HasValue)
@@ -744,7 +727,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             if (CanGetObjectHeader && !string.IsNullOrWhiteSpace(ExtraOptionsIn))
             {
-                var optionsIn = new List<OptionsIn> {OptionsIn.ReturnElements.All};
+                var optionsIn = new List<OptionsIn> { OptionsIn.ReturnElements.All };
                 var extraOptions = OptionsIn.Parse(ExtraOptionsIn);
                 foreach (var extraOptionsKey in extraOptions.Keys)
                 {
@@ -794,7 +777,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             NotifyOfPropertyChange(() => CanGetObjectIds);
             NotifyOfPropertyChange(() => CanGetObjectHeader);
             NotifyOfPropertyChange(() => CanGetObjectDetails);
-            NotifyOfPropertyChange(() => CanGetObjectDetailsOptions);
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithReturnElementsAll);
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithMaxDataRows);
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithRequestLatest);
@@ -1035,7 +1017,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                         x.IsVisible = active && matchesWell && matchesRig;
 
                         if (x.IsVisible) return;
-                        
+
                         x.IsSelected = false;
                     });
                 }
@@ -1049,7 +1031,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             lock (_lock)
             {
-                var selectedWellbores = 
+                var selectedWellbores =
                     Items
                         .Where(well => !well.IsVisible)
                         .SelectMany(well => well.Children)
@@ -1063,14 +1045,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             lock (_lock)
             {
-                var dataTypeFolders = 
+                var dataTypeFolders =
                 Items
                     .Where(well => !well.IsVisible) // Non-Visible Wells
                     .SelectMany(well => well.Children) // Wellbores
                     .SelectMany(wellbores => wellbores.Children)
                     .ToArray(); // datatype folders
 
-                var selectedNonLogDataTypes = 
+                var selectedNonLogDataTypes =
                     dataTypeFolders
                         .Where(folder => !ObjectTypes.Log.Equals(folder.DisplayName)) // Non-Log datatype folders
                         .SelectMany(folder => folder.Children) // data objects
@@ -1080,7 +1062,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 // Unselect selected non-log data objects
                 selectedNonLogDataTypes.ForEach(dataObject => dataObject.IsSelected = false);
 
-                var logs = 
+                var logs =
                     dataTypeFolders
                         .Where(folder => ObjectTypes.Log.Equals(folder.DisplayName)) // Non-Log datatype folders
                         .SelectMany(logFolder => logFolder.Children) // log sub-folders
@@ -1622,7 +1604,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 HasChildren = children
             };
 
-            var viewModel = new ResourceViewModel(Runtime, resource, dataContext) {Parent = parent};
+            var viewModel = new ResourceViewModel(Runtime, resource, dataContext) { Parent = parent };
 
             if (children != 0 && action != null)
             {
