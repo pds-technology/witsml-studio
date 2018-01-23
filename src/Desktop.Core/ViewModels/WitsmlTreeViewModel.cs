@@ -403,6 +403,22 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
         }
 
+        private bool _showOnlyRefreshMenuOptions;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether context menu displays refresh menu options only.
+        /// </summary>
+        public bool ShowOnlyRefreshMenuOptions
+        {
+            get { return _showOnlyRefreshMenuOptions; }
+            set
+            {
+                if (value == _showOnlyRefreshMenuOptions) return;
+                _showOnlyRefreshMenuOptions = value;
+                NotifyOfPropertyChange(() => ShowOnlyRefreshMenuOptions);
+            }
+        }
+
         private int? _maxDataRows;
 
         /// <summary>
@@ -537,8 +553,25 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Determines whether a GetFromStore request can be sent for the selected item.
         /// </summary>
-        /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
         public bool CanGetObjectDetails
+        {
+            get
+            {
+                var resource = Items.FindSelected(_itemsLock);
+
+                if (resource == null) return false;
+
+                var uri = new EtpUri(resource.Resource.Uri);
+                
+                return !CanGetObjectHeader && !uri.Version.Equals(OptionsIn.DataVersion.Version131.Value) || 
+                    CanGetObjectHeader && uri.Version.Equals(OptionsIn.DataVersion.Version131.Value);
+            }
+        }
+
+        /// <summary>
+        /// Determines whether a GetFromStore request can be sent for the selected item.
+        /// </summary>
+        public bool CanGetObjectDetailsOptions
         {
             get
             {
@@ -761,6 +794,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             NotifyOfPropertyChange(() => CanGetObjectIds);
             NotifyOfPropertyChange(() => CanGetObjectHeader);
             NotifyOfPropertyChange(() => CanGetObjectDetails);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsOptions);
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithReturnElementsAll);
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithMaxDataRows);
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithRequestLatest);

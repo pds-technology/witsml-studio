@@ -93,14 +93,28 @@
             </TreeView.Resources>
             <TreeView.ContextMenu>
                 <ContextMenu Visibility="{Binding IsContextMenuEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <MenuItem Header="Get IDs" cal:Message.Attach="GetObjectIds" />
-                    <MenuItem Header="Get Header" cal:Message.Attach="GetObjectHeader" />
+                    
+                    <ContextMenu.Resources>
+                        <Style TargetType="MenuItem" x:Key="MenuItemVisibilityTrigger">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShowOnlyRefreshMenuOptions}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContextMenu.Resources>
+                    
+                    <MenuItem Header="Get IDs" cal:Message.Attach="GetObjectIds" Style="{StaticResource MenuItemVisibilityTrigger}"/>
+                    
+                    <MenuItem Header="Get Header" cal:Message.Attach="GetObjectHeader" Style="{StaticResource MenuItemVisibilityTrigger}"/>
                     
                     <MenuItem Header="Get Details" IsEnabled="{Binding CanGetObjectIds}" cal:Message.Attach="GetObjectDetailsWithReturnElementsAll"
-                              Visibility="{Binding CanGetObjectDetails, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=true}"/>
+                              Style="{StaticResource MenuItemVisibilityTrigger}"
+                              Visibility="{Binding CanGetObjectDetails, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                     
                     <MenuItem Header="Get Details" IsEnabled="{Binding CanGetObjectIds}"
-                              Visibility="{Binding CanGetObjectDetails, Converter={StaticResource BooleanToVisibilityConverter}}">
+                              Style="{StaticResource MenuItemVisibilityTrigger}"
+                              Visibility="{Binding CanGetObjectDetailsOptions, Converter={StaticResource BooleanToVisibilityConverter}}">
                         
                         <MenuItem Header="Return Elements = all" ToolTip="returnElements=all" cal:Message.Attach="GetObjectDetailsWithReturnElementsAll"/>
                         <MenuItem ToolTip="{Binding ObjectDetailsWithRequestLatestTooltip}" cal:Message.Attach="GetObjectDetailsWithRequestLatest">
@@ -119,10 +133,13 @@
                         <MenuItem Header="All of the Above" ToolTip="{Binding ObjectDetailsWithAllOptionsTooltip}" cal:Message.Attach="GetObjectDetailsWithAllOptions"/>
                         <MenuItem Header="Custom Options In" ToolTip="{Binding ExtraOptionsIn}" cal:Message.Attach="GetObjectDetailsWithExtraOptionsIn"/>
                     </MenuItem>
+
+                    <MenuItem Header="Refresh" cal:Message.Attach="RefreshSelected"/>
+
+                    <!--<MenuItem Header="Delete" cal:Message.Attach="DeleteObject" IsEnabled="False" Style="{StaticResource MenuItemVisibilityTrigger}"/>-->
+
+                    <Separator Visibility="{Binding ShowOnlyRefreshMenuOptions, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter='True'}"/>
                     
-                    <MenuItem Header="Refresh" cal:Message.Attach="RefreshSelected" />
-                    <!--<MenuItem Header="Delete" cal:Message.Attach="DeleteObject" IsEnabled="False" />-->
-                    <Separator />
                     <MenuItem Header="Refresh All" cal:Message.Attach="RefreshHierarchy" />
                 </ContextMenu>
             </TreeView.ContextMenu>
