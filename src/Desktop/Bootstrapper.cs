@@ -116,6 +116,9 @@ namespace PDS.WITSMLstudio.Desktop
 
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
+            var splashScreen = new SplashScreen(GetType().Assembly, "Images/SplashScreen.png");
+            splashScreen.Show(true, true);
+
             DisplayRootViewFor<IShellViewModel>();
         }
     }
