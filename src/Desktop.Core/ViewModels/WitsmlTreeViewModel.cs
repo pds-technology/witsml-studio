@@ -17,6 +17,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using Action = System.Action;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -54,11 +55,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         private long _messageId;
 
         private readonly object _lock = new object();
-        private readonly object _itemsLock = new object();
-        private readonly object _dataObjectsLock = new object();
-        private readonly object _rigNamesLock = new object();
-        private readonly object _growingObjectsLock = new object();
-        private readonly object _activeWellboresLock = new object();
         private readonly object _loadLock = new object();
         private bool _cleared;
         private CancellationTokenSource _tokenSource;
@@ -77,9 +73,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             DataObjects = new BindableCollection<string>();
             RigNames = new BindableCollection<string>();
 
-            BindingOperations.EnableCollectionSynchronization(Items, _itemsLock);
-            BindingOperations.EnableCollectionSynchronization(DataObjects, _dataObjectsLock);
-            BindingOperations.EnableCollectionSynchronization(RigNames, _rigNamesLock);
+            BindingOperations.EnableCollectionSynchronization(Items, null, ReaderWriterLockManager.SynchronizeReadWriteAccess);
+            BindingOperations.EnableCollectionSynchronization(DataObjects, null, ReaderWriterLockManager.SynchronizeReadWriteAccess);
+            BindingOperations.EnableCollectionSynchronization(RigNames, null, ReaderWriterLockManager.SynchronizeReadWriteAccess);
         }
 
         /// <summary>
@@ -490,7 +486,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             get
             {
-                var resource = Items.FindSelected(_itemsLock);
+                var resource = Items.FindSelectedSynchronized();
                 if (resource == null) return false;
 
                 var uri = new EtpUri(resource.Resource.Uri);
@@ -506,7 +502,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void GetObjectIds()
         {
-            var resource = Items.FindSelected(_itemsLock);
+            var resource = Items.FindSelectedSynchronized();
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
@@ -525,7 +521,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             get
             {
-                var resource = Items.FindSelected(_itemsLock);
+                var resource = Items.FindSelectedSynchronized();
                 if (resource == null) return false;
 
                 var uri = new EtpUri(resource.Resource.Uri);
@@ -540,7 +536,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void GetObjectHeader()
         {
-            var resource = Items.FindSelected(_itemsLock);
+            var resource = Items.FindSelectedSynchronized();
             var uri = new EtpUri(resource.Resource.Uri);
 
             Runtime.ShowBusy();
@@ -562,7 +558,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 if (!CanGetObjectHeader)
                     return false;
 
-                var resource = Items.FindSelected(_itemsLock);
+                var resource = Items.FindSelectedSynchronized();
                 var uri = new EtpUri(resource.Resource.Uri);
 
                 return uri.Version.Equals(OptionsIn.DataVersion.Version141.Value);
@@ -654,7 +650,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <param name="optionIn"></param>
         public void GetObjectDetails(params OptionsIn[] optionIn)
         {
-            var resource = Items.FindSelected(_itemsLock);
+            var resource = Items.FindSelectedSynchronized();
             var uri = new EtpUri(resource.Resource.Uri);
 
             // For 131 always perform requested for details
@@ -761,7 +757,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void RefreshSelected()
         {
-            var resource = Items.FindSelected(_itemsLock);
+            var resource = Items.FindSelectedSynchronized();
             // Return if there is nothing currently selected
             if (resource == null) return;
 
@@ -790,7 +786,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             if (OnSelectedItemChanged == null) return;
 
-            var selectedResource = Items.FindSelected(_itemsLock);
+            var selectedResource = Items.FindSelectedSynchronized();
 
             OnSelectedItemChanged(selectedResource);
         }
@@ -832,14 +828,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
                 Items.Clear();
 
-                lock (_activeWellboresLock)
-                {
-                    _activeWellbores.Clear();
-                }
-                lock (_growingObjectsLock)
-                {
-                    _growingObjects.Clear();
-                }
+                _activeWellbores.ExecuteWithWriteLock(_activeWellbores.Clear);
+                _growingObjects.ExecuteWithWriteLock(_growingObjects.Clear);
+
                 ShowOnlyActiveWells = false;
                 CanUseActiveWellsFilter = false;
                 CanUseRigFilter = false;
@@ -862,11 +853,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             lock (_lock)
             {
-                bool hasItems;
-                lock (_itemsLock)
-                {
-                    hasItems = Items.Any();
-                }
+                bool hasItems = Items.ExecuteWithReadLock(Items.Any);
 
                 if (!hasItems && Context != null)
                     LoadWells();
@@ -989,40 +976,42 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         private void UpdateWellVisibility()
         {
+            HashSet<string> wellUids = null;
+
+            var pattern = WellName ?? string.Empty;
+
+            // Treat well name patterns like /pattern/ as regular expressions but other patterns as literal strings
+            if (pattern.StartsWith("/") && pattern.EndsWith("/") && pattern.Length >= 2)
+                pattern = pattern.Trim('/');
+            else
+                pattern = Regex.Escape(pattern);
+
             lock (_lock)
             {
-                var pattern = WellName ?? string.Empty;
-
-                // Treat well name patterns like /pattern/ as regular expressions but other patterns as literal strings
-                if (pattern.StartsWith("/") && pattern.EndsWith("/") && pattern.Length >= 2)
-                    pattern = pattern.Trim('/');
-                else
-                    pattern = Regex.Escape(pattern);
-
-                HashSet<string> wellUids = null;
                 if (RigsMonitor != null)
                     wellUids = RigsMonitor.GetWellUids(SelectedRigName);
-
-                lock (_itemsLock)
-                {
-                    Items.ForEach(x =>
-                    {
-                        var active = !ShowOnlyActiveWells || x.IsActiveOrGrowing;
-                        var matchesWell = Regex.IsMatch(x.Resource.Name, pattern, RegexOptions.IgnoreCase);
-
-                        var matchesRig = true;
-                        var dataObject = x.GetDataObject();
-                        if (wellUids != null && dataObject != null)
-                            matchesRig = wellUids.Contains(dataObject.Uid);
-
-                        x.IsVisible = active && matchesWell && matchesRig;
-
-                        if (x.IsVisible) return;
-
-                        x.IsSelected = false;
-                    });
-                }
             }
+
+            var access = new Action(() =>
+            {
+                Items.ForEach(x =>
+                {
+                    var active = !ShowOnlyActiveWells || x.IsActiveOrGrowing;
+                    var matchesWell = Regex.IsMatch(x.Resource.Name, pattern, RegexOptions.IgnoreCase);
+
+                    var matchesRig = true;
+                    var dataObject = x.GetDataObject();
+                    if (wellUids != null && dataObject != null)
+                        matchesRig = wellUids.Contains(dataObject.Uid);
+
+                    x.IsVisible = active && matchesWell && matchesRig;
+
+                    if (x.IsVisible) return;
+
+                    x.IsSelected = false;
+                });
+            });
+            Items.ExecuteWithReadLock(access);
 
             UnselectWellbores();
             UnselectDataObjects();
@@ -1030,7 +1019,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
         private void UnselectWellbores()
         {
-            lock (_lock)
+            var access = new Action(() =>
             {
                 var selectedWellbores =
                     Items
@@ -1039,19 +1028,20 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                         .Where(wellbore => wellbore.IsSelected);
 
                 selectedWellbores.ForEach(wellbore => wellbore.IsSelected = false);
-            }
+            });
+            Items.ExecuteWithReadLock(access);
         }
 
         private void UnselectDataObjects()
         {
-            lock (_lock)
+            var access = new Action(() =>
             {
                 var dataTypeFolders =
-                Items
-                    .Where(well => !well.IsVisible) // Non-Visible Wells
-                    .SelectMany(well => well.Children) // Wellbores
-                    .SelectMany(wellbores => wellbores.Children)
-                    .ToArray(); // datatype folders
+                    Items
+                        .Where(well => !well.IsVisible) // Non-Visible Wells
+                        .SelectMany(well => well.Children) // Wellbores
+                        .SelectMany(wellbores => wellbores.Children)
+                        .ToArray(); // datatype folders
 
                 var selectedNonLogDataTypes =
                     dataTypeFolders
@@ -1080,7 +1070,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                     .SelectMany(log => log.Children)
                     .Where(mnemonic => mnemonic.IsSelected)
                     .ForEach(channel => channel.IsSelected = false);
-            }
+            });
+            Items.ExecuteWithReadLock(access);
         }
 
         private void LoadWells()
@@ -1173,10 +1164,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             // Do not trust server to filter out non growing objects
             wellbores.RemoveAll(x => !x.GetObjectGrowingStatus().GetValueOrDefault());
 
-            lock (_activeWellboresLock)
+            var access = new Action(() =>
             {
                 _activeWellbores.UnionWith(wellbores.Select(x => x.GetUri()));
-            }
+            });
+            _activeWellbores.ExecuteWithWriteLock(access);
 
             // Update the indicator for active wellbores
             if (_activeWellbores.Count > 0)
@@ -1209,10 +1201,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             CanUseActiveWellsFilter = true;
             Runtime.Invoke(() =>
             {
-                lock (_itemsLock)
+                var access = new Action(() =>
                 {
                     Items.ForEach(UpdateResourceViewModelIndicator);
-                }
+                });
+                Items.ExecuteWithReadLock(access);
             });
         }
 
@@ -1236,10 +1229,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             RemoveNonGrowingObjects(logs);
 
-            lock (_growingObjectsLock)
+            var access = new Action(() =>
             {
                 _growingObjects.UnionWith(logs.Select(x => x.GetUri()));
-            }
+            });
+            _growingObjects.ExecuteWithWriteLock(access);
 
             return true;
         }
@@ -1264,10 +1258,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             RemoveNonGrowingObjects(mudLogs);
 
-            lock (_growingObjectsLock)
+            var access = new Action(() =>
             {
                 _growingObjects.UnionWith(mudLogs.Select(x => x.GetUri()));
-            }
+            });
+            _growingObjects.ExecuteWithWriteLock(access);
 
             return true;
         }
@@ -1292,10 +1287,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             RemoveNonGrowingObjects(trajectories);
 
-            lock (_growingObjectsLock)
+            var access = new Action(() =>
             {
                 _growingObjects.UnionWith(trajectories.Select(x => x.GetUri()));
-            }
+            });
+            _growingObjects.ExecuteWithWriteLock(access);
 
             return true;
         }
@@ -1347,12 +1343,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 var etpUri = new EtpUri(uri);
 
-                lock (_dataObjectsLock)
+                var access = new Action(() =>
                 {
                     DataObjects
                         .Select(x => ToResourceViewModel(parent, etpUri.Append(x), x, LoadWellboreObjects))
                         .ForEach(parent.Children.Add);
-                }
+                });
+                DataObjects.ExecuteWithReadLock(access);
 
                 Runtime.ShowBusy(false);
             });
@@ -1489,12 +1486,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             var wellbore = wellboreVM.GetWellObject();
 
-            bool growing;
             var active = wellbore.GetWellboreStatus();
-            lock (_growingObjectsLock)
+            var access = new Func<bool>(() =>
             {
-                growing = _growingObjects.Any(o => o.Parent == wellboreVM.Resource.Uri);
-            }
+                return _growingObjects.Any(o => o.Parent == wellboreVM.Resource.Uri);
+            });
+            bool growing = _growingObjects.ExecuteWithReadLock(access);
 
             wellboreVM.IsGrowing = growing;
             wellboreVM.IsActive = active;
@@ -1508,7 +1505,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             var wellboreUri = wellbore.GetUri();
             var updateWell = false;
 
-            lock (_activeWellboresLock)
+            var access = new Action(() =>
             {
                 if (active && !_activeWellbores.Contains(wellboreUri))
                 {
@@ -1520,7 +1517,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                     _activeWellbores.Remove(wellboreUri);
                     updateWell = true;
                 }
-            }
+            });
+            _activeWellbores.ExecuteWithWriteLock(access);
 
             if (updateWell)
             {
@@ -1550,7 +1548,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             var growingObjectUri = growingObject.GetUri();
             var updateParents = false;
 
-            lock (_growingObjectsLock)
+            var access = new Action(() =>
             {
                 if (growing && !_growingObjects.Contains(growingObjectUri))
                 {
@@ -1562,7 +1560,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                     _growingObjects.Remove(growingObjectUri);
                     updateParents = true;
                 }
-            }
+            });
+            _growingObjects.ExecuteWithWriteLock(access);
 
             if (updateParents)
             {
@@ -1582,18 +1581,17 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
         private void UpdateWellIndicator(ResourceViewModel wellVM)
         {
-            lock (_growingObjectsLock)
+            var access = new Func<bool>(() =>
             {
-                var growing = _growingObjects.Any(o => o.Parent.Parent == wellVM.Resource.Uri);
+                return _growingObjects.Any(o => o.Parent.Parent == wellVM.Resource.Uri);
+            });
+            wellVM.IsGrowing = _growingObjects.ExecuteWithReadLock(access);
 
-                wellVM.IsGrowing = growing;
-            }
-            lock (_activeWellboresLock)
+            access = new Func<bool>(() =>
             {
-                var active = _activeWellbores.Any(o => o.Parent == wellVM.Resource.Uri);
-
-                wellVM.IsActive = active;
-            }
+                return _activeWellbores.Any(o => o.Parent == wellVM.Resource.Uri);
+            });
+            wellVM.IsActive = _activeWellbores.ExecuteWithReadLock(access);
         }
 
         private ResourceViewModel ToResourceViewModel(ResourceViewModel parent, EtpUri uri, string name, Func<ResourceViewModel, string, Task> action, int children = -1, object dataContext = null)
@@ -1646,6 +1644,16 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                             _tokenSource.Dispose();
 
                         _tokenSource = null;
+
+                        BindingOperations.DisableCollectionSynchronization(Items);
+                        BindingOperations.DisableCollectionSynchronization(DataObjects);
+                        BindingOperations.DisableCollectionSynchronization(RigNames);
+
+                        Items.RemoveLock();
+                        DataObjects.RemoveLock();
+                        RigNames.RemoveLock();
+                        _growingObjects.RemoveLock();
+                        _activeWellbores.RemoveLock();
                     }
                 }
 

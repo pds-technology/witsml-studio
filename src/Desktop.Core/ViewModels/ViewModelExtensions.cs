@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using PDS.WITSMLstudio.Desktop.Core.Models;
 
 namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 {
@@ -70,6 +71,18 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             lock (lockObject)
                 return resources.FindSelected();
+        }
+
+        /// <summary>
+        /// Finds the selected resource, using global lock for  synchronization.
+        /// </summary>
+        /// <param name="resources">The resources.</param>
+        /// <returns>
+        /// A <see cref="ResourceViewModel" /> instance.
+        /// </returns>
+        public static ResourceViewModel FindSelectedSynchronized(this IList<ResourceViewModel> resources)
+        {
+            return resources.ExecuteWithReadLock(resources.FindSelected);
         }
 
         /// <summary>

@@ -205,6 +205,7 @@
     <Compile Include="Models\CustomPropertyDescriptor.cs" />
     <Compile Include="Models\DataObjectWrapper.cs" />
     <Compile Include="Models\LogCurveItem.cs" />
+    <Compile Include="Models\ReaderWriterLockManager.cs" />
     <Compile Include="Models\RigsMonitor.cs" />
     <Compile Include="Models\SecurityProtocolItem.cs" />
     <Compile Include="Models\ListItemPropertyDescriptor.cs" />
