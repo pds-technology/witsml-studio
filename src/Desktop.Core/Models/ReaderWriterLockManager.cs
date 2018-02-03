@@ -27,7 +27,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Models
         {
             lock (_internalLock)
             {
-                return _managedLocks.GetOrCreateValue(instance);
+                return _managedLocks.GetValue(instance, k => new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion));
             }
         }
 
