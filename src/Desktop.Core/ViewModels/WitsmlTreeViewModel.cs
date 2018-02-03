@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -1447,7 +1448,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
         private EtpUri GetLogCurveInfoUri(EtpUri logUri, LogCurveInfo logCurveInfo)
         {
-            return logUri.Append(ObjectTypes.LogCurveInfo, logCurveInfo.Mnemonic);
+            var encodedMnemonic = WebUtility.UrlEncode(logCurveInfo.Mnemonic);
+            return logUri.Append(ObjectTypes.LogCurveInfo, encodedMnemonic);
         }
 
         private void LoadDataItems<T>(
