@@ -23,7 +23,7 @@
         </Grid.RowDefinitions>
         
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Base URI:" Margin="10,0,5,10" HorizontalAlignment="Right" VerticalAlignment="Center" />
-        <TextBox Grid.Row="0" Grid.Column="1" Margin="5,0,0,10" Padding="5" VerticalContentAlignment="Center" Text="{Binding Model.BaseUri}" x:Name="BaseUriInput">
+        <TextBox Grid.Row="0" Grid.Column="1" Margin="5,0,0,10" Padding="5" VerticalContentAlignment="Center" Text="{Binding Model.BaseUri, UpdateSourceTrigger=PropertyChanged}" x:Name="BaseUriInput">
             <TextBox.InputBindings>
                 <KeyBinding Key="Enter" Command="{Binding GetBaseUriCommand}" />
             </TextBox.InputBindings>
