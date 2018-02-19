@@ -102,6 +102,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public void GetBaseUri()
         {
             //Parent.OnConnectionChanged(true, false);
+            Parent.Resources.Clear();
             Parent.GetResources(Model?.BaseUri);
         }
 
