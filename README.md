@@ -38,7 +38,7 @@ Unit tests for the WITSML Browser and core functionality.
 ---
 
 ### Copyright and License
-Copyright &copy; 2017 PDS Americas LLC
+Copyright &copy; 2018 PDS Americas LLC
 
 Released under the PDS Open Source WITSML™ Product License Agreement
 http://www.pds.group/WITSMLstudio/OpenSource/ProductLicenseAgreement
