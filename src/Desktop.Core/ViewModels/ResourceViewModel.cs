@@ -17,6 +17,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using Caliburn.Micro;
@@ -130,6 +131,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Indicates whether this resource is active or growing
         /// </summary>
         public bool IsActiveOrGrowing => (IsActive ?? false) || (IsGrowing ?? false);
+
+        /// <summary>
+        /// Gets or sets the record list.
+        /// </summary>
+        public List<string> RecordList { get; set; }
 
         private ResourceViewModel _parent;
         /// <summary>
@@ -296,6 +302,25 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
                 _isEditable = value;
                 NotifyOfPropertyChange(() => IsEditable);
+            }
+        }
+
+        private bool _isEditableCombobox;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is editable.
+        /// </summary>
+        /// <value><c>true</c> if this instance is editable; otherwise, <c>false</c>.</value>
+        public bool IsEditableCombobox
+        {
+            get { return _isEditableCombobox; }
+            set
+            {
+                if (_isEditableCombobox == value)
+                    return;
+
+                _isEditableCombobox = value;
+                NotifyOfPropertyChange(() => IsEditableCombobox);
             }
         }
 
