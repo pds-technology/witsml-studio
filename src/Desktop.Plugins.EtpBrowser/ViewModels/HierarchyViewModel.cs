@@ -152,7 +152,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void RefreshHierarchy()
         {
-            Parent.OnConnectionChanged(true, false);
+            //Parent.OnConnectionChanged(true, false);
+            GetBaseUri();
         }
 
         /// <summary>

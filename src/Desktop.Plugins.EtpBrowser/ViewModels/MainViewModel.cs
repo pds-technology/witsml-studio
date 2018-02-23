@@ -27,6 +27,7 @@ using Caliburn.Micro;
 using Energistics;
 using Energistics.Common;
 using Energistics.Datatypes;
+using Energistics.Datatypes.Object;
 using Energistics.Protocol.ChannelStreaming;
 using Energistics.Protocol.Core;
 using Energistics.Protocol.Discovery;
@@ -53,6 +54,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(MainViewModel));
         private static readonly string _pluginDisplayName = Settings.Default.PluginDisplayName;
         private static readonly string _pluginVersion = typeof(MainViewModel).GetAssemblyVersion();
+        private const string GzipEncoding = "gzip";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainViewModel" /> class.
@@ -501,14 +503,44 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <param name="e">The <see cref="ProtocolEventArgs{Object}"/> instance containing the event data.</param>
         private void OnObject(object sender, ProtocolEventArgs<Energistics.Protocol.Store.Object> e)
         {
-            Details.SetText(string.Format(
-                "// Header:{2}{0}{2}{2}// Body:{2}{1}",
-                Client.Serialize(e.Header, true),
-                Client.Serialize(e.Message, true),
-                Environment.NewLine));
+            LogDataObject(e, e.Message.DataObject);
+        }
 
-            var data = e.Message.DataObject.GetString();
-            var uri = new EtpUri(e.Message.DataObject.Resource.Uri);
+        /// <summary>
+        /// Called when an ObjectFragment message is recieved.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="ProtocolEventArgs{ObjectFragment}"/> instance containing the event data.</param>
+        private void OnObjectFragment(object sender, ProtocolEventArgs<ObjectFragment> e)
+        {
+            var dataObject = new DataObject
+            {
+                Data = e.Message.Data,
+                Resource = new Resource
+                {
+                    Uri = EtpUri.RootUri
+                }
+            };
+
+            if (GzipEncoding.EqualsIgnoreCase(e.Message.ContentEncoding))
+                dataObject.ContentEncoding = GzipEncoding;
+
+            LogDataObject(e, dataObject, true);
+        }
+
+        /// <summary>
+        /// Logs the data object.
+        /// </summary>
+        /// <typeparam name="T">The message type.</typeparam>
+        /// <param name="e">The <see cref="ProtocolEventArgs{T}"/> instance containing the event data.</param>
+        /// <param name="dataObject">The data object.</param>
+        /// <param name="append">if set to <c>true</c> append the data object; otherwise, replace.</param>
+        private void LogDataObject<T>(ProtocolEventArgs<T> e, DataObject dataObject, bool append = false) where T : ISpecificRecord
+        {
+            LogObjectDetails(e);
+
+            var data = dataObject.GetString();
+            var uri = new EtpUri(dataObject.Resource.Uri);
             var isJson = EtpContentType.Json.EqualsIgnoreCase(uri.Format);
 
             if (isJson)
@@ -517,11 +549,15 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                     ? ObjectTypes.GetObjectType(uri.ObjectType, uri.Version)
                     : ObjectTypes.GetObjectGroupType(uri.ObjectType, uri.Version);
 
-                var dataObject = EtpExtensions.Deserialize(objectType, data);
-                data = EtpExtensions.Serialize(dataObject, true);
+                var instance = EtpExtensions.Deserialize(objectType, data);
+                data = EtpExtensions.Serialize(instance, true);
             }
 
-            DataObject.SetText(data);
+            if (append)
+                DataObject.Append(data);
+            else
+                DataObject.SetText(data);
+
             Runtime.Invoke(() => DataObject.Language = isJson ? "JavaScript" : "XML");
         }
 
@@ -657,7 +693,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             if (Requesting(Protocols.GrowingObject, "store"))
             {
                 client.Register<IGrowingObjectCustomer, GrowingObjectCustomerHandler>();
-                RegisterEventHandlers(client.Handler<IGrowingObjectCustomer>());
+                RegisterEventHandlers(client.Handler<IGrowingObjectCustomer>(),
+                    x => x.OnObjectFragment += OnObjectFragment);
             }
             if (Requesting(Protocols.DataArray, "store"))
             {
