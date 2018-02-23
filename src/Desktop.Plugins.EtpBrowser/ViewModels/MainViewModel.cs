@@ -554,9 +554,14 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             }
 
             if (append)
+            {
                 DataObject.Append(data);
+                DataObject.Append(Environment.NewLine + Environment.NewLine);
+            }
             else
+            {
                 DataObject.SetText(data);
+            }
 
             Runtime.Invoke(() => DataObject.Language = isJson ? "JavaScript" : "XML");
         }
