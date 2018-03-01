@@ -204,7 +204,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <param name="e">The <see cref="ProtocolEventArgs{OpenSession}" /> instance containing the event data.</param>
         public void OnSessionOpened(ProtocolEventArgs<OpenSession> e)
         {
-            if (e.Message.SupportedProtocols.All(x => x.Protocol != (int) Protocols.ChannelStreaming))
+            if (!e.Message.SupportedProtocols.Any(x => x.Protocol == (int) Protocols.ChannelStreaming && x.Role == "producer"))
                 return;
 
             var handler = Parent.Client.Handler<IChannelStreamingConsumer>();
