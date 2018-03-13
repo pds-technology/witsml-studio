@@ -1378,11 +1378,20 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 }
                 else
                 {
-                    var dataObjects = ObjectTypes.IsGrowingDataObject(etpUri.ObjectType)
-                        ? Context.GetGrowingObjectsWithStatus(etpUri.ObjectType, etpUri)
-                        : Context.GetWellboreObjects(etpUri.ObjectType, etpUri);
-
-                    LoadDataItems(parent, dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri(), 0);
+                    try
+                    {
+                        // Handle exception when the expanded object type is not supported 
+                        // So that the application does not crash
+                        var dataObjects = ObjectTypes.IsGrowingDataObject(etpUri.ObjectType)
+                            ? Context.GetGrowingObjectsWithStatus(etpUri.ObjectType, etpUri)
+                            : Context.GetWellboreObjects(etpUri.ObjectType, etpUri);
+                        LoadDataItems(parent, dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri(),
+                            0);
+                    }
+                    catch (InvalidCastException)
+                    {
+                        // Do nothing
+                    }
                 }
 
                 Runtime.ShowBusy(false);
