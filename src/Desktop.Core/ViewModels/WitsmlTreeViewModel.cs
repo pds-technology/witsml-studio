@@ -51,6 +51,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
     /// <seealso cref="Caliburn.Micro.Screen" />
     public class WitsmlTreeViewModel : Screen, IDisposable
     {
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(WitsmlTreeViewModel));
         private FrameworkElement _hierarchy;
         private long _messageId;
 
@@ -1385,16 +1386,21 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                         var dataObjects = ObjectTypes.IsGrowingDataObject(etpUri.ObjectType)
                             ? Context.GetGrowingObjectsWithStatus(etpUri.ObjectType, etpUri)
                             : Context.GetWellboreObjects(etpUri.ObjectType, etpUri);
-                        LoadDataItems(parent, dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri(),
-                            0);
+                        LoadDataItems(parent, dataObjects, parent.Children, LoadGrowingObjectChildren, x => x.GetUri(), 0);
                     }
-                    catch (InvalidCastException)
+                    catch (InvalidCastException ice)
                     {
                         // Do nothing
+                        _log.Error(ice);
                     }
-                }
+                    catch (ArgumentNullException ane)
+                    {
+                        // Do nothing
+                        _log.Error(ane);
+                    }
 
-                Runtime.ShowBusy(false);
+                    Runtime.ShowBusy(false);
+                }
             });
         }
 
