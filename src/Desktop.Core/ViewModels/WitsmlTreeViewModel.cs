@@ -347,6 +347,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public bool CanClearSelectedRigName => !string.IsNullOrEmpty(SelectedRigName);
 
         /// <summary>
+        /// Gets or sets a value indicating whether indicator queries should be disabled.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if indicator queries are disabled; otherwise, <c>false</c>.
+        /// </value>
+        public bool DisableIndicatorQueries { get; set; }
+
+        /// <summary>
         /// Clears the name of the rig.
         /// </summary>
         public void ClearSelectedRigName()
@@ -1132,6 +1140,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
         private async void GetActiveAndGrowingObjects()
         {
+            // if DisableIndicatorQueries flag is true exit without searching for active and growing objects.
+            if (DisableIndicatorQueries) return;
+
             // Get the server capabilities
             var suppportedObjects = Context.GetSupportedGetFromStoreObjects();
 
