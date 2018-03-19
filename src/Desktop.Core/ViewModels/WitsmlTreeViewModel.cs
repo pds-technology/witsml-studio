@@ -1409,9 +1409,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                         // Do nothing
                         _log.Error(ane);
                     }
-
-                    Runtime.ShowBusy(false);
                 }
+
+                Runtime.ShowBusy(false);
             });
         }
 
