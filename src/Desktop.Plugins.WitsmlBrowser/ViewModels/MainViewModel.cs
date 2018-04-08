@@ -467,7 +467,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
                     objectType = ObjectTypes.GetObjectTypeFromGroup(document.Root);
                 }
 
-                using (var client = Proxy.CreateClientProxy())
+                using (var client = Proxy.CreateClientProxy().WithUserAgent())
                 {
                     var wmls = (IWitsmlClient) client;
                     string suppMsgOut;
