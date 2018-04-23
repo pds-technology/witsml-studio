@@ -7,14 +7,19 @@
              xmlns:conv="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters"
              xmlns:local="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Views"
              xmlns:cal="http://www.caliburnproject.org"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
-
+    
     <UserControl.Resources>
         <conv:BooleanInverseConverter x:Key="BooleanInverseConverter" />
         <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
-    
+
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="{Binding WriteSettingsRowHeight}"/>
+        </Grid.RowDefinitions>
         <avalon:TextEditor Padding="5" FontFamily="Consolas" FontSize="10pt"
                            Document="{Binding Document}" 
                            IsReadOnly="{Binding IsReadOnly}"
@@ -40,5 +45,22 @@
                 </ContextMenu>
             </avalon:TextEditor.ContextMenu>
         </avalon:TextEditor>
+        <Grid Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Flush To:" Margin="10,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+            <TextBox x:Name="FlushToFilePath" Grid.Column="1" Margin="5" Padding="5" VerticalContentAlignment="Center" Text="{Binding FlushToFilePath}" ToolTip="{Binding FlushToFilePath}"/>
+            <Button Grid.Column="2" Margin="0,5,5,5" Content="..." ToolTip="Select File" x:Name="SelectFile" />
+            <Button Grid.Column="3" Margin="0,5,5,5" Width="50" Content="Open" ToolTip="Open File" x:Name="OpenFile" IsEnabled="{Binding ElementName=FlushToFilePath, Path=Text.Length}"/>
+            <TextBlock Grid.Column="4" Text="Display:" Margin="20,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+            <xctk:IntegerUpDown Grid.Column="5" Margin="5" Padding="5" FormatString="N0" VerticalContentAlignment="Center" 
+                                Minimum="0" Value="{Binding TruncateSize, UpdateSourceTrigger=PropertyChanged, Delay=500}"/>
+        </Grid>
     </Grid>
 </UserControl>

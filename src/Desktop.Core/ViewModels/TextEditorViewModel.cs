@@ -17,7 +17,8 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Threading;
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Threading;
 using System.Xml.Linq;
@@ -36,6 +37,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
     public class TextEditorViewModel : Screen
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(TextEditorViewModel));
+        private readonly int _defaultWriteSettingsRowHeight = 38;
         private TextEditor _textEditor;
 
         /// <summary>
@@ -50,6 +52,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             Language = language;
             IsReadOnly = isReadOnly;
             Document = new TextDocument();
+            TruncateSize = 1000000; // 1M char
 
             if (runtime.DispatcherThread != null)
             {
@@ -278,12 +281,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         }
 
         /// <summary>
-        /// Gets wether to display the pretty print context menu checkbox
+        /// Gets whether to display the pretty print context menu checkbox
         /// </summary>
         public bool DisplayPrettyPrintCheckBox => IsPrettyPrintAllowed && IsReadOnly;
 
         /// <summary>
-        /// Gets wether to display the pretty print context menu item
+        /// Gets whether to display the pretty print context menu item
         /// </summary>
         public bool DisplayPrettyPrintItem => IsPrettyPrintAllowed && !IsReadOnly;
 
@@ -291,6 +294,77 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Gets the document text.
         /// </summary>
         public string Text => Runtime.Invoke(() => Document.Text, DispatcherPriority.Send);
+
+        private bool _showWriteSettings;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether write settings is displayed.
+        /// </summary>
+        public bool ShowWriteSettings
+        {
+            get { return _showWriteSettings; }
+            set
+            {
+                if (value == _showWriteSettings) return;
+                _showWriteSettings = value;
+                WriteSettingsRowHeight = _showWriteSettings ? _defaultWriteSettingsRowHeight : 0;
+                NotifyOfPropertyChange(() => ShowWriteSettings);
+                NotifyOfPropertyChange(() => WriteSettingsRowHeight);
+            }
+        }
+
+        private int _writeSettingsRowHeight;
+
+        /// <summary>
+        /// Gets or sets the value of row height for write settings.
+        /// </summary>
+        public int WriteSettingsRowHeight
+        {
+            get { return _writeSettingsRowHeight; }
+            set
+            {
+                if (value == _writeSettingsRowHeight) return;
+                _writeSettingsRowHeight = value;
+                NotifyOfPropertyChange(() => WriteSettingsRowHeight);
+            }
+        }
+
+        private string _flushToFilePath;
+
+        /// <summary>
+        /// Gets or sets the flush to path.
+        /// </summary>
+        /// <value>
+        /// The flush to path.
+        /// </value>
+        public string FlushToFilePath
+        {
+            get { return _flushToFilePath; }
+            set
+            {
+                if (_flushToFilePath != value)
+                {
+                    _flushToFilePath = value;
+                    NotifyOfPropertyChange(() => FlushToFilePath);
+                }
+            }
+        }
+
+        private int _truncateSize;
+
+        /// <summary>
+        /// Gets or sets the truncate size
+        /// </summary>
+        public int TruncateSize
+        {
+            get { return _truncateSize; }
+            set
+            {
+                if (value == _truncateSize) return;
+                _truncateSize = value;
+                NotifyOfPropertyChange(() => TruncateSize);
+            }
+        }
 
         /// <summary>
         /// Formats the text using an XML parser.
@@ -307,6 +381,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public void SetText(string text)
         {
             Runtime.Invoke(() => Document.Text = Format(text), DispatcherPriority.Send);
+
+            Runtime.Invoke(TruncateText);
         }
 
         /// <summary>
@@ -316,6 +392,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public void Append(string text)
         {
             Runtime.Invoke(() => Document.Insert(Document.TextLength, Format(text)));
+
+            if (!ShowWriteSettings) return;
+
+            if (!string.IsNullOrEmpty(FlushToFilePath))
+                Runtime.Invoke(() => File.AppendAllText(FlushToFilePath, text));
+
+            Runtime.Invoke(TruncateText);
         }
 
         /// <summary>
@@ -404,6 +487,58 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 control.ScrollToEnd();
             }
+        }
+
+        /// <summary>
+        /// Selects the output path.
+        /// </summary>
+        public void SelectFile()
+        {
+            var owner = new Win32WindowHandle(Application.Current.MainWindow);
+            var dialog = new System.Windows.Forms.OpenFileDialog()
+            {
+                Title = "Select 'Flush To' file",                
+                DefaultExt = ".txt",
+                Multiselect = false
+            };
+
+            if (dialog.ShowDialog(owner) == System.Windows.Forms.DialogResult.OK)
+            {
+                FlushToFilePath = dialog.FileName;
+            }
+        }
+
+        /// <summary>
+        /// Opens the file
+        /// </summary>
+        public void OpenFile()
+        {
+            if (string.IsNullOrEmpty(FlushToFilePath)) return;
+
+            var fileInfo = new FileInfo(FlushToFilePath);
+
+            if (fileInfo.Exists)
+                Process.Start(FlushToFilePath);
+            else
+                File.WriteAllText(FlushToFilePath, string.Empty);
+        }
+
+        private void TruncateText()
+        {
+            if (!ShowWriteSettings) return;
+
+            if (TruncateSize == 0)
+            {
+                Document.Text = string.Empty;
+                return;
+            }
+
+            var textLength = Document.Text.Length;
+            if (textLength <= TruncateSize) return;
+
+            var truncatedText = Document.Text.Substring(textLength - TruncateSize);
+            var firstNewLine = truncatedText.IndexOf(Environment.NewLine, StringComparison.InvariantCultureIgnoreCase);
+            Document.Text = firstNewLine > 0 ? truncatedText.Substring(firstNewLine + Environment.NewLine.Length) : truncatedText;
         }
 
         /// <summary>

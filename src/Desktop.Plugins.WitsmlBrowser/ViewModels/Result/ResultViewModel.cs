@@ -49,11 +49,13 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Result
 
             Messages = new TextEditorViewModel(runtime, "XML", true)
             {
-                Document = messages
+                Document = messages,
+                ShowWriteSettings = true
             };
             SoapMessages = new TextEditorViewModel(runtime, "XML", true)
             {
-                Document = soapMessages
+                Document = soapMessages,
+                ShowWriteSettings = true
             };
         }
 

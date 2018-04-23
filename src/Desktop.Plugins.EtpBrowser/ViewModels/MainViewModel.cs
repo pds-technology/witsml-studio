@@ -73,13 +73,18 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 ApplicationVersion = _pluginVersion
             };
 
-            Details = new TextEditorViewModel(runtime, "JavaScript", true);
+            Details = new TextEditorViewModel(runtime, "JavaScript", true)
+            {
+                ShowWriteSettings = true
+            };
             Messages = new TextEditorViewModel(runtime, "JavaScript", true)
             {
+                ShowWriteSettings = true,
                 IsScrollingEnabled = true
             };
             DataObject = new TextEditorViewModel(runtime, "XML", true)
             {
+                ShowWriteSettings = true,
                 IsPrettyPrintAllowed = true
             };
         }
