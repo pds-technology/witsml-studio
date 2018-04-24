@@ -369,7 +369,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public void PrettyPrintText()
         {
             SetText(Text);
-        } 
+        }
 
         /// <summary>
         /// Sets the document text.
@@ -377,9 +377,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <param name="text">The text.</param>
         public void SetText(string text)
         {
-            Runtime.Invoke(() => Document.Text = Format(text), DispatcherPriority.Send);
+            Runtime.Invoke(() =>
+            {
+                var formattedText = Format(text);
+                Document.Text = formattedText;
+                FlushToFile(formattedText);
 
-            Runtime.Invoke(TruncateText);
+            }, DispatcherPriority.Send);
         }
 
         /// <summary>
@@ -388,16 +392,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <param name="text">The text to append.</param>
         public void Append(string text)
         {
-            var formattedText = Format(text);
-
-            Runtime.Invoke(() => Document.Insert(Document.TextLength, formattedText));
-
-            if (!ShowWriteSettings) return;
-
-            if (!string.IsNullOrEmpty(FlushToFilePath))
-                Runtime.Invoke(() => File.AppendAllText(FlushToFilePath, formattedText));
-
-            Runtime.Invoke(TruncateText);
+            Runtime.Invoke(() =>
+            {
+                var formattedText = Format(text);
+                Document.Insert(Document.TextLength, formattedText);
+                FlushToFile(formattedText);
+            });
         }
 
         /// <summary>
@@ -520,6 +520,16 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 File.WriteAllText(FlushToFilePath, string.Empty);
 
             Process.Start(FlushToFilePath);
+        }
+
+        private void FlushToFile(string text)
+        {
+            if (!ShowWriteSettings) return;
+
+            if (!string.IsNullOrEmpty(FlushToFilePath))
+                File.AppendAllText(FlushToFilePath, $"{Environment.NewLine}{text}");
+
+            TruncateText();
         }
 
         private void TruncateText()
