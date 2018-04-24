@@ -54,10 +54,13 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
+            
             <TextBlock Grid.Column="0" Text="Flush To:" Margin="10,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-            <TextBox x:Name="FlushToFilePath" Grid.Column="1" Margin="5" Padding="5" VerticalContentAlignment="Center" Text="{Binding FlushToFilePath}" ToolTip="{Binding FlushToFilePath}"/>
+            <TextBox x:Name="FlushToFilePath" Grid.Column="1" Margin="5" Padding="5" VerticalContentAlignment="Center" 
+                     Text="{Binding FlushToFilePath, UpdateSourceTrigger=PropertyChanged, Delay=500}" ToolTip="{Binding FlushToFilePath}"/>
             <Button Grid.Column="2" Margin="0,5,5,5" Content="..." ToolTip="Select File" x:Name="SelectFile" />
             <Button Grid.Column="3" Margin="0,5,5,5" Width="50" Content="Open" ToolTip="Open File" x:Name="OpenFile" IsEnabled="{Binding ElementName=FlushToFilePath, Path=Text.Length}"/>
+            
             <TextBlock Grid.Column="4" Text="Display:" Margin="20,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right" />
             <xctk:IntegerUpDown Grid.Column="5" Margin="5" Padding="5" FormatString="N0" VerticalContentAlignment="Center" 
                                 Minimum="0" Value="{Binding TruncateSize, UpdateSourceTrigger=PropertyChanged, Delay=500}"/>

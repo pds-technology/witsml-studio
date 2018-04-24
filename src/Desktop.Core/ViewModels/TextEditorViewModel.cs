@@ -334,9 +334,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Gets or sets the flush to path.
         /// </summary>
-        /// <value>
-        /// The flush to path.
-        /// </value>
         public string FlushToFilePath
         {
             get { return _flushToFilePath; }
@@ -391,12 +388,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <param name="text">The text to append.</param>
         public void Append(string text)
         {
-            Runtime.Invoke(() => Document.Insert(Document.TextLength, Format(text)));
+            var formattedText = Format(text);
+
+            Runtime.Invoke(() => Document.Insert(Document.TextLength, formattedText));
 
             if (!ShowWriteSettings) return;
 
             if (!string.IsNullOrEmpty(FlushToFilePath))
-                Runtime.Invoke(() => File.AppendAllText(FlushToFilePath, text));
+                Runtime.Invoke(() => File.AppendAllText(FlushToFilePath, formattedText));
 
             Runtime.Invoke(TruncateText);
         }
@@ -517,10 +516,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             var fileInfo = new FileInfo(FlushToFilePath);
 
-            if (fileInfo.Exists)
-                Process.Start(FlushToFilePath);
-            else
+            if (!fileInfo.Exists)
                 File.WriteAllText(FlushToFilePath, string.Empty);
+
+            Process.Start(FlushToFilePath);
         }
 
         private void TruncateText()
