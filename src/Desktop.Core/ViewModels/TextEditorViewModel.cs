@@ -307,7 +307,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 if (value == _showWriteSettings) return;
                 _showWriteSettings = value;
+
                 WriteSettingsRowHeight = _showWriteSettings ? _defaultWriteSettingsRowHeight : 0;
+
+                if (_showWriteSettings)
+                    Document.UndoStack.SizeLimit = 0;
+
                 NotifyOfPropertyChange(() => ShowWriteSettings);
                 NotifyOfPropertyChange(() => WriteSettingsRowHeight);
             }
@@ -379,7 +384,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             Runtime.Invoke(() =>
             {
-                var formattedText = Format(text);
+                var formattedText = Format(text);              
                 Document.Text = formattedText;
                 FlushToFile(formattedText);
 
@@ -496,7 +501,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             var owner = new Win32WindowHandle(Application.Current.MainWindow);
             var dialog = new System.Windows.Forms.OpenFileDialog()
             {
-                Title = "Select 'Flush To' file",                
+                Title = "Select 'Flush To' file",
                 DefaultExt = ".txt",
                 Multiselect = false
             };
