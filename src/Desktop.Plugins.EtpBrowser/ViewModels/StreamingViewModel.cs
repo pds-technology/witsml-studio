@@ -40,6 +40,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
     /// <seealso cref="Caliburn.Micro.Screen" />
     public sealed class StreamingViewModel : Screen, ISessionAware
     {
+        private const string UnscaledIndexMessage = "Unscaled index values are required";
+        private const string ErrorSettingIndexMessage = "Error setting indexes for range request";
+
         /// <summary>
         /// Initializes a new instance of the <see cref="StreamingViewModel"/> class.
         /// </summary>
@@ -145,6 +148,22 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             //Channels.Clear();
             //ChannelStreamingInfos.Clear();
 
+            // Verify streaming start value is not scaled
+            try
+            {
+                ((double) Model.Streaming.StartIndex).IndexToScale(GetScale());
+            }
+            catch (OverflowException ex)
+            {
+                Runtime.ShowError(UnscaledIndexMessage, ex);
+                return;
+            }
+            catch (Exception ex)
+            {
+                Runtime.ShowError(ErrorSettingIndexMessage, ex);
+                return;
+            }
+
             Parent.Client.Handler<IChannelStreamingConsumer>()
                 .ChannelDescribe(Model.Streaming.Uris);
         }
@@ -155,7 +174,20 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public void StartStreaming()
         {
             // Prepare ChannelStreamingInfos startIndexes
-            ChannelStreamingInfos.ForEach(x => x.StartIndex = new StreamingStartIndex { Item = GetStreamingStartValue() });
+            try
+            {
+                ChannelStreamingInfos.ForEach(x => x.StartIndex = new StreamingStartIndex { Item = GetStreamingStartValue() });
+            }
+            catch (OverflowException ex)
+            {
+                Runtime.ShowError(UnscaledIndexMessage, ex);
+                return;
+            }
+            catch (Exception ex)
+            {
+                Runtime.ShowError(ErrorSettingIndexMessage, ex);
+                return;
+            }
 
             Parent.Client.Handler<IChannelStreamingConsumer>()
                 .ChannelStreamingStart(ChannelStreamingInfos);
@@ -181,10 +213,24 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             var rangeInfo = new ChannelRangeInfo()
             {
-                ChannelId = Channels.Select(x => x.ChannelId).ToArray(),
-                StartIndex = (long)GetStreamingStartValue(true),
-                EndIndex = (long)GetStreamingEndValue()
+                ChannelId = Channels.Select(x => x.ChannelId).ToArray()
             };
+
+            try
+            {
+                rangeInfo.EndIndex = (long)GetStreamingEndValue();
+                rangeInfo.StartIndex = (long)GetStreamingStartValue(true);
+            }
+            catch (OverflowException ex)
+            {
+                Runtime.ShowError(UnscaledIndexMessage, ex);
+                return;
+            }
+            catch (Exception ex)
+            {
+                Runtime.ShowError(ErrorSettingIndexMessage, ex);
+                return;
+            }
 
             Parent.Client.Handler<IChannelStreamingConsumer>()
                 .ChannelRangeRequest(new[] { rangeInfo });
@@ -370,3 +416,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
     }
 }
+
+
+
