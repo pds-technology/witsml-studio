@@ -499,11 +499,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public void SelectFile()
         {
             var owner = new Win32WindowHandle(Application.Current.MainWindow);
-            var dialog = new System.Windows.Forms.OpenFileDialog()
+            var dialog = new System.Windows.Forms.SaveFileDialog()
             {
                 Title = "Select 'Flush To' file",
-                DefaultExt = ".txt",
-                Multiselect = false
+                DefaultExt = ".txt"
             };
 
             if (dialog.ShowDialog(owner) == System.Windows.Forms.DialogResult.OK)
