@@ -33,6 +33,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
     public class RequestViewModel : Conductor<IScreen>.Collection.OneActive, IConnectionAware
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(RequestViewModel));
+        private static readonly OptionsIn.ReturnElements _blank = new OptionsIn.ReturnElements(string.Empty);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RequestViewModel"/> class.
@@ -49,10 +50,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
         /// <summary>
         /// Gets the Parent <see cref="T:Caliburn.Micro.IConductor" /> for this view model.
         /// </summary>
-        public new MainViewModel Parent
-        {
-            get { return (MainViewModel)base.Parent; }
-        }
+        public new MainViewModel Parent => (MainViewModel)base.Parent;
 
         /// <summary>
         /// Gets the data model for this view model.
@@ -60,10 +58,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
         /// <value>
         /// The WitsmlSettings data model.
         /// </value>
-        public Models.WitsmlSettings Model
-        {
-            get { return Parent.Model; }
-        }
+        public Models.WitsmlSettings Model => Parent.Model;
 
         private TextEditorViewModel _xmlQuery;
 
@@ -90,16 +85,13 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
         /// <value>
         /// The WITSML web service proxy.
         /// </value>
-        public WITSMLWebServiceConnection Proxy
-        {
-            get { return Parent.Proxy; }
-        }
+        public WITSMLWebServiceConnection Proxy => Parent.Proxy;
 
         /// <summary>
         /// Gets the runtime service.
         /// </summary>
         /// <value>The runtime.</value>
-        public IRuntimeService Runtime { get; private set; }
+        public IRuntimeService Runtime { get; }
 
         /// <summary>
         /// Gets the store functions that can be executed.
@@ -107,10 +99,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
         /// <value>
         /// The executable store functions.
         /// </value>
-        public IEnumerable<Functions> StoreFunctions
-        {
-            get { return new Functions[] { Functions.AddToStore, Functions.GetFromStore, Functions.UpdateInStore, Functions.DeleteFromStore }; }
-        }
+        public IEnumerable<Functions> StoreFunctions => new [] { Functions.AddToStore, Functions.GetFromStore, Functions.UpdateInStore, Functions.DeleteFromStore };
 
         /// <summary>
         /// Gets the options in return elements.
@@ -118,10 +107,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
         /// <value>
         /// The options in return elements.
         /// </value>
-        public IEnumerable<OptionsIn.ReturnElements> ReturnElements
-        {
-            get { return OptionsIn.ReturnElements.GetValues(); }
-        }
+        public IEnumerable<OptionsIn.ReturnElements> ReturnElements => OptionsIn.ReturnElements.GetValues().Concat(new [] { _blank });
 
         /// <summary>
         /// Called when the selected WITSML version has changed.

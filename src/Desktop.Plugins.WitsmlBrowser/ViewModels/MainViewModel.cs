@@ -1110,9 +1110,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
         private string GetFromStoreOptionsIn(bool isPartialQuery)
         {
             var model = GetModel();
+            var returnElements = string.IsNullOrWhiteSpace(model.ReturnElementType?.Value) ? string.Empty : model.ReturnElementType;
+
             var optionsIn = new List<string>
             {
-                isPartialQuery ? OptionsIn.ReturnElements.DataOnly : model.ReturnElementType ?? string.Empty,
+                isPartialQuery ? OptionsIn.ReturnElements.DataOnly : returnElements,
                 model.IsRequestObjectSelectionCapability
                     ? OptionsIn.RequestObjectSelectionCapability.True
                     : string.Empty,
