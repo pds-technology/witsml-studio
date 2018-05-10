@@ -659,8 +659,15 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             if (logDetails)
                 LogDetailMessage(message);
 
-            if (message.StartsWith("{"))
-                message = FormatTimeStamps(message);
+            try
+            {
+                if (message.StartsWith("{"))
+                    message = FormatMessage(message);
+            }
+            catch (Exception ex)
+            {
+                _log.Warn($"Error formatting ETP message:{Environment.NewLine}{message}", ex);
+            }
 
             Messages.Append(string.Concat(
                 message.StartsWith("{") ? string.Empty : "// ",
@@ -678,7 +685,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             LogClientOutput($"{message}\n/*\n{error}\n*/", true);
         }
 
-        private string FormatTimeStamps(string message)
+        private string FormatMessage(string message)
         {
             if (string.IsNullOrWhiteSpace(message)) return string.Empty;
 
@@ -705,14 +712,16 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 JToken channel;
                 if (!_channels.TryGetValue(channelId, out channel)) continue;
 
+                // Append custom data to each channel data item (for visual inspection only)
+                var customData = dataItem["_customData"] = new JObject();
+                customData["_mnemonic"] = channel.Value<string>("channelName");
+
+                // Process index values
                 var indexes = channel["indexes"] as JArray;
                 var values = dataItem["indexes"] as JArray;
 
                 if (indexes == null || values == null) continue;
-
-                // Append custom data to each channel data item (for visual inspection only)
-                var customData = dataItem["_customData"] = new JObject();
-                customData["_mnemonic"] = channel.Value<string>("channelName");
+                if (indexes.Count != values.Count) continue;
 
                 for (var i = 0; i < indexes.Count; i++)
                 {
@@ -750,6 +759,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             var primaryIndex = indexes[0] as JObject;
             var startIndex = channel["startIndex"];
             var endIndex = channel["endIndex"];
+
+            if (startIndex == null || !startIndex.HasValues) return;
+            if (endIndex == null || !endIndex.HasValues) return;
 
             FormatIndex(primaryIndex, startIndex, startIndex.Value<long>("long"));
             FormatIndex(primaryIndex, endIndex, endIndex.Value<long>("long"));
