@@ -17,12 +17,14 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Media;
 using Caliburn.Micro;
 using Energistics.DataAccess;
+using Energistics.Datatypes.Object;
 using log4net.Appender;
 using Witsml131 = Energistics.DataAccess.WITSML131;
 using Witsml141 = Energistics.DataAccess.WITSML141;
@@ -167,6 +169,22 @@ namespace PDS.WITSMLstudio.Desktop.Core
         public static IWellboreObject GetWellboreObject(this ResourceViewModel resourceViewModel)
         {
             return resourceViewModel.GetDataObject() as IWellboreObject;
+        }
+
+        /// <summary>
+        /// Formats the last changed microseconds into a readable date time offset.
+        /// </summary>
+        /// <param name="resource">The resource.</param>
+        public static void FormatLastChanged(this Resource resource)
+        {
+            if (resource == null || resource.LastChanged < 1) return;
+
+            if (resource.CustomData == null)
+                resource.CustomData = new ConcurrentDictionary<string, string>();
+
+            resource.CustomData["lastChanged"] = DateTimeExtensions
+                .FromUnixTimeMicroseconds(resource.LastChanged)
+                .ToString("o");
         }
 
         /// <summary>

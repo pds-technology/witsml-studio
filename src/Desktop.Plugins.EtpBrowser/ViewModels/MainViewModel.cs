@@ -17,6 +17,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
@@ -40,6 +41,9 @@ using Energistics.Protocol.ChannelDataFrame;
 using Energistics.Protocol.DataArray;
 using Energistics.Protocol.GrowingObject;
 using Energistics.Protocol.StoreNotification;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using PDS.WITSMLstudio.Desktop.Core;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
@@ -56,6 +60,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         private static readonly string _pluginVersion = typeof(MainViewModel).GetAssemblyVersion();
         private const string GzipEncoding = "gzip";
 
+        private readonly ConcurrentDictionary<int, JToken> _channels;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MainViewModel" /> class.
         /// </summary>
@@ -67,6 +73,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             DisplayName = EtpSettings.EtpSubProtocolName;
             DisplayName = _pluginDisplayName;
             Resources = new BindableCollection<ResourceViewModel>();
+            _channels = new ConcurrentDictionary<int, JToken>();
+
             Model = new Models.EtpSettings()
             {
                 ApplicationName = Assembly.GetEntryAssembly().GetAssemblyName(),
@@ -474,8 +482,14 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             // Handle case when "No Data" Acknowledge message was received
             if (e.Message.Resource != null)
             {
-                viewModel = new ResourceViewModel(Runtime, e.Message.Resource);
-                viewModel.LoadChildren = GetResources;
+                var resource = e.Message.Resource;
+
+                viewModel = new ResourceViewModel(Runtime, resource)
+                {
+                    LoadChildren = GetResources
+                };
+
+                resource.FormatLastChanged();
             }
 
             LogObjectDetails(e);
@@ -542,6 +556,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <param name="append">if set to <c>true</c> append the data object; otherwise, replace.</param>
         private void LogDataObject<T>(ProtocolEventArgs<T> e, DataObject dataObject, bool append = false) where T : ISpecificRecord
         {
+            dataObject.Resource?.FormatLastChanged();
+
             LogObjectDetails(e);
 
             var data = dataObject.GetString();
@@ -643,6 +659,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             if (logDetails)
                 LogDetailMessage(message);
 
+            if (message.StartsWith("{"))
+                message = FormatTimeStamps(message);
+
             Messages.Append(string.Concat(
                 message.StartsWith("{") ? string.Empty : "// ",
                 message,
@@ -657,6 +676,118 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         internal void LogClientError(string message, Exception error)
         {
             LogClientOutput($"{message}\n/*\n{error}\n*/", true);
+        }
+
+        private string FormatTimeStamps(string message)
+        {
+            if (string.IsNullOrWhiteSpace(message)) return string.Empty;
+
+            var jObject = JObject.Parse(message);
+
+            FormatResource(jObject["resource"] as JObject);
+            FormatDataObject(jObject["dataObject"] as JObject);
+            FormatChannelMetadataRecords(jObject["channels"] as JArray);
+            FormatChannelData(jObject["data"] as JArray);
+
+            return jObject["protocol"] != null
+                ? jObject.ToString(Formatting.None)
+                : jObject.ToString();
+        }
+
+        private void FormatChannelData(JArray data)
+        {
+            if (data == null || data.Count < 1) return;
+
+            foreach (var dataItem in data)
+            {
+                var channelId = dataItem.Value<int>("channelId");
+
+                JToken channel;
+                if (!_channels.TryGetValue(channelId, out channel)) continue;
+
+                var indexes = channel["indexes"] as JArray;
+                var values = dataItem["indexes"] as JArray;
+
+                if (indexes == null || values == null) continue;
+
+                // Append custom data to each channel data item (for visual inspection only)
+                var customData = dataItem["_customData"] = new JObject();
+                customData["_mnemonic"] = channel.Value<string>("channelName");
+
+                for (var i = 0; i < indexes.Count; i++)
+                {
+                    var index = indexes[i] as JObject;
+                    var indexValue = values.Value<long>(i);
+                    FormatIndex(index, customData, indexValue);
+                }
+            }
+        }
+
+        private void FormatChannelMetadataRecords(JArray channels)
+        {
+            if (channels == null || channels.Count < 1) return;
+
+            // Check to make sure we only process ChannelMetadataRecord
+            var indexes = channels[0]["indexes"] as JArray;
+            if (indexes == null || indexes.Count < 1) return;
+
+            foreach (var channel in channels)
+            {
+                var channelId = channel.Value<int>("channelId");
+                _channels[channelId] = channel;
+
+                FormatIndexRange(channel as JObject);
+                FormatDataObject(channel["domainObject"] as JObject);
+            }
+        }
+
+        private void FormatIndexRange(JObject channel)
+        {
+            var indexes = channel?["indexes"] as JArray;
+            if (indexes == null || indexes.Count < 1) return;
+
+            var primaryIndex = indexes[0] as JObject;
+            var startIndex = channel["startIndex"];
+            var endIndex = channel["endIndex"];
+
+            FormatIndex(primaryIndex, startIndex, startIndex.Value<long>("long"));
+            FormatIndex(primaryIndex, endIndex, endIndex.Value<long>("long"));
+        }
+
+        private void FormatIndex(JObject indexMetadata, JToken indexData, long indexValue)
+        {
+            if (indexMetadata == null || indexData == null) return;
+
+            var mnemonic = indexMetadata["mnemonic"].Value<string>("string");
+            var indexType = indexMetadata.Value<string>("indexType");
+            var scale = indexMetadata.Value<int>("scale");
+
+            var value = "Time".EqualsIgnoreCase(indexType)
+                ? DateTimeExtensions.FromUnixTimeMicroseconds(indexValue).ToString("o")
+                : indexValue.IndexFromScale(scale) as object;
+
+            indexData[$"_{mnemonic}"] = JToken.FromObject(value);
+        }
+
+        private void FormatDataObject(JObject dataObject)
+        {
+            if (dataObject == null) return;
+            FormatResource(dataObject["resource"] as JObject);
+        }
+
+        private void FormatResource(JObject resource)
+        {
+            if (resource == null) return;
+
+            var lastChanged = resource.Value<long>("lastChanged");
+            if (lastChanged < 1) return;
+
+            var customData = resource["customData"] as JObject;
+            if (customData == null) return;
+
+            customData["_lastChanged"] = DateTimeExtensions
+                .FromUnixTimeMicroseconds(lastChanged)
+                .ToString("o");
         }
 
         private void RegisterProtocolHandlers(EtpClient client)
