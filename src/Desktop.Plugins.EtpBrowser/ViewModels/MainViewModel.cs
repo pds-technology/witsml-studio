@@ -728,7 +728,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             if (channels == null || channels.Count < 1) return;
 
             // Check to make sure we only process ChannelMetadataRecord
-            var indexes = channels[0]["indexes"] as JArray;
+            var firstChannel = channels[0] as JObject;
+            var indexes = firstChannel?["indexes"] as JArray;
             if (indexes == null || indexes.Count < 1) return;
 
             foreach (var channel in channels)
