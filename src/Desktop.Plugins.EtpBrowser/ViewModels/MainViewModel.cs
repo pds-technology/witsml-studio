@@ -694,6 +694,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             FormatResource(jObject["resource"] as JObject);
             FormatDataObject(jObject["dataObject"] as JObject);
             FormatChannelMetadataRecords(jObject["channels"] as JArray);
+            FormatChannelRangeRequests(jObject["channelRanges"] as JArray);
             FormatChannelData(jObject["data"] as JArray);
 
             return jObject["protocol"] != null
@@ -725,10 +726,42 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
                 for (var i = 0; i < indexes.Count; i++)
                 {
-                    var index = indexes[i] as JObject;
+                    var index = indexes[i];
                     var indexValue = values.Value<long>(i);
                     FormatIndex(index, customData, indexValue);
                 }
+            }
+        }
+
+        private void FormatChannelRangeRequests(JArray channelRanges)
+        {
+            if (channelRanges == null || channelRanges.Count < 1) return;
+
+            foreach (var channelRange in channelRanges)
+            {
+                var channelId = channelRange["channelId"].Value<int>(0);
+
+                JToken channel;
+                if (!_channels.TryGetValue(channelId, out channel)) continue;
+
+                var indexes = channel?["indexes"] as JArray;
+                if (indexes == null || indexes.Count < 1) return;
+
+                // Append custom data to each channel data item (for visual inspection only)
+                var customData = channelRange["_customData"] = new JObject();
+                customData["_mnemonic"] = channel.Value<string>("channelName");
+
+                var primaryStartIndex = indexes[0].DeepClone();
+                primaryStartIndex["mnemonic"]["string"] = "startIndex";
+
+                var primaryEndIndex = indexes[0].DeepClone();
+                primaryEndIndex["mnemonic"]["string"] = "endIndex";
+
+                var startIndex = channelRange.Value<long>("startIndex");
+                var endIndex = channelRange.Value<long>("endIndex");
+
+                FormatIndex(primaryStartIndex, customData, startIndex);
+                FormatIndex(primaryEndIndex, customData, endIndex);
             }
         }
 
@@ -739,7 +772,16 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             // Check to make sure we only process ChannelMetadataRecord
             var firstChannel = channels[0] as JObject;
             var indexes = firstChannel?["indexes"] as JArray;
-            if (indexes == null || indexes.Count < 1) return;
+
+            if (indexes == null || indexes.Count < 1)
+            {
+                var startIndex = firstChannel?["startIndex"] as JObject;
+
+                if (startIndex != null)
+                    FormatStreamingStartInfo(channels);
+
+                return;
+            }
 
             foreach (var channel in channels)
             {
@@ -751,23 +793,46 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             }
         }
 
-        private void FormatIndexRange(JObject channel)
+        private void FormatStreamingStartInfo(JArray channelInfos)
+        {
+            if (channelInfos == null || channelInfos.Count < 1) return;
+
+            foreach (var channelInfo in channelInfos)
+            {
+                var channelId = channelInfo.Value<int>("channelId");
+
+                JToken channel;
+                if (!_channels.TryGetValue(channelId, out channel)) continue;
+
+                FormatIndexRange(channel as JObject, channelInfo);
+            }
+        }
+
+        private void FormatIndexRange(JObject channel, JToken channelData = null)
         {
             var indexes = channel?["indexes"] as JArray;
             if (indexes == null || indexes.Count < 1) return;
 
-            var primaryIndex = indexes[0] as JObject;
-            var startIndex = channel["startIndex"];
-            var endIndex = channel["endIndex"];
+            var primaryIndex = indexes[0];
+            channelData = channelData ?? channel;
 
-            if (startIndex == null || !startIndex.HasValues) return;
-            if (endIndex == null || !endIndex.HasValues) return;
-
-            FormatIndex(primaryIndex, startIndex, startIndex.Value<long>("long"));
-            FormatIndex(primaryIndex, endIndex, endIndex.Value<long>("long"));
+            FormatIndex(primaryIndex, channelData["startIndex"]);
+            FormatIndex(primaryIndex, channelData["endIndex"]);
         }
 
-        private void FormatIndex(JObject indexMetadata, JToken indexData, long indexValue)
+        private void FormatIndex(JToken indexMetadata, JToken indexData)
+        {
+            if (indexData == null || !indexData.HasValues) return;
+
+            // Check if there is an embedded item attribute
+            indexData = indexData["item"] ?? indexData;
+            // Only process long index value types
+            if (indexData["long"] == null) return;
+
+            FormatIndex(indexMetadata, indexData, indexData.Value<long>("long"));
+        }
+
+        private void FormatIndex(JToken indexMetadata, JToken indexData, long indexValue)
         {
             if (indexMetadata == null || indexData == null) return;
 
