@@ -151,7 +151,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             // Verify streaming start value is not scaled
             try
             {
-                ((double) Model.Streaming.StartIndex).IndexToScale(GetScale());
+                Model.Streaming.StartIndex.IndexToScale(GetScale());
             }
             catch (OverflowException ex)
             {
@@ -329,7 +329,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
             var startIndex = isTimeIndex
                 ? new DateTimeOffset(Model.Streaming.StartTime).ToUnixTimeMicroseconds()
-                : ((double)Model.Streaming.StartIndex).IndexToScale(GetScale());
+                : Model.Streaming.StartIndex.IndexToScale(GetScale());
 
             return startIndex;
         }

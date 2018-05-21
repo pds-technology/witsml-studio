@@ -66,13 +66,13 @@
 
         <TextBlock Grid.Row="6" Grid.Column="0" Text="Start Index:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center"
                    Visibility="{Binding IsChecked, ElementName=DepthIndexButton, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-        <xctk:LongUpDown Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
+        <xctk:DoubleUpDown Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
                          Visibility="{Binding IsChecked, ElementName=DepthIndexButton, Converter={StaticResource BooleanToVisibilityConverter}}"
                          Value="{Binding Model.Streaming.StartIndex}" />
 
         <TextBlock Grid.Row="7" Grid.Column="0" Text="End Index:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center"
                    Visibility="{Binding IsChecked, ElementName=DepthIndexButton, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-        <xctk:LongUpDown Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
+        <xctk:DoubleUpDown Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center" 
                          Visibility="{Binding IsChecked, ElementName=DepthIndexButton, Converter={StaticResource BooleanToVisibilityConverter}}"
                          Value="{Binding Model.Streaming.EndIndex}" />
 
