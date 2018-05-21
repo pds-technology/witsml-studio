@@ -132,6 +132,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void Start()
         {
+            if (Parent.Client == null)
+            {
+                LogSessionClientError();
+                return;
+            }
+
             Parent.Client.Handler<IChannelStreamingConsumer>()
                 .Start(Model.Streaming.MaxDataItems, Model.Streaming.MaxMessageRate);
 
@@ -145,6 +151,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void Describe()
         {
+            if (Parent.Client == null)
+            {
+                LogSessionClientError();
+                return;
+            }
+
             //Channels.Clear();
             //ChannelStreamingInfos.Clear();
 
@@ -173,6 +185,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void StartStreaming()
         {
+            if (Parent.Client == null)
+            {
+                LogSessionClientError();
+                return;
+            }
+
             // Prepare ChannelStreamingInfos startIndexes
             try
             {
@@ -198,6 +216,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void StopStreaming()
         {
+            if (Parent.Client == null)
+            {
+                LogSessionClientError();
+                return;
+            }
+
             var channelIds = Channels
                 .Select(x => x.ChannelId)
                 .ToArray();
@@ -211,6 +235,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void RequestRange()
         {
+            if (Parent.Client == null)
+            {
+                LogSessionClientError();
+                return;
+            }
+
             var rangeInfo = new ChannelRangeInfo()
             {
                 ChannelId = Channels.Select(x => x.ChannelId).ToArray()
@@ -357,6 +387,13 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 .FirstOrDefault()?
                 .Indexes.FirstOrDefault()?
                 .Scale ?? 0; // Default to no scale of no index is found.;
+        }
+
+        private void LogSessionClientError()
+        {
+            Parent.Details.SetText(string.Format(
+                "// ERROR: No ETP connection for Channel Streaming session.{0}{0}",
+                Environment.NewLine));
         }
 
         private void LogStartSession()
