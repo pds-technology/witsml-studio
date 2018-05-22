@@ -61,6 +61,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         private const string GzipEncoding = "gzip";
 
         private readonly ConcurrentDictionary<int, JToken> _channels;
+        private DateTimeOffset _dateReceived;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainViewModel" /> class.
@@ -662,7 +663,21 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             try
             {
                 if (message.StartsWith("{"))
+                {
                     message = FormatMessage(message);
+                }
+                else
+                {
+                    const string receivedText = "Message received at ";
+                    var index = message.IndexOf(receivedText, StringComparison.InvariantCultureIgnoreCase);
+                    if (index != -1)
+                    {
+                        if (DateTimeOffset.TryParse(message.Substring(index + receivedText.Length).Trim(), out _dateReceived))
+                        {
+                            _dateReceived = _dateReceived.ToUniversalTime();
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -840,11 +855,18 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             var indexType = indexMetadata.Value<string>("indexType");
             var scale = indexMetadata.Value<int>("scale");
 
-            var value = "Time".EqualsIgnoreCase(indexType)
-                ? DateTimeExtensions.FromUnixTimeMicroseconds(indexValue).ToString("o")
-                : indexValue.IndexFromScale(scale) as object;
-
-            indexData[$"_{mnemonic}"] = JToken.FromObject(value);
+            if ("Time".EqualsIgnoreCase(indexType))
+            {
+                var timeIndex = DateTimeExtensions.FromUnixTimeMicroseconds(indexValue);
+                var elapsedTime = _dateReceived.Subtract(timeIndex);
+                indexData[$"_{mnemonic}"] = JToken.FromObject(timeIndex.ToString("o"));
+                indexData["_ElapsedTime"] = elapsedTime;
+            }
+            else
+            {
+                var value = indexValue.IndexFromScale(scale) as object;
+                indexData[$"_{mnemonic}"] = JToken.FromObject(value);
+            }
         }
 
         private void FormatDataObject(JObject dataObject)
