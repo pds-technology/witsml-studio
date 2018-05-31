@@ -142,6 +142,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <value>The selected resource.</value>
         public ResourceViewModel SelectedResource => Resources.FindSelected();
 
+        /// <summary>
+        /// Gets the checked resources.
+        /// </summary>
+        /// <value>The checked resources.</value>
+        public IEnumerable<ResourceViewModel> CheckedResources => Resources.FindChecked();
+
         private EtpClient _client;
 
         /// <summary>

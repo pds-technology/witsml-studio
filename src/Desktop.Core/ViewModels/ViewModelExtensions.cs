@@ -64,9 +64,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         /// <param name="resources">The resources.</param>
         /// <param name="lockObject">The lock object.</param>
-        /// <returns>
-        /// A <see cref="ResourceViewModel" /> instance.
-        /// </returns>
+        /// <returns>A <see cref="ResourceViewModel" /> instance.</returns>
         public static ResourceViewModel FindSelected(this IList<ResourceViewModel> resources, object lockObject)
         {
             lock (lockObject)
@@ -77,9 +75,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Finds the selected resource, using global lock for  synchronization.
         /// </summary>
         /// <param name="resources">The resources.</param>
-        /// <returns>
-        /// A <see cref="ResourceViewModel" /> instance.
-        /// </returns>
+        /// <returns>A <see cref="ResourceViewModel" /> instance.</returns>
         public static ResourceViewModel FindSelectedSynchronized(this IList<ResourceViewModel> resources)
         {
             return resources.ExecuteWithReadLock(resources.FindSelected);
@@ -107,6 +103,34 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Finds all resources by evaluating the specified predicate on each item in the collection.
+        /// </summary>
+        /// <param name="resources">The resources.</param>
+        /// <param name="predicate">The predicate.</param>
+        /// <returns>A collection of <see cref="ResourceViewModel" /> instances.</returns>
+        public static IEnumerable<ResourceViewModel> FindAll(this IList<ResourceViewModel> resources, Func<ResourceViewModel, bool> predicate)
+        {
+            foreach (var resource in resources)
+            {
+                if (predicate(resource))
+                    yield return resource;
+
+                foreach (var child in resource.Children.FindAll(predicate))
+                    yield return child;
+            }
+        }
+
+        /// <summary>
+        /// Finds all of the checked resources.
+        /// </summary>
+        /// <param name="resources">The resources.</param>
+        /// <returns>A collection of <see cref="ResourceViewModel" /> instances.</returns>
+        public static IEnumerable<ResourceViewModel> FindChecked(this IList<ResourceViewModel> resources)
+        {
+            return resources.FindAll(x => x.IsChecked);
         }
     }
 }

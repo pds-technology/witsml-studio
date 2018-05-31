@@ -39,7 +39,10 @@
             </TreeView.ItemContainerStyle>
             <TreeView.Resources>
                 <HierarchicalDataTemplate DataType="{x:Type vm:ResourceViewModel}" ItemsSource="{Binding Children}">
-                    <TextBlock Text="{Binding DisplayName}" />
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Focusable="False" VerticalAlignment="Center" />
+                        <ContentPresenter Content="{Binding DisplayName, Mode=OneTime}" Margin="2,0" />
+                    </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.Resources>
             <TreeView.ContextMenu>
@@ -54,6 +57,7 @@
                     <MenuItem Header="Refresh" cal:Message.Attach="RefreshSelected" />
                     <Separator />
                     <MenuItem Header="Refresh All" cal:Message.Attach="RefreshHierarchy" />
+                    <MenuItem Header="Uncheck All" cal:Message.Attach="ClearCheckedItems" />
                 </ContextMenu>
             </TreeView.ContextMenu>
         </TreeView>

@@ -259,11 +259,17 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             get
             {
-                var resource = Parent.SelectedResource;
-
-                if (CanExecute && !string.IsNullOrWhiteSpace(resource?.Resource?.Uri))
+                if (CanExecute)
                 {
-                    return resource.Resource.ChannelSubscribable;
+                    var isChecked = Parent.CheckedResources.Any(x => !string.IsNullOrWhiteSpace(x.Resource?.Uri) && x.Resource.ChannelSubscribable);
+                    if (isChecked) return true;
+
+                    var resource = Parent.SelectedResource;
+
+                    if (!string.IsNullOrWhiteSpace(resource?.Resource?.Uri))
+                    {
+                        return resource.Resource.ChannelSubscribable;
+                    }
                 }
 
                 return false;
@@ -276,9 +282,21 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public void CopyUriToStreaming()
         {
             var viewModel = Parent.Items.OfType<StreamingViewModel>().FirstOrDefault();
-            var resource = Parent.SelectedResource;
+            if (viewModel == null) return;
 
-            if (viewModel != null && resource != null)
+            // Get list of checked resources
+            var checkedResources = Parent.CheckedResources.ToList();
+            if (checkedResources.Count < 1)
+            {
+                // Use selected resource of none are checked
+                var selectedResource = Parent.SelectedResource;
+                if (selectedResource != null)
+                {
+                    checkedResources.Add(selectedResource);
+                }
+            }
+
+            foreach (var resource in checkedResources)
             {
                 Model.Streaming.Uri = resource.Resource.Uri;
                 viewModel.AddUri();
@@ -317,6 +335,17 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             {
                 Model.StoreNotification.Uri = resource.Resource.Uri;
                 Parent.ActivateItem(viewModel);
+            }
+        }
+
+        /// <summary>
+        /// Clears the checked items.
+        /// </summary>
+        public void ClearCheckedItems()
+        {
+            foreach (var resource in Parent.CheckedResources)
+            {
+                resource.IsChecked = false;
             }
         }
 

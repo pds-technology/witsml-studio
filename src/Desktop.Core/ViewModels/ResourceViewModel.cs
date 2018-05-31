@@ -208,6 +208,24 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
         }
 
+        private bool _isChecked;
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is checked.
+        /// </summary>
+        /// <value><c>true</c> if this instance is checked; otherwise, <c>false</c>.</value>
+        public bool IsChecked
+        {
+            get { return _isChecked; }
+            set
+            {
+                if (_isChecked != value)
+                {
+                    _isChecked = value;
+                    NotifyOfPropertyChange(() => IsChecked);
+                }
+            }
+        }
+
         private bool _isVisible;
         /// <summary>
         /// Gets or sets a value indicating whether this instance is visible.
