@@ -13,6 +13,38 @@
                     <Style TargetType="TextBox">
                         <Setter Property="cmd:InputCommands.SelectOnFocus" Value="True" />
                     </Style>
+
+                    <Style x:Key="DefaultGridStyle" TargetType="DataGrid">
+                        <Setter Property="ColumnHeaderStyle" Value="{DynamicResource DefaultHeaderStyle}" />
+                        <Setter Property="CellStyle" Value="{DynamicResource DefaultCellStyle}" />
+                        <Setter Property="AlternatingRowBackground" Value="AliceBlue" />
+                        <Setter Property="AutoGenerateColumns" Value="False" />
+                        <Setter Property="GridLinesVisibility" Value="None" />
+                        <Setter Property="IsReadOnly" Value="True" />
+                        <Setter Property="RowHeaderWidth" Value="0" />
+                        <Setter Property="SelectionMode" Value="Single" />
+                        <Setter Property="cmd:ScrollCommands.AutoScrollIntoView" Value="True" />
+                    </Style>
+
+                    <Style x:Key="DefaultHeaderStyle" TargetType="DataGridColumnHeader">
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="Padding" Value="5,5,20,5" />
+                    </Style>
+
+                    <Style x:Key="DefaultCellStyle" TargetType="DataGridCell">
+                        <Setter Property="MinHeight" Value="26" />
+                        <Setter Property="MinWidth" Value="70" />
+                        <Setter Property="Padding" Value="5,0,20,0" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="DataGridCell">
+                                    <Grid Background="{TemplateBinding Background}">
+                                        <ContentPresenter VerticalAlignment="Center" Margin="{TemplateBinding Padding}" />
+                                    </Grid>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

@@ -28,9 +28,11 @@ using Energistics.Datatypes.ChannelData;
 using Energistics.Protocol;
 using Energistics.Protocol.ChannelStreaming;
 using Energistics.Protocol.Core;
+using PDS.WITSMLstudio.Desktop.Core.Commands;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
+using PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 {
@@ -49,27 +51,22 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public StreamingViewModel(IRuntimeService runtime)
         {
             Runtime = runtime;
-            DisplayName = string.Format("{0:D} - Streaming", Protocols.ChannelStreaming);
-            Channels = new List<ChannelMetadataRecord>();
+            DisplayName = $"{Protocols.ChannelStreaming:D} - Streaming";
+            Channels = new BindableCollection<ChannelMetadataViewModel>();
             ChannelStreamingInfos = new List<ChannelStreamingInfo>();
+            ToggleChannelCommand = new DelegateCommand(x => ToggleSelectedChannel());
         }
 
         /// <summary>
         /// Gets or Sets the Parent <see cref="T:Caliburn.Micro.IConductor" />
         /// </summary>
-        public new MainViewModel Parent
-        {
-            get { return (MainViewModel)base.Parent; }
-        }
+        public new MainViewModel Parent => (MainViewModel) base.Parent;
 
         /// <summary>
         /// Gets the model.
         /// </summary>
         /// <value>The model.</value>
-        public Models.EtpSettings Model
-        {
-            get { return Parent.Model; }
-        }
+        public Models.EtpSettings Model => Parent.Model;
 
         /// <summary>
         /// Gets the runtime service.
@@ -81,13 +78,43 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// Gets the collection of channel metadata.
         /// </summary>
         /// <value>The channel metadata.</value>
-        public IList<ChannelMetadataRecord> Channels { get; }
+        public BindableCollection<ChannelMetadataViewModel> Channels { get; }
 
         /// <summary>
         /// Gets the collection of channel streaming information.
         /// </summary>
         /// <value>The channel streaming information.</value>
         public IList<ChannelStreamingInfo> ChannelStreamingInfos { get; }
+
+        /// <summary>
+        /// Gets the toggle channel command.
+        /// </summary>
+        public ICommand ToggleChannelCommand { get; }
+
+        private ChannelMetadataViewModel _selectedChannel;
+
+        /// <summary>
+        /// Gets or sets the selected channel.
+        /// </summary>
+        public ChannelMetadataViewModel SelectedChannel
+        {
+            get { return _selectedChannel; }
+            set
+            {
+                if (ReferenceEquals(_selectedChannel, value)) return;
+                _selectedChannel = value;
+                NotifyOfPropertyChange(() => SelectedChannel);
+            }
+        }
+
+        /// <summary>
+        /// Toggles the selected channel.
+        /// </summary>
+        public void ToggleSelectedChannel()
+        {
+            if (SelectedChannel == null) return;
+            SelectedChannel.IsChecked = !SelectedChannel.IsChecked;
+        }
 
         /// <summary>
         /// Sets the type of channel streaming.
@@ -223,7 +250,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             }
 
             var channelIds = Channels
-                .Select(x => x.ChannelId)
+                .Select(x => x.Record.ChannelId)
                 .ToArray();
 
             Parent.Client.Handler<IChannelStreamingConsumer>()
@@ -241,9 +268,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 return;
             }
 
-            var rangeInfo = new ChannelRangeInfo()
+            var rangeInfo = new ChannelRangeInfo
             {
-                ChannelId = Channels.Select(x => x.ChannelId).ToArray()
+                ChannelId = Channels.Select(x => x.Record.ChannelId).ToArray()
             };
 
             try
@@ -314,16 +341,16 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             // add to channel metadata collection
             e.Message.Channels.ForEach(x =>
             {
-                if (Channels.Any(c => c.ChannelUri.EqualsIgnoreCase(x.ChannelUri)))
+                if (Channels.Any(c => c.Record.ChannelUri.EqualsIgnoreCase(x.ChannelUri)))
                     return;
 
-                Channels.Add(x);
+                Channels.Add(new ChannelMetadataViewModel(x));
                 ChannelStreamingInfos.Add(ToChannelStreamingInfo(x));
             });
 
             if (e.Header.MessageFlags != (int)MessageFlags.MultiPart)
             {
-                LogChannelMetadata(Channels);
+                LogChannelMetadata(Channels.Select(c => c.Record).ToArray());
             }
         }
 
@@ -384,6 +411,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         private int GetScale()
         {
             return Channels
+                .Select(c => c.Record)
                 .FirstOrDefault()?
                 .Indexes.FirstOrDefault()?
                 .Scale ?? 0; // Default to no scale of no index is found.;
@@ -430,11 +458,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             {
                 for (int i=0; i<dataItems.Count; i+=2)
                 {
-                    var valueChannel = Channels.FirstOrDefault(c => c.ChannelId == dataItems[i + 1].ChannelId);
+                    var valueChannel = Channels.FirstOrDefault(c => c.Record.ChannelId == dataItems[i + 1].ChannelId);
 
                     Parent.Details.Append(string.Format(
                         "[ \"{0}\", {1}, {2} ],{3}",
-                        valueChannel?.ChannelName,
+                        valueChannel?.Record.ChannelName,
                         dataItems[i].Value.Item,
                         dataItems[i + 1].Value.Item,
                         Environment.NewLine));
@@ -444,10 +472,10 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             {
                 var dataValues = string.Join(Environment.NewLine, dataItems.Select(x =>
                 {
-                    var valueChannel = Channels.FirstOrDefault(c => c.ChannelId == x.ChannelId);
+                    var valueChannel = Channels.FirstOrDefault(c => c.Record.ChannelId == x.ChannelId);
 
                     return string.Format("[ \"{0}\", {1}, {2} ] // Channel ID: {3}",
-                        valueChannel?.ChannelName,
+                        valueChannel?.Record.ChannelName,
                         x.Indexes.FirstOrDefault(),
                         x.Value.Item,
                         x.ChannelId);

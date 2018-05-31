@@ -5,9 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-             xmlns:local="clr-namespace:PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Views"
              xmlns:conv="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters;assembly=PDS.WITSMLstudio.Desktop.Core"
-             mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="300"
+             mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="450"
              FocusManager.FocusedElement="{x:Reference MaxDataItemsInput}">
 
     <UserControl.Resources>
@@ -47,9 +46,42 @@
         <Button x:Name="AddUri" Grid.Row="2" Grid.Column="2" Margin="5" Content="Add" Width="40" HorizontalAlignment="Right" />
 
         <TextBlock Grid.Row="3" Grid.Column="0" Text="URI List:" Margin="10,5,5,5" HorizontalAlignment="Left" VerticalAlignment="Bottom" />
-        
-        <ListBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" ItemsSource="{Binding Model.Streaming.Uris}"
-                 cal:Message.Attach="[Event KeyUp] = [Action OnKeyUp($source, $eventArgs)]" />
+
+        <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*" MinHeight="40" />
+                <RowDefinition Height="3*" MinHeight="60" />
+            </Grid.RowDefinitions>
+            
+            <ListBox Grid.Row="0" Margin="0,0,0,5" ItemsSource="{Binding Model.Streaming.Uris}"
+                     cal:Message.Attach="[Event KeyUp] = [Action OnKeyUp($source, $eventArgs)]" />
+
+            <DataGrid Grid.Row="1" Style="{StaticResource DefaultGridStyle}" AutoGenerateColumns="False" FrozenColumnCount="1"
+                      ItemsSource="{Binding Channels}" SelectedItem="{Binding SelectedChannel, Mode=TwoWay}">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="" Width="25" CanUserResize="False">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsChecked}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="ID" Binding="{Binding Record.ChannelId}" />
+                    <DataGridTextColumn Header="Name" Binding="{Binding Record.ChannelName}" />
+                    <DataGridTextColumn Header="Unit" Binding="{Binding Record.Uom}" />
+                    <DataGridTextColumn Header="Data Type" Binding="{Binding Record.DataType}" />
+                    <DataGridTextColumn Header="Index Name" Binding="{Binding Record.Indexes[0].Mnemonic}" />
+                    <DataGridTextColumn Header="Index Unit" Binding="{Binding Record.Indexes[0].Uom}" />
+                    <DataGridTextColumn Header="Index Type" Binding="{Binding Record.Indexes[0].IndexType}" />
+                </DataGrid.Columns>
+                <DataGrid.InputBindings>
+                    <KeyBinding Key="Enter" Command="{Binding ToggleChannelCommand}" />
+                    <KeyBinding Key="Space" Command="{Binding ToggleChannelCommand}" />
+                </DataGrid.InputBindings>
+            </DataGrid>
+
+            <GridSplitter Grid.Row="0" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="Transparent" />
+        </Grid>
 
         <StackPanel Grid.Row="5" Grid.ColumnSpan="4" Orientation="Horizontal" VerticalAlignment="Center">
             <RadioButton x:Name="LatestValueButton" Content="Latest Value" IsChecked="True" Margin="20,0,0,0" cal:Message.Attach="SetStreamingType('LatestValue')" />
