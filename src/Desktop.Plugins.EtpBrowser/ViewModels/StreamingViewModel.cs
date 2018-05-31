@@ -413,6 +413,14 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 headers,
                 units,
                 Environment.NewLine));
+
+            var crlf = Environment.NewLine + Environment.NewLine;
+
+            var dataObjects = string.Join(crlf, channels
+                .Select(x => x.DomainObject?.GetString())
+                .Where(x => !string.IsNullOrWhiteSpace(x)));
+
+            Parent.DataObject.SetText(dataObjects);
         }
 
         private void LogChannelData(IList<DataItem> dataItems)

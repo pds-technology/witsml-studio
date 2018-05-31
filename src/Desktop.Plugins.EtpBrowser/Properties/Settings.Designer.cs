@@ -43,7 +43,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        [global::System.Configuration.DefaultSettingValueAttribute("10000")]
         public int ChannelStreamingDefaultMaxDataItems {
             get {
                 return ((int)(this["ChannelStreamingDefaultMaxDataItems"]));
@@ -52,7 +52,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
         public int ChannelStreamingDefaultMaxMessageRate {
             get {
                 return ((int)(this["ChannelStreamingDefaultMaxMessageRate"]));

@@ -80,13 +80,13 @@
                    Visibility="{Binding IsChecked, ElementName=TimeIndexButton, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         <xctk:DateTimePicker Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
                              Visibility="{Binding IsChecked, ElementName=TimeIndexButton, Converter={StaticResource BooleanToVisibilityConverter}}"
-                             Value="{Binding Model.Streaming.StartTime}" Kind="Utc" ShowButtonSpinner="False" />
+                             Value="{Binding Model.Streaming.StartTime}" Kind="Utc" ShowButtonSpinner="False" Format="UniversalSortableDateTime" />
 
         <TextBlock Grid.Row="7" Grid.Column="0" Text="End Time:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center"
                    Visibility="{Binding IsChecked, ElementName=TimeIndexButton, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         <xctk:DateTimePicker Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center"
                              Visibility="{Binding IsChecked, ElementName=TimeIndexButton, Converter={StaticResource BooleanToVisibilityConverter}}"
-                             Value="{Binding Model.Streaming.EndTime}" Kind="Utc" ShowButtonSpinner="False" />
+                             Value="{Binding Model.Streaming.EndTime}" Kind="Utc" ShowButtonSpinner="False" Format="UniversalSortableDateTime" />
 
         <StackPanel Grid.Row="9" Grid.ColumnSpan="3" Margin="5,0,5,5" Orientation="Horizontal">
             <Button x:Name="Start" Content="Start" IsEnabled="{Binding CanStart}" Margin="0,0,5,0" Width="65" />

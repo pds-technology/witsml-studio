@@ -45,6 +45,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
         {
             SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
             IsAuthenticationBasic = true;
+            PreAuthenticate = true;
             ProxyPort = 80;
             RedirectPort = 9005;
             SubProtocol = EtpSettings.EtpSubProtocolName;
