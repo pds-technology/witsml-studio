@@ -847,8 +847,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
             // Check if there is an embedded item attribute
             indexData = indexData["item"] ?? indexData;
+
             // Only process long index value types
-            if (indexData["long"] == null) return;
+            if (!indexData.HasValues || indexData["long"] == null) return;
 
             FormatIndex(indexMetadata, indexData, indexData.Value<long>("long"));
         }

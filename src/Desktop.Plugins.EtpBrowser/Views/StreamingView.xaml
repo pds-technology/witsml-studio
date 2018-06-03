@@ -62,11 +62,18 @@
                     <DataGridTemplateColumn Header="" Width="25" CanUserResize="False">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <CheckBox IsChecked="{Binding IsChecked}" />
+                                <CheckBox IsChecked="{Binding Path=IsChecked, UpdateSourceTrigger=PropertyChanged}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="ID" Binding="{Binding Record.ChannelId}" />
+                    <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Record.ChannelId}" />
+                    <DataGridTemplateColumn Header="Notify?" CanUserResize="True">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding Path=ReceiveChangeNotification, UpdateSourceTrigger=PropertyChanged}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn Header="Name" Binding="{Binding Record.ChannelName}" />
                     <DataGridTextColumn Header="Unit" Binding="{Binding Record.Uom}" />
                     <DataGridTextColumn Header="Data Type" Binding="{Binding Record.DataType}" />

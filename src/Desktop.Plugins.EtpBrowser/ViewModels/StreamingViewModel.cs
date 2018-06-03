@@ -44,6 +44,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
     {
         private const string UnscaledIndexMessage = "Unscaled index values are required";
         private const string ErrorSettingIndexMessage = "Error setting indexes for range request";
+        private const string NoChannelsSelectedMessage = "No channels selected for {0}";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StreamingViewModel"/> class.
@@ -221,6 +222,22 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             // Prepare ChannelStreamingInfos startIndexes
             try
             {
+                ChannelStreamingInfos.Clear();
+                
+                // Create a list of ChannelStreamingInfos only for selected, described channels.
+                Channels
+                    .Where(c => c.IsChecked)
+                    .Select(c => ToChannelStreamingInfo(c.Record, c.ReceiveChangeNotification))
+                    .ToList()
+                    .ForEach(x => ChannelStreamingInfos.Add(x));
+
+                // If no channels were selected display a warning message
+                if (!ChannelStreamingInfos.Any())
+                {
+                    Runtime.ShowWarning(string.Format(NoChannelsSelectedMessage, "Streaming Start"));
+                    return;
+                }
+
                 ChannelStreamingInfos.ForEach(x => x.StartIndex = new StreamingStartIndex { Item = GetStreamingStartValue() });
             }
             catch (OverflowException ex)
@@ -249,9 +266,18 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 return;
             }
 
+            // Create an array of channel ids for selected, described channels.
             var channelIds = Channels
+                .Where(c => c.IsChecked)
                 .Select(x => x.Record.ChannelId)
                 .ToArray();
+
+            // If no channels were selected display a warning message
+            if (!channelIds.Any())
+            {
+                Runtime.ShowWarning(string.Format(NoChannelsSelectedMessage, "Streaming Stop"));
+                return;
+            }
 
             Parent.Client.Handler<IChannelStreamingConsumer>()
                 .ChannelStreamingStop(channelIds);
@@ -268,9 +294,19 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 return;
             }
 
+            var channelIds = Channels
+                .Where(c => c.IsChecked)
+                .Select(x => x.Record.ChannelId).ToArray();
+
+            if (!channelIds.Any())
+            {
+                Runtime.ShowWarning(string.Format(NoChannelsSelectedMessage, "Range Request"));
+                return;
+            }
+
             var rangeInfo = new ChannelRangeInfo
             {
-                ChannelId = Channels.Select(x => x.Record.ChannelId).ToArray()
+                ChannelId = channelIds
             };
 
             try
@@ -345,7 +381,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                     return;
 
                 Channels.Add(new ChannelMetadataViewModel(x));
-                ChannelStreamingInfos.Add(ToChannelStreamingInfo(x));
             });
 
             if (e.Header.MessageFlags != (int)MessageFlags.MultiPart)
@@ -361,7 +396,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 LogChannelData(e.Message.Data);
         }
 
-        private ChannelStreamingInfo ToChannelStreamingInfo(ChannelMetadataRecord channel)
+        private ChannelStreamingInfo ToChannelStreamingInfo(ChannelMetadataRecord channel, bool receiveChangeNotification)
         {
             return new ChannelStreamingInfo()
             {
@@ -369,7 +404,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 StartIndex = new StreamingStartIndex()
                 {
                     Item = GetStreamingStartValue()
-                }
+                },
+                ReceiveChangeNotification = receiveChangeNotification
             };
         }
 

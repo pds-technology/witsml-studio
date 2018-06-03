@@ -56,5 +56,24 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
                 NotifyOfPropertyChange(() => IsChecked);
             }
         }
+
+        private bool _receiveChangeNotification;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether [receive change notification].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if receive change notification is requested; otherwise, <c>false</c>.
+        /// </value>
+        public bool ReceiveChangeNotification
+        {
+            get { return _receiveChangeNotification; }
+            set
+            {
+                if (_receiveChangeNotification == value) return;
+                _receiveChangeNotification = value;
+                NotifyOfPropertyChange(() => ReceiveChangeNotification);
+            }
+        }
     }
 }
