@@ -57,7 +57,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
             }
         }
 
-        private bool _receiveChangeNotification;
+        private bool _receiveChangeNotification = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether [receive change notification].

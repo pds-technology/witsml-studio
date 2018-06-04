@@ -366,6 +366,18 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             handler.OnChannelData -= OnChannelData;
         }
 
+        /// <summary>
+        /// Called when checkbox in ID column of channels datagrid is checked or unchecked.
+        /// </summary>
+        /// <param name="isSelected">if set to <c>true</c> if all channels should be selected, <c>false</c> if channels should be unselected.</param>
+        public void OnChannelSelection(bool isSelected)
+        {
+            foreach (var channelMetadataViewModel in Channels)
+            {
+                channelMetadataViewModel.IsChecked = isSelected;
+            }
+        }
+
         private void OnChannelMetadata(object sender, ProtocolEventArgs<ChannelMetadata> e)
         {
             if (!e.Message.Channels.Any())

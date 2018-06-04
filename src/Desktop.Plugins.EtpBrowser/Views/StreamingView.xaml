@@ -59,7 +59,10 @@
             <DataGrid Grid.Row="1" Style="{StaticResource DefaultGridStyle}" AutoGenerateColumns="False" FrozenColumnCount="1"
                       ItemsSource="{Binding Channels}" SelectedItem="{Binding SelectedChannel, Mode=TwoWay}">
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="" Width="25" CanUserResize="False">
+                    <DataGridTemplateColumn Width="40" CanUserResize="False">
+                        <DataGridTemplateColumn.Header>
+                            <CheckBox cal:Message.Attach="OnChannelSelection($this)" ToolTip="Toggle channel selection"/>
+                        </DataGridTemplateColumn.Header>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <CheckBox IsChecked="{Binding Path=IsChecked, UpdateSourceTrigger=PropertyChanged}" />
@@ -67,7 +70,13 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                     <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Record.ChannelId}" />
-                    <DataGridTemplateColumn Header="Notify?" CanUserResize="True">
+                    <DataGridTemplateColumn Header="Notify?" CanUserResize="True" SortMemberPath="ReceiveChangeNotification">
+                        <DataGridTemplateColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}">
+                                <Setter Property="ToolTip" Value="Receive change notifications" />
+                                <Setter Property="FontWeight" Value="Bold" />
+                            </Style>
+                        </DataGridTemplateColumn.HeaderStyle>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <CheckBox IsChecked="{Binding Path=ReceiveChangeNotification, UpdateSourceTrigger=PropertyChanged}" />
