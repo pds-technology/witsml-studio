@@ -70,6 +70,9 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                     <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Record.ChannelId}" />
+                    <DataGridTextColumn Header="Name" Binding="{Binding Record.ChannelName}" />
+                    <DataGridTextColumn Header="Unit" Binding="{Binding Record.Uom}" />
+                    <DataGridTextColumn Header="Data Type" Binding="{Binding Record.DataType}" />
                     <DataGridTemplateColumn Header="Notify?" CanUserResize="True" SortMemberPath="ReceiveChangeNotification">
                         <DataGridTemplateColumn.HeaderStyle>
                             <Style TargetType="{x:Type DataGridColumnHeader}">
@@ -83,9 +86,6 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="Name" Binding="{Binding Record.ChannelName}" />
-                    <DataGridTextColumn Header="Unit" Binding="{Binding Record.Uom}" />
-                    <DataGridTextColumn Header="Data Type" Binding="{Binding Record.DataType}" />
                     <DataGridTextColumn Header="Index Name" Binding="{Binding Record.Indexes[0].Mnemonic}" />
                     <DataGridTextColumn Header="Index Unit" Binding="{Binding Record.Indexes[0].Uom}" />
                     <DataGridTextColumn Header="Index Type" Binding="{Binding Record.Indexes[0].IndexType}" />
