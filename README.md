@@ -1,4 +1,4 @@
-## WITSML Studio
+## PDS WITSMLstudio Desktop
 
 **Quick Links:**&nbsp;
 [Blog](https://witsml.pds.technology/blog) |
@@ -9,38 +9,39 @@
 
 > **Note:** Be sure to perform a recursive clone of the repository to retrieve the `witsml` submodule.
 
-The "PDS.Witsml.Studio" solution builds PDS WITSML Studio, a Windows desktop application written in C# and WPF using plug-in technology that can connect to any WITSML server via SOAP or ETP. It contains the following projects: 
+The "PDS.WITSMLstudio.Desktop" solution builds PDS WITSMLstudio Desktop, a Windows desktop application written in C# and WPF using plug-in technology that can connect to any WITSML server via SOAP or ETP. It contains the following projects: 
 
-##### PDS.Witsml.Studio
-Provides the main application user interface for PDS WITSML Studio.
+##### Desktop
+Provides the main application user interface for PDS WITSMLstudio Desktop.
 
-##### PDS.Witsml.Core
+##### Desktop.Core
 A collection of reusable components and plug-in framework.
 
-##### PDS.Witsml.Studio.IntegrationTest
+##### Desktop.IntegrationTest
 Contains integration tests for the WITSML Browser plug-in and core functionality.
 
-##### PDS.Witsml.Studio.DataReplay
+##### Desktop.Plugins.DataReplay
 Data Producer plug-in that simulates streaming data in and out of a WITSML server.
 
-##### PDS.Witsml.Studio.EtpBrowser
+##### Desktop.Plugins.EtpBrowser
 ETP Browser plug-in to communicate with a WITSML server via ETP protocol.
 
-##### PDS.Witsml.Studio.ObjectInspector
+##### Desktop.Plugins.ObjectInspector
 Object Inspector plug-in that displays WITSML data objects with corresponding Energistics schema information.
 
-##### PDS.Witsml.Studio.WitsmlBrowser
+##### Desktop.Plugins.WitsmlBrowser
 WITSML Browser plug-in to communicate with a WITSML server via SOAP.
 
-##### PDS.Witsml.Studio.UnitTest
+##### Desktop.UnitTest
 Unit tests for the WITSML Browser and core functionality.
 
 ---
 
 ### Copyright and License
-Copyright &copy; 2016 Petrotechnical Data Systems
+Copyright &copy; 2018 PDS Americas LLC
 
-Released under the Apache License, Version 2.0
+Released under the PDS Open Source WITSML™ Product License Agreement
+http://www.pds.group/WITSMLstudio/OpenSource/ProductLicenseAgreement
 
 ---
 

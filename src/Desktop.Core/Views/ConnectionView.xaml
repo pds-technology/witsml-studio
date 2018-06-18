@@ -1,0 +1,246 @@
+﻿<Window x:Class="PDS.WITSMLstudio.Desktop.Core.Views.ConnectionView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:cal="http://www.caliburnproject.org"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:cmd="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Commands"
+        xmlns:conv="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters"
+        mc:Ignorable="d" Height="350" Width="600"
+        MinHeight="350" MinWidth="600"
+        FocusManager.FocusedElement="{x:Reference NameTextBox}"
+        cmd:KeyCommands.CloseOnEscape="True"
+        ResizeMode="CanResizeWithGrip">
+
+    <Window.Resources>
+        <conv:NullToBooleanConverter x:Key="NullToBooleanConverter" />
+        <conv:BooleanInverseConverter x:Key="BooleanInverseConverter" />
+        <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <Style x:Key="DialogButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="80"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="40" />
+        </Grid.RowDefinitions>
+
+        <!-- SelectedIndex="{Binding AuthenticationType}" -->
+        <TabControl Margin="5">
+            <TabItem Header="General">
+
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Name:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Name}" VerticalAlignment="Center" x:Name="NameTextBox" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="URL:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <TextBox Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Uri, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Authentication:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <StackPanel Grid.Row="3" Grid.Column="1" Margin="5" Orientation="Horizontal">
+                        <RadioButton Content="Basic" VerticalAlignment="Center" IsChecked="{Binding EditItem.IsAuthenticationBasic}" Margin="0,0,20,0" />
+                        <RadioButton Content="Bearer" VerticalAlignment="Center" IsChecked="{Binding EditItem.IsAuthenticationBearer}" Margin="0,0,10,0" />
+                        <Button x:Name="GetJsonWebToken"  Content="..." ToolTip="Click to retrieve a JSON Web Token from a Token Provider Service" VerticalAlignment="Center" Margin="0,0,120,0" Width="25" IsEnabled="{Binding EditItem.IsAuthenticationBearer}" />
+                        <CheckBox Content="Pre-Authenticate" VerticalAlignment="Center" IsChecked="{Binding EditItem.PreAuthenticate}"
+                                  IsEnabled="{Binding IsEtpConnection, Converter={StaticResource BooleanInverseConverter}}" />
+                    </StackPanel>
+
+                    <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding EditItem.IsAuthenticationBasic, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="40" />
+                            <RowDefinition Height="40" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="90" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="User Name:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                        <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Username, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Password:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                        <PasswordBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" PasswordChar="*" VerticalAlignment="Center"
+                                 cal:Message.Attach="[Event Loaded] = [Action OnPasswordLoaded($source)]; [Event PasswordChanged] = [Action OnPasswordChanged($source)]" />
+                    </Grid>
+
+                    <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding EditItem.IsAuthenticationBearer, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="40" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="90" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="JWT:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                        <TextBox Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Margin="5" Padding="5" Text="{Binding EditItem.JsonWebToken, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Stretch"
+                                 TextWrapping="Wrap" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Proxy">
+
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Host:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.ProxyHost, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Port:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <xctk:IntegerUpDown Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.ProxyPort}" Minimum="0" VerticalAlignment="Center"
+                                        IsEnabled="{Binding EditItem.IsProxyHostName}" />
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="User Name:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <TextBox Grid.Row="3" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.ProxyUsername, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Password:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <PasswordBox Grid.Row="4" Grid.Column="1" Margin="5" Padding="5" PasswordChar="*" VerticalAlignment="Center"
+                                 cal:Message.Attach="[Event Loaded] = [Action OnProxyPasswordLoaded($source)]; [Event PasswordChanged] = [Action OnProxyPasswordChanged($source)]" />
+
+                    <TextBlock Grid.Row="5" Grid.Column="0" Text="" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <CheckBox Grid.Row="5" Grid.Column="1" Margin="5,0,0,0" Content="Use Default Credentials" VerticalAlignment="Center"
+                              IsChecked="{Binding EditItem.ProxyUseDefaultCredentials}" />
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Security">
+
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="SSL Protocols:" Margin="5" VerticalAlignment="Top" HorizontalAlignment="Right" />
+                    <StackPanel Grid.Row="1" Grid.Column="1" Margin="5" Orientation="Vertical" VerticalAlignment="Top">
+                        <ListBox ItemsSource="{Binding SecurityProtocols}" Padding="5">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected, Mode=TwoWay}" IsEnabled="{Binding IsEnabled}" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <CheckBox Grid.Row="2" Grid.Column="1" Margin="5,0,0,0" Content="Accept Invalid Certificates" VerticalAlignment="Center"
+                              IsChecked="{Binding EditItem.AcceptInvalidCertificates}" />
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="WebSocket" Visibility="{Binding IsEtpConnection, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Sub-Protocol:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.SubProtocol, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Encoding:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <TextBox Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.EtpEncoding, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="OpenID" IsEnabled="False" Visibility="Collapsed">
+
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="85" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="1" Text="Name:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Name}" VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="URL:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <TextBox Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Uri, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Client ID:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <TextBox Grid.Row="3" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.ClientId}" VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Redirect Port:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <xctk:IntegerUpDown Grid.Row="4" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.RedirectPort}" Minimum="0" VerticalAlignment="Center" />
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <Button x:Name="TestConnection" Grid.Row="1" Grid.Column="0" Style="{StaticResource DialogButtonStyle}" Content="Test" HorizontalAlignment="Left"
+                IsEnabled="{Binding CanTestConnection}" />
+
+        <StackPanel Grid.Row="1" Margin="90,5,5,5" HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
+            <Image Margin="5,0,5,0" Source="../Images/StatusInvalid_16x.png" Visibility="{Binding IsTestFailure, Converter={StaticResource BooleanToVisibilityConverter}}" Height="16" Width="16" />
+            <Image Margin="5,0,5,0" Source="../Images/StatusOK_16x.png" Visibility="{Binding IsTestSuccess, Converter={StaticResource BooleanToVisibilityConverter}}" Height="16" Width="16" />
+
+            <TextBlock Text="Connection successful" Visibility="{Binding IsTestSuccess, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            <TextBlock cal:Message.Attach="[Event MouseLeftButtonUp] = [Action OpenLogFile]" Foreground="Blue" Visibility="{Binding IsTestFailure, Converter={StaticResource BooleanToVisibilityConverter}}" >
+                <Underline Cursor="Hand">Connection Failed</Underline>
+            </TextBlock>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="Accept" Style="{StaticResource DialogButtonStyle}" Content="OK" IsEnabled="{Binding CanTestConnection}" />
+            <Button x:Name="Cancel" Style="{StaticResource DialogButtonStyle}" Content="Cancel" />
+        </StackPanel>
+    </Grid>
+</Window>

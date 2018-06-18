@@ -1,11 +1,14 @@
-PDS.Witsml.Studio, 2016.1
-Copyright 2016 Petrotechnical Data Systems
+﻿PDS WITSMLstudio Desktop, 2018.2
+Copyright 2018 PDS Americas LLC
 
-PDS.Witsml.Studio incorporates ETP, WITSML™, PRODML™ and RESQML™ technology and standards
+PDS WITSMLstudio Desktop incorporates ETP, WITSML™, PRODML™ and RESQML™ technology and standards
 provided by the Energistics Consortium, Inc.  Energistics®, WITSML™, PRODML™, RESQML™ and
 their logos are trademarks or registered trademarks of Energistics Consortium, Inc.
 
 Third Party Software
+
+PDS
+This product uses open source WITSML™ technology developed by PDS
 
 Energistics 
 The following Energistics © products were used in the creation of this work: 
@@ -47,7 +50,7 @@ The application source code is published here:
   https://github.com/pds-technology/witsml-studio
 
 The application is published here:
-  https://witsml.pds.technology/studio
+  https://witsml.pds.technology/studio/click-once
   
 In accordance with US Export Administration Regulations (EAR) Section 742.15(b), this
 application is not subject to EAR:
