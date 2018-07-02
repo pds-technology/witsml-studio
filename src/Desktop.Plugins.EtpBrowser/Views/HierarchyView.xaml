@@ -29,8 +29,8 @@
             </TextBox.InputBindings>
         </TextBox>
         <Button x:Name="GetBaseUri" Grid.Row="0" Grid.Column="2" Margin="5,0,0,10" Content="Get" Width="40" HorizontalAlignment="Right" IsEnabled="{Binding CanExecute}" />
-        
-        <TreeView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" ItemsSource="{Binding Parent.Resources}" cal:Message.Attach="[Event SelectedItemChanged] = [Action RefreshContextMenu()]">
+
+        <TreeView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" ItemsSource="{Binding Parent.Resources}" cal:Message.Attach="[Event SelectedItemChanged] = [Action RefreshContextMenu()]" VirtualizingStackPanel.IsVirtualizing="True"  VirtualizingStackPanel.VirtualizationMode="Recycling">
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
