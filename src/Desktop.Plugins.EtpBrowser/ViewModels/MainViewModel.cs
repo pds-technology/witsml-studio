@@ -29,6 +29,7 @@ using Energistics;
 using Energistics.Common;
 using Energistics.Datatypes;
 using Energistics.Datatypes.Object;
+using Energistics.Protocol;
 using Energistics.Protocol.ChannelStreaming;
 using Energistics.Protocol.Core;
 using Energistics.Protocol.Discovery;
@@ -45,6 +46,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PDS.WITSMLstudio.Desktop.Core;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models;
+using EtpSettings = Energistics.Common.EtpSettings;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 {
@@ -62,6 +65,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
         private readonly ConcurrentDictionary<int, JToken> _channels;
         private DateTimeOffset _dateReceived;
+        private EtpClient _client;
+        private EtpSession _server;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainViewModel" /> class.
@@ -84,7 +89,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
             Details = new TextEditorViewModel(runtime, "JavaScript", true)
             {
-                ShowWriteSettings = true
+                ShowWriteSettings = true,
+                IsScrollingEnabled = true
             };
             Messages = new TextEditorViewModel(runtime, "JavaScript", true)
             {
@@ -148,7 +154,10 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <value>The checked resources.</value>
         public IEnumerable<ResourceViewModel> CheckedResources => Resources.FindChecked();
 
-        private EtpClient _client;
+        /// <summary>
+        /// Gets the ETP socket server instance.
+        /// </summary>
+        public EtpSocketServer SocketServer { get; private set; }
 
         /// <summary>
         /// Gets or sets the currently active <see cref="EtpClient"/> instance.
@@ -166,6 +175,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 NotifyOfPropertyChange(() => Client);
             }
         }
+
+        /// <summary>
+        /// Gets the currently active <see cref="IEtpSession"/> instance.
+        /// </summary>
+        /// <value>The ETP client instance.</value>
+        public EtpSession Session => _client ?? _server;
 
         private TextEditorViewModel _details;
 
@@ -233,7 +248,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <returns>The message identifier.</returns>
         public Task<long> GetResources(string uri, ResourceViewModel parent = null)
         {
-            var result = Client.Handler<IDiscoveryCustomer>()
+            var result = Session.Handler<IDiscoveryCustomer>()
                 .GetResources(uri);
 
             return Task.FromResult(result);
@@ -256,7 +271,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <param name="uri">The URI.</param>
         public void SendGetObject(string uri)
         {
-            Client.Handler<IStoreCustomer>()
+            Session.Handler<IStoreCustomer>()
                 .GetObject(uri);
         }
 
@@ -286,7 +301,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <param name="uri">The URI.</param>
         public void SendDeleteObject(string uri)
         {
-            Client.Handler<IStoreCustomer>()
+            Session.Handler<IStoreCustomer>()
                 .DeleteObject(uri);
         }
 
@@ -327,6 +342,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             if (close)
             {
                 CloseEtpClient();
+                CloseEtpServer();
             }
 
             base.OnDeactivate(close);
@@ -411,6 +427,112 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
+        /// Initializes the ETP client.
+        /// </summary>
+        public void InitEtpServer()
+        {
+            try
+            {
+                Runtime.Invoke(() => Runtime.Shell.StatusBarText = "Listening...");
+
+                var message = $"Listening for ETP connections on port {Model.PortNumber}...";
+                LogClientOutput(message, true);
+                _log.Debug(message);
+
+                SocketServer = new EtpSocketServer(Model.PortNumber, Model.ApplicationName, Model.ApplicationVersion);
+                SocketServer.SessionConnected += OnServerSessionConnected;
+                SocketServer.SessionClosed += OnServerSessionClosed;
+                SocketServer.Start();
+            }
+            catch (Exception ex)
+            {
+                Runtime.Invoke(() => Runtime.Shell.StatusBarText = "Error");
+                Runtime.ShowError("Error initializing ETP server.", ex);
+            }
+        }
+
+        private void OnServerSessionConnected(object sender, IEtpSession session)
+        {
+            var server = session as EtpSession;
+            if (server == null) return;
+
+            server.Output = LogClientOutput;
+            _server = server;
+
+            var message = $"[{server.SessionId}] ETP client connected.";
+            LogClientOutput(message, true);
+            _log.Debug(message);
+
+            RegisterProtocolHandlers(server);
+
+            RegisterEventHandlers(server.Handler<ICoreServer>(),
+                x => x.OnRequestSession += OnRequestSession,
+                x => x.OnCloseSession += OnCloseSession);
+
+        }
+
+        private void OnServerSessionClosed(object sender, IEtpSession session)
+        {
+            var server = session as EtpSession;
+            if (server == null) return;
+
+            var message = $"[{server.SessionId}] ETP client disconnected.";
+            LogClientOutput(message, true);
+            _log.Debug(message);
+
+            var header = new MessageHeader
+            {
+                Protocol = (int) Protocols.Core,
+                MessageType = (int) MessageTypes.Core.CloseSession
+            };
+
+            var closeSession = new CloseSession();
+
+            OnCloseSession(SocketServer, new ProtocolEventArgs<CloseSession>(header, closeSession));
+
+            if (server == _server)
+            {
+                _server = null;
+            }
+        }
+
+        private void OnRequestSession(object sender, ProtocolEventArgs<RequestSession> e)
+        {
+            var server = _server;
+
+            var header = new MessageHeader
+            {
+                Protocol = (int) Protocols.Core,
+                MessageType = (int) MessageTypes.Core.OpenSession,
+                CorrelationId = e.Header.MessageId
+            };
+
+            var openSession = new OpenSession
+            {
+                ApplicationName = Model.ApplicationName,
+                ApplicationVersion = Model.ApplicationVersion,
+                SupportedProtocols = server.GetSupportedProtocols(),
+                SupportedObjects = new List<string>(),
+                SessionId = server.SessionId
+            };
+
+            OnOpenSession(SocketServer, new ProtocolEventArgs<OpenSession>(header, openSession));
+        }
+
+        private void OnCloseSession(object sender, ProtocolEventArgs<CloseSession> e)
+        {
+            Runtime.Invoke(() =>
+            {
+                if (Runtime.Shell != null)
+                    Runtime.Shell.StatusBarText = "Connection Closed";
+            });
+
+            // notify child view models
+            Items.OfType<ISessionAware>()
+                .ForEach(x => x.OnSocketClosed());
+        }
+
+        /// <summary>
         /// Closes the ETP client.
         /// </summary>
         private void CloseEtpClient()
@@ -422,6 +544,21 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             Client = null;
 
             OnClientSocketClosed(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Closes the ETP client.
+        /// </summary>
+        private void CloseEtpServer()
+        {
+            if (SocketServer == null) return;
+
+            OnServerSessionClosed(this, _server);
+
+            SocketServer.SessionConnected -= OnServerSessionConnected;
+            SocketServer.SessionClosed -= OnServerSessionClosed;
+            SocketServer.Dispose();
+            SocketServer = null;
         }
 
         /// <summary>
@@ -603,8 +740,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             Details.SetText(string.Format(
                 "// Header:{2}{0}{2}{2}// Body:{2}{1}{2}",
-                Client.Serialize(e.Header, true),
-                Client.Serialize(e.Message, true),
+                Session.Serialize(e.Header, true),
+                Session.Serialize(e.Message, true),
                 Environment.NewLine));
         }
 
@@ -618,9 +755,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             Details.SetText(string.Format(
                 "// Header:{3}{0}{3}{3}// Body:{3}{1}{3}{3}// Context:{3}{2}{3}",
-                Client.Serialize(e.Header, true),
-                Client.Serialize(e.Message, true),
-                Client.Serialize(e.Context, true),
+                Session.Serialize(e.Header, true),
+                Session.Serialize(e.Message, true),
+                Session.Serialize(e.Context, true),
                 Environment.NewLine));
         }
 
@@ -897,7 +1034,15 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 .ToString("o");
         }
 
-        private void RegisterProtocolHandlers(EtpClient client)
+        private void RegisterProtocolHandlers(EtpSession client)
+        {
+            if (Model.IsEtpClient)
+                RegisterRequestedProtocolHandlers(client);
+            else
+                RegisterSupportedProtocolHandlers(client);
+        }
+
+        private void RegisterRequestedProtocolHandlers(EtpSession client)
         {
             if (Requesting(Protocols.ChannelStreaming, "producer"))
             {
@@ -927,33 +1072,168 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 RegisterEventHandlers(client.Handler<IDiscoveryCustomer>(),
                     x => x.OnGetResourcesResponse += OnGetResourcesResponse);
             }
+            if (Requesting(Protocols.Discovery, "customer"))
+            {
+                client.Register<IDiscoveryStore, DiscoveryStoreHandler>();
+                RegisterEventHandlers(client.Handler<IDiscoveryStore>(),
+                    x => x.OnGetResources += OnGetResources);
+            }
+
             if (Requesting(Protocols.Store, "store"))
             {
                 client.Register<IStoreCustomer, StoreCustomerHandler>();
                 RegisterEventHandlers(client.Handler<IStoreCustomer>(),
                     x => x.OnObject += OnObject);
             }
+            if (Requesting(Protocols.Store, "customer"))
+            {
+                client.Register<IStoreStore, StoreStoreHandler>();
+                RegisterEventHandlers(client.Handler<IStoreStore>());
+            }
+
             if (Requesting(Protocols.StoreNotification, "store"))
             {
                 client.Register<IStoreNotificationCustomer, StoreNotificationCustomerHandler>();
                 RegisterEventHandlers(client.Handler<IStoreNotificationCustomer>());
             }
+            if (Requesting(Protocols.StoreNotification, "customer"))
+            {
+                client.Register<IStoreNotificationStore, StoreNotificationStoreHandler>();
+                RegisterEventHandlers(client.Handler<IStoreNotificationStore>());
+            }
+
             if (Requesting(Protocols.GrowingObject, "store"))
             {
                 client.Register<IGrowingObjectCustomer, GrowingObjectCustomerHandler>();
                 RegisterEventHandlers(client.Handler<IGrowingObjectCustomer>(),
                     x => x.OnObjectFragment += OnObjectFragment);
             }
+            if (Requesting(Protocols.GrowingObject, "customer"))
+            {
+                client.Register<IGrowingObjectStore, GrowingObjectStoreHandler>();
+                RegisterEventHandlers(client.Handler<IGrowingObjectStore>());
+            }
+
             if (Requesting(Protocols.DataArray, "store"))
             {
                 client.Register<IDataArrayCustomer, DataArrayCustomerHandler>();
                 RegisterEventHandlers(client.Handler<IDataArrayCustomer>());
             }
+            if (Requesting(Protocols.DataArray, "customer"))
+            {
+                client.Register<IDataArrayStore, DataArrayStoreHandler>();
+                RegisterEventHandlers(client.Handler<IDataArrayStore>());
+            }
+
             if (Requesting(Protocols.WitsmlSoap, "store"))
             {
                 //client.Register<IWitsmlSoapCustomer, WitsmlSoapCustomerHandler>();
                 //RegisterEventHandlers(client.Handler<IWitsmlSoapCustomer>());
             }
+            if (Requesting(Protocols.WitsmlSoap, "customer"))
+            {
+                //client.Register<IWitsmlSoapStore, WitsmlSoapStoreHandler>();
+                //RegisterEventHandlers(client.Handler<IWitsmlSoapStore>());
+            }
+        }
+
+        private void RegisterSupportedProtocolHandlers(EtpSession client)
+        {
+            if (Requesting(Protocols.ChannelStreaming, "consumer"))
+            {
+                client.Register<IChannelStreamingConsumer, ChannelStreamingConsumerHandler>();
+                RegisterEventHandlers(client.Handler<IChannelStreamingConsumer>());
+            }
+            if (Requesting(Protocols.ChannelStreaming, "producer"))
+            {
+                client.Register<IChannelStreamingProducer, ChannelStreamingProducerHandler>();
+                RegisterEventHandlers(client.Handler<IChannelStreamingProducer>());
+            }
+
+            if (Requesting(Protocols.ChannelDataFrame, "consumer"))
+            {
+                client.Register<IChannelDataFrameConsumer, ChannelDataFrameConsumerHandler>();
+                RegisterEventHandlers(client.Handler<IChannelDataFrameConsumer>());
+            }
+            if (Requesting(Protocols.ChannelDataFrame, "producer"))
+            {
+                client.Register<IChannelDataFrameProducer, ChannelDataFrameProducerHandler>();
+                RegisterEventHandlers(client.Handler<IChannelDataFrameProducer>());
+            }
+
+            if (Requesting(Protocols.Discovery, "store"))
+            {
+                client.Register<IDiscoveryStore, DiscoveryStoreHandler>();
+                RegisterEventHandlers(client.Handler<IDiscoveryStore>(),
+                    x => x.OnGetResources += OnGetResources);
+            }
+            if (Requesting(Protocols.Discovery, "customer"))
+            {
+                client.Register<IDiscoveryCustomer, DiscoveryCustomerHandler>();
+                RegisterEventHandlers(client.Handler<IDiscoveryCustomer>(),
+                    x => x.OnGetResourcesResponse += OnGetResourcesResponse);
+            }
+
+            if (Requesting(Protocols.Store, "store"))
+            {
+                client.Register<IStoreStore, StoreStoreHandler>();
+                RegisterEventHandlers(client.Handler<IStoreStore>());
+            }
+            if (Requesting(Protocols.Store, "customer"))
+            {
+                client.Register<IStoreCustomer, StoreCustomerHandler>();
+                RegisterEventHandlers(client.Handler<IStoreCustomer>(),
+                    x => x.OnObject += OnObject);
+            }
+
+            if (Requesting(Protocols.StoreNotification, "store"))
+            {
+                client.Register<IStoreNotificationStore, StoreNotificationStoreHandler>();
+                RegisterEventHandlers(client.Handler<IStoreNotificationStore>());
+            }
+            if (Requesting(Protocols.StoreNotification, "customer"))
+            {
+                client.Register<IStoreNotificationCustomer, StoreNotificationCustomerHandler>();
+                RegisterEventHandlers(client.Handler<IStoreNotificationCustomer>());
+            }
+
+            if (Requesting(Protocols.GrowingObject, "store"))
+            {
+                client.Register<IGrowingObjectStore, GrowingObjectStoreHandler>();
+                RegisterEventHandlers(client.Handler<IGrowingObjectStore>());
+            }
+            if (Requesting(Protocols.GrowingObject, "customer"))
+            {
+                client.Register<IGrowingObjectCustomer, GrowingObjectCustomerHandler>();
+                RegisterEventHandlers(client.Handler<IGrowingObjectCustomer>(),
+                    x => x.OnObjectFragment += OnObjectFragment);
+            }
+
+            if (Requesting(Protocols.DataArray, "store"))
+            {
+                client.Register<IDataArrayStore, DataArrayStoreHandler>();
+                RegisterEventHandlers(client.Handler<IDataArrayStore>());
+            }
+            if (Requesting(Protocols.DataArray, "customer"))
+            {
+                client.Register<IDataArrayCustomer, DataArrayCustomerHandler>();
+                RegisterEventHandlers(client.Handler<IDataArrayCustomer>());
+            }
+
+            if (Requesting(Protocols.WitsmlSoap, "store"))
+            {
+                //client.Register<IWitsmlSoapStore, WitsmlSoapStoreHandler>();
+                //RegisterEventHandlers(client.Handler<IWitsmlSoapStore>());
+            }
+            if (Requesting(Protocols.WitsmlSoap, "customer"))
+            {
+                //client.Register<IWitsmlSoapCustomer, WitsmlSoapCustomerHandler>();
+                //RegisterEventHandlers(client.Handler<IWitsmlSoapCustomer>());
+            }
+        }
+
+        private void OnGetResources(object sender, ProtocolEventArgs<GetResources, IList<Resource>> e)
+        {
         }
 
         private THandler RegisterEventHandlers<THandler>(THandler handler, params Action<THandler>[] actions) where THandler : IProtocolHandler
@@ -984,6 +1264,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 {
                     // NOTE: dispose managed state (managed objects).
                     Client?.Dispose();
+                    SocketServer?.Dispose();
                 }
 
                 // NOTE: free unmanaged resources (unmanaged objects) and override a finalizer below.

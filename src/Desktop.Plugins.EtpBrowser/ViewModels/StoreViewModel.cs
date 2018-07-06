@@ -220,7 +220,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
                 dataObject.SetString(xml);
 
-                Parent.Client.Handler<IStoreCustomer>()
+                Parent.Session.Handler<IStoreCustomer>()
                     .PutObject(dataObject);
             }
             catch (Exception ex)

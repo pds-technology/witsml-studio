@@ -3,21 +3,23 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Views"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:conv="clr-namespace:PDS.WITSMLstudio.Desktop.Core.Converters;assembly=PDS.WITSMLstudio.Desktop.Core"
-             mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="300">
+             mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="600">
 
     <UserControl.Resources>
         <conv:NullToBooleanConverter x:Key="NullToBooleanConverter" />
+        <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="90"/>
             <ColumnDefinition />
             <ColumnDefinition Width="50"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="40" />
             <RowDefinition Height="40" />
             <RowDefinition Height="40" />
             <RowDefinition Height="40" />
@@ -26,17 +28,30 @@
             <RowDefinition Height="40" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Connection:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
-        <ContentControl x:Name="ConnectionPicker" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" />
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Role:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
+        <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal">
+            <RadioButton Content="Client" Margin="10,0,0,0" VerticalAlignment="Center" IsChecked="{Binding Model.IsEtpClient, Mode=TwoWay}" />
+            <RadioButton Content="Server" Margin="30,0,0,0" VerticalAlignment="Center" />
+        </StackPanel>
 
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="App Name:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
-        <TextBox Text="{Binding Model.ApplicationName}" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center" />
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Connection:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="{Binding Model.IsEtpClient, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        <ContentControl Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" x:Name="ConnectionPicker" Visibility="{Binding Model.IsEtpClient, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="App Version:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
-        <TextBox Text="{Binding Model.ApplicationVersion}" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" Margin="5" Padding="5" VerticalContentAlignment="Center" />
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Port Number:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="{Binding Model.IsEtpClient, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=True}" />
+        <xctk:IntegerUpDown Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Value="{Binding Model.PortNumber}" Minimum="0" Maximum="65535" Margin="5" Padding="5" VerticalContentAlignment="Center" Visibility="{Binding Model.IsEtpClient, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=True}" />
 
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="Protocols:" Margin="10,12,5,5" HorizontalAlignment="Right" VerticalAlignment="Top" />
-        <StackPanel Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Orientation="Vertical">
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="App Name:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
+        <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Model.ApplicationName}" Margin="5" Padding="5" VerticalContentAlignment="Center" />
+
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="App Version:" Margin="10,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Center" />
+        <TextBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Model.ApplicationVersion}" Margin="5" Padding="5" VerticalContentAlignment="Center" />
+
+        <StackPanel Grid.Row="4" Grid.Column="0" Margin="10,12,5,5" HorizontalAlignment="Right" VerticalAlignment="Top">
+            <TextBlock Text="Requested" HorizontalAlignment="Right" Margin="0,0,0,5" Visibility="{Binding Model.IsEtpClient, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            <TextBlock Text="Supported" HorizontalAlignment="Right" Margin="0,0,0,5" Visibility="{Binding Model.IsEtpClient, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=True}" />
+            <TextBlock Text="Protocols:" HorizontalAlignment="Right" />
+        </StackPanel>
+        <StackPanel Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Orientation="Vertical">
             <ListBox ItemsSource="{Binding EtpProtocols}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
@@ -46,15 +61,25 @@
             </ListBox>
         </StackPanel>
 
-        <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Orientation="Horizontal" HorizontalAlignment="Right"
-                    IsEnabled="{Binding Model.Connection.Uri, Converter={StaticResource NullToBooleanConverter}}">
-            
+        <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Orientation="Horizontal" HorizontalAlignment="Right"
+                    IsEnabled="{Binding Model.Connection.Uri, Converter={StaticResource NullToBooleanConverter}}"
+                    Visibility="{Binding Model.IsEtpClient, Converter={StaticResource BooleanToVisibilityConverter}}">
+
             <Button x:Name="RequestSession" Content="Request Session" Margin="5,0,0,0" Width="100" />
             <Button x:Name="CloseSession" Content="Close Session" Margin="5,0,0,0" Width="100" />
         </StackPanel>
 
         <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Orientation="Horizontal" HorizontalAlignment="Right"
-                    IsEnabled="{Binding Model.Connection.Uri, Converter={StaticResource NullToBooleanConverter}}">
+                    IsEnabled="{Binding Model.PortNumber, Converter={StaticResource NullToBooleanConverter}}"
+                    Visibility="{Binding Model.IsEtpClient, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=True}">
+
+            <Button x:Name="StartServer" Content="Start Server" Margin="5,0,0,0" Width="100" />
+            <Button x:Name="StopServer" Content="Stop Server" Margin="5,0,0,0" Width="100" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Orientation="Horizontal" HorizontalAlignment="Right"
+                    IsEnabled="{Binding Model.Connection.Uri, Converter={StaticResource NullToBooleanConverter}}"
+                    Visibility="{Binding Model.IsEtpClient, Converter={StaticResource BooleanToVisibilityConverter}}">
             
             <Button x:Name="ServerCapabilities" Content="Server Capabilities" Margin="5,0,0,0" Width="120" />
         </StackPanel>

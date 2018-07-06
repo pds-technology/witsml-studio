@@ -206,13 +206,13 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
         private void GrowingObjectGet()
         {
-            Parent.Client.Handler<IGrowingObjectCustomer>()
+            Parent.Session.Handler<IGrowingObjectCustomer>()
                 .GrowingObjectGet(Model.GrowingObject.Uri, Model.GrowingObject.Uid);
         }
 
         private void GrowingObjectGetRange()
         {
-            Parent.Client.Handler<IGrowingObjectCustomer>()
+            Parent.Session.Handler<IGrowingObjectCustomer>()
                 .GrowingObjectGetRange(Model.GrowingObject.Uri, Model.GrowingObject.StartIndex, Model.GrowingObject.EndIndex, string.Empty, string.Empty);
         }
 
@@ -221,19 +221,19 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             var dataObject = new DataObject();
             dataObject.SetString(Data.Document.Text, Model.GrowingObject.CompressDataObject);
 
-            Parent.Client.Handler<IGrowingObjectCustomer>()
+            Parent.Session.Handler<IGrowingObjectCustomer>()
                 .GrowingObjectPut(Model.GrowingObject.Uri, Model.GrowingObject.ContentType, dataObject.Data);
         }
 
         private void GrowingObjectDelete()
         {
-            Parent.Client.Handler<IGrowingObjectCustomer>()
+            Parent.Session.Handler<IGrowingObjectCustomer>()
                 .GrowingObjectDelete(Model.GrowingObject.Uri, Model.GrowingObject.Uid);
         }
 
         private void GrowingObjectDeleteRange()
         {
-            Parent.Client.Handler<IGrowingObjectCustomer>()
+            Parent.Session.Handler<IGrowingObjectCustomer>()
                 .GrowingObjectDeleteRange(Model.GrowingObject.Uri, Model.GrowingObject.StartIndex, Model.GrowingObject.EndIndex, string.Empty, string.Empty);
         }
     }

@@ -160,13 +160,13 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void Start()
         {
-            if (Parent.Client == null)
+            if (Parent.Session == null)
             {
                 LogSessionClientError();
                 return;
             }
 
-            Parent.Client.Handler<IChannelStreamingConsumer>()
+            Parent.Session.Handler<IChannelStreamingConsumer>()
                 .Start(Model.Streaming.MaxDataItems, Model.Streaming.MaxMessageRate);
 
             //Channels.Clear();
@@ -179,7 +179,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void Describe()
         {
-            if (Parent.Client == null)
+            if (Parent.Session == null)
             {
                 LogSessionClientError();
                 return;
@@ -204,7 +204,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 return;
             }
 
-            Parent.Client.Handler<IChannelStreamingConsumer>()
+            Parent.Session.Handler<IChannelStreamingConsumer>()
                 .ChannelDescribe(Model.Streaming.Uris);
         }
 
@@ -213,7 +213,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void StartStreaming()
         {
-            if (Parent.Client == null)
+            if (Parent.Session == null)
             {
                 LogSessionClientError();
                 return;
@@ -251,7 +251,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 return;
             }
 
-            Parent.Client.Handler<IChannelStreamingConsumer>()
+            Parent.Session.Handler<IChannelStreamingConsumer>()
                 .ChannelStreamingStart(ChannelStreamingInfos);
         }
 
@@ -260,7 +260,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void StopStreaming()
         {
-            if (Parent.Client == null)
+            if (Parent.Session == null)
             {
                 LogSessionClientError();
                 return;
@@ -279,7 +279,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 return;
             }
 
-            Parent.Client.Handler<IChannelStreamingConsumer>()
+            Parent.Session.Handler<IChannelStreamingConsumer>()
                 .ChannelStreamingStop(channelIds);
         }
 
@@ -288,7 +288,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void RequestRange()
         {
-            if (Parent.Client == null)
+            if (Parent.Session == null)
             {
                 LogSessionClientError();
                 return;
@@ -325,7 +325,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 return;
             }
 
-            Parent.Client.Handler<IChannelStreamingConsumer>()
+            Parent.Session.Handler<IChannelStreamingConsumer>()
                 .ChannelRangeRequest(new[] { rangeInfo });
         }
 
@@ -343,10 +343,10 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <param name="e">The <see cref="ProtocolEventArgs{OpenSession}" /> instance containing the event data.</param>
         public void OnSessionOpened(ProtocolEventArgs<OpenSession> e)
         {
-            if (!e.Message.SupportedProtocols.Any(x => x.Protocol == (int) Protocols.ChannelStreaming && x.Role == "producer"))
+            if (e.Message.SupportedProtocols.All(x => x.Protocol != (int) Protocols.ChannelStreaming))
                 return;
 
-            var handler = Parent.Client.Handler<IChannelStreamingConsumer>();
+            var handler = Parent.Session.Handler<IChannelStreamingConsumer>();
             handler.OnChannelMetadata += OnChannelMetadata;
             handler.OnChannelData += OnChannelData;
 
@@ -359,9 +359,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void OnSocketClosed()
         {
-            if (Parent.Client == null || !Parent.Client.CanHandle<IChannelStreamingConsumer>()) return;
+            if (Parent.Session == null || !Parent.Session.CanHandle<IChannelStreamingConsumer>()) return;
 
-            var handler = Parent.Client.Handler<IChannelStreamingConsumer>();
+            var handler = Parent.Session.Handler<IChannelStreamingConsumer>();
             handler.OnChannelMetadata -= OnChannelMetadata;
             handler.OnChannelData -= OnChannelData;
         }
@@ -520,13 +520,21 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             {
                 var dataValues = string.Join(Environment.NewLine, dataItems.Select(x =>
                 {
-                    var valueChannel = Channels.FirstOrDefault(c => c.Record.ChannelId == x.ChannelId);
+                    var channel = Channels.FirstOrDefault(c => c.Record.ChannelId == x.ChannelId);
+                    var channelIndex = channel?.Record.Indexes.FirstOrDefault();
+                    var isTimeIndex = channelIndex?.IndexType == ChannelIndexTypes.Time;
+                    var indexValue = x.Indexes.FirstOrDefault();
 
-                    return string.Format("[ \"{0}\", {1}, {2} ] // Channel ID: {3}",
-                        valueChannel?.Record.ChannelName,
-                        x.Indexes.FirstOrDefault(),
+                    var indexFormat = isTimeIndex
+                        ? DateTimeExtensions.FromUnixTimeMicroseconds(indexValue).ToString("o")
+                        : $"{indexValue.IndexFromScale(channelIndex?.Scale ?? 3)}";
+
+                    return string.Format("[ \"{0}\", {1}, {2} ] // Channel ID: {3} // {4}",
+                        channel?.Record.ChannelName,
+                        indexValue,
                         x.Value.Item,
-                        x.ChannelId);
+                        x.ChannelId,
+                        indexFormat);
                 }));
 
                 Parent.Details.Append(string.Format(

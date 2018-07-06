@@ -183,7 +183,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                     var header = JsonConvert.DeserializeObject<MessageHeader>(headerText);
                     var message = JsonConvert.DeserializeObject(messageText, SelectedMessageType.Value) as ISpecificRecord;
 
-                    Parent.Client.SendMessage(header, message);
+                    Parent.Session.SendMessage(header, message);
                 }
                 catch (Exception ex)
                 {
@@ -233,7 +233,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             _currentHeader = new MessageHeader
             {
-                MessageId = Parent.Client.NewMessageId()
+                MessageId = Parent.Session.NewMessageId()
             };
 
             OnHeaderChanged();
@@ -241,7 +241,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
         private void OnHeaderChanged()
         {
-            Header.SetText(Parent.Client.Serialize(_currentHeader, true));
+            Header.SetText(Parent.Session.Serialize(_currentHeader, true));
         }
 
         private void OnMessageTypeChanged()
@@ -252,7 +252,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             var type = SelectedMessageType.Value;
             var message = Activator.CreateInstance(type) as ISpecificRecord;
 
-            Message.SetText(Parent.Client.Serialize(message, true));
+            Message.SetText(Parent.Session.Serialize(message, true));
             UpdateCurrentHeader(message?.Schema);
         }
 

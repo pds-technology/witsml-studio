@@ -57,6 +57,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
             GrowingObjectFunction = Functions.GrowingObjectGet;
             RequestedProtocols = new BindableCollection<EtpProtocolItem>();
             BaseUri = EtpUri.RootUri;
+            IsEtpClient = true;
+            PortNumber = 9000;
         }
 
         private Connection _connection;
@@ -151,6 +153,38 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
                     _growingObject = value;
                     NotifyOfPropertyChange(() => GrowingObject);
                 }
+            }
+        }
+
+        private bool _isEtpClient;
+        /// <summary>
+        /// Gets or sets a value indicating whether the ETP client role is selected.
+        /// </summary>
+        [DataMember]
+        public bool IsEtpClient
+        {
+            get { return _isEtpClient; }
+            set
+            {
+                if (_isEtpClient == value) return;
+                _isEtpClient = value;
+                NotifyOfPropertyChange(() => IsEtpClient);
+            }
+        }
+
+        private int _portNumber;
+        /// <summary>
+        /// Gets or sets the port number.
+        /// </summary>
+        [DataMember]
+        public int PortNumber
+        {
+            get { return _portNumber; }
+            set
+            {
+                if (_portNumber == value) return;
+                _portNumber = value;
+                NotifyOfPropertyChange(() => PortNumber);
             }
         }
 

@@ -120,7 +120,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             _log.DebugFormat("Sending ETP Message for StoreNotification protocol: NotificationRequest");
 
-            Parent.Client.Handler<IStoreNotificationCustomer>()
+            Parent.Session.Handler<IStoreNotificationCustomer>()
                 .NotificationRequest(CreateNotificationRequest());
         }
 
@@ -134,7 +134,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             var request = _requests.FirstOrDefault(x => x.Uuid.EqualsIgnoreCase(Model.StoreNotification.Uuid));
             if (request == null) return;
 
-            Parent.Client.Handler<IStoreNotificationCustomer>()
+            Parent.Session.Handler<IStoreNotificationCustomer>()
                 .CancelNotification(request.Uuid);
 
             _requests.Remove(request);

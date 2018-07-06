@@ -60,11 +60,17 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 new EtpProtocolItem(Protocols.ChannelDataFrame, "consumer"),
                 new EtpProtocolItem(Protocols.ChannelDataFrame, "producer"),
                 new EtpProtocolItem(Protocols.Discovery, "store", true),
+                new EtpProtocolItem(Protocols.Discovery, "customer"),
                 new EtpProtocolItem(Protocols.Store, "store", true),
+                new EtpProtocolItem(Protocols.Store, "customer"),
                 new EtpProtocolItem(Protocols.StoreNotification, "store", true),
+                new EtpProtocolItem(Protocols.StoreNotification, "customer"),
                 new EtpProtocolItem(Protocols.GrowingObject, "store", true),
+                new EtpProtocolItem(Protocols.GrowingObject, "customer"),
                 new EtpProtocolItem(Protocols.DataArray, "store"),
+                new EtpProtocolItem(Protocols.DataArray, "customer"),
                 new EtpProtocolItem(Protocols.WitsmlSoap, "store", isEnabled: false),
+                new EtpProtocolItem(Protocols.WitsmlSoap, "customer", isEnabled: false),
             };
         }
 
@@ -145,6 +151,73 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             }
         }
 
+        private bool _canStartServer;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the Start Server button is enabled.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if Start Server is enabled; otherwise, <c>false</c>.
+        /// </value>
+        public bool CanStartServer
+        {
+            get { return _canStartServer; }
+            set
+            {
+                if (_canStartServer == value)
+                    return;
+
+                _canStartServer = value;
+                NotifyOfPropertyChange(() => CanStartServer);
+            }
+        }
+
+        private bool _canStopServer;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the Stop Server button is enabled.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if Stop Server is enabled; otherwise, <c>false</c>.
+        /// </value>
+        public bool CanStopServer
+        {
+            get { return _canStopServer; }
+            set
+            {
+                if (_canStopServer == value)
+                    return;
+
+                _canStopServer = value;
+                NotifyOfPropertyChange(() => CanStopServer);
+            }
+        }
+
+        /// <summary>
+        /// Requests a new ETP session.
+        /// </summary>
+        public void StartServer()
+        {
+            Model.RequestedProtocols.Clear();
+            Model.RequestedProtocols.AddRange(EtpProtocols.Where(x => x.IsSelected));
+            Parent.InitEtpServer();
+            CanRequestSession = false;
+            CanStartServer = !Parent.SocketServer?.IsRunning ?? true;
+            CanStopServer = !CanStartServer;
+        }
+
+        /// <summary>
+        /// Closes the current ETP session.
+        /// </summary>
+        public void StopServer()
+        {
+            Parent.SocketServer?.Stop();
+            CanStartServer = true;
+            CanStopServer = false;
+            CanCloseSession = false;
+            CanRequestSession = true;
+        }
+
         /// <summary>
         /// Requests a new ETP session.
         /// </summary>
@@ -161,8 +234,17 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void CloseSession()
         {
-            Parent.Client.Handler<ICoreClient>()
-                .CloseSession();
+            if (Parent.Session?.CanHandle<ICoreClient>() ?? false)
+            {
+                Parent.Session?.Handler<ICoreClient>()
+                    ?.CloseSession();
+            }
+
+            if (Parent.Session?.CanHandle<ICoreServer>() ?? false)
+            {
+                Parent.Session?.Handler<ICoreServer>()
+                    ?.CloseSession();
+            }
         }
 
         /// <summary>
@@ -186,12 +268,16 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             CanRequestSession = false;
             CanCloseSession = true;
+            CanStartServer = false;
+            CanStopServer = Parent.SocketServer?.IsRunning ?? false;
         }
 
         public void OnSocketClosed()
         {
-            CanRequestSession = true;
             CanCloseSession = false;
+            CanStartServer = !Parent.SocketServer?.IsRunning ?? true;
+            CanStopServer = !CanStartServer;
+            CanRequestSession = CanStartServer;
         }
 
         private void OnConnectionChanged(Connection connection)
@@ -199,7 +285,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             Model.Connection = connection;
             Model.Connection.SetServerCertificateValidation();
             Parent.OnConnectionChanged(false);
-            CanRequestSession = true;
+            CanStartServer = !Parent.SocketServer?.IsRunning ?? true;
+            CanStopServer = !CanStartServer;
+            CanRequestSession = !CanStopServer;
             CanCloseSession = false;
         }
 
@@ -216,7 +304,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
                 Parent.LogDetailMessage(
                     "Server Capabilites:",
-                    Parent.Client.Serialize(capabilities, true));
+                    Parent.Session.Serialize(capabilities, true));
 
                 return Task.FromResult(true);
             }
