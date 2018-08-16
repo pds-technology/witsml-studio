@@ -22,6 +22,7 @@ using Caliburn.Micro;
 using Energistics.Datatypes;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Properties;
+using PDS.WITSMLstudio.Framework;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
 {
@@ -46,12 +47,10 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
                 MaxDataItems = _defaultMaxDataItems,
                 MaxMessageRate = _defaultMaxMessageRate,
                 StreamingType = "LatestValue",
-                StartTime = DateTime.Now.ToUniversalTime(),
+                StartTime = DateTimeOffset.Now.TruncateToSeconds().UtcDateTime,
                 StartIndex = 0,
                 IndexCount = 10
             };
-            // Remove milliseconds from starting time
-            Streaming.StartTime = Streaming.StartTime - TimeSpan.FromMilliseconds(Streaming.StartTime.Millisecond);
             Store = new StoreSettings();
             StoreFunction = Functions.GetObject;
             StoreNotification = new StoreNotificationSettings();
