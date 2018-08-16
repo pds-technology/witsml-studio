@@ -50,6 +50,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
                 StartIndex = 0,
                 IndexCount = 10
             };
+            // Remove milliseconds from starting time
+            Streaming.StartTime = Streaming.StartTime - TimeSpan.FromMilliseconds(Streaming.StartTime.Millisecond);
             Store = new StoreSettings();
             StoreFunction = Functions.GetObject;
             StoreNotification = new StoreNotificationSettings();
