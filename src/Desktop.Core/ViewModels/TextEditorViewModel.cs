@@ -520,10 +520,39 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             var fileInfo = new FileInfo(FlushToFilePath);
 
-            if (!fileInfo.Exists)
-                File.WriteAllText(FlushToFilePath, string.Empty);
+            var errorMessage = string.Empty;
 
-            Process.Start(FlushToFilePath);
+            try
+            {
+                if (!fileInfo.Exists)
+                {
+                    try
+                    {
+                        File.WriteAllText(FlushToFilePath, string.Empty);
+                    }
+                    catch (Exception e)
+                    {
+                        errorMessage = $"Could not create file:{Environment.NewLine}{e.Message}";
+                        _log.Error(errorMessage);
+                        return;
+                    }
+                }
+
+                try
+                {
+                    Process.Start(FlushToFilePath);
+                }
+                catch (Exception e)
+                {
+                    errorMessage = $"Could not open file:{Environment.NewLine}{e.Message}";
+                    _log.Error(errorMessage);
+                }
+            }
+            finally
+            {
+                if (!string.IsNullOrWhiteSpace(errorMessage))
+                    Runtime.ShowError(errorMessage);
+            }
         }
 
         private void FlushToFile(string text)
@@ -531,7 +560,19 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             if (!ShowWriteSettings) return;
 
             if (!string.IsNullOrEmpty(FlushToFilePath))
-                File.AppendAllText(FlushToFilePath, $"{Environment.NewLine}{text}");
+            {
+                try
+                {
+                    if (File.Exists(FlushToFilePath))
+                        File.AppendAllText(FlushToFilePath, $"{Environment.NewLine}{text}");
+                    else
+                        File.WriteAllText(FlushToFilePath, $"{Environment.NewLine}{text}");
+                }
+                catch (Exception e)
+                {
+                    _log.Error($"Could not flush to file: {e.Message}");
+                }
+            }
 
             TruncateText();
         }
