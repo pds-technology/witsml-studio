@@ -169,7 +169,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 CurrentPluginIndex = Items.IndexOf(ActiveItem)
             };
 
-            File.WriteAllText(settingsPath, JsonConvert.SerializeObject(settings));
+            try
+            {
+                File.WriteAllText(settingsPath, JsonConvert.SerializeObject(settings));
+            }
+            catch (Exception e)
+            {
+                _log.Debug($"Could not save window placement: {e.Message}");
+            }
         }
 
         /// <summary>
