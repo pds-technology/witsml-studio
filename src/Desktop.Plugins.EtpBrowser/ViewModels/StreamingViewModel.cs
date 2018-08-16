@@ -171,7 +171,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
             //Channels.Clear();
             //ChannelStreamingInfos.Clear();
-            LogStartSession();
+            LogStartSession(Model.Streaming.MaxDataItems, Model.Streaming.MaxMessageRate);
         }
 
         /// <summary>
@@ -472,11 +472,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 Environment.NewLine));
         }
 
-        private void LogStartSession()
+        private void LogStartSession(int maxDataItems, int maxMessageRate)
         {
             Parent.Details.SetText(string.Format(
-                "// Channel Streaming session started.{0}{0}",
-                Environment.NewLine));
+                "// Channel Streaming session started. [maxMessageRate={1}, maxDataItems={2}]{0}{0}",
+                Environment.NewLine, maxMessageRate, maxDataItems));
         }
 
         private void LogChannelMetadata(IList<ChannelMetadataRecord> channels)
