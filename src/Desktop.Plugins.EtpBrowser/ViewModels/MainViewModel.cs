@@ -63,7 +63,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         private static readonly char[] _whiteSpace = Enumerable.Range(0, 20).Select(Convert.ToChar).ToArray();
         private const string GzipEncoding = "gzip";
 
-
         private readonly ConcurrentDictionary<int, JToken> _channels;
         private DateTimeOffset _dateReceived;
         private EtpClient _client;
