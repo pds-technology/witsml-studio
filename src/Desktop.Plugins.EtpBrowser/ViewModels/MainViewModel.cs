@@ -46,7 +46,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PDS.WITSMLstudio.Desktop.Core;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
-using PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models;
 using EtpSettings = Energistics.Common.EtpSettings;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
@@ -61,7 +60,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(MainViewModel));
         private static readonly string _pluginDisplayName = Settings.Default.PluginDisplayName;
         private static readonly string _pluginVersion = typeof(MainViewModel).GetAssemblyVersion();
+        private static readonly char[] _whiteSpace = Enumerable.Range(0, 20).Select(Convert.ToChar).ToArray();
         private const string GzipEncoding = "gzip";
+
 
         private readonly ConcurrentDictionary<int, JToken> _channels;
         private DateTimeOffset _dateReceived;
@@ -704,7 +705,10 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
             LogObjectDetails(e);
 
-            var data = dataObject.GetString();
+            var data = dataObject
+                .GetString()
+                .Trim(_whiteSpace);
+
             var uri = new EtpUri(dataObject.Resource.Uri);
             var isJson = EtpContentType.Json.EqualsIgnoreCase(uri.Format);
 
