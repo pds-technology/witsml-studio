@@ -20,52 +20,50 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energistics.Datatypes;
-using Energistics.Datatypes.ChannelData;
-using Energistics.Protocol.ChannelStreaming;
+using Energistics.Etp.Common.Datatypes;
+using Energistics.Etp.v11.Datatypes;
+using Energistics.Etp.v11.Datatypes.ChannelData;
+using Energistics.Etp.v11.Protocol.ChannelStreaming;
 using PDS.WITSMLstudio.Framework;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
 {
-    public class SimulationChannelStreamingProvider : ChannelStreamingProducerHandler
+    public class SimulationChannelStreaming11Provider : ChannelStreamingProducerHandler
     {
         private CancellationTokenSource _tokenSource;
 
-        public SimulationChannelStreamingProvider(Models.Simulation simulation)
+        public SimulationChannelStreaming11Provider(Models.Simulation simulation)
         {
             Simulation = simulation;
             IsSimpleStreamer = true;
         }
 
-        public Models.Simulation Simulation { get; private set; }
+        public Models.Simulation Simulation { get; }
 
-        protected override void HandleStart(MessageHeader header, Start start)
+        protected override void HandleStart(IMessageHeader header, Start start)
         {
             base.HandleStart(header, start);
-            ChannelMetadata(header, Simulation.Channels);
+            ChannelMetadata(header, Simulation.Channels.Cast<ChannelMetadataRecord>().ToList());
             StartSendingChannelData(header);
         }
 
-        protected override void HandleChannelStreamingStart(MessageHeader header, ChannelStreamingStart channelStreamingStart)
+        protected override void HandleChannelStreamingStart(IMessageHeader header, ChannelStreamingStart channelStreamingStart)
         {
             base.HandleChannelStreamingStart(header, channelStreamingStart);
             StartSendingChannelData(header);
         }
 
-        protected override void HandleChannelStreamingStop(MessageHeader header, ChannelStreamingStop channelStreamingStop)
+        protected override void HandleChannelStreamingStop(IMessageHeader header, ChannelStreamingStop channelStreamingStop)
         {
             base.HandleChannelStreamingStop(header, channelStreamingStop);
-
-            if (_tokenSource != null)
-                _tokenSource.Cancel();
+            _tokenSource?.Cancel();
         }
 
-        private void StartSendingChannelData(MessageHeader request)
+        private void StartSendingChannelData(IMessageHeader request)
         {
-            if (_tokenSource != null)
-                _tokenSource.Cancel();
-
+            _tokenSource?.Cancel();
             _tokenSource = new CancellationTokenSource();
+
             var token = _tokenSource.Token;
 
             Task.Run(async () =>
@@ -79,7 +77,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
             token);
         }
 
-        private async Task SendChannelData(MessageHeader request, CancellationToken token)
+        private async Task SendChannelData(IMessageHeader request, CancellationToken token)
         {
             while (true)
             {
@@ -97,7 +95,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
                             ChannelId = x.ChannelId,
                             Indexes = new long[0],
                             ValueAttributes = new DataAttribute[0],
-                            Value = new DataValue()
+                            Value = new DataValue
                             {
                                Item = DateTimeOffset.UtcNow.ToUnixTimeMicroseconds()
                             }

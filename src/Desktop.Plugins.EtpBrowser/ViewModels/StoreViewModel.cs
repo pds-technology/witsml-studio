@@ -22,13 +22,9 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Xml.Linq;
 using Caliburn.Micro;
-using Energistics.Common;
 using Energistics.DataAccess;
 using Energistics.DataAccess.WITSML200;
-using Energistics.Datatypes;
-using Energistics.Datatypes.Object;
-using Energistics.Protocol.Core;
-using Energistics.Protocol.Store;
+using Energistics.Etp.Common.Datatypes;
 using ICSharpCode.AvalonEdit.Document;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
@@ -51,7 +47,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public StoreViewModel(IRuntimeService runtime)
         {
             Runtime = runtime;
-            DisplayName = string.Format("{0:D} - {0}", Protocols.Store);
+            DisplayName = "Store";
             Data = new TextEditorViewModel(runtime, "XML")
             {
                 IsPrettyPrintAllowed = true
@@ -172,6 +168,20 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 case Functions.DeleteObject:
                     DeleteObject();
                     break;
+                case Functions.FindObjects:
+                    GetObject();
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Finds the specified resource's details using the StoreQuery protocol.
+        /// </summary>
+        public void FindObjects()
+        {
+            if (!string.IsNullOrWhiteSpace(Model.Store.Uri))
+            {
+                Parent.SendFindObjects(Model.Store.Uri);
             }
         }
 
@@ -195,33 +205,19 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
-        /// Sends the <see cref="Energistics.Protocol.Store.PutObject"/> message with the supplied XML string.
+        /// Sends the <see cref="PutObject"/> message with the supplied XML string.
         /// </summary>
         /// <param name="xml">The XML string.</param>
         public void SendPutObject(string xml)
         {
             try
             {
-                var uri = new EtpUri(Model.Store.Uri);
-
-                var dataObject = new DataObject()
-                {
-                    Resource = new Resource()
-                    {
-                        Uri = uri,
-                        Uuid = Model.Store.Uuid,
-                        Name = Model.Store.Name,
-                        HasChildren = -1,
-                        ContentType = Model.Store.ContentType,
-                        ResourceType = ResourceTypes.DataObject.ToString(),
-                        CustomData = new Dictionary<string, string>()
-                    }
-                };
-
-                dataObject.SetString(xml);
-
-                Parent.Session.Handler<IStoreCustomer>()
-                    .PutObject(dataObject);
+                Parent.EtpExtender.PutObject(
+                    Model.Store.Uri,
+                    Model.Store.Uuid,
+                    Model.Store.Name,
+                    xml,
+                    Model.Store.ContentType);
             }
             catch (Exception ex)
             {
@@ -274,6 +270,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                         return true;
                     case Functions.GetObject:
                     case Functions.DeleteObject:
+                    case Functions.FindObjects:
                         return false;
                     default:
                         return true;
@@ -298,19 +295,19 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
-        /// Called when the <see cref="OpenSession" /> message is recieved.
+        /// Called when the OpenSession message is recieved.
         /// </summary>
-        /// <param name="e">The <see cref="ProtocolEventArgs{OpenSession}" /> instance containing the event data.</param>
-        public void OnSessionOpened(ProtocolEventArgs<OpenSession> e)
+        /// <param name="supportedProtocols">The supported protocols.</param>
+        public void OnSessionOpened(IList<ISupportedProtocol> supportedProtocols)
         {
-            if (e.Message.SupportedProtocols.All(x => x.Protocol != (int) Protocols.Store))
+            if (supportedProtocols.All(x => x.Protocol != Parent.EtpExtender.Protocols.Store && x.Protocol != Parent.EtpExtender.Protocols.StoreQuery))
                 return;
 
             CanExecute = true;
         }
 
         /// <summary>
-        /// Called when the <see cref="Energistics.EtpClient" /> web socket is closed.
+        /// Called when the <see cref="Energistics.Etp.EtpClient" /> web socket is closed.
         /// </summary>
         public void OnSocketClosed()
         {
@@ -355,7 +352,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             if (root == null) return;
 
             var version = root.Attribute("version");
-            var match = false;
+            bool match;
 
             if (version != null)
             {
@@ -489,7 +486,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             var objectType = element?.Name.LocalName;
             if (string.IsNullOrEmpty(objectType)) return true;
 
-            var idAttribute = element?.Attribute(idField);
+            var idAttribute = element.Attribute(idField);
 
             if (idAttribute != null && !IsUuidMatch(Model.Store?.Uuid, idAttribute.Value))
                 match = false;

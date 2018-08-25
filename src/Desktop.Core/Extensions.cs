@@ -24,12 +24,16 @@ using System.Linq;
 using System.Windows.Media;
 using Caliburn.Micro;
 using Energistics.DataAccess;
-using Energistics.Datatypes.Object;
-using log4net.Appender;
+using Energistics.Etp.Common;
+using IDataObject = Energistics.DataAccess.IDataObject;
 using Witsml131 = Energistics.DataAccess.WITSML131;
 using Witsml141 = Energistics.DataAccess.WITSML141;
+using Energistics.Etp.Common.Datatypes.Object;
+using log4net.Appender;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Data.Logs;
+using PDS.WITSMLstudio.Desktop.Core.Adapters;
+using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 
@@ -175,7 +179,7 @@ namespace PDS.WITSMLstudio.Desktop.Core
         /// Formats the last changed microseconds into a readable date time offset.
         /// </summary>
         /// <param name="resource">The resource.</param>
-        public static void FormatLastChanged(this Resource resource)
+        public static void FormatLastChanged(this IResource resource)
         {
             if (resource == null || resource.LastChanged < 1) return;
 
@@ -183,7 +187,7 @@ namespace PDS.WITSMLstudio.Desktop.Core
                 resource.CustomData = new ConcurrentDictionary<string, string>();
 
             resource.CustomData["lastChanged"] = DateTimeExtensions
-                .FromUnixTimeMicroseconds(resource.LastChanged)
+                .FromUnixTimeMicroseconds(resource.LastChanged.GetValueOrDefault())
                 .ToString("o");
         }
 
@@ -200,6 +204,33 @@ namespace PDS.WITSMLstudio.Desktop.Core
             if (appender == null) return;
 
             Process.Start(appender.File);
+        }
+
+        /// <summary>
+        /// Creates the ETP protocol metadata provider based on the ETP version specified for the <see cref="Connection"/>.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <returns>A new <see cref="IEtpProtocols"/> instance.</returns>
+        public static IEtpProtocols CreateEtpProtocols(this Connection connection)
+        {
+            using (var client = connection.CreateEtpClient(string.Empty, string.Empty))
+            {
+                return client.CreateEtpExtender(new EtpProtocolItem[0], true).Protocols;
+            }
+        }
+
+        /// <summary>
+        /// Creates a new ETP extender for the specified ETP session.
+        /// </summary>
+        /// <param name="session">The ETP session.</param>
+        /// <param name="protocolItems">The protocol items.</param>
+        /// <param name="isEtpClient">if set to <c>true</c> the session is an ETP client.</param>
+        /// <returns>A new <see cref="IEtpExtender"/> instance.</returns>
+        public static IEtpExtender CreateEtpExtender(this EtpSession session, IList<EtpProtocolItem> protocolItems, bool isEtpClient)
+        {
+            return session.Adapter is Energistics.Etp.v11.Etp11Adapter
+                ? new Etp11Extender(session, protocolItems, isEtpClient)
+                : new Etp12Extender(session, protocolItems, isEtpClient) as IEtpExtender;
         }
     }
 }

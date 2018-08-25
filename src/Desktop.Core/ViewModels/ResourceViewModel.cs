@@ -20,7 +20,8 @@ using System;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using Caliburn.Micro;
-using Energistics.Datatypes.Object;
+using Energistics.Etp.Common.Datatypes.Object;
+using Energistics.Etp.v11.Datatypes.Object;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
 namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
@@ -51,7 +52,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <param name="runtime">The runtime.</param>
         /// <param name="resource">The resource.</param>
         /// <param name="dataContext">The data context.</param>
-        public ResourceViewModel(IRuntimeService runtime, Resource resource, object dataContext = null)
+        public ResourceViewModel(IRuntimeService runtime, IResource resource, object dataContext = null)
         {
             Runtime = runtime;
             Resource = resource;
@@ -60,7 +61,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             DataContext = dataContext;
             IsVisible = true;
 
-            if (resource.HasChildren != 0)
+            if (resource.ChildCount != 0)
             {
                 Children.Add(Placeholder);
             }
@@ -78,7 +79,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Gets the resource.
         /// </summary>
         /// <value>The resource.</value>
-        public Resource Resource { get; }
+        public IResource Resource { get; }
 
         /// <summary>
         /// Gets the data context.
@@ -118,7 +119,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Gets the display name.
         /// </summary>
         /// <value>The display name.</value>
-        public string DisplayName => Resource.HasChildren > 0 ? $"{Resource.Name} ({Resource.HasChildren})" : Resource.Name;
+        public string DisplayName => Resource.ChildCount > 0 ? $"{Resource.Name} ({Resource.ChildCount})" : Resource.Name;
 
         /// <summary>
         /// Gets a value indicating whether this instance has a placeholder element.
@@ -149,20 +150,20 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
         }
 
-        private int _hasChildren;
+        private int _childCount;
 
         /// <summary>
         /// Gets or sets whether the parent has children.
         /// </summary>
-        public int HasChildren
+        public int ChildCount
         {
-            get { return Resource.HasChildren; }
+            get { return Resource.ChildCount.GetValueOrDefault(-1); }
             set
             {
-                if (value == _hasChildren) return;
-                _hasChildren = value;
-                Resource.HasChildren = value;
-                NotifyOfPropertyChange(() => HasChildren);
+                if (value == _childCount) return;
+                _childCount = value;
+                Resource.ChildCount = value;
+                NotifyOfPropertyChange(() => ChildCount);
                 NotifyOfPropertyChange(() => DisplayName);
             }
         }

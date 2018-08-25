@@ -20,7 +20,7 @@ using System;
 using System.Data;
 using System.Threading.Tasks;
 using Caliburn.Micro;
-using Energistics.Datatypes;
+using Energistics.Etp.Common.Datatypes;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Data.Channels;
 using PDS.WITSMLstudio.Desktop.Core.Properties;

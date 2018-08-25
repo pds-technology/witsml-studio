@@ -20,9 +20,9 @@ using System;
 using System.Collections.Generic;
 using Energistics.DataAccess;
 using System.Net;
-using Energistics;
-using Energistics.Common;
-using Energistics.Datatypes;
+using Energistics.Etp;
+using Energistics.Etp.Common;
+using PDS.WITSMLstudio.Framework;
 
 namespace PDS.WITSMLstudio.Desktop.Core.Connections
 {
@@ -102,7 +102,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
         /// Creates a Json client for the current connection uri.
         /// </summary>
         /// <param name="connection">The connection.</param>
-        /// <returns>An <see cref="Energistics.JsonClient"/> instance.</returns>
+        /// <returns>An <see cref="Energistics.Etp.JsonClient"/> instance.</returns>
         public static JsonClient CreateJsonClient(this Connection connection)
         {
             return connection.IsAuthenticationBasic
@@ -116,7 +116,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
         /// <param name="connection">The connection.</param>
         /// <param name="applicationName">Name of the application.</param>
         /// <param name="applicationVersion">The application version.</param>
-        /// <returns>An <see cref="Energistics.EtpClient"/> instance.</returns>
+        /// <returns>An <see cref="Energistics.Etp.EtpClient"/> instance.</returns>
         public static EtpClient CreateEtpClient(this Connection connection, string applicationName, string applicationVersion)
         {
             var headers = connection.GetAuthorizationHeader();
@@ -124,7 +124,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
             connection.UpdateEtpSettings(headers);
             connection.SetServerCertificateValidation();
 
-            var client = new EtpClient(connection.Uri, applicationName, applicationVersion, headers);
+            var client = new EtpClient(connection.Uri, applicationName, applicationVersion, connection.SubProtocol, headers);
 
             if (!string.IsNullOrWhiteSpace(connection.ProxyHost))
             {
@@ -143,8 +143,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
         public static IDictionary<string, string> GetAuthorizationHeader(this Connection connection)
         {
             return connection.IsAuthenticationBasic
-                   ? Energistics.Security.Authorization.Basic(connection.Username, connection.Password)
-                   : Energistics.Security.Authorization.Bearer(connection.JsonWebToken);
+                   ? Energistics.Etp.Security.Authorization.Basic(connection.Username, connection.Password)
+                   : Energistics.Etp.Security.Authorization.Bearer(connection.JsonWebToken);
         }
 
         /// <summary>
@@ -172,15 +172,19 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
             if (string.IsNullOrWhiteSpace(connection?.Uri))
                 return string.Empty;
 
-            return $"http{connection.Uri.Substring(2)}/.well-known/etp-server-capabilities";
+            var etpVersion = EtpSettings.Etp12SubProtocol.EqualsIgnoreCase(connection.SubProtocol)
+                ? "?etp-version=1.2"
+                : string.Empty;
+
+            return $"http{connection.Uri.Substring(2)}/.well-known/etp-server-capabilities{etpVersion}";
         }
 
         /// <summary>
         /// Gets the ETP server capabilities for the connection.
         /// </summary>
         /// <param name="connection">The connection.</param>
-        /// <returns>The <see cref="Energistics.Datatypes.ServerCapabilities"/> result</returns>
-        public static ServerCapabilities GetEtpServerCapabilities(this Connection connection) =>
+        /// <returns>The server capabilities result</returns>
+        public static object GetEtpServerCapabilities(this Connection connection) =>
             CreateJsonClient(connection).GetServerCapabilities(GetEtpServerCapabilitiesUrl(connection));
 
         /// <summary>

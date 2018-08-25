@@ -16,11 +16,11 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System;
 using System.Runtime.Serialization;
 using Caliburn.Micro;
-using Energistics.Datatypes;
 
-namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
+namespace PDS.WITSMLstudio.Desktop.Core.Models
 {
     /// <summary>
     /// Defines the properties needed to allow selection of ETP Protocols.
@@ -38,9 +38,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
         /// <param name="role">The role.</param>
         /// <param name="isSelected">if set to <c>true</c> the item is selected.</param>
         /// <param name="isEnabled">if set to <c>true</c> the item is enabled.</param>
-        public EtpProtocolItem(Protocols protocol, string role, bool isSelected = false, bool isEnabled = true)
+        public EtpProtocolItem(Enum protocol, string role, bool isSelected = false, bool isEnabled = true)
         {
-            Protocol = (int) protocol;
+            Protocol = Convert.ToInt32(protocol);
             Name = protocol.ToString();
             Role = role;
             IsSelected = isSelected;

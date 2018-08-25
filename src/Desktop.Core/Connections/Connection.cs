@@ -20,7 +20,7 @@ using System.Net;
 using System.Runtime.Serialization;
 using System.Security;
 using Caliburn.Micro;
-using Energistics.Common;
+using Energistics.Etp.Common;
 
 namespace PDS.WITSMLstudio.Desktop.Core.Connections
 {

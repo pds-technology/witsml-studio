@@ -17,16 +17,17 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Caliburn.Micro;
-using Energistics.Common;
-using Energistics.Datatypes;
-using Energistics.Protocol.Core;
+using Energistics.Etp.Common;
+using Energistics.Etp.Common.Datatypes;
+using PDS.WITSMLstudio.Desktop.Core;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
-using PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 {
@@ -45,7 +46,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public SettingsViewModel(IRuntimeService runtime)
         {
             Runtime = runtime;
-            DisplayName =  string.Format("{0:D} - {0}", Protocols.Core);
+            DisplayName =  "Core";
 
             ConnectionPicker = new ConnectionPickerViewModel(runtime, ConnectionTypes.Etp)
             {
@@ -53,43 +54,19 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 OnConnectionChanged = OnConnectionChanged
             };
 
-            EtpProtocols = new BindableCollection<EtpProtocolItem>
-            {
-                new EtpProtocolItem(Protocols.ChannelStreaming, "consumer"),
-                new EtpProtocolItem(Protocols.ChannelStreaming, "producer", true),
-                new EtpProtocolItem(Protocols.ChannelDataFrame, "consumer"),
-                new EtpProtocolItem(Protocols.ChannelDataFrame, "producer"),
-                new EtpProtocolItem(Protocols.Discovery, "store", true),
-                new EtpProtocolItem(Protocols.Discovery, "customer"),
-                new EtpProtocolItem(Protocols.Store, "store", true),
-                new EtpProtocolItem(Protocols.Store, "customer"),
-                new EtpProtocolItem(Protocols.StoreNotification, "store", true),
-                new EtpProtocolItem(Protocols.StoreNotification, "customer"),
-                new EtpProtocolItem(Protocols.GrowingObject, "store", true),
-                new EtpProtocolItem(Protocols.GrowingObject, "customer"),
-                new EtpProtocolItem(Protocols.DataArray, "store"),
-                new EtpProtocolItem(Protocols.DataArray, "customer"),
-                new EtpProtocolItem(Protocols.WitsmlSoap, "store", isEnabled: false),
-                new EtpProtocolItem(Protocols.WitsmlSoap, "customer", isEnabled: false),
-            };
+            EtpProtocols = new BindableCollection<EtpProtocolItem>();
         }
 
         /// <summary>
         /// Gets or Sets the Parent <see cref="T:Caliburn.Micro.IConductor" />
         /// </summary>
-        public new MainViewModel Parent
-        {
-            get { return (MainViewModel)base.Parent; }
-        }
+        public new MainViewModel Parent => (MainViewModel) base.Parent;
 
         /// <summary>
         /// Gets the model.
         /// </summary>
         /// <value>The model.</value>
-        public Models.EtpSettings Model
-        {
-            get { return Parent.Model; }
-        }
+        public Models.EtpSettings Model => Parent.Model;
 
         /// <summary>
         /// Gets the runtime service.
@@ -234,17 +211,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void CloseSession()
         {
-            if (Parent.Session?.CanHandle<ICoreClient>() ?? false)
-            {
-                Parent.Session?.Handler<ICoreClient>()
-                    ?.CloseSession();
-            }
-
-            if (Parent.Session?.CanHandle<ICoreServer>() ?? false)
-            {
-                Parent.Session?.Handler<ICoreServer>()
-                    ?.CloseSession();
-            }
+            Parent.EtpExtender?.CloseSession();
         }
 
         /// <summary>
@@ -264,7 +231,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             // Nothing to do here as the connection change was initiated on this tab.
         }
 
-        public void OnSessionOpened(ProtocolEventArgs<OpenSession> e)
+        public void OnSessionOpened(IList<ISupportedProtocol> supportedProtocols)
         {
             CanRequestSession = false;
             CanCloseSession = true;
@@ -289,6 +256,15 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             CanStopServer = !CanStartServer;
             CanRequestSession = !CanStopServer;
             CanCloseSession = false;
+
+            var protocols = Parent.EtpExtender?.Protocols ??
+                            connection.CreateEtpProtocols();
+
+            Runtime.InvokeAsync(() =>
+            {
+                EtpProtocols.Clear();
+                EtpProtocols.AddRange(protocols.GetProtocolItems());
+            });
         }
 
         private Task<bool> GetServerCapabilities()

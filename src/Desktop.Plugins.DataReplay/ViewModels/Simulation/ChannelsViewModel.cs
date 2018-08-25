@@ -24,19 +24,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
-using Energistics;
-using Energistics.Datatypes;
-using Energistics.Datatypes.ChannelData;
-using Energistics.Protocol.ChannelStreaming;
-using Energistics.Protocol.Discovery;
+using Energistics.Etp;
+using Energistics.Etp.Common;
+using Energistics.Etp.Common.Datatypes;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
-using PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers;
-using PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
+using PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies;
+using PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Simulation
 {
@@ -64,10 +62,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Simulation
             };
         }
 
-        public Models.Simulation Model
-        {
-            get { return ((SimulationViewModel)Parent).Model; }
-        }
+        public Models.Simulation Model => ((SimulationViewModel)Parent).Model;
 
         public IRuntimeService Runtime { get; }
 
@@ -175,7 +170,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Simulation
 
                 try
                 {
-                    var channels = JsonConvert.DeserializeObject<List<ChannelMetadataRecord>>(json);
+                    var channels = JsonConvert.DeserializeObject<List<Energistics.Etp.v11.Datatypes.ChannelData.ChannelMetadataRecord>>(json);
                     Model.Channels.AddRange(channels);
                 }
                 catch (Exception ex)
@@ -346,15 +341,15 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Simulation
         {
             using (var server = new EtpSocketServer(Model.PortNumber, ((IScreen)Parent).DisplayName, Model.Version))
             {
-                server.Register(InitChannelStreamingProvider);
-                server.Register(InitDiscoveryProvider);
+                var simulator = CreateEtpSimulator();
+                simulator.Register(server);
                 server.Start();
 
                 Log("ETP Socket Server started, listening on port {0}.", Model.PortNumber);
 
                 while (true)
                 {
-                    await Task.Delay(250);
+                    await Task.Delay(250, token);
 
                     if (token.IsCancellationRequested)
                     {
@@ -362,16 +357,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Simulation
                     }
                 }
             }
-        }
-
-        private IChannelStreamingProducer InitChannelStreamingProvider()
-        {
-            return new SimulationChannelStreamingProvider(Model);
-        }
-
-        private IDiscoveryStore InitDiscoveryProvider()
-        {
-            return new SimulationDiscoveryProvider(Model);
         }
 
         /// <summary>
@@ -455,7 +440,16 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Simulation
 
         private EtpProxyViewModel CreateEtpClientProxy()
         {
-            return new EtpChannelStreamingProxy(Runtime, Model.EtpVersion, Log);
+            return EtpSettings.Etp12SubProtocol.EqualsIgnoreCase(Model.EtpConnection?.SubProtocol)
+                ? new Etp12ChannelStreamingProxy(Runtime, Model.EtpVersion, Log)
+                : new Etp11ChannelStreamingProxy(Runtime, Model.EtpVersion, Log) as EtpProxyViewModel;
+        }
+
+        private IEtpSimulator CreateEtpSimulator()
+        {
+            return EtpSettings.Etp12SubProtocol.EqualsIgnoreCase(Model.SubProtocol)
+                ? new Etp12Simulator(Model)
+                : new Etp11Simulator(Model) as IEtpSimulator;
         }
 
         private void GetSupportedObjects()
@@ -466,8 +460,10 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Simulation
             {
                 EtpVersions.Clear();
 
-                var versions = Model.EtpConnection.GetEtpServerCapabilities()
-                    .SupportedObjects
+                dynamic capabilities = Model.EtpConnection.GetEtpServerCapabilities();
+                var supportedObjects = capabilities.SupportedObjects as IList<string>;
+
+                var versions = (supportedObjects ?? new string[0])
                     .Select(x => new EtpContentType(x))
                     .Where(x => x.IsValid)
                     .Select(x => x.Version)

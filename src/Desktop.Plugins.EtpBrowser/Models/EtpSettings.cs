@@ -19,8 +19,9 @@
 using System;
 using System.Runtime.Serialization;
 using Caliburn.Micro;
-using Energistics.Datatypes;
+using Energistics.Etp.Common.Datatypes;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Properties;
 using PDS.WITSMLstudio.Framework;
 
@@ -42,7 +43,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
         public EtpSettings()
         {
             Connection = new Connection();
-            Streaming = new StreamingSettings()
+            Streaming = new StreamingSettings
             {
                 MaxDataItems = _defaultMaxDataItems,
                 MaxMessageRate = _defaultMaxMessageRate,
@@ -51,11 +52,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
                 StartIndex = 0,
                 IndexCount = 10
             };
+            DiscoveryFunction = Functions.GetResources;
             Store = new StoreSettings();
             StoreFunction = Functions.GetObject;
             StoreNotification = new StoreNotificationSettings();
             GrowingObject = new GrowingObjectSettings();
-            GrowingObjectFunction = Functions.GrowingObjectGet;
+            GrowingObjectFunction = Functions.GetPart;
             RequestedProtocols = new BindableCollection<EtpProtocolItem>();
             BaseUri = EtpUri.RootUri;
             IsEtpClient = true;
@@ -246,6 +248,25 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
             }
         }
 
+        private Functions _discoveryFunction;
+        /// <summary>
+        /// Gets or sets the ETP discovery function.
+        /// </summary>
+        /// <value>The ETP discovery function.</value>
+        [DataMember]
+        public Functions DiscoveryFunction
+        {
+            get { return _discoveryFunction; }
+            set
+            {
+                if (!Equals(_discoveryFunction, value))
+                {
+                    _discoveryFunction = value;
+                    NotifyOfPropertyChange(() => DiscoveryFunction);
+                }
+            }
+        }
+
         private Functions _storeFunction;
         /// <summary>
         /// Gets or sets the ETP store function.
@@ -260,6 +281,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
                 if (!Equals(_storeFunction, value))
                 {
                     _storeFunction = value;
+                    NotifyOfPropertyChange(() => StoreFunction);
                 }
             }
         }
@@ -278,6 +300,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
                 if (!Equals(_growingObjectFunction, value))
                 {
                     _growingObjectFunction = value;
+                    NotifyOfPropertyChange(() => GrowingObjectFunction);
                 }
             }
         }

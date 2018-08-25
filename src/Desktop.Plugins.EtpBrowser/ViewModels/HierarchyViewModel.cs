@@ -16,14 +16,13 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Input;
 using Caliburn.Micro;
-using Energistics.Common;
-using Energistics.Datatypes;
-using Energistics.Protocol.Core;
+using Energistics.Etp.Common.Datatypes;
 using PDS.WITSMLstudio.Desktop.Core.Commands;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
@@ -44,32 +43,26 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public HierarchyViewModel(IRuntimeService runtime)
         {
             Runtime = runtime;
-            DisplayName = string.Format("{0:D} - {0}", Protocols.Discovery);
+            DisplayName = "Discovery";
             GetBaseUriCommand = new DelegateCommand(x => GetBaseUri(), x => CanExecute);
         }
 
         /// <summary>
         /// Gets or Sets the Parent <see cref="T:Caliburn.Micro.IConductor" />
         /// </summary>
-        public new MainViewModel Parent
-        {
-            get { return (MainViewModel)base.Parent; }
-        }
+        public new MainViewModel Parent => (MainViewModel) base.Parent;
 
         /// <summary>
         /// Gets the model.
         /// </summary>
         /// <value>The model.</value>
-        public Models.EtpSettings Model
-        {
-            get { return Parent.Model; }
-        }
+        public Models.EtpSettings Model => Parent.Model;
 
         /// <summary>
         /// Gets the runtime service.
         /// </summary>
         /// <value>The runtime service.</value>
-        public IRuntimeService Runtime { get; private set; }
+        public IRuntimeService Runtime { get; }
 
         /// <summary>
         /// Gets the GetBaseUri command.
@@ -103,7 +96,15 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             //Parent.OnConnectionChanged(true, false);
             Parent.Resources.Clear();
-            Parent.GetResources(Model?.BaseUri);
+
+            if (Model.DiscoveryFunction == Functions.FindResources)
+            {
+                Parent.FindResources(Model?.BaseUri);
+            }
+            else
+            {
+                Parent.GetResources(Model?.BaseUri);
+            }
         }
 
         /// <summary>
@@ -170,7 +171,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
                 if (CanExecute && !string.IsNullOrWhiteSpace(resource?.Resource?.Uri))
                 {
-                    return resource.Resource.HasChildren != 0 ||
+                    return resource.Resource.ChildCount != 0 ||
                            ResourceTypes.Folder.ToString().EqualsIgnoreCase(resource.Resource.ResourceType);
                 }
 
@@ -358,12 +359,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
-        /// Called when the <see cref="OpenSession" /> message is recieved.
+        /// Called when the OpenSession message is recieved.
         /// </summary>
-        /// <param name="e">The <see cref="ProtocolEventArgs{OpenSession}" /> instance containing the event data.</param>
-        public void OnSessionOpened(ProtocolEventArgs<OpenSession> e)
+        /// <param name="supportedProtocols">The supported protocols.</param>
+        public void OnSessionOpened(IList<ISupportedProtocol> supportedProtocols)
         {
-            if (e.Message.SupportedProtocols.All(x => x.Protocol != (int)Protocols.Discovery))
+            if (supportedProtocols.All(x => x.Protocol != Parent.EtpExtender.Protocols.Discovery && x.Protocol != Parent.EtpExtender.Protocols.DiscoveryQuery))
                 return;
             
             CanExecute = true;
@@ -371,7 +372,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
-        /// Called when the <see cref="Energistics.EtpClient" /> web socket is closed.
+        /// Called when the <see cref="Energistics.Etp.EtpClient" /> web socket is closed.
         /// </summary>
         public void OnSocketClosed()
         {

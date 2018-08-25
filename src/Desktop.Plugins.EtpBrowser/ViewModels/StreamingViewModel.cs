@@ -22,17 +22,14 @@ using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Caliburn.Micro;
-using Energistics.Common;
-using Energistics.Datatypes;
-using Energistics.Datatypes.ChannelData;
-using Energistics.Protocol;
-using Energistics.Protocol.ChannelStreaming;
-using Energistics.Protocol.Core;
+using Energistics.Etp.Common;
+using Energistics.Etp.Common.Datatypes;
+using Energistics.Etp.Common.Datatypes.ChannelData;
 using PDS.WITSMLstudio.Desktop.Core.Commands;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
-using PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 {
@@ -52,9 +49,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public StreamingViewModel(IRuntimeService runtime)
         {
             Runtime = runtime;
-            DisplayName = $"{Protocols.ChannelStreaming:D} - Streaming";
+            DisplayName = "Streaming";
             Channels = new BindableCollection<ChannelMetadataViewModel>();
-            ChannelStreamingInfos = new List<ChannelStreamingInfo>();
             ToggleChannelCommand = new DelegateCommand(x => ToggleSelectedChannel());
         }
 
@@ -80,12 +76,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         /// <value>The channel metadata.</value>
         public BindableCollection<ChannelMetadataViewModel> Channels { get; }
-
-        /// <summary>
-        /// Gets the collection of channel streaming information.
-        /// </summary>
-        /// <value>The channel streaming information.</value>
-        public IList<ChannelStreamingInfo> ChannelStreamingInfos { get; }
 
         /// <summary>
         /// Gets the toggle channel command.
@@ -166,8 +156,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 return;
             }
 
-            Parent.Session.Handler<IChannelStreamingConsumer>()
-                .Start(Model.Streaming.MaxDataItems, Model.Streaming.MaxMessageRate);
+            Parent.EtpExtender.Start(Model.Streaming.MaxDataItems, Model.Streaming.MaxMessageRate);
 
             //Channels.Clear();
             //ChannelStreamingInfos.Clear();
@@ -204,8 +193,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 return;
             }
 
-            Parent.Session.Handler<IChannelStreamingConsumer>()
-                .ChannelDescribe(Model.Streaming.Uris);
+            Parent.EtpExtender.ChannelDescribe(Model.Streaming.Uris);
         }
 
         /// <summary>
@@ -219,40 +207,25 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 return;
             }
 
-            // Prepare ChannelStreamingInfos startIndexes
+            // If no channels were selected display a warning message
+            if (!Channels.Any(c => c.IsChecked))
+            {
+                Runtime.ShowWarning(string.Format(NoChannelsSelectedMessage, "Streaming Start"));
+                return;
+            }
+
             try
             {
-                ChannelStreamingInfos.Clear();
-                
-                // Create a list of ChannelStreamingInfos only for selected, described channels.
-                Channels
-                    .Where(c => c.IsChecked)
-                    .Select(c => ToChannelStreamingInfo(c.Record, c.ReceiveChangeNotification))
-                    .ToList()
-                    .ForEach(x => ChannelStreamingInfos.Add(x));
-
-                // If no channels were selected display a warning message
-                if (!ChannelStreamingInfos.Any())
-                {
-                    Runtime.ShowWarning(string.Format(NoChannelsSelectedMessage, "Streaming Start"));
-                    return;
-                }
-
-                ChannelStreamingInfos.ForEach(x => x.StartIndex = new StreamingStartIndex { Item = GetStreamingStartValue() });
+                Parent.EtpExtender.ChannelStreamingStart(Channels, GetStreamingStartValue());
             }
             catch (OverflowException ex)
             {
                 Runtime.ShowError(UnscaledIndexMessage, ex);
-                return;
             }
             catch (Exception ex)
             {
                 Runtime.ShowError(ErrorSettingIndexMessage, ex);
-                return;
             }
-
-            Parent.Session.Handler<IChannelStreamingConsumer>()
-                .ChannelStreamingStart(ChannelStreamingInfos);
         }
 
         /// <summary>
@@ -279,8 +252,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 return;
             }
 
-            Parent.Session.Handler<IChannelStreamingConsumer>()
-                .ChannelStreamingStop(channelIds);
+            Parent.EtpExtender.ChannelStreamingStop(channelIds);
         }
 
         /// <summary>
@@ -304,29 +276,21 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 return;
             }
 
-            var rangeInfo = new ChannelRangeInfo
-            {
-                ChannelId = channelIds
-            };
-
             try
             {
-                rangeInfo.EndIndex = (long)GetStreamingEndValue();
-                rangeInfo.StartIndex = (long)GetStreamingStartValue(true);
+                var startIndex = (long)GetStreamingStartValue(true);
+                var endIndex = (long)GetStreamingEndValue();
+
+                Parent.EtpExtender.ChannelRangeRequest(channelIds, startIndex, endIndex);
             }
             catch (OverflowException ex)
             {
                 Runtime.ShowError(UnscaledIndexMessage, ex);
-                return;
             }
             catch (Exception ex)
             {
                 Runtime.ShowError(ErrorSettingIndexMessage, ex);
-                return;
             }
-
-            Parent.Session.Handler<IChannelStreamingConsumer>()
-                .ChannelRangeRequest(new[] { rangeInfo });
         }
 
         /// <summary>
@@ -338,32 +302,26 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
-        /// Called when the <see cref="OpenSession" /> message is recieved.
+        /// Called when the OpenSession message is recieved.
         /// </summary>
-        /// <param name="e">The <see cref="ProtocolEventArgs{OpenSession}" /> instance containing the event data.</param>
-        public void OnSessionOpened(ProtocolEventArgs<OpenSession> e)
+        /// <param name="supportedProtocols">The supported protocols.</param>
+        public void OnSessionOpened(IList<ISupportedProtocol> supportedProtocols)
         {
-            if (e.Message.SupportedProtocols.All(x => x.Protocol != (int) Protocols.ChannelStreaming))
+            if (supportedProtocols.All(x => x.Protocol != Parent.EtpExtender.Protocols.ChannelStreaming))
                 return;
 
-            var handler = Parent.Session.Handler<IChannelStreamingConsumer>();
-            handler.OnChannelMetadata += OnChannelMetadata;
-            handler.OnChannelData += OnChannelData;
+            Parent.EtpExtender.Register(
+                onChannelMetadata: OnChannelMetadata,
+                onChannelData: OnChannelData);
 
             Channels.Clear();
-            ChannelStreamingInfos.Clear();
         }
 
         /// <summary>
-        /// Called when the <see cref="Energistics.EtpClient" /> web socket is closed.
+        /// Called when the <see cref="Energistics.Etp.EtpClient" /> web socket is closed.
         /// </summary>
         public void OnSocketClosed()
         {
-            if (Parent.Session == null || !Parent.Session.CanHandle<IChannelStreamingConsumer>()) return;
-
-            var handler = Parent.Session.Handler<IChannelStreamingConsumer>();
-            handler.OnChannelMetadata -= OnChannelMetadata;
-            handler.OnChannelData -= OnChannelData;
         }
 
         /// <summary>
@@ -378,16 +336,16 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             }
         }
 
-        private void OnChannelMetadata(object sender, ProtocolEventArgs<ChannelMetadata> e)
+        private void OnChannelMetadata(IMessageHeader header, IList<IChannelMetadataRecord> channels)
         {
-            if (!e.Message.Channels.Any())
+            if (!channels.Any())
             {
                 Parent.Details.Append(Environment.NewLine + "// No channels were described");
                 return;
             }
 
             // add to channel metadata collection
-            e.Message.Channels.ForEach(x =>
+            channels.ForEach(x =>
             {
                 if (Channels.Any(c => c.Record.ChannelUri.EqualsIgnoreCase(x.ChannelUri)))
                     return;
@@ -395,30 +353,17 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 Channels.Add(new ChannelMetadataViewModel(x));
             });
 
-            if (e.Header.MessageFlags != (int)MessageFlags.MultiPart)
+            if (header.MessageFlags != (int) MessageFlags.MultiPart)
             {
                 LogChannelMetadata(Channels.Select(c => c.Record).ToArray());
             }
         }
 
 
-        private void OnChannelData(object sender, ProtocolEventArgs<ChannelData> e)
+        private void OnChannelData(IMessageHeader header, IList<IDataItem> channelData)
         {
-            if (e.Message.Data.Any())
-                LogChannelData(e.Message.Data);
-        }
-
-        private ChannelStreamingInfo ToChannelStreamingInfo(ChannelMetadataRecord channel, bool receiveChangeNotification)
-        {
-            return new ChannelStreamingInfo()
-            {
-                ChannelId = channel.ChannelId,
-                StartIndex = new StreamingStartIndex()
-                {
-                    Item = GetStreamingStartValue()
-                },
-                ReceiveChangeNotification = receiveChangeNotification
-            };
+            if (channelData.Any())
+                LogChannelData(channelData);
         }
 
         private object GetStreamingStartValue(bool isRangeRequest = false)
@@ -461,7 +406,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             return Channels
                 .Select(c => c.Record)
                 .FirstOrDefault()?
-                .Indexes.FirstOrDefault()?
+                .Indexes
+                .Cast<IIndexMetadataRecord>()
+                .FirstOrDefault()?
                 .Scale ?? 0; // Default to no scale of no index is found.;
         }
 
@@ -479,7 +426,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 Environment.NewLine, maxMessageRate, maxDataItems));
         }
 
-        private void LogChannelMetadata(IList<ChannelMetadataRecord> channels)
+        private void LogChannelMetadata(IList<IChannelMetadataRecord> channels)
         {
             var headers = string.Join("\", \"", channels.Select(x => x.ChannelName));
             var units = string.Join("\", \"", channels.Select(x => x.Uom));
@@ -499,7 +446,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             Parent.DataObject.SetText(dataObjects);
         }
 
-        private void LogChannelData(IList<DataItem> dataItems)
+        private void LogChannelData(IList<IDataItem> dataItems)
         {
             // Check if producer is sending index/value pairs
             if (!dataItems.Take(1).SelectMany(x => x.Indexes).Any())
@@ -521,8 +468,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 var dataValues = string.Join(Environment.NewLine, dataItems.Select(x =>
                 {
                     var channel = Channels.FirstOrDefault(c => c.Record.ChannelId == x.ChannelId);
-                    var channelIndex = channel?.Record.Indexes.FirstOrDefault();
-                    var isTimeIndex = channelIndex?.IndexType == ChannelIndexTypes.Time;
+                    var channelIndex = channel?.Record.Indexes.Cast<IIndexMetadataRecord>().FirstOrDefault();
+                    var isTimeIndex = Parent.EtpExtender.IsTimeIndex(channelIndex);
                     var indexValue = x.Indexes.FirstOrDefault();
 
                     var indexFormat = isTimeIndex

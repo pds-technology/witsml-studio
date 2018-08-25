@@ -23,9 +23,8 @@ using System.Runtime.Serialization;
 using Avro;
 using Avro.Specific;
 using Caliburn.Micro;
-using Energistics.Common;
-using Energistics.Datatypes;
-using Energistics.Protocol.Core;
+using Energistics.Etp.Common;
+using Energistics.Etp.Common.Datatypes;
 using Newtonsoft.Json;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
@@ -41,7 +40,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
     public sealed class JsonMessageViewModel : Screen, ISessionAware
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(JsonMessageViewModel));
-        private MessageHeader _currentHeader;
+        private IMessageHeader _currentHeader;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonMessageViewModel"/> class.
@@ -59,8 +58,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
             var recordType = typeof (ISpecificRecord);
 
-            MessageTypes.AddRange(typeof(MessageHeader).Assembly.GetTypes()
-                .Where(x => recordType.IsAssignableFrom(x) && HasProtocolProperty(x))
+            MessageTypes.AddRange(typeof(IMessageHeader).Assembly.GetTypes()
+                .Where(x => recordType.IsAssignableFrom(x) && x.IsClass && HasProtocolProperty(x))
                 .OrderBy(GetProtocol)
                 .ThenBy(x => x.Name)
                 .Select(x => new KeyValuePair<string, Type>($"{GetProtocol(x)} - {x.Name}", x)));
@@ -180,7 +179,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                     var headerText = Header.Document.Text;
                     var messageText = Message.Document.Text;
 
-                    var header = JsonConvert.DeserializeObject<MessageHeader>(headerText);
+                    var headerType = Parent.Session.Adapter.CreateMessageHeader().GetType();
+                    var header = JsonConvert.DeserializeObject(headerText, headerType) as IMessageHeader;
                     var message = JsonConvert.DeserializeObject(messageText, SelectedMessageType.Value) as ISpecificRecord;
 
                     Parent.Session.SendMessage(header, message);
@@ -202,10 +202,10 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
-        /// Called when the <see cref="OpenSession" /> message is recieved.
+        /// Called when the OpenSession message is recieved.
         /// </summary>
-        /// <param name="e">The <see cref="ProtocolEventArgs{T}" /> instance containing the event data.</param>
-        public void OnSessionOpened(ProtocolEventArgs<OpenSession> e)
+        /// <param name="supportedProtocols">The supported protocols.</param>
+        public void OnSessionOpened(IList<ISupportedProtocol> supportedProtocols)
         {
             CanExecute = true;
 
@@ -219,7 +219,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
-        /// Called when the <see cref="Energistics.EtpClient" /> web socket is closed.
+        /// Called when the <see cref="Energistics.Etp.EtpClient" /> web socket is closed.
         /// </summary>
         public void OnSocketClosed()
         {
@@ -231,10 +231,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void NewHeader()
         {
-            _currentHeader = new MessageHeader
-            {
-                MessageId = Parent.Session.NewMessageId()
-            };
+            _currentHeader = Parent.Session.Adapter.CreateMessageHeader();
+            _currentHeader.MessageId = Parent.Session.NewMessageId();
 
             OnHeaderChanged();
         }

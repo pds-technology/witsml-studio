@@ -16,14 +16,11 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using Caliburn.Micro;
-using Energistics.Common;
-using Energistics.Datatypes;
-using Energistics.Datatypes.Object;
-using Energistics.Protocol.Core;
-using Energistics.Protocol.GrowingObject;
+using Energistics.Etp.Common.Datatypes;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
@@ -44,7 +41,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public GrowingObjectViewModel(IRuntimeService runtime)
         {
             Runtime = runtime;
-            DisplayName = $"{Protocols.GrowingObject:D} - Growing";
+            DisplayName = "Growing Object";
             Data = new TextEditorViewModel(runtime, "XML")
             {
                 IsPrettyPrintAllowed = true
@@ -134,20 +131,23 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
             switch (Model.GrowingObjectFunction)
             {
-                case Functions.GrowingObjectGet:
-                    GrowingObjectGet();
+                case Functions.FindParts:
+                    FindParts();
                     break;
-                case Functions.GrowingObjectGetRange:
-                    GrowingObjectGetRange();
+                case Functions.GetPart:
+                    GetPart();
                     break;
-                case Functions.GrowingObjectPut:
-                    GrowingObjectPut();
+                case Functions.GetPartsByRange:
+                    GetPartsByRange();
                     break;
-                case Functions.GrowingObjectDelete:
-                    GrowingObjectDelete();
+                case Functions.PutPart:
+                    PutPart();
                     break;
-                case Functions.GrowingObjectDeleteRange:
-                    GrowingObjectDeleteRange();
+                case Functions.DeletePart:
+                    DeletePart();
+                    break;
+                case Functions.DeletePartsByRange:
+                    DeletePartsByRange();
                     break;
             }
         }
@@ -183,19 +183,19 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
-        /// Called when the <see cref="OpenSession" /> message is recieved.
+        /// Called when the OpenSession message is recieved.
         /// </summary>
-        /// <param name="e">The <see cref="ProtocolEventArgs{OpenSession}" /> instance containing the event data.</param>
-        public void OnSessionOpened(ProtocolEventArgs<OpenSession> e)
+        /// <param name="supportedProtocols">The supported protocols.</param>
+        public void OnSessionOpened(IList<ISupportedProtocol> supportedProtocols)
         {
-            if (e.Message.SupportedProtocols.All(x => x.Protocol != (int)Protocols.GrowingObject))
+            if (supportedProtocols.All(x => x.Protocol != Parent.EtpExtender.Protocols.GrowingObject))
                 return;
 
             CanExecute = true;
         }
 
         /// <summary>
-        /// Called when the <see cref="Energistics.EtpClient" /> web socket is closed.
+        /// Called when the <see cref="Energistics.Etp.EtpClient" /> web socket is closed.
         /// </summary>
         public void OnSocketClosed()
         {
@@ -204,37 +204,34 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
         private void ResetDataEditorBorderColor() => DataEditorBorderColor = "#FFABADB3";
 
-        private void GrowingObjectGet()
+        private void FindParts()
         {
-            Parent.Session.Handler<IGrowingObjectCustomer>()
-                .GrowingObjectGet(Model.GrowingObject.Uri, Model.GrowingObject.Uid);
+            Parent.EtpExtender.FindParts(Model.GrowingObject.Uri);
         }
 
-        private void GrowingObjectGetRange()
+        private void GetPart()
         {
-            Parent.Session.Handler<IGrowingObjectCustomer>()
-                .GrowingObjectGetRange(Model.GrowingObject.Uri, Model.GrowingObject.StartIndex, Model.GrowingObject.EndIndex, string.Empty, string.Empty);
+            Parent.EtpExtender.GetPart(Model.GrowingObject.Uri, Model.GrowingObject.Uid);
         }
 
-        private void GrowingObjectPut()
+        private void GetPartsByRange()
         {
-            var dataObject = new DataObject();
-            dataObject.SetString(Data.Document.Text, Model.GrowingObject.CompressDataObject);
-
-            Parent.Session.Handler<IGrowingObjectCustomer>()
-                .GrowingObjectPut(Model.GrowingObject.Uri, Model.GrowingObject.ContentType, dataObject.Data);
+            Parent.EtpExtender.GetPartsByRange(Model.GrowingObject.Uri, Model.GrowingObject.StartIndex, Model.GrowingObject.EndIndex, string.Empty, string.Empty);
         }
 
-        private void GrowingObjectDelete()
+        private void PutPart()
         {
-            Parent.Session.Handler<IGrowingObjectCustomer>()
-                .GrowingObjectDelete(Model.GrowingObject.Uri, Model.GrowingObject.Uid);
+            Parent.EtpExtender.PutPart(Model.GrowingObject.Uri, Model.GrowingObject.Uid, Model.GrowingObject.ContentType, Data.Document.Text, Model.GrowingObject.CompressDataObject);
         }
 
-        private void GrowingObjectDeleteRange()
+        private void DeletePart()
         {
-            Parent.Session.Handler<IGrowingObjectCustomer>()
-                .GrowingObjectDeleteRange(Model.GrowingObject.Uri, Model.GrowingObject.StartIndex, Model.GrowingObject.EndIndex, string.Empty, string.Empty);
+            Parent.EtpExtender.DeletePart(Model.GrowingObject.Uri, Model.GrowingObject.Uid);
+        }
+
+        private void DeletePartsByRange()
+        {
+            Parent.EtpExtender.DeletePartsByRange(Model.GrowingObject.Uri, Model.GrowingObject.StartIndex, Model.GrowingObject.EndIndex, string.Empty, string.Empty);
         }
     }
 }

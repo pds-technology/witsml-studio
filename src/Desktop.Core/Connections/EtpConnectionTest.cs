@@ -23,9 +23,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Navigation;
-using Energistics.Protocol.ChannelStreaming;
-using Energistics.Protocol.Discovery;
-using Energistics.Protocol.Store;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
@@ -82,7 +79,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
                 using (var client = connection.CreateEtpClient(applicationName, applicationVersion))
                 {
                     //client.Register<IChannelStreamingConsumer, ChannelStreamingConsumerHandler>();
-                    client.Register<IDiscoveryCustomer, DiscoveryCustomerHandler>();
+                    //client.Register<IDiscoveryCustomer, DiscoveryCustomerHandler>();
                     //client.Register<IStoreCustomer, StoreCustomerHandler>();
 
                     var count = 0;

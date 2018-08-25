@@ -23,11 +23,7 @@ using System.Runtime.Serialization;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Caliburn.Micro;
-using Energistics.Common;
-using Energistics.Datatypes;
-using Energistics.Datatypes.Object;
-using Energistics.Protocol.Core;
-using Energistics.Protocol.StoreNotification;
+using Energistics.Etp.Common.Datatypes;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Framework;
@@ -37,13 +33,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
     public sealed class StoreNotificationViewModel : Screen, ISessionAware
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(StoreNotificationViewModel));
-        private readonly List<NotificationRequestRecord> _requests;
 
         public StoreNotificationViewModel(IRuntimeService runtime)
         {
             Runtime = runtime;
-            DisplayName = $"{Protocols.StoreNotification:D} - Notification";
-            _requests = new List<NotificationRequestRecord>();
+            DisplayName = "Store Notification";
         }
 
         /// <summary>
@@ -120,8 +114,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             _log.DebugFormat("Sending ETP Message for StoreNotification protocol: NotificationRequest");
 
-            Parent.Session.Handler<IStoreNotificationCustomer>()
-                .NotificationRequest(CreateNotificationRequest());
+            Parent.EtpExtender.NotificationRequest(
+                Model.StoreNotification.Uri,
+                Model.StoreNotification.Uuid,
+                Model.StoreNotification.StartTime.ToUnixTimeMicroseconds(),
+                Model.StoreNotification.IncludeObjectData,
+                Model.StoreNotification.ObjectTypes.ToArray());
         }
 
         /// <summary>
@@ -131,13 +129,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             _log.DebugFormat("Sending ETP Message for StoreNotification protocol: CancelNotification");
 
-            var request = _requests.FirstOrDefault(x => x.Uuid.EqualsIgnoreCase(Model.StoreNotification.Uuid));
-            if (request == null) return;
-
-            Parent.Session.Handler<IStoreNotificationCustomer>()
-                .CancelNotification(request.Uuid);
-
-            _requests.Remove(request);
+            Parent.EtpExtender.CancelNotification(Model.StoreNotification.Uuid);
         }
 
         /// <summary>
@@ -177,43 +169,23 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
-        /// Called when the <see cref="OpenSession" /> message is recieved.
+        /// Called when the OpenSession message is recieved.
         /// </summary>
-        /// <param name="e">The <see cref="ProtocolEventArgs{OpenSession}" /> instance containing the event data.</param>
-        public void OnSessionOpened(ProtocolEventArgs<OpenSession> e)
+        /// <param name="supportedProtocols">The supported protocols.</param>
+        public void OnSessionOpened(IList<ISupportedProtocol> supportedProtocols)
         {
-            if (e.Message.SupportedProtocols.All(x => x.Protocol != (int)Protocols.StoreNotification))
+            if (supportedProtocols.All(x => x.Protocol != Parent.EtpExtender.Protocols.StoreNotification))
                 return;
 
             CanExecute = true;
         }
 
         /// <summary>
-        /// Called when the <see cref="Energistics.EtpClient" /> web socket is closed.
+        /// Called when the <see cref="Energistics.Etp.EtpClient" /> web socket is closed.
         /// </summary>
         public void OnSocketClosed()
         {
             CanExecute = false;
-        }
-
-        /// <summary>
-        /// Creates a new notification request record.
-        /// </summary>
-        /// <returns>A new <see cref="NotificationRequestRecord"/> instance.</returns>
-        private NotificationRequestRecord CreateNotificationRequest()
-        {
-            var request = new NotificationRequestRecord
-            {
-                Uri = Model.StoreNotification.Uri,
-                Uuid = Model.StoreNotification.Uuid,
-                StartTime = Model.StoreNotification.StartTime.ToUnixTimeMicroseconds(),
-                IncludeObjectData = Model.StoreNotification.IncludeObjectData,
-                ObjectTypes = Model.StoreNotification.ObjectTypes.ToArray()
-            };
-
-            _requests.Add(request);
-
-            return request;
         }
     }
 }

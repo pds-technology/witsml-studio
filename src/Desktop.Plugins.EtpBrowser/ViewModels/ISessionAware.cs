@@ -16,14 +16,14 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
-using Energistics.Common;
-using Energistics.Protocol.Core;
+using System.Collections.Generic;
+using Energistics.Etp.Common.Datatypes;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 {
     /// <summary>
-    /// Defines methods that can be implemented to receive <see cref="Energistics.EtpClient"/> status notifications.
+    /// Defines methods that can be implemented to receive <see cref="Energistics.Etp.EtpClient"/> status notifications.
     /// </summary>
     public interface ISessionAware
     {
@@ -34,13 +34,13 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         void OnConnectionChanged(Connection connection);
 
         /// <summary>
-        /// Called when the <see cref="OpenSession"/> message is recieved.
+        /// Called when the OpenSession message is recieved.
         /// </summary>
-        /// <param name="e">The <see cref="ProtocolEventArgs{OpenSession}"/> instance containing the event data.</param>
-        void OnSessionOpened(ProtocolEventArgs<OpenSession> e);
+        /// <param name="supportedProtocols">The supported protocols.</param>
+        void OnSessionOpened(IList<ISupportedProtocol> supportedProtocols);
 
         /// <summary>
-        /// Called when the <see cref="Energistics.EtpClient"/> web socket is closed.
+        /// Called when the <see cref="Energistics.Etp.EtpClient"/> web socket is closed.
         /// </summary>
         void OnSocketClosed();
     }

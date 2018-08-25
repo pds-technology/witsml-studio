@@ -19,7 +19,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energistics;
+using Energistics.Etp;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 

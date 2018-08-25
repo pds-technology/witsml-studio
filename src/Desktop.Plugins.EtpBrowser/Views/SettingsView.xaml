@@ -24,7 +24,7 @@
             <RowDefinition Height="40" />
             <RowDefinition Height="40" />
             <RowDefinition Height="40" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="300" />
             <RowDefinition Height="40" />
             <RowDefinition Height="40" />
         </Grid.RowDefinitions>
@@ -52,15 +52,13 @@
             <TextBlock Text="Supported" HorizontalAlignment="Right" Margin="0,0,0,5" Visibility="{Binding Model.IsEtpClient, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=True}" />
             <TextBlock Text="Protocols:" HorizontalAlignment="Right" />
         </StackPanel>
-        <StackPanel Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Orientation="Vertical">
-            <ListBox ItemsSource="{Binding EtpProtocols}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <CheckBox Content="{Binding DisplayName}" IsChecked="{Binding IsSelected, Mode=TwoWay}" IsEnabled="{Binding IsEnabled}" />
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </StackPanel>
+        <ListBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" ItemsSource="{Binding EtpProtocols}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox Content="{Binding DisplayName}" IsChecked="{Binding IsSelected, Mode=TwoWay}" IsEnabled="{Binding IsEnabled}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
         <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Orientation="Horizontal" HorizontalAlignment="Right"
                     IsEnabled="{Binding Model.Connection.Uri, Converter={StaticResource NullToBooleanConverter}}"

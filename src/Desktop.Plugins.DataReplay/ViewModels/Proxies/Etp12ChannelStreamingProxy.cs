@@ -22,24 +22,26 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energistics.Common;
 using Energistics.DataAccess.WITSML141.ReferenceData;
-using Energistics.Datatypes;
-using Energistics.Datatypes.ChannelData;
-using Energistics.Protocol.ChannelStreaming;
-using Energistics.Protocol.Core;
+using Energistics.Etp.Common;
+using Energistics.Etp.Common.Datatypes;
+using Energistics.Etp.Common.Datatypes.ChannelData;
+using Energistics.Etp.v12.Datatypes;
+using Energistics.Etp.v12.Datatypes.ChannelData;
+using Energistics.Etp.v12.Protocol.ChannelStreaming;
+using Energistics.Etp.v12.Protocol.Core;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 {
-    public class EtpChannelStreamingProxy : EtpProxyViewModel
+    public class Etp12ChannelStreamingProxy : EtpProxyViewModel
     {
-        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(EtpChannelStreamingProxy));
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(Etp12ChannelStreamingProxy));
         private readonly Random _random;
 
-        public EtpChannelStreamingProxy(IRuntimeService runtime, string dataSchemaVersion, Action<string> log) : base(runtime, dataSchemaVersion, log)
+        public Etp12ChannelStreamingProxy(IRuntimeService runtime, string dataSchemaVersion, Action<string> log) : base(runtime, dataSchemaVersion, log)
         {
             _random = new Random(246);
             Channels = new List<ChannelMetadataRecord>();
@@ -100,7 +102,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 
         protected virtual void OnStart(object sender, ProtocolEventArgs<Start> e)
         {
-            TaskRunner = new TaskRunner(e.Message.MaxMessageRate)
+            TaskRunner = new TaskRunner(e.Message.MinMessageInterval)
             {
                 OnExecute = StreamChannelData,
                 OnError = LogStreamingError
@@ -137,12 +139,13 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
             TaskRunner.Stop();
         }
 
-        protected virtual List<ChannelMetadataRecord> GetChannelMetadata(MessageHeader header)
+        protected virtual List<ChannelMetadataRecord> GetChannelMetadata(IMessageHeader header)
         {
             var indexMetadata = ToIndexMetadataRecord(Model.Channels.First());
 
             // Skip index channel
             var channelMetadata = Model.Channels
+                .Cast<ChannelMetadataRecord>()
                 .Skip(1)
                 .Select(x => ToChannelMetadataRecord(x, indexMetadata))
                 .ToList();
@@ -197,11 +200,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 
         private static ChannelStreamingInfo ToChannelStreamingInfo(ChannelMetadataRecord record)
         {
-            return new ChannelStreamingInfo()
+            return new ChannelStreamingInfo
             {
                 ChannelId = record.ChannelId,
                 ReceiveChangeNotification = false,
-                StartIndex = new StreamingStartIndex()
+                StartIndex = new StreamingStartIndex
                 {
                     // "null" indicates a request for the latest value
                     Item = null
@@ -209,7 +212,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
             };
         }
 
-        private ChannelMetadataRecord ToChannelMetadataRecord(ChannelMetadataRecord record, IndexMetadataRecord indexMetadata)
+        private ChannelMetadataRecord ToChannelMetadataRecord(IChannelMetadataRecord record, IndexMetadataRecord indexMetadata)
         {
             var uri = GetChannelUri(record.ChannelName);
 
@@ -224,7 +227,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
                 DataType = record.DataType,
                 Description = record.Description,
                 Uuid = record.Uuid,
-                Status = record.Status,
+                Status = (ChannelStatuses) record.Status,
                 Source = record.Source,
                 Indexes = new[]
                 {
@@ -237,7 +240,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
             return channel;
         }
 
-        private IndexMetadataRecord ToIndexMetadataRecord(ChannelMetadataRecord record, int scale = 3)
+        private IndexMetadataRecord ToIndexMetadataRecord(IChannelMetadataRecord record, int scale = 3)
         {
             return new IndexMetadataRecord()
             {
@@ -246,9 +249,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
                 Description = record.Description,
                 Uom = record.Uom,
                 Scale = scale,
-                IndexType = Model.LogIndexType == LogIndexType.datetime || Model.LogIndexType == LogIndexType.elapsedtime
-                    ? ChannelIndexTypes.Time
-                    : ChannelIndexTypes.Depth,
+                IndexKind = Model.LogIndexType == LogIndexType.datetime || Model.LogIndexType == LogIndexType.elapsedtime
+                    ? ChannelIndexKinds.Time
+                    : ChannelIndexKinds.Depth,
                 Direction = IndexDirections.Increasing,
                 CustomData = new Dictionary<string, DataValue>(0),
             };
@@ -261,14 +264,14 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 
             var indexDateTimeOffset = DateTimeOffset.UtcNow;
 
-            return new DataItem()
+            return new DataItem
             {
                 ChannelId = channel.ChannelId,
                 Indexes = channel.Indexes
-                .Select(x => ToChannelIndexValue(streamingInfo, x, indexDateTimeOffset))
-                .ToList(),
+                    .Select(x => ToChannelIndexValue(streamingInfo, x, indexDateTimeOffset))
+                    .ToList(),
                 ValueAttributes = new DataAttribute[0],
-                Value = new DataValue()
+                Value = new DataValue
                 {
                     Item = ToChannelDataValue(channel, indexDateTimeOffset)
                 }
@@ -277,7 +280,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 
         private long ToChannelIndexValue(ChannelStreamingInfo streamingInfo, IndexMetadataRecord index, DateTimeOffset indexDateTimeOffset)
         {
-            if (index.IndexType == ChannelIndexTypes.Time)
+            if (index.IndexKind == ChannelIndexKinds.Time)
                 return indexDateTimeOffset.ToUnixTimeMicroseconds();
 
             var value = 0d;
@@ -296,10 +299,10 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
         private object ToChannelDataValue(ChannelMetadataRecord channel, DateTimeOffset indexDateTimeOffset)
         {
             object dataValue = null;
-            var indexType = channel.Indexes.Select(i => i.IndexType).FirstOrDefault();
+            var indexType = channel.Indexes.Select(i => i.IndexKind).FirstOrDefault();
 
             LogDataType logDataType;
-            var logDataTypeExists = Enum.TryParse<LogDataType>(channel.DataType, out logDataType);
+            if (!Enum.TryParse(channel.DataType, out logDataType)) return null;
 
             switch (logDataType)
             {
@@ -310,7 +313,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
                     }
                 case LogDataType.datetime:
                 {
-                        var dto = indexType == ChannelIndexTypes.Time 
+                        var dto = indexType == ChannelIndexKinds.Time 
                             ? indexDateTimeOffset 
                             : indexDateTimeOffset.AddSeconds(_random.Next(1, 5));
 

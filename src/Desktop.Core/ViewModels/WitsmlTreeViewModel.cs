@@ -31,9 +31,9 @@ using System.Windows.Data;
 using System.Windows.Input;
 using Caliburn.Micro;
 using Energistics.DataAccess;
+using IDataObject = Energistics.DataAccess.IDataObject;
 using Witsml141 = Energistics.DataAccess.WITSML141;
-using Energistics.Datatypes;
-using Energistics.Datatypes.Object;
+using Energistics.Etp.Common.Datatypes;
 using PDS.WITSMLstudio.Adapters;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Linq;
@@ -41,7 +41,6 @@ using PDS.WITSMLstudio.Query;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
-using IDataObject = Energistics.DataAccess.IDataObject;
 
 namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 {
@@ -1622,7 +1621,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
         private ResourceViewModel ToResourceViewModel(ResourceViewModel parent, EtpUri uri, string name, Func<ResourceViewModel, string, Task> action, int children = -1, object dataContext = null)
         {
-            var resource = new Resource
+            var resource = new Energistics.Etp.v11.Datatypes.Object.Resource
             {
                 Uri = uri,
                 Name = name,
@@ -1649,7 +1648,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         }
 
         #region IDisposable Support
-        private bool _disposedValue = false; // To detect redundant calls
+        private bool _disposedValue; // To detect redundant calls
 
         /// <summary>
         /// Releases unmanaged and - optionally - managed resources.
@@ -1666,9 +1665,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                         if (Loading)
                             _tokenSource.Cancel();
 
-                        if (_tokenSource != null)
-                            _tokenSource.Dispose();
-
+                        _tokenSource?.Dispose();
                         _tokenSource = null;
 
                         BindingOperations.DisableCollectionSynchronization(Items);

@@ -18,17 +18,17 @@
 
 using System;
 using System.Collections.Generic;
-using Energistics.Common;
-using Energistics.Datatypes;
-using Energistics.Datatypes.Object;
-using Energistics.Protocol.Discovery;
+using Energistics.Etp.Common;
+using Energistics.Etp.Common.Datatypes;
+using Energistics.Etp.v11.Datatypes.Object;
+using Energistics.Etp.v11.Protocol.Discovery;
 using PDS.WITSMLstudio.Framework;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
 {
-    public class SimulationDiscoveryProvider : DiscoveryStoreHandler
+    public class SimulationDiscovery11Provider : DiscoveryStoreHandler
     {
-        public SimulationDiscoveryProvider(Models.Simulation simulation)
+        public SimulationDiscovery11Provider(Models.Simulation simulation)
         {
             Simulation = simulation;
         }

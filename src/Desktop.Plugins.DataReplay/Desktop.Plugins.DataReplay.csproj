@@ -57,11 +57,12 @@
       <HintPath>$(SolutionDir)\packages\Standards.DevKit-PDS.2.0.20180429.2\lib\net40\Energistics.DataAccess.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ETP.DevKit, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\ETP.DevKit-PDS.1.1.20180702.1\lib\net452\ETP.DevKit.dll</HintPath>
+    <Reference Include="ETP.DevKit, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\ETP.DevKit.1.2.0-dev08\lib\net452\ETP.DevKit.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="ETP.Messages, Version=1.5.0.0, Culture=neutral, PublicKeyToken=c2b7028481fb2795, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\ETP.1.5.0.0\lib\ETP.Messages.dll</HintPath>
+    <Reference Include="ETP.Messages, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\ETP.1.6.0-dev06\lib\net40\ETP.Messages.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
@@ -154,12 +155,18 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Providers\SimulationChannelStreamingProvider.cs" />
-    <Compile Include="Providers\SimulationDiscoveryProvider.cs" />
+    <Compile Include="Providers\Etp12Simulator.cs" />
+    <Compile Include="Providers\Etp11Simulator.cs" />
+    <Compile Include="Providers\IEtpSimulator.cs" />
+    <Compile Include="Providers\SimulationChannelStreaming12Provider.cs" />
+    <Compile Include="Providers\SimulationChannelStreaming11Provider.cs" />
+    <Compile Include="Providers\SimulationDiscovery12Provider.cs" />
+    <Compile Include="Providers\SimulationDiscovery11Provider.cs" />
+    <Compile Include="ViewModels\Proxies\Etp12ChannelStreamingProxy.cs" />
     <Compile Include="ViewModels\Proxies\EtpProxyViewModel.cs" />
     <Compile Include="ViewModels\Proxies\Log131ProxyViewModel.cs" />
     <Compile Include="ViewModels\Proxies\Log141ProxyViewModel.cs" />
-    <Compile Include="ViewModels\Proxies\EtpChannelStreamingProxy.cs" />
+    <Compile Include="ViewModels\Proxies\Etp11ChannelStreamingProxy.cs" />
     <Compile Include="ViewModels\Proxies\WitsmlProxyViewModel.cs" />
     <Compile Include="ViewModels\Simulation\ChannelsViewModel.cs" />
     <Compile Include="ViewModels\DataReplayViewModel.cs" />
@@ -197,7 +204,6 @@
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Page Include="Views\Simulation\ChannelsView.xaml">
       <SubType>Designer</SubType>

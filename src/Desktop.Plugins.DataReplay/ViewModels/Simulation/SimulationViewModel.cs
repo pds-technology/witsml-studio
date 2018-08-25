@@ -21,7 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using Caliburn.Micro;
-using Energistics.Common;
+using Energistics.Etp.Common;
 using Microsoft.Win32;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
@@ -30,18 +30,18 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Simulation
 {
     public class SimulationViewModel : Conductor<IScreen>.Collection.OneActive
     {
-        private static readonly string PluginVersion = typeof(SimulationViewModel).GetAssemblyVersion();
+        private static readonly string _pluginVersion = typeof(SimulationViewModel).GetAssemblyVersion();
 
         public SimulationViewModel(IRuntimeService runtime)
         {
             Runtime = runtime;
             Model = new Models.Simulation()
             {
-                Version = PluginVersion
+                Version = _pluginVersion
             };
         }
 
-        public IRuntimeService Runtime { get; private set; }
+        public IRuntimeService Runtime { get; }
 
         private Models.Simulation _model;
 

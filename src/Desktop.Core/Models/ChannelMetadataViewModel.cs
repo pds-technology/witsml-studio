@@ -17,12 +17,12 @@
 //-----------------------------------------------------------------------
 
 using Caliburn.Micro;
-using Energistics.Datatypes.ChannelData;
+using Energistics.Etp.Common.Datatypes.ChannelData;
 
-namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
+namespace PDS.WITSMLstudio.Desktop.Core.Models
 {
     /// <summary>
-    /// Wraps a <see cref="ChannelMetadataRecord"/> for data binding.
+    /// Wraps a <see cref="IChannelMetadataRecord"/> for data binding.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.PropertyChangedBase" />
     public class ChannelMetadataViewModel : PropertyChangedBase
@@ -31,7 +31,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
         /// Initializes a new instance of the <see cref="ChannelMetadataViewModel"/> class.
         /// </summary>
         /// <param name="record">The record.</param>
-        public ChannelMetadataViewModel(ChannelMetadataRecord record)
+        public ChannelMetadataViewModel(IChannelMetadataRecord record)
         {
             Record = record;
         }
@@ -39,7 +39,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
         /// <summary>
         /// Gets the channel metadata record.
         /// </summary>
-        public ChannelMetadataRecord Record { get; }
+        public IChannelMetadataRecord Record { get; }
 
         private bool _isChecked;
 

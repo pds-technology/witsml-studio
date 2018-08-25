@@ -23,7 +23,7 @@ using Energistics.DataAccess;
 using Energistics.DataAccess.WITSML131;
 using Energistics.DataAccess.WITSML131.ComponentSchemas;
 using Energistics.DataAccess.WITSML131.ReferenceData;
-using Energistics.Datatypes.ChannelData;
+using Energistics.Etp.Common.Datatypes.ChannelData;
 using PDS.WITSMLstudio.Data.Logs;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
@@ -38,9 +38,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
             Generator = new Log131Generator();
         }
 
-        public IRuntimeService Runtime { get; private set; }
+        public IRuntimeService Runtime { get; }
 
-        public Log131Generator Generator { get; private set; }
+        public Log131Generator Generator { get; }
 
         private TextEditorViewModel _messages;
 
@@ -98,7 +98,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
             }
         }
 
-        private LogCurveInfo ToLogCurveInfo(ChannelMetadataRecord channel)
+        private LogCurveInfo ToLogCurveInfo(IChannelMetadataRecord channel)
         {
             return new LogCurveInfo()
             {

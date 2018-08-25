@@ -19,7 +19,7 @@
 using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
-using Energistics;
+using Energistics.Etp;
 
 namespace PDS.WITSMLstudio.Desktop.Core.Connections
 {

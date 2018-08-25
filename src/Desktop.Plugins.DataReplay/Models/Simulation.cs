@@ -19,7 +19,7 @@
 using System.Runtime.Serialization;
 using Caliburn.Micro;
 using Energistics.DataAccess.WITSML141.ReferenceData;
-using Energistics.Datatypes.ChannelData;
+using Energistics.Etp.Common.Datatypes.ChannelData;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Models
@@ -29,7 +29,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Models
     {
         public Simulation()
         {
-            Channels = new BindableCollection<ChannelMetadataRecord>();
+            Channels = new BindableCollection<IChannelMetadataRecord>();
             WitsmlConnection = new Connection();
             EtpConnection = new Connection();
             LogIndexType = LogIndexType.measureddepth;
@@ -264,9 +264,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Models
             }
         }
 
-        private BindableCollection<ChannelMetadataRecord> _channels;
+        private BindableCollection<IChannelMetadataRecord> _channels;
         [DataMember]
-        public BindableCollection<ChannelMetadataRecord> Channels
+        public BindableCollection<IChannelMetadataRecord> Channels
         {
             get { return _channels; }
             set
@@ -305,6 +305,21 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Models
                 {
                     _etpVersion = value;
                     NotifyOfPropertyChange(() => EtpVersion);
+                }
+            }
+        }
+
+        private string _subProtocol;
+        [DataMember]
+        public string SubProtocol
+        {
+            get { return _subProtocol; }
+            set
+            {
+                if (_subProtocol != value)
+                {
+                    _subProtocol = value;
+                    NotifyOfPropertyChange(() => SubProtocol);
                 }
             }
         }

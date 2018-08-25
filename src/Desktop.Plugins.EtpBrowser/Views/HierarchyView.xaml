@@ -15,22 +15,25 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition />
-            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="AUto"/>
+            <ColumnDefinition Width="60"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="40" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Base URI:" Margin="10,0,5,10" HorizontalAlignment="Right" VerticalAlignment="Center" />
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="URI:" Margin="5,0,5,10" HorizontalAlignment="Right" VerticalAlignment="Center" />
         <TextBox Grid.Row="0" Grid.Column="1" Margin="5,0,0,10" Padding="5" VerticalContentAlignment="Center" Text="{Binding Model.BaseUri, UpdateSourceTrigger=PropertyChanged}" x:Name="BaseUriInput">
             <TextBox.InputBindings>
                 <KeyBinding Key="Enter" Command="{Binding GetBaseUriCommand}" />
             </TextBox.InputBindings>
         </TextBox>
-        <Button x:Name="GetBaseUri" Grid.Row="0" Grid.Column="2" Margin="5,0,0,10" Content="Get" Width="40" HorizontalAlignment="Right" IsEnabled="{Binding CanExecute}" />
+        <ComboBox Grid.Row="0" Grid.Column="2" Width="105" Margin="5,0,0,10" VerticalContentAlignment="Center" IsEditable="False" 
+                  ItemsSource="{Binding Parent.DiscoveryFunctions}" SelectedItem="{Binding Model.DiscoveryFunction}" IsEnabled="{Binding CanExecute}" />
+        <Button x:Name="GetBaseUri" Grid.Row="0" Grid.Column="3" Margin="5,0,0,10" Content="Execute" IsEnabled="{Binding CanExecute}" />
 
-        <TreeView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" ItemsSource="{Binding Parent.Resources}" cal:Message.Attach="[Event SelectedItemChanged] = [Action RefreshContextMenu()]" VirtualizingStackPanel.IsVirtualizing="True"  VirtualizingStackPanel.VirtualizationMode="Recycling">
+        <TreeView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" ItemsSource="{Binding Parent.Resources}" cal:Message.Attach="[Event SelectedItemChanged] = [Action RefreshContextMenu()]" VirtualizingStackPanel.IsVirtualizing="True"  VirtualizingStackPanel.VirtualizationMode="Recycling">
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
