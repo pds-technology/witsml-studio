@@ -207,15 +207,15 @@ namespace PDS.WITSMLstudio.Desktop.Core
         }
 
         /// <summary>
-        /// Creates the ETP protocol metadata provider based on the ETP version specified for the <see cref="Connection"/>.
+        /// Creates a new ETP extender based on the ETP version specified for the <see cref="Connection"/>.
         /// </summary>
         /// <param name="connection">The connection.</param>
-        /// <returns>A new <see cref="IEtpProtocols"/> instance.</returns>
-        public static IEtpProtocols CreateEtpProtocols(this Connection connection)
+        /// <returns>A new <see cref="IEtpExtender"/> instance.</returns>
+        public static IEtpExtender CreateEtpExtender(this Connection connection)
         {
             using (var client = connection.CreateEtpClient(string.Empty, string.Empty))
             {
-                return client.CreateEtpExtender(new EtpProtocolItem[0], true).Protocols;
+                return client.CreateEtpExtender(new EtpProtocolItem[0], true);
             }
         }
 

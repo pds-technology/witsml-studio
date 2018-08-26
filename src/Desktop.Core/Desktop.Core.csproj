@@ -182,10 +182,7 @@
     </Compile>
     <Compile Include="Adapters\Etp12Extender.cs" />
     <Compile Include="Adapters\Etp11Extender.cs" />
-    <Compile Include="Adapters\Etp12Protocols.cs" />
-    <Compile Include="Adapters\Etp11Protocols.cs" />
     <Compile Include="Adapters\IEtpExtender.cs" />
-    <Compile Include="Adapters\IEtpProtocols.cs" />
     <Compile Include="Behaviors\DropDownButtonBehavior.cs" />
     <Compile Include="Commands\DelegateCommand.cs" />
     <Compile Include="Commands\ScrollCommands.cs" />

@@ -23,6 +23,7 @@ using Energistics.Etp.Common;
 using Energistics.Etp.Common.Datatypes;
 using Energistics.Etp.Common.Datatypes.ChannelData;
 using Energistics.Etp.Common.Datatypes.Object;
+using PDS.WITSMLstudio.Adapters;
 using PDS.WITSMLstudio.Desktop.Core.Models;
 
 namespace PDS.WITSMLstudio.Desktop.Core.Adapters
@@ -62,6 +63,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// Sends the CloseSession message.
         /// </summary>
         void CloseSession();
+
+        /// <summary>
+        /// Gets the protocol items.
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<EtpProtocolItem> GetProtocolItems();
 
         /// <summary>
         /// Determines if the specified index metadata is time-based.

@@ -37,6 +37,7 @@ using Energistics.Etp.v11.Protocol.Discovery;
 using Energistics.Etp.v11.Protocol.GrowingObject;
 using Energistics.Etp.v11.Protocol.Store;
 using Energistics.Etp.v11.Protocol.StoreNotification;
+using PDS.WITSMLstudio.Adapters;
 using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Framework;
 
@@ -160,6 +161,30 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
                 Session?.Handler<ICoreServer>()
                     ?.CloseSession();
             }
+        }
+
+        /// <summary>
+        /// Gets the protocol items.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<EtpProtocolItem> GetProtocolItems()
+        {
+            yield return new EtpProtocolItem(Energistics.Etp.v11.Protocols.ChannelStreaming, "consumer");
+            yield return new EtpProtocolItem(Energistics.Etp.v11.Protocols.ChannelStreaming, "producer", true);
+            yield return new EtpProtocolItem(Energistics.Etp.v11.Protocols.ChannelDataFrame, "consumer");
+            yield return new EtpProtocolItem(Energistics.Etp.v11.Protocols.ChannelDataFrame, "producer");
+            yield return new EtpProtocolItem(Energistics.Etp.v11.Protocols.Discovery, "store", true);
+            yield return new EtpProtocolItem(Energistics.Etp.v11.Protocols.Discovery, "customer");
+            yield return new EtpProtocolItem(Energistics.Etp.v11.Protocols.Store, "store", true);
+            yield return new EtpProtocolItem(Energistics.Etp.v11.Protocols.Store, "customer");
+            yield return new EtpProtocolItem(Energistics.Etp.v11.Protocols.StoreNotification, "store", true);
+            yield return new EtpProtocolItem(Energistics.Etp.v11.Protocols.StoreNotification, "customer");
+            yield return new EtpProtocolItem(Energistics.Etp.v11.Protocols.GrowingObject, "store", true);
+            yield return new EtpProtocolItem(Energistics.Etp.v11.Protocols.GrowingObject, "customer");
+            yield return new EtpProtocolItem(Energistics.Etp.v11.Protocols.DataArray, "store");
+            yield return new EtpProtocolItem(Energistics.Etp.v11.Protocols.DataArray, "customer");
+            yield return new EtpProtocolItem(Energistics.Etp.v11.Protocols.WitsmlSoap, "store", isEnabled: false);
+            yield return new EtpProtocolItem(Energistics.Etp.v11.Protocols.WitsmlSoap, "customer", isEnabled: false);
         }
 
         /// <summary>

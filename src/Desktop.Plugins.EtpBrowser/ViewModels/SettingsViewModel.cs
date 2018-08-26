@@ -257,8 +257,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             CanRequestSession = !CanStopServer;
             CanCloseSession = false;
 
-            var protocols = Parent.EtpExtender?.Protocols ??
-                            connection.CreateEtpProtocols();
+            var protocols = Parent.EtpExtender ??
+                            connection.CreateEtpExtender();
 
             Runtime.InvokeAsync(() =>
             {
