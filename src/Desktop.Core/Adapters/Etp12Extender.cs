@@ -73,7 +73,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             Session = session;
             ProtocolItems = protocolItems;
             IsEtpClient = isEtpClient;
-            Protocols = new Etp11Protocols();
+            Protocols = new Etp12Protocols();
             _channelStreamingInfos = new List<ChannelStreamingInfo>();
             _notificationRequests = new List<NotificationRequestRecord>();
         }
