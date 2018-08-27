@@ -169,7 +169,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                     DeleteObject();
                     break;
                 case Functions.FindObjects:
-                    GetObject();
+                    FindObjects();
                     break;
             }
         }
