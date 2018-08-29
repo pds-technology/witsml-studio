@@ -201,8 +201,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
 
             //yield return new EtpProtocolItem(Energistics.Etp.v12.Protocols.WitsmlSoap, "store", isEnabled: false);
             //yield return new EtpProtocolItem(Energistics.Etp.v12.Protocols.WitsmlSoap, "customer", isEnabled: false);
-            //yield return new EtpProtocolItem(Energistics.Etp.v12.Protocols.ChannelDataLoad, "consumer");
-            //yield return new EtpProtocolItem(Energistics.Etp.v12.Protocols.ChannelDataLoad, "producer");
+            yield return new EtpProtocolItem(Energistics.Etp.v12.Protocols.ChannelDataLoad, "consumer");
+            yield return new EtpProtocolItem(Energistics.Etp.v12.Protocols.ChannelDataLoad, "producer");
         }
 
         /// <summary>
