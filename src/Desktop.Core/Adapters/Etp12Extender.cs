@@ -30,6 +30,7 @@ using Energistics.Etp.v12.Datatypes;
 using Energistics.Etp.v12.Datatypes.ChannelData;
 using Energistics.Etp.v12.Datatypes.Object;
 using Energistics.Etp.v12.Protocol.ChannelDataFrame;
+using Energistics.Etp.v12.Protocol.ChannelDataLoad;
 using Energistics.Etp.v12.Protocol.ChannelStreaming;
 using Energistics.Etp.v12.Protocol.Core;
 using Energistics.Etp.v12.Protocol.Discovery;
@@ -565,6 +566,17 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
                 RegisterEventHandlers(session.Handler<IChannelDataFrameProducer>());
             }
 
+            if (Requesting(Protocols.ChannelDataLoad, "producer"))
+            {
+                session.Register<IChannelDataLoadConsumer, ChannelDataLoadConsumerHandler>();
+                RegisterEventHandlers(session.Handler<IChannelDataLoadConsumer>());
+            }
+            if (Requesting(Protocols.ChannelDataLoad, "consumer"))
+            {
+                session.Register<IChannelDataLoadProducer, ChannelDataLoadProducerHandler>();
+                RegisterEventHandlers(session.Handler<IChannelDataLoadProducer>());
+            }
+
             if (Requesting(Protocols.Discovery, "store"))
             {
                 session.Register<IDiscoveryCustomer, DiscoveryCustomerHandler>();
@@ -708,6 +720,17 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             {
                 session.Register<IChannelDataFrameProducer, ChannelDataFrameProducerHandler>();
                 RegisterEventHandlers(session.Handler<IChannelDataFrameProducer>());
+            }
+
+            if (Requesting(Protocols.ChannelDataLoad, "consumer"))
+            {
+                session.Register<IChannelDataLoadConsumer, ChannelDataLoadConsumerHandler>();
+                RegisterEventHandlers(session.Handler<IChannelDataLoadConsumer>());
+            }
+            if (Requesting(Protocols.ChannelDataLoad, "producer"))
+            {
+                session.Register<IChannelDataLoadProducer, ChannelDataLoadProducerHandler>();
+                RegisterEventHandlers(session.Handler<IChannelDataLoadProducer>());
             }
 
             if (Requesting(Protocols.Discovery, "store"))
