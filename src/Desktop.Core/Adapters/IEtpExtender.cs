@@ -49,6 +49,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="onGetResourcesResponse">The GetResources handler.</param>
         /// <param name="onObject">The Object handler.</param>
         /// <param name="onObjectPart">The ObjectPart handler.</param>
+        /// <param name="onOpenChannel">The OpenChannel handler.</param>
         void Register(
             Action<ProtocolEventArgs<ISpecificRecord>> logObjectDetails = null,
             Action<IMessageHeader, ISpecificRecord, IList<ISupportedProtocol>> onOpenSession = null,
@@ -57,7 +58,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             Action<IMessageHeader, IList<IDataItem>> onChannelData = null,
             Action<IMessageHeader, ISpecificRecord, IResource, string> onGetResourcesResponse = null,
             Action<IMessageHeader, ISpecificRecord, IDataObject> onObject = null,
-            Action<IMessageHeader, ISpecificRecord, IDataObject> onObjectPart = null);
+            Action<IMessageHeader, ISpecificRecord, IDataObject> onObjectPart = null,
+            Action<IMessageHeader, ISpecificRecord, long, string> onOpenChannel = null);
 
         /// <summary>
         /// Sends the CloseSession message.

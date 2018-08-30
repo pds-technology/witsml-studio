@@ -61,6 +61,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         private Action<IMessageHeader, ISpecificRecord, IResource, string> _onGetResourcesResponse;
         private Action<IMessageHeader, ISpecificRecord, IDataObject> _onObject;
         private Action<IMessageHeader, ISpecificRecord, IDataObject> _onObjectPart;
+        private Action<IMessageHeader, ISpecificRecord, long, string> _onOpenChannel;
         private bool _protocolHandlersRegistered;
 
         /// <summary>
@@ -101,6 +102,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="onGetResourcesResponse">The GetResources handler.</param>
         /// <param name="onObject">The Object handler.</param>
         /// <param name="onObjectPart">The ObjectPart handler.</param>
+        /// <param name="onOpenChannel">The OpenChannel handler.</param>
         public void Register(
             Action<ProtocolEventArgs<ISpecificRecord>> logObjectDetails = null,
             Action<IMessageHeader, ISpecificRecord, IList<ISupportedProtocol>> onOpenSession = null,
@@ -109,7 +111,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             Action<IMessageHeader, IList<IDataItem>> onChannelData = null,
             Action<IMessageHeader, ISpecificRecord, IResource, string> onGetResourcesResponse = null,
             Action<IMessageHeader, ISpecificRecord, IDataObject> onObject = null,
-            Action<IMessageHeader, ISpecificRecord, IDataObject> onObjectPart = null)
+            Action<IMessageHeader, ISpecificRecord, IDataObject> onObjectPart = null,
+            Action<IMessageHeader, ISpecificRecord, long, string> onOpenChannel = null)
         {
             _logObjectDetails = logObjectDetails ?? _logObjectDetails;
             _onChannelMetadata = onChannelMetadata ?? _onChannelMetadata;
@@ -117,6 +120,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             _onGetResourcesResponse = onGetResourcesResponse ?? _onGetResourcesResponse;
             _onObject = onObject ?? _onObject;
             _onObjectPart = onObjectPart ?? _onObjectPart;
+            _onOpenChannel = onOpenChannel ?? _onOpenChannel;
 
             RegisterProtocolHandlers(Session, IsEtpClient);
 
@@ -569,7 +573,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             if (Requesting(Protocols.ChannelDataLoad, "producer"))
             {
                 session.Register<IChannelDataLoadConsumer, ChannelDataLoadConsumerHandler>();
-                RegisterEventHandlers(session.Handler<IChannelDataLoadConsumer>());
+                RegisterEventHandlers(session.Handler<IChannelDataLoadConsumer>(),
+                    x => x.OnOpenChannel += (s, e) => _onOpenChannel?.Invoke(e.Header, e.Message, e.Message.Id, e.Message.Uri));
             }
             if (Requesting(Protocols.ChannelDataLoad, "consumer"))
             {
@@ -725,7 +730,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             if (Requesting(Protocols.ChannelDataLoad, "consumer"))
             {
                 session.Register<IChannelDataLoadConsumer, ChannelDataLoadConsumerHandler>();
-                RegisterEventHandlers(session.Handler<IChannelDataLoadConsumer>());
+                RegisterEventHandlers(session.Handler<IChannelDataLoadConsumer>(),
+                    x => x.OnOpenChannel += (s, e) => _onOpenChannel?.Invoke(e.Header, e.Message, e.Message.Id, e.Message.Uri));
             }
             if (Requesting(Protocols.ChannelDataLoad, "producer"))
             {

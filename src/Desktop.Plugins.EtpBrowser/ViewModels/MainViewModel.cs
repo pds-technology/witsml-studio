@@ -487,7 +487,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 onCloseSession: OnCloseSession,
                 onGetResourcesResponse: OnGetResourcesResponse,
                 onObject: OnObject,
-                onObjectPart: OnObjectPart);
+                onObjectPart: OnObjectPart,
+                onOpenChannel: OnOpenChannel);
         }
 
         private void OnServerSessionClosed(object sender, IEtpSession session)
@@ -629,6 +630,19 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
             viewModel.Parent = parent;
             parent.Children.Add(viewModel);
+        }
+
+        /// <summary>
+        /// Called when the OpenChannel message is recieved.
+        /// </summary>
+        /// <param name="header">The header.</param>
+        /// <param name="message">The message.</param>
+        /// <param name="channelId">The channel identifier.</param>
+        /// <param name="uri">The URI.</param>
+        private void OnOpenChannel(IMessageHeader header, ISpecificRecord message, long channelId, string uri)
+        {
+            var handler = Client.Handler<Energistics.Etp.v12.Protocol.ChannelDataLoad.IChannelDataLoadConsumer>();
+            handler.OpenChannelResponse(uri, channelId, Guid.NewGuid());
         }
 
         /// <summary>
