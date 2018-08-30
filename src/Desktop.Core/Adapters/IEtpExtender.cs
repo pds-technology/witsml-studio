@@ -34,6 +34,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
     public interface IEtpExtender
     {
         /// <summary>
+        /// Gets the session.
+        /// </summary>
+        EtpSession Session { get; }
+
+        /// <summary>
         /// Gets the ETP protocol metadata.
         /// </summary>
         IEtpProtocols Protocols { get; }

@@ -85,7 +85,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// </summary>
         public IEtpProtocols Protocols { get; }
 
-        private EtpSession Session { get; }
+        /// <summary>
+        /// Gets the session.
+        /// </summary>
+        public EtpSession Session { get; }
 
         private IList<EtpProtocolItem> ProtocolItems { get; }
 
