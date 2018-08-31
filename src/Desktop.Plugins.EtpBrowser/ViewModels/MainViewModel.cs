@@ -431,7 +431,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                     onOpenSession: OnOpenSession,
                     onGetResourcesResponse: OnGetResourcesResponse,
                     onObject: OnObject,
-                    onObjectPart: OnObjectPart);
+                    onObjectPart: OnObjectPart,
+                    onOpenChannel: OnOpenChannel);
 
                 Client.SocketClosed += OnClientSocketClosed;
                 Client.Output = LogClientOutput;
@@ -641,8 +642,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <param name="uri">The URI.</param>
         private void OnOpenChannel(IMessageHeader header, ISpecificRecord message, long channelId, string uri)
         {
-            var handler = EtpExtender.Session.Handler<Energistics.Etp.v12.Protocol.ChannelDataLoad.IChannelDataLoadConsumer>();
-            handler.OpenChannelResponse(uri, channelId, Guid.NewGuid());
+            EtpExtender.OpenChannelResponse(uri, channelId, Guid.NewGuid());
         }
 
         /// <summary>

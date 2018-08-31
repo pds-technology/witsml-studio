@@ -88,7 +88,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <summary>
         /// Gets the session.
         /// </summary>
-        public EtpSession Session { get; }
+        IEtpSession IEtpExtender.Session => Session;
+
+        private EtpSession Session { get; }
 
         private IList<EtpProtocolItem> ProtocolItems { get; }
 
@@ -290,6 +292,21 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
 
             Session.Handler<IChannelStreamingConsumer>()
                 .ChannelRangeRequest(new[] { rangeInfo });
+        }
+
+        /// <summary>
+        /// Sends the OpenChannelResponse message with the specified paramters.
+        /// </summary>
+        /// <param name="uri">The URI.</param>
+        /// <param name="id">The channel identifier.</param>
+        /// <param name="uuid">The UUID.</param>
+        /// <param name="lastIndex">The last index value.</param>
+        /// <param name="infill">if set to <c>true</c> supports infill.</param>
+        /// <param name="dataChanges">if set to <c>true</c> supports data changes.</param>
+        public void OpenChannelResponse(string uri, long id, Guid uuid, object lastIndex = null, bool infill = true, bool dataChanges = true)
+        {
+            Session.Handler<IChannelDataLoadConsumer>()
+                .OpenChannelResponse(uri, id, uuid, lastIndex, dataChanges);
         }
 
         /// <summary>
