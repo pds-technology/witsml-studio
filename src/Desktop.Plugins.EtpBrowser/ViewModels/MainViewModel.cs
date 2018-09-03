@@ -642,7 +642,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <param name="uri">The URI.</param>
         private void OnOpenChannel(IMessageHeader header, ISpecificRecord message, long channelId, string uri)
         {
-            EtpExtender.OpenChannelResponse(uri, channelId, Guid.NewGuid());
+            EtpExtender.OpenChannelResponse(header, uri, channelId, Guid.NewGuid());
         }
 
         /// <summary>

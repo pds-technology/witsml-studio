@@ -121,13 +121,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <summary>
         /// Sends the OpenChannelResponse message with the specified paramters.
         /// </summary>
+        /// <param name="request">The request.</param>
         /// <param name="uri">The URI.</param>
         /// <param name="id">The channel identifier.</param>
         /// <param name="uuid">The UUID.</param>
         /// <param name="lastIndex">The last index value.</param>
         /// <param name="infill">if set to <c>true</c> supports infill.</param>
         /// <param name="dataChanges">if set to <c>true</c> supports data changes.</param>
-        void OpenChannelResponse(string uri, long id, Guid uuid, object lastIndex = null, bool infill = true, bool dataChanges = true);
+        void OpenChannelResponse(IMessageHeader request, string uri, long id, Guid uuid, object lastIndex = null, bool infill = true, bool dataChanges = true);
 
         /// <summary>
         /// Sends the GetResources message with the specified URI.
