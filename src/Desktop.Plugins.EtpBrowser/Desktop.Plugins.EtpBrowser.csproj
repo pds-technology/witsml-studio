@@ -145,6 +145,7 @@
     <Compile Include="..\External\GlobalAssemblyInfo.cs">
       <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Models\DataLoadSettings.cs" />
     <Compile Include="Models\EtpSettings.cs" />
     <Compile Include="Models\StoreNotificationSettings.cs" />
     <Compile Include="Models\GrowingObjectSettings.cs" />
@@ -163,6 +164,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="ViewModels\DataLoadViewModel.cs" />
     <Compile Include="ViewModels\GrowingObjectViewModel.cs" />
     <Compile Include="ViewModels\HierarchyViewModel.cs" />
     <Compile Include="ViewModels\ISessionAware.cs" />
@@ -172,6 +174,9 @@
     <Compile Include="ViewModels\StoreNotificationViewModel.cs" />
     <Compile Include="ViewModels\StoreViewModel.cs" />
     <Compile Include="ViewModels\StreamingViewModel.cs" />
+    <Compile Include="Views\DataLoadView.xaml.cs">
+      <DependentUpon>DataLoadView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\GrowingObjectView.xaml.cs">
       <DependentUpon>GrowingObjectView.xaml</DependentUpon>
     </Compile>
@@ -227,6 +232,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\DataLoadView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\GrowingObjectView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

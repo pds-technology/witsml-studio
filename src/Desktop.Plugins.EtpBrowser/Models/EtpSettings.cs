@@ -58,6 +58,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
             StoreNotification = new StoreNotificationSettings();
             GrowingObject = new GrowingObjectSettings();
             GrowingObjectFunction = Functions.GetPart;
+            DataLoad = new DataLoadSettings();
             RequestedProtocols = new BindableCollection<EtpProtocolItem>();
             BaseUri = EtpUri.RootUri;
             IsEtpClient = true;
@@ -155,6 +156,25 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
                 {
                     _growingObject = value;
                     NotifyOfPropertyChange(() => GrowingObject);
+                }
+            }
+        }
+
+        private DataLoadSettings _dataLoad;
+        /// <summary>
+        /// Gets or sets the Data Load settings.
+        /// </summary>
+        /// <value>The Data Load settings.</value>
+        [DataMember]
+        public DataLoadSettings DataLoad
+        {
+            get { return _dataLoad; }
+            set
+            {
+                if (!ReferenceEquals(_dataLoad, value))
+                {
+                    _dataLoad = value;
+                    NotifyOfPropertyChange(() => DataLoad);
                 }
             }
         }

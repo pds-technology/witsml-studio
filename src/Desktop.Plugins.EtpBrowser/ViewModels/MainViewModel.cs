@@ -333,9 +333,10 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             Items.Add(new StoreViewModel(Runtime));
             Items.Add(new StoreNotificationViewModel(Runtime));
             Items.Add(new GrowingObjectViewModel(Runtime));
+            Items.Add(new DataLoadViewModel(Runtime));
             Items.Add(new JsonMessageViewModel(Runtime));
         }
-        
+
         /// <summary>
         /// Update status when activated
         /// </summary>
@@ -642,7 +643,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <param name="uri">The URI.</param>
         private void OnOpenChannel(IMessageHeader header, ISpecificRecord message, long channelId, string uri)
         {
-            EtpExtender.OpenChannelResponse(header, uri, channelId, Guid.NewGuid());
+            var dataLoadSettings = Model.DataLoad;
+            object lastIndex = dataLoadSettings.IsTimeIndex
+                ? new DateTimeOffset(dataLoadSettings.LastTimeIndex).ToUnixTimeMicroseconds()
+                : dataLoadSettings.LastDepthIndex;
+
+            EtpExtender.OpenChannelResponse(header, uri, channelId, Guid.NewGuid(), lastIndex, dataLoadSettings.IsInfill, dataLoadSettings.IsDataChange);
         }
 
         /// <summary>

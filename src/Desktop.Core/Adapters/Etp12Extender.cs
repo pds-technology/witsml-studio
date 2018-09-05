@@ -317,7 +317,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             if (!Session.IsRegistered<IChannelDataLoadConsumer>()) return;
 
             Session.Handler<IChannelDataLoadConsumer>()
-                .OpenChannelResponse(request, uri, id, uuid, lastIndex, dataChanges);
+                .OpenChannelResponse(request, uri, id, uuid, lastIndex, infill, dataChanges);
         }
 
         /// <summary>
