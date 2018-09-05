@@ -232,5 +232,19 @@ namespace PDS.WITSMLstudio.Desktop.Core
                 ? new Etp11Extender(session, protocolItems, isEtpClient)
                 : new Etp12Extender(session, protocolItems, isEtpClient) as IEtpExtender;
         }
+
+        /// <summary>
+        /// Determines if the protocol handler has been registered with the current ETP session.
+        /// </summary>
+        /// <typeparam name="T">The handler type.</typeparam>
+        /// <param name="session">The ETP session.</param>
+        /// <returns><c>true</c> if the protocol handler has been registered, otherwise <c>false</c>.</returns>
+        public static bool IsRegistered<T>(this IEtpSession session) where T : IProtocolHandler
+        {
+            if ((session?.CanHandle<T>()).GetValueOrDefault()) return true;
+            var crlf = Environment.NewLine;
+            session?.Output?.Invoke($"{crlf}// WARNING: Protocol handler not registered: {typeof(T).Name}{crlf}//");
+            return false;
+        }
     }
 }

@@ -157,16 +157,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// </summary>
         public void CloseSession()
         {
-            if (Session?.CanHandle<ICoreClient>() ?? false)
+            if ((Session?.CanHandle<ICoreClient>()).GetValueOrDefault())
             {
-                Session?.Handler<ICoreClient>()
-                    ?.CloseSession();
+                Session?.Handler<ICoreClient>()?.CloseSession();
             }
 
-            if (Session?.CanHandle<ICoreServer>() ?? false)
+            if ((Session?.CanHandle<ICoreServer>()).GetValueOrDefault())
             {
-                Session?.Handler<ICoreServer>()
-                    ?.CloseSession();
+                Session?.Handler<ICoreServer>()?.CloseSession();
             }
         }
 
@@ -211,6 +209,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="minMessageInterval"></param>
         public void Start(int maxDataItems, int minMessageInterval)
         {
+            if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
+
             Session.Handler<IChannelStreamingConsumer>()
                 .Start(maxDataItems, minMessageInterval);
         }
@@ -221,6 +221,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="uris">The URIs.</param>
         public void ChannelDescribe(IList<string> uris)
         {
+            if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
+
             Session.Handler<IChannelStreamingConsumer>()
                 .ChannelDescribe(uris);
         }
@@ -232,6 +234,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="startIndex">The start index.</param>
         public void ChannelStreamingStart(IList<ChannelMetadataViewModel> channels, object startIndex)
         {
+            if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
+
             // Prepare ChannelStreamingInfos startIndexes
             _channelStreamingInfos.Clear();
 
@@ -250,6 +254,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="channelIds"></param>
         public void ChannelStreamingStop(IList<long> channelIds)
         {
+            if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
+
             Session.Handler<IChannelStreamingConsumer>()
                 .ChannelStreamingStop(channelIds);
         }
@@ -262,6 +268,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="endIndex">The end index.</param>
         public void ChannelRangeRequest(IList<long> channelIds, long startIndex, long endIndex)
         {
+            if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
+
             var rangeInfo = new ChannelRangeInfo
             {
                 ChannelId = channelIds,
@@ -294,6 +302,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <returns>The message identifier.</returns>
         public long GetResources(string uri)
         {
+            if (!Session.IsRegistered<IDiscoveryCustomer>()) return 0;
+
             return Session.Handler<IDiscoveryCustomer>()
                 .GetResources(uri);
         }
@@ -322,6 +332,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="uri">The URI.</param>
         public void GetObject(string uri)
         {
+            if (!Session.IsRegistered<IStoreCustomer>()) return;
+
             Session.Handler<IStoreCustomer>()
                 .GetObject(uri);
         }
@@ -332,6 +344,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="uri">The URI.</param>
         public void DeleteObject(string uri)
         {
+            if (!Session.IsRegistered<IStoreCustomer>()) return;
+
             Session.Handler<IStoreCustomer>()
                 .DeleteObject(uri);
         }
@@ -348,6 +362,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="childCount">The child count.</param>
         public void PutObject(string uri, string uuid, string name, string xml, string contentType, ResourceTypes resourceType = ResourceTypes.DataObject, int childCount = -1)
         {
+            if (!Session.IsRegistered<IStoreCustomer>()) return;
+
             var dataObject = new DataObject
             {
                 Resource = new Resource
@@ -378,6 +394,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="objectTypes">The object types.</param>
         public void NotificationRequest(string uri, string uuid, long startTime, bool includeObjectData, IList<string> objectTypes)
         {
+            if (!Session.IsRegistered<IStoreNotificationCustomer>()) return;
+
             var request = new NotificationRequestRecord
             {
                 Uri = uri,
@@ -399,6 +417,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="uuid"></param>
         public void CancelNotification(string uuid)
         {
+            if (!Session.IsRegistered<IStoreNotificationCustomer>()) return;
+
             var request = _notificationRequests.FirstOrDefault(x => x.Uuid.EqualsIgnoreCase(uuid));
             if (request == null) return;
 
@@ -423,6 +443,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="uid">The UID.</param>
         public void GetPart(string uri, string uid)
         {
+            if (!Session.IsRegistered<IGrowingObjectCustomer>()) return;
+
             Session.Handler<IGrowingObjectCustomer>()
                 .GrowingObjectGet(uri, uid);
         }
@@ -437,6 +459,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="depthDatum">The depth datum.</param>
         public void GetPartsByRange(string uri, double? startIndex, double? endIndex, string uom, string depthDatum)
         {
+            if (!Session.IsRegistered<IGrowingObjectCustomer>()) return;
+
             Session.Handler<IGrowingObjectCustomer>()
                 .GrowingObjectGetRange(uri, startIndex, endIndex, uom, depthDatum);
         }
@@ -451,6 +475,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="compress"><c>true</c> if the data object should be compressed; otherwise, <c>false</c>.</param>
         public void PutPart(string uri, string uid, string contentType, string data, bool compress)
         {
+            if (!Session.IsRegistered<IGrowingObjectCustomer>()) return;
+
             var dataObject = new DataObject();
             dataObject.SetString(data, compress);
 
@@ -465,6 +491,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="uid">The UID.</param>
         public void DeletePart(string uri, string uid)
         {
+            if (!Session.IsRegistered<IGrowingObjectCustomer>()) return;
+
             Session.Handler<IGrowingObjectCustomer>()
                 .GrowingObjectDelete(uri, uid);
         }
@@ -479,6 +507,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="depthDatum">The depth datum.</param>
         public void DeletePartsByRange(string uri, double? startIndex, double? endIndex, string uom, string depthDatum)
         {
+            if (!Session.IsRegistered<IGrowingObjectCustomer>()) return;
+
             Session.Handler<IGrowingObjectCustomer>()
                 .GrowingObjectDeleteRange(uri, startIndex, endIndex, uom, depthDatum);
         }
