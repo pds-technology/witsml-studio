@@ -644,9 +644,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         private void OnOpenChannel(IMessageHeader header, ISpecificRecord message, long channelId, string uri)
         {
             var dataLoadSettings = Model.DataLoad;
-            object lastIndex = dataLoadSettings.IsTimeIndex
-                ? new DateTimeOffset(dataLoadSettings.LastTimeIndex).ToUnixTimeMicroseconds()
-                : dataLoadSettings.LastDepthIndex;
+            object lastIndex;
+
+            if (dataLoadSettings.IsTimeIndex)
+                lastIndex = new DateTimeOffset(dataLoadSettings.LastTimeIndex).ToUnixTimeMicroseconds();
+            else
+                lastIndex = dataLoadSettings.LastDepthIndex;
 
             EtpExtender.OpenChannelResponse(header, uri, channelId, Guid.NewGuid(), lastIndex, dataLoadSettings.IsInfill, dataLoadSettings.IsDataChange);
         }
