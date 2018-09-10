@@ -223,6 +223,17 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
+        /// Clears the selected protocols.
+        /// </summary>
+        public void ClearSelectedProtocols()
+        {
+            foreach (var protocol in EtpProtocols)
+            {
+                protocol.IsSelected = false;
+            }
+        }
+
+        /// <summary>
         /// Called when the selected connection has changed.
         /// </summary>
         /// <param name="connection">The connection.</param>

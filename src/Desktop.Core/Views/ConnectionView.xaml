@@ -176,6 +176,7 @@
                         <RowDefinition Height="5" />
                         <RowDefinition Height="40" />
                         <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
@@ -194,6 +195,12 @@
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Encoding:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
                     <TextBox Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.EtpEncoding, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Compression:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <ComboBox Grid.Row="3" Grid.Column="1" Margin="5" Padding="5" VerticalAlignment="Center" IsEditable="True"
+                              Text="{Binding EditItem.EtpCompression, UpdateSourceTrigger=PropertyChanged}">
+                        <ComboBoxItem Content="gzip" />
+                    </ComboBox>
                 </Grid>
             </TabItem>
 

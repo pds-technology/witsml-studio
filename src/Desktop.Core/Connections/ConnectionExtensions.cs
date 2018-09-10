@@ -131,6 +131,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
                 client.SetProxy(connection.ProxyHost, connection.ProxyPort,
                                 connection.ProxyUsername, connection.ProxyPassword);
             }
+            if (!string.IsNullOrWhiteSpace(connection.EtpCompression))
+            {
+                client.SetSupportedCompression(connection.EtpCompression);
+            }
 
             return client;
         }

@@ -60,6 +60,10 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
+        <StackPanel Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Orientation="Horizontal" HorizontalAlignment="Left">
+            <Button x:Name="ClearSelectedProtocols" Content="Clear All" Width="70" />
+        </StackPanel>
+
         <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Orientation="Horizontal" HorizontalAlignment="Right"
                     IsEnabled="{Binding Model.Connection.Uri, Converter={StaticResource NullToBooleanConverter}}"
                     Visibility="{Binding Model.IsEtpClient, Converter={StaticResource BooleanToVisibilityConverter}}">

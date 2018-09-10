@@ -172,9 +172,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
         /// <summary>
         /// Gets a value indicating whether the proxy host name is not a URI.
         /// </summary>
-        /// <value>
-        ///   <c>true</c> if the proxy host name is not a URI; otherwise, <c>false</c>.
-        /// </value>
         public bool IsProxyHostName => !ProxyHost?.Contains("://") ?? false;
 
         private string _proxyHost;
@@ -252,9 +249,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
         /// <summary>
         /// Gets or sets a value indicating whether to use default credentials for the web proxy.
         /// </summary>
-        /// <value>
-        /// <c>true</c> if use default credentials; otherwise, <c>false</c>.
-        /// </value>
         [DataMember]
         public bool ProxyUseDefaultCredentials
         {
@@ -356,14 +350,30 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
             }
         }
 
+        private string _etpCompression;
+
+        /// <summary>
+        /// Gets or sets the ETP compression.
+        /// </summary>
+        [DataMember]
+        public string EtpCompression
+        {
+            get { return _etpCompression; }
+            set
+            {
+                if (!string.Equals(_etpCompression, value))
+                {
+                    _etpCompression = value;
+                    NotifyOfPropertyChange(() => EtpCompression);
+                }
+            }
+        }
+
         private bool _acceptInvalidCertificates;
 
         /// <summary>
         /// Gets or sets a value indicating whether to accept invalid certificates.
         /// </summary>
-        /// <value>
-        /// <c>true</c> if accept invalid certificates; otherwise, <c>false</c>.
-        /// </value>
         [DataMember]
         public bool AcceptInvalidCertificates
         {
@@ -383,9 +393,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
         /// <summary>
         /// Gets or sets a value indicating whether to pre-authenticate.
         /// </summary>
-        /// <value>
-        /// <c>true</c> if pre-authenticate; otherwise, <c>false</c>.
-        /// </value>
         [DataMember]
         public bool PreAuthenticate
         {
@@ -405,9 +412,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
         /// <summary>
         /// Gets or sets a value indicating whether to connect using Basic authentication.
         /// </summary>
-        /// <value>
-        /// <c>true</c> if using Basic authentication; otherwise, <c>false</c>.
-        /// </value>
         [DataMember]
         public bool IsAuthenticationBasic
         {
@@ -428,9 +432,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
         /// <summary>
         /// Gets or sets a value indicating whether to connect using Bearer authentication.
         /// </summary>
-        /// <value>
-        /// <c>true</c> if using Bearer authentication; otherwise, <c>false</c>.
-        /// </value>
         [DataMember]
         public bool IsAuthenticationBearer
         {
