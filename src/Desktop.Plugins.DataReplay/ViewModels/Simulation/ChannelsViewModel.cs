@@ -29,6 +29,7 @@ using Energistics.Etp.Common;
 using Energistics.Etp.Common.Datatypes;
 using Microsoft.Win32;
 using Newtonsoft.Json;
+using PDS.WITSMLstudio.Desktop.Core;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
@@ -507,7 +508,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Simulation
                 return;
 
             Messages.Append(string.Concat(
-                message.StartsWith("{") ? string.Empty : "// ",
+                message.IsJsonString() ? string.Empty : "// ",
                 message,
                 Environment.NewLine));
         }

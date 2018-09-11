@@ -26,6 +26,7 @@ using Energistics.DataAccess.WITSML141.ComponentSchemas;
 using Energistics.DataAccess.WITSML141.ReferenceData;
 using Energistics.Etp.Common.Datatypes.ChannelData;
 using PDS.WITSMLstudio.Data.Logs;
+using PDS.WITSMLstudio.Desktop.Core;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 
@@ -140,7 +141,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
                 return;
 
             _messages.Append(string.Concat(
-                message.StartsWith("{") ? string.Empty : "// ",
+                message.IsJsonString() ? string.Empty : "// ",
                 message,
                 Environment.NewLine));
         }

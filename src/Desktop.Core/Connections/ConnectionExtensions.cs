@@ -170,14 +170,15 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
         /// Gets the ETP server capabilities URL for the connection.
         /// </summary>
         /// <param name="connection">The connection.</param>
+        /// <param name="includeGetVersion">if set to <c>true</c> include the GetVersion query parameter.</param>
         /// <returns>The well-known server capabilities URL.</returns>
-        public static string GetEtpServerCapabilitiesUrl(this Connection connection)
+        public static string GetEtpServerCapabilitiesUrl(this Connection connection, bool includeGetVersion = true)
         {
             if (string.IsNullOrWhiteSpace(connection?.Uri))
                 return string.Empty;
 
-            var etpVersion = EtpSettings.Etp12SubProtocol.EqualsIgnoreCase(connection.SubProtocol)
-                ? "?etp-version=1.2"
+            var etpVersion = includeGetVersion
+                ? $"?{EtpSettings.GetVersionHeader}={WebUtility.UrlEncode(connection.SubProtocol)}"
                 : string.Empty;
 
             return $"http{connection.Uri.Substring(2)}/.well-known/etp-server-capabilities{etpVersion}";
@@ -190,6 +191,17 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
         /// <returns>The server capabilities result</returns>
         public static object GetEtpServerCapabilities(this Connection connection) =>
             CreateJsonClient(connection).GetServerCapabilities(GetEtpServerCapabilitiesUrl(connection));
+
+        /// <summary>
+        /// Gets the ETP versions for the connection.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <returns>The ETP versions</returns>
+        public static IList<string> GetEtpVersions(this Connection connection)
+        {
+            var url = $"{GetEtpServerCapabilitiesUrl(connection, false)}?{EtpSettings.GetVersionsHeader}=true";
+            return CreateJsonClient(connection).GetEtpVersions(url);
+        }
 
         /// <summary>
         /// Updates the ETP settings based on the connection settings.

@@ -246,5 +246,20 @@ namespace PDS.WITSMLstudio.Desktop.Core
             session?.Output?.Invoke($"{crlf}// WARNING: Protocol handler not registered: {typeof(T).Name}{crlf}//");
             return false;
         }
+
+        /// <summary>
+        /// Determines whether the value is a JSON string.
+        /// </summary>
+        /// <param name="value">The string value.</param>
+        /// <returns><c>true</c> if the value is a JSON string; otherwise, <c>false</c>.</returns>
+        public static bool IsJsonString(this string value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return false;
+
+            var json = value.Trim();
+
+            return json.StartsWith("{") && json.EndsWith("}") ||
+                   json.StartsWith("[") && json.EndsWith("]");
+        }
     }
 }

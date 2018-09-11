@@ -757,7 +757,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         internal void LogDetailMessage(string header, string message = null)
         {
             Details.SetText(string.Concat(
-                header.StartsWith("{") ? string.Empty : "// ",
+                header.IsJsonString() ? string.Empty : "// ",
                 header,
                 Environment.NewLine));
 
@@ -765,7 +765,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 return;
 
             Details.Append(string.Concat(
-                message.StartsWith("{") ? string.Empty : "// ",
+                message.IsJsonString() ? string.Empty : "// ",
                 message,
                 Environment.NewLine));
         }
@@ -793,7 +793,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
             try
             {
-                if (message.StartsWith("{"))
+                if (message.IsJsonString())
                 {
                     message = FormatMessage(message);
                 }
@@ -816,7 +816,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             }
 
             Messages.Append(string.Concat(
-                message.StartsWith("{") ? string.Empty : "// ",
+                message.IsJsonString() ? string.Empty : "// ",
                 message,
                 Environment.NewLine));
         }

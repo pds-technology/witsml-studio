@@ -83,7 +83,8 @@
         <StackPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Orientation="Horizontal" HorizontalAlignment="Right"
                     IsEnabled="{Binding Model.Connection.Uri, Converter={StaticResource NullToBooleanConverter}}"
                     Visibility="{Binding Model.IsEtpClient, Converter={StaticResource BooleanToVisibilityConverter}}">
-            
+
+            <Button x:Name="EtpVersions" Content="Get Versions" Margin="5,0,0,0" Width="100" />
             <Button x:Name="ServerCapabilities" Content="Server Capabilities" Margin="5,0,0,0" Width="120" />
         </StackPanel>
     </Grid>

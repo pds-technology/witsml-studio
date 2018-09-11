@@ -215,6 +215,14 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
+        /// Retrieves the ETP versions.
+        /// </summary>
+        public void EtpVersions()
+        {
+            Task.Run(GetEtpVersions);
+        }
+
+        /// <summary>
         /// Retrieves the ETP Server's capabilities.
         /// </summary>
         public void ServerCapabilities()
@@ -276,6 +284,35 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 EtpProtocols.Clear();
                 EtpProtocols.AddRange(protocols.GetProtocolItems());
             });
+        }
+
+        private Task<bool> GetEtpVersions()
+        {
+            if (!Model.Connection.Uri.ToLowerInvariant().StartsWith("ws"))
+                return Task.FromResult(false);
+
+            try
+            {
+                Runtime.ShowBusy();
+
+                var versions = Model.Connection.GetEtpVersions();
+
+                Parent.LogDetailMessage(
+                    "ETP Versions:",
+                    Parent.Session.Serialize(versions, true));
+
+                return Task.FromResult(true);
+            }
+            catch (Exception ex)
+            {
+                _log.Warn("Error getting ETP versions", ex);
+                Parent.LogClientError("Error getting ETP versions:", ex);
+                return Task.FromResult(false);
+            }
+            finally
+            {
+                Runtime.ShowBusy(false);
+            }
         }
 
         private Task<bool> GetServerCapabilities()
