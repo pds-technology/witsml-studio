@@ -28,12 +28,14 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
 {
     public class SimulationDiscovery11Provider : DiscoveryStoreHandler
     {
-        public SimulationDiscovery11Provider(Models.Simulation simulation)
+        public SimulationDiscovery11Provider(IEtpSimulator simulator)
         {
-            Simulation = simulation;
+            Simulator = simulator;
         }
 
-        public Models.Simulation Simulation { get; private set; }
+        public IEtpSimulator Simulator { get; }
+
+        public Models.Simulation Simulation => Simulator.Model;
 
         protected override void HandleGetResources(ProtocolEventArgs<GetResources, IList<Resource>> args)
         {

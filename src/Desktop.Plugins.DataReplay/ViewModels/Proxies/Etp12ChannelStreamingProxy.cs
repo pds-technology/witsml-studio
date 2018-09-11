@@ -25,7 +25,6 @@ using System.Threading.Tasks;
 using Energistics.DataAccess.WITSML141.ReferenceData;
 using Energistics.Etp.Common;
 using Energistics.Etp.Common.Datatypes;
-using Energistics.Etp.Common.Datatypes.ChannelData;
 using Energistics.Etp.v12.Datatypes;
 using Energistics.Etp.v12.Datatypes.ChannelData;
 using Energistics.Etp.v12.Protocol.ChannelStreaming;
@@ -33,6 +32,7 @@ using Energistics.Etp.v12.Protocol.Core;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
+using PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 {
@@ -48,13 +48,16 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
             ChannelStreamingInfo = new List<ChannelStreamingInfo>();
         }
 
-        public IList<ChannelMetadataRecord> Channels { get; }
+        public List<ChannelMetadataRecord> Channels { get; }
 
-        public IList<ChannelStreamingInfo> ChannelStreamingInfo { get; }
+        public List<ChannelStreamingInfo> ChannelStreamingInfo { get; }
+
+        public IEtpSimulator Simulator { get; private set; }
 
         public override async Task Start(Models.Simulation model, CancellationToken token, int interval = 5000)
         {
             Model = model;
+            Simulator = new Etp12Simulator(model);
 
             _log.Debug($"Establishing ETP connection for {Model.EtpConnection}");
 
@@ -110,7 +113,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 
             if (Client.Handler<IChannelStreamingProducer>().IsSimpleStreamer)
             {
-                var channelMetadata = GetChannelMetadata(e.Header);
+                var channelMetadata = Simulator.GetChannelMetadata(e.Header)
+                    .Cast<ChannelMetadataRecord>()
+                    .ToList();
+
+                Channels.Clear();
+                Channels.AddRange(channelMetadata);
 
                 Client.Handler<IChannelStreamingProducer>()
                     .ChannelMetadata(e.Header, channelMetadata);
@@ -124,7 +132,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 
         protected virtual void OnChannelDescribe(object sender, ProtocolEventArgs<ChannelDescribe, IList<ChannelMetadataRecord>> e)
         {
-            GetChannelMetadata(e.Header)
+            Simulator.GetChannelMetadata(e.Header)
+                .Cast<ChannelMetadataRecord>()
                 .ForEach(e.Context.Add);
         }
 
@@ -137,53 +146,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
         protected virtual void OnChannelStreamingStop(object sender, ProtocolEventArgs<ChannelStreamingStop> e)
         {
             TaskRunner.Stop();
-        }
-
-        protected virtual List<ChannelMetadataRecord> GetChannelMetadata(IMessageHeader header)
-        {
-            var indexMetadata = ToIndexMetadataRecord(Model.Channels.First());
-
-            // Skip index channel
-            var channelMetadata = Model.Channels
-                .Cast<ChannelMetadataRecord>()
-                .Skip(1)
-                .Select(x => ToChannelMetadataRecord(x, indexMetadata))
-                .ToList();
-
-            return channelMetadata;
-        }
-
-        protected virtual EtpUri GetChannelUri(string mnemonic)
-        {
-            if (OptionsIn.DataVersion.Version131.Equals(DataSchemaVersion))
-            {
-                return EtpUris.Witsml131
-                    .Append(ObjectTypes.Well, Model.WellUid)
-                    .Append(ObjectTypes.Wellbore, Model.WellboreUid)
-                    .Append(ObjectTypes.Log, Model.LogUid)
-                    .Append(ObjectTypes.LogCurveInfo, mnemonic);
-            }
-
-            if (OptionsIn.DataVersion.Version141.Equals(DataSchemaVersion))
-            {
-                return EtpUris.Witsml141
-                    .Append(ObjectTypes.Well, Model.WellUid)
-                    .Append(ObjectTypes.Wellbore, Model.WellboreUid)
-                    .Append(ObjectTypes.Log, Model.LogUid)
-                    .Append(ObjectTypes.LogCurveInfo, mnemonic);
-            }
-
-            if (OptionsIn.DataVersion.Version200.Equals(DataSchemaVersion))
-            {
-                return EtpUris.Witsml200
-                    .Append(ObjectTypes.Well, Model.WellUid)
-                    .Append(ObjectTypes.Wellbore, Model.WellboreUid)
-                    .Append(ObjectTypes.Log, Model.LogUid)
-                    .Append(ObjectTypes.ChannelSet, Model.ChannelSetUid)
-                    .Append(ObjectTypes.Channel, mnemonic);
-            }
-
-            return default(EtpUri);
         }
 
         private void StreamChannelData()
@@ -209,51 +171,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
                     // "null" indicates a request for the latest value
                     Item = null
                 }
-            };
-        }
-
-        private ChannelMetadataRecord ToChannelMetadataRecord(IChannelMetadataRecord record, IndexMetadataRecord indexMetadata)
-        {
-            var uri = GetChannelUri(record.ChannelName);
-
-            var channel = new ChannelMetadataRecord()
-            {
-                ChannelUri = uri,
-                ContentType = uri.ContentType,
-                ChannelId = record.ChannelId,
-                ChannelName = record.ChannelName,
-                Uom = record.Uom,
-                MeasureClass = record.MeasureClass,
-                DataType = record.DataType,
-                Description = record.Description,
-                Uuid = record.Uuid,
-                Status = (ChannelStatuses) record.Status,
-                Source = record.Source,
-                Indexes = new[]
-                {
-                    indexMetadata
-                },
-                CustomData = new Dictionary<string, DataValue>()
-            };
-
-            Channels.Add(channel);
-            return channel;
-        }
-
-        private IndexMetadataRecord ToIndexMetadataRecord(IChannelMetadataRecord record, int scale = 3)
-        {
-            return new IndexMetadataRecord()
-            {
-                Uri = GetChannelUri(record.ChannelName),
-                Mnemonic = record.ChannelName,
-                Description = record.Description,
-                Uom = record.Uom,
-                Scale = scale,
-                IndexKind = Model.LogIndexType == LogIndexType.datetime || Model.LogIndexType == LogIndexType.elapsedtime
-                    ? ChannelIndexKinds.Time
-                    : ChannelIndexKinds.Depth,
-                Direction = IndexDirections.Increasing,
-                CustomData = new Dictionary<string, DataValue>(0),
             };
         }
 

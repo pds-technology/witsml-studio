@@ -16,7 +16,14 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System.Collections.Generic;
+using System.Linq;
+using Energistics.DataAccess.WITSML141.ReferenceData;
 using Energistics.Etp;
+using Energistics.Etp.Common.Datatypes;
+using Energistics.Etp.Common.Datatypes.ChannelData;
+using Energistics.Etp.v12.Datatypes;
+using Energistics.Etp.v12.Datatypes.ChannelData;
 using Energistics.Etp.v12.Protocol.ChannelStreaming;
 using Energistics.Etp.v12.Protocol.Discovery;
 
@@ -29,7 +36,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
             Model = model;
         }
 
-        private Models.Simulation Model { get; }
+        public Models.Simulation Model { get; }
 
         public void Register(EtpSocketServer server)
         {
@@ -37,14 +44,104 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
             server.Register(InitDiscoveryProvider);
         }
 
+        public IList<IChannelMetadataRecord> GetChannelMetadata(IMessageHeader header)
+        {
+            var indexMetadata = ToIndexMetadataRecord(Model.Channels.First());
+
+            // Skip index channel
+            var channelMetadata = Model.Channels
+                .Skip(1)
+                .Select(x => ToChannelMetadataRecord(x, indexMetadata))
+                .ToList();
+
+            return channelMetadata;
+        }
+
+        public IChannelMetadataRecord ToChannelMetadataRecord(IChannelMetadataRecord channelMetadata, IIndexMetadataRecord indexMetadata)
+        {
+            var uri = GetChannelUri(channelMetadata.ChannelName);
+
+            var channel = new ChannelMetadataRecord
+            {
+                ChannelUri = uri,
+                ContentType = uri.ContentType,
+                ChannelId = channelMetadata.ChannelId,
+                ChannelName = channelMetadata.ChannelName,
+                Uom = channelMetadata.Uom,
+                MeasureClass = channelMetadata.MeasureClass,
+                DataType = channelMetadata.DataType,
+                Description = channelMetadata.Description,
+                Uuid = channelMetadata.Uuid,
+                Status = (ChannelStatuses) channelMetadata.Status,
+                Source = channelMetadata.Source,
+                Indexes = new[] { indexMetadata }
+                    .OfType<IndexMetadataRecord>()
+                    .ToList(),
+                CustomData = new Dictionary<string, DataValue>()
+            };
+
+            return channel;
+        }
+
+        public IIndexMetadataRecord ToIndexMetadataRecord(IChannelMetadataRecord channelMetadata, int scale = 3)
+        {
+            return new IndexMetadataRecord
+            {
+                Uri = GetChannelUri(channelMetadata.ChannelName),
+                Mnemonic = channelMetadata.ChannelName,
+                Description = channelMetadata.Description,
+                Uom = channelMetadata.Uom,
+                Scale = scale,
+                IndexKind = Model.LogIndexType == LogIndexType.datetime ||
+                            Model.LogIndexType == LogIndexType.elapsedtime
+                    ? ChannelIndexKinds.Time
+                    : ChannelIndexKinds.Depth,
+                Direction = IndexDirections.Increasing,
+                CustomData = new Dictionary<string, DataValue>(0)
+            };
+        }
+
         private IChannelStreamingProducer InitChannelStreamingProvider()
         {
-            return new SimulationChannelStreaming12Provider(Model);
+            return new SimulationChannelStreaming12Provider(this);
         }
 
         private IDiscoveryStore InitDiscoveryProvider()
         {
-            return new SimulationDiscovery12Provider(Model);
+            return new SimulationDiscovery12Provider(this);
+        }
+
+        protected virtual EtpUri GetChannelUri(string mnemonic)
+        {
+            if (OptionsIn.DataVersion.Version131.Equals(Model.EtpVersion))
+            {
+                return EtpUris.Witsml131
+                    .Append(ObjectTypes.Well, Model.WellUid)
+                    .Append(ObjectTypes.Wellbore, Model.WellboreUid)
+                    .Append(ObjectTypes.Log, Model.LogUid)
+                    .Append(ObjectTypes.LogCurveInfo, mnemonic);
+            }
+
+            if (OptionsIn.DataVersion.Version141.Equals(Model.EtpVersion))
+            {
+                return EtpUris.Witsml141
+                    .Append(ObjectTypes.Well, Model.WellUid)
+                    .Append(ObjectTypes.Wellbore, Model.WellboreUid)
+                    .Append(ObjectTypes.Log, Model.LogUid)
+                    .Append(ObjectTypes.LogCurveInfo, mnemonic);
+            }
+
+            if (OptionsIn.DataVersion.Version200.Equals(Model.EtpVersion))
+            {
+                return EtpUris.Witsml200
+                    .Append(ObjectTypes.Well, Model.WellUid)
+                    .Append(ObjectTypes.Wellbore, Model.WellboreUid)
+                    .Append(ObjectTypes.Log, Model.LogUid)
+                    .Append(ObjectTypes.ChannelSet, Model.ChannelSetUid)
+                    .Append(ObjectTypes.Channel, mnemonic);
+            }
+
+            return default(EtpUri);
         }
     }
 }

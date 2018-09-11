@@ -32,18 +32,26 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
     {
         private CancellationTokenSource _tokenSource;
 
-        public SimulationChannelStreaming11Provider(Models.Simulation simulation)
+        public SimulationChannelStreaming11Provider(IEtpSimulator simulator)
         {
-            Simulation = simulation;
+            Simulator = simulator;
             IsSimpleStreamer = true;
         }
 
-        public Models.Simulation Simulation { get; }
+        public IEtpSimulator Simulator { get; }
+
+        public Models.Simulation Simulation => Simulator.Model;
 
         protected override void HandleStart(IMessageHeader header, Start start)
         {
             base.HandleStart(header, start);
-            ChannelMetadata(header, Simulation.Channels.Cast<ChannelMetadataRecord>().ToList());
+
+            var channelMetadata = Simulator.GetChannelMetadata(header)
+                .Cast<ChannelMetadataRecord>()
+                .ToList();
+
+            ChannelMetadata(header, channelMetadata);
+
             StartSendingChannelData(header);
         }
 

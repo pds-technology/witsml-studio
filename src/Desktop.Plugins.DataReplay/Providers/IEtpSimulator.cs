@@ -16,7 +16,10 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System.Collections.Generic;
 using Energistics.Etp;
+using Energistics.Etp.Common.Datatypes;
+using Energistics.Etp.Common.Datatypes.ChannelData;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
 {
@@ -26,9 +29,21 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
     public interface IEtpSimulator
     {
         /// <summary>
+        /// Gets the simulation model.
+        /// </summary>
+        Models.Simulation Model { get; }
+
+        /// <summary>
         /// Registers the ETP simulator with the specified ETP socket server.
         /// </summary>
         /// <param name="server">The server.</param>
         void Register(EtpSocketServer server);
+
+        /// <summary>
+        /// Gets the channel metadata.
+        /// </summary>
+        /// <param name="header">The message header.</param>
+        /// <returns>A collection of channel metadata records.</returns>
+        IList<IChannelMetadataRecord> GetChannelMetadata(IMessageHeader header);
     }
 }

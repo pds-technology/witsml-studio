@@ -19,7 +19,7 @@
 using System.Runtime.Serialization;
 using Caliburn.Micro;
 using Energistics.DataAccess.WITSML141.ReferenceData;
-using Energistics.Etp.Common.Datatypes.ChannelData;
+using Energistics.Etp.v11.Datatypes.ChannelData;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Models
@@ -29,7 +29,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Models
     {
         public Simulation()
         {
-            Channels = new BindableCollection<IChannelMetadataRecord>();
+            Channels = new BindableCollection<ChannelMetadataRecord>();
             WitsmlConnection = new Connection();
             EtpConnection = new Connection();
             LogIndexType = LogIndexType.measureddepth;
@@ -264,9 +264,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Models
             }
         }
 
-        private BindableCollection<IChannelMetadataRecord> _channels;
+        private BindableCollection<ChannelMetadataRecord> _channels;
         [DataMember]
-        public BindableCollection<IChannelMetadataRecord> Channels
+        public BindableCollection<ChannelMetadataRecord> Channels
         {
             get { return _channels; }
             set
