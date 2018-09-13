@@ -984,7 +984,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             if (indexMetadata == null || indexData == null) return;
 
             var mnemonic = indexMetadata["mnemonic"].Value<string>("string");
-            var indexType = indexMetadata.Value<string>("indexType");
+            var indexType = indexMetadata.Value<string>("indexType") ?? indexMetadata.Value<string>("indexKind");
             var scale = indexMetadata.Value<int>("scale");
 
             if ("Time".EqualsIgnoreCase(indexType))
@@ -1011,7 +1011,10 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             if (resource == null) return;
 
-            var lastChanged = resource.Value<long>("lastChanged");
+            var lastChangedObj = resource["lastChanged"] as JObject;
+            var lastChanged = lastChangedObj?.Value<long>("long") ??
+                              resource.Value<long>("lastChanged");
+
             if (lastChanged < 1) return;
 
             var customData = resource["customData"] as JObject;
