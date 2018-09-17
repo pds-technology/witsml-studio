@@ -398,6 +398,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             Resources.Clear();
             Messages.Clear();
             Details.Clear();
+            EtpExtender = null;
 
             // notify child view models
             Items.OfType<ISessionAware>()
