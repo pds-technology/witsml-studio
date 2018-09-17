@@ -18,12 +18,14 @@
 
 using System;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Navigation;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
@@ -78,9 +80,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
 
                 using (var client = connection.CreateEtpClient(applicationName, applicationVersion))
                 {
-                    //client.Register<IChannelStreamingConsumer, ChannelStreamingConsumerHandler>();
-                    //client.Register<IDiscoveryCustomer, DiscoveryCustomerHandler>();
-                    //client.Register<IStoreCustomer, StoreCustomerHandler>();
+                    var protocols = connection.CreateEtpExtender().GetProtocolItems().ToList();
+                    var extender = client.CreateEtpExtender(protocols, true);
+                    extender.Register();
 
                     var count = 0;
                     client.Open();
