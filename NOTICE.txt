@@ -1,4 +1,4 @@
-﻿PDS WITSMLstudio Desktop, 2018.2
+﻿PDS WITSMLstudio Desktop, 2018.3
 Copyright 2018 PDS Americas LLC
 
 PDS WITSMLstudio Desktop incorporates ETP, WITSML™, PRODML™ and RESQML™ technology and standards
