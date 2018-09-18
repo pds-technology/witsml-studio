@@ -682,7 +682,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             if (Requesting(Protocols.StoreNotification, "store"))
             {
                 session.Register<IStoreNotificationCustomer, StoreNotificationCustomerHandler>();
-                RegisterEventHandlers(session.Handler<IStoreNotificationCustomer>());
+                RegisterEventHandlers(session.Handler<IStoreNotificationCustomer>(),
+                    x => x.OnChangeNotification += (s, e) => _onObject?.Invoke(e.Header, e.Message, e.Message.Change.DataObject));
             }
             if (Requesting(Protocols.StoreNotification, "customer"))
             {
@@ -831,7 +832,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             if (Requesting(Protocols.StoreNotification, "customer"))
             {
                 session.Register<IStoreNotificationCustomer, StoreNotificationCustomerHandler>();
-                RegisterEventHandlers(session.Handler<IStoreNotificationCustomer>());
+                RegisterEventHandlers(session.Handler<IStoreNotificationCustomer>(),
+                    x => x.OnChangeNotification += (s, e) => _onObject?.Invoke(e.Header, e.Message, e.Message.Change.DataObject));
             }
 
             if (Requesting(Protocols.GrowingObject, "store"))
