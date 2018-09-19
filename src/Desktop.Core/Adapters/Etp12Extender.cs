@@ -410,7 +410,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
                 }
             };
 
-            dataObject.SetString(xml);
+            dataObject.SetString(xml, false);
 
             Session.Handler<IStoreCustomer>()
                 .PutObject(dataObject);
