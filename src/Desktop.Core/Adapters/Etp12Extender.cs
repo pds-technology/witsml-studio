@@ -875,7 +875,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         {
         }
 
-        private void OnFindResources(object sender, ProtocolEventArgs<FindResources, IList<Resource>> e)
+        private void OnFindResources(object sender, ProtocolEventArgs<FindResources, ResourceResponse> e)
         {
         }
 
