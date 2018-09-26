@@ -159,7 +159,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Runtime
         /// <param name="message">The message.</param>
         /// <param name="buttons">The buttons.</param>
         /// <returns><c>true</c> if the user clicks OK/Yes; otherwise, <c>false</c>.</returns>
-        public bool ShowConfirm(string message, MessageBoxButton buttons = MessageBoxButton.OKCancel)
+        public bool ShowConfirm(string message, MessageBoxButton buttons = MessageBoxButton.OKCancel, bool hideTitle = false)
         {
             Console.WriteLine("Confirm: {0}", message);
             return DialogResult;
