@@ -448,18 +448,27 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
         private void LogChannelData(IList<IDataItem> dataItems)
         {
+            var dataObjects = new List<Tuple<ChannelMetadataViewModel, byte[]>>();
+
             // Check if producer is sending index/value pairs
             if (!dataItems.Take(1).SelectMany(x => x.Indexes).Any())
             {
                 for (int i=0; i<dataItems.Count; i+=2)
                 {
-                    var valueChannel = Channels.FirstOrDefault(c => c.Record.ChannelId == dataItems[i + 1].ChannelId);
+                    var indexItem = dataItems[i];
+                    var valueItem = dataItems[i + 1];
+                    var valueChannel = Channels.FirstOrDefault(c => c.Record.ChannelId == valueItem.ChannelId);
+
+                    if (valueChannel != null && valueItem.Value.Item is byte[])
+                    {
+                        dataObjects.Add(Tuple.Create(valueChannel, (byte[]) valueItem.Value.Item));
+                    }
 
                     Parent.Details.Append(string.Format(
                         "[ \"{0}\", {1}, {2} ],{3}",
                         valueChannel?.Record.ChannelName,
-                        dataItems[i].Value.Item,
-                        dataItems[i + 1].Value.Item,
+                        indexItem.Value.Item,
+                        valueItem.Value.Item,
                         Environment.NewLine));
                 }
             }
@@ -476,6 +485,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                         ? DateTimeExtensions.FromUnixTimeMicroseconds(indexValue).ToString("o")
                         : $"{indexValue.IndexFromScale(channelIndex?.Scale ?? 3)}";
 
+                    if (channel != null && x.Value.Item is byte[])
+                    {
+                        dataObjects.Add(Tuple.Create(channel, (byte[]) x.Value.Item));
+                    }
+
                     return string.Format("[ \"{0}\", {1}, {2} ] // Channel ID: {3} // {4}",
                         channel?.Record.ChannelName,
                         indexValue,
@@ -488,6 +502,20 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                     "{0}{1}",
                     dataValues,
                     Environment.NewLine));
+            }
+
+            foreach (var tuple in dataObjects)
+            {
+                var dataObject = new Energistics.Etp.v11.Datatypes.Object.DataObject
+                {
+                    Data = tuple.Item2
+                };
+
+                var xml = dataObject.GetString();
+                if (string.IsNullOrWhiteSpace(xml)) continue;
+
+                Parent.DataObject.Append(Environment.NewLine + Environment.NewLine);
+                Parent.DataObject.Append(xml);
             }
         }
     }
