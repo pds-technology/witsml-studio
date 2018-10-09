@@ -241,6 +241,7 @@
     <Compile Include="ViewModels\ConnectionPickerViewModel.cs" />
     <Compile Include="ViewModels\ConnectionViewModel.cs" />
     <Compile Include="ViewModels\DataGridViewModel.cs" />
+    <Compile Include="ViewModels\DiscoveryViewModel.cs" />
     <Compile Include="ViewModels\IndicatorViewModel.cs" />
     <Compile Include="ViewModels\IPluginViewModel.cs" />
     <Compile Include="ViewModels\IShellViewModel.cs" />
@@ -262,6 +263,9 @@
     </Compile>
     <Compile Include="Views\DataGridView.xaml.cs">
       <DependentUpon>DataGridView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\DiscoveryView.xaml.cs">
+      <DependentUpon>DiscoveryView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PropertyGridView.xaml.cs">
       <DependentUpon>PropertyGridView.xaml</DependentUpon>
@@ -313,6 +317,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\DataGridView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\DiscoveryView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
