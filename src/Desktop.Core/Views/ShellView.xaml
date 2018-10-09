@@ -23,8 +23,12 @@
             </MenuItem>
         </Menu>
 
-        <Grid DockPanel.Dock="Top">
-            <TextBlock x:Name="BreadcrumbText" Padding="8,5,5,5" FontSize="18" />
+        <Grid DockPanel.Dock="Top" x:Name="BreadcrumbGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="100"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="BreadcrumbText" Grid.Column="0" Padding="8,5,5,5" FontSize="18" />
         </Grid>
 
         <StatusBar x:Name="MainStatusBar" DockPanel.Dock="Bottom">
