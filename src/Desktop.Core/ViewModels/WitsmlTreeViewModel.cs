@@ -19,6 +19,7 @@
 using System;
 using Action = System.Action;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -34,6 +35,7 @@ using Energistics.DataAccess;
 using IDataObject = Energistics.DataAccess.IDataObject;
 using Witsml141 = Energistics.DataAccess.WITSML141;
 using Energistics.Etp.Common.Datatypes;
+using Microsoft.Win32;
 using PDS.WITSMLstudio.Adapters;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Linq;
@@ -656,7 +658,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Gets the selected item's details using a GetFromStore request.
         /// </summary>
         /// <param name="optionIn"></param>
-        public void GetObjectDetails(params OptionsIn[] optionIn)
+        public Task<IDataObject> GetObjectDetails(params OptionsIn[] optionIn)
         {
             var resource = Items.FindSelectedSynchronized();
             var uri = new EtpUri(resource.Resource.Uri);
@@ -668,11 +670,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             Runtime.ShowBusy();
 
-            Task.Run(() =>
+            return Task.Run(() =>
             {
                 try
                 {
-                    Context.GetObjectDetails(uri.ObjectType, uri, optionIn);
+                    return Context.GetObjectDetails(uri.ObjectType, uri, optionIn);
                 }
                 finally
                 {
@@ -684,9 +686,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Gets the selected item's details using a GetFromStore request.
         /// </summary>
-        public void GetObjectDetailsWithReturnElementsAll()
+        public Task<IDataObject> GetObjectDetailsWithReturnElementsAll()
         {
-            GetObjectDetails(OptionsIn.ReturnElements.All);
+            return GetObjectDetails(OptionsIn.ReturnElements.All);
         }
 
         /// <summary>
@@ -750,6 +752,99 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         }
 
         /// <summary>
+        /// Determines whether a GetFromStore request can be sent for the selected item.
+        /// </summary>
+        /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
+        public bool CanGetAttachments
+        {
+            get
+            {
+                if (!CanGetObjectIds)
+                    return false;
+
+                var resource = Items.FindSelectedSynchronized();
+                var uri = new EtpUri(resource.Resource.Uri);
+
+                return uri.Version.Equals(OptionsIn.DataVersion.Version141.Value);
+            }
+        }
+
+        /// <summary>
+        /// Determines whether a GetFromStore request can be sent for the selected item.
+        /// </summary>
+        /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
+        public bool CanGetAttachment
+        {
+            get
+            {
+                if (!CanGetAttachments)
+                    return false;
+
+                var resource = Items.FindSelectedSynchronized();
+                var uri = new EtpUri(resource.Resource.Uri);
+
+                return uri.ObjectType.EqualsIgnoreCase(ObjectTypes.Attachment)
+                    && !string.IsNullOrWhiteSpace(uri.ObjectId);
+            }
+        }
+
+        /// <summary>
+        /// Uploads the attachment.
+        /// </summary>
+        public void UploadAttachment()
+        {
+            var resource = Items.FindSelectedSynchronized();
+            var uri = new EtpUri(resource.Resource.Uri);
+            var ids = uri.GetObjectIdMap();
+
+            var attachment = new Witsml141.Attachment
+            {
+                Uid = uri.ObjectId,
+                UidWell = ids[ObjectTypes.Well],
+                UidWellbore = ids[ObjectTypes.Wellbore]
+            };
+
+            // TODO: Show Upload Dialog
+        }
+
+        /// <summary>
+        /// Downloads the attachment.
+        /// </summary>
+        public void DownloadAttachment()
+        {
+            GetObjectDetailsWithReturnElementsAll()
+                .ContinueWith(x =>
+                {
+                    var attachment = x.Result as Witsml141.Attachment;
+                    if (attachment == null) return;
+
+                    var fileName = attachment.FileName ?? attachment.Name.Replace(" ", "-");
+                    var fileType = attachment.FileType ?? ObjectTypes.Unknown;
+
+                    var extension = !fileType.StartsWith(".")
+                        ? MimeTypes.MimeTypeMap.GetExtension(fileType, false)
+                        : fileType;
+
+                    Runtime.InvokeAsync(() =>
+                    {
+                        var dialog = new SaveFileDialog
+                        {
+                            Title = "Save Attachment...",
+                            Filter = $"{fileType}|*{extension}|All Files|*.*",
+                            DefaultExt = extension,
+                            AddExtension = true,
+                            FileName = fileName
+                        };
+
+                        if (dialog.ShowDialog(Application.Current.MainWindow).GetValueOrDefault())
+                        {
+                            File.WriteAllBytes(dialog.FileName, attachment.Content);
+                        }
+                    });
+                });
+        }
+
+        /// <summary>
         /// Gets a value indicating whether this selected node can be refreshed.
         /// </summary>
         /// <value>
@@ -779,6 +874,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void RefreshContextMenu()
         {
+
+            NotifyOfPropertyChange(() => CanGetAttachments);
+            NotifyOfPropertyChange(() => CanGetAttachment);
             NotifyOfPropertyChange(() => CanGetObjectIds);
             NotifyOfPropertyChange(() => CanGetObjectHeader);
             NotifyOfPropertyChange(() => CanGetObjectDetails);

@@ -95,6 +95,18 @@
             <TreeView.ContextMenu>
                 <ContextMenu Visibility="{Binding IsContextMenuEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
 
+                    <MenuItem Header="Attachments">
+                        <MenuItem.Visibility>
+                            <MultiBinding Converter="{StaticResource BooleanToVisibilityMultiConverter}">
+                                <Binding Path="CanGetAttachments"/>
+                                <Binding Path="ShowOnlyRefreshMenuOptions" Converter="{StaticResource BooleanInverseConverter}"/>
+                            </MultiBinding>
+                        </MenuItem.Visibility>
+
+                        <MenuItem Header="Upload" cal:Message.Attach="UploadAttachment" />
+                        <MenuItem Header="Download" cal:Message.Attach="DownloadAttachment" IsEnabled="{Binding CanGetAttachment}" />
+                    </MenuItem>
+                    
                     <MenuItem Header="Get IDs" cal:Message.Attach="GetObjectIds" 
                               Visibility="{Binding ShowOnlyRefreshMenuOptions, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=true}"/>
 
@@ -139,8 +151,11 @@
 
                     <MenuItem Header="Refresh" cal:Message.Attach="RefreshSelected" />
                     <!--<MenuItem Header="Delete" cal:Message.Attach="DeleteObject" IsEnabled="False" />-->
+
                     <Separator Visibility="{Binding ShowOnlyRefreshMenuOptions, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=true}"/>
+                    
                     <MenuItem Header="Refresh All" cal:Message.Attach="RefreshHierarchy" />
+                    
                 </ContextMenu>
             </TreeView.ContextMenu>
         </TreeView>
