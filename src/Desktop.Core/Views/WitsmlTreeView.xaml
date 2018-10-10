@@ -103,7 +103,7 @@
                             </MultiBinding>
                         </MenuItem.Visibility>
 
-                        <MenuItem Header="Upload" cal:Message.Attach="UploadAttachment" />
+                        <MenuItem Header="Upload" cal:Message.Attach="UploadAttachment" IsEnabled="{Binding CanAddAttachment}" />
                         <MenuItem Header="Download" cal:Message.Attach="DownloadAttachment" IsEnabled="{Binding CanGetAttachment}" />
                     </MenuItem>
                     

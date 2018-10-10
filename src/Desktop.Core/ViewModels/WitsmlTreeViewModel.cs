@@ -53,16 +53,16 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
     public class WitsmlTreeViewModel : Screen, IDisposable
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(WitsmlTreeViewModel));
-        private FrameworkElement _hierarchy;
-        private long _messageId;
-
-        private readonly object _lock = new object();
-        private readonly object _loadLock = new object();
-        private bool _cleared;
         private CancellationTokenSource _tokenSource;
+        private FrameworkElement _hierarchy;
+        private string[] _supportedObjects;
+        private long _messageId;
+        private bool _cleared;
 
         private readonly HashSet<EtpUri> _growingObjects = new HashSet<EtpUri>();
         private readonly HashSet<EtpUri> _activeWellbores = new HashSet<EtpUri>();
+        private readonly object _loadLock = new object();
+        private readonly object _lock = new object();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WitsmlTreeViewModel"/> class.
@@ -709,7 +709,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 GetObjectDetails(OptionsIn.ReturnElements.All, OptionsIn.RequestLatestValues.Eq(RequestLatestValues.Value));
         }
 
-
         /// <summary>
         /// Gets the selected item's details using a GetFromStore request.
         /// </summary>
@@ -718,6 +717,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             if (CanGetObjectHeader)
             {
                 var optionsIn = new List<OptionsIn> { OptionsIn.ReturnElements.All };
+
                 if (MaxDataRows.HasValue)
                     optionsIn.Add(OptionsIn.MaxReturnNodes.Eq(MaxDataRows.Value));
                 if (RequestLatestValues.HasValue)
@@ -736,6 +736,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 var optionsIn = new List<OptionsIn> { OptionsIn.ReturnElements.All };
                 var extraOptions = OptionsIn.Parse(ExtraOptionsIn);
+
                 foreach (var extraOptionsKey in extraOptions.Keys)
                 {
                     try
@@ -747,6 +748,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                         //ignore if invalid optionsIn pair
                     }
                 }
+
                 GetObjectDetails(optionsIn.ToArray());
             }
         }
@@ -762,10 +764,17 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 if (!CanGetObjectIds)
                     return false;
 
-                var resource = Items.FindSelectedSynchronized();
-                var uri = new EtpUri(resource.Resource.Uri);
+                if (_supportedObjects == null)
+                    _supportedObjects = Context.GetSupportedGetFromStoreObjects();
 
-                return uri.Version.Equals(OptionsIn.DataVersion.Version141.Value);
+                if (!_supportedObjects.ContainsIgnoreCase(ObjectTypes.Attachment))
+                    return false;
+
+                var resource = Items.FindSelectedSynchronized();
+                var wrapper = resource.DataContext as DataObjectWrapper;
+
+                return wrapper?.Instance is Witsml141.Wellbore
+                    || wrapper?.Instance is Witsml141.Attachment;
             }
         }
 
@@ -781,10 +790,27 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                     return false;
 
                 var resource = Items.FindSelectedSynchronized();
-                var uri = new EtpUri(resource.Resource.Uri);
+                var wrapper = resource.DataContext as DataObjectWrapper;
 
-                return uri.ObjectType.EqualsIgnoreCase(ObjectTypes.Attachment)
-                    && !string.IsNullOrWhiteSpace(uri.ObjectId);
+                return wrapper?.Instance is Witsml141.Attachment;
+            }
+        }
+
+        /// <summary>
+        /// Determines whether a GetFromStore request can be sent for the selected item.
+        /// </summary>
+        /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
+        public bool CanAddAttachment
+        {
+            get
+            {
+                if (!CanGetAttachments)
+                    return false;
+
+                var resource = Items.FindSelectedSynchronized();
+                var wrapper = resource.DataContext as DataObjectWrapper;
+
+                return wrapper?.Instance is Witsml141.Wellbore;
             }
         }
 
@@ -794,17 +820,77 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public void UploadAttachment()
         {
             var resource = Items.FindSelectedSynchronized();
-            var uri = new EtpUri(resource.Resource.Uri);
-            var ids = uri.GetObjectIdMap();
+            var wrapper = resource.DataContext as DataObjectWrapper;
 
-            var attachment = new Witsml141.Attachment
+            var wellbore = wrapper?.Instance as Witsml141.Wellbore;
+            if (wellbore == null) return;
+
+            Runtime.InvokeAsync(() =>
             {
-                Uid = uri.ObjectId,
-                UidWell = ids[ObjectTypes.Well],
-                UidWellbore = ids[ObjectTypes.Wellbore]
-            };
+                var dialog = new OpenFileDialog
+                {
+                    Title = "Select Attachment...",
+                    Filter = "All Files|*.*",
+                    Multiselect = true
+                };
 
-            // TODO: Show Upload Dialog
+                if (!dialog.ShowDialog(Application.Current.MainWindow).GetValueOrDefault())
+                    return;
+
+                var attachments = new Witsml141.AttachmentList
+                {
+                    Attachment = new List<Witsml141.Attachment>()
+                };
+
+                foreach (var filePath in dialog.FileNames)
+                {
+                    var fileName = Path.GetFileName(filePath);
+
+                    var attachment = new Witsml141.Attachment
+                    {
+                        UidWell = wellbore.UidWell,
+                        NameWell = wellbore.NameWell,
+                        UidWellbore = wellbore.Uid,
+                        NameWellbore = wellbore.Name,
+                        Uid = Guid.NewGuid().ToString(),
+                        Name = fileName,
+                        FileName = fileName,
+                        FileType = MimeTypes.MimeTypeMap.GetMimeType(Path.GetExtension(fileName)),
+                        Content = File.ReadAllBytes(filePath)
+                    };
+
+                    attachments.Attachment.Add(attachment);
+                }
+
+                if (!attachments.Attachment.Any())
+                    return;
+
+                var context = Context as WitsmlContext;
+                if (context == null) return;
+
+                using (var proxy = context.Connection.CreateClientProxy().WithUserAgent())
+                {
+                    var client = (IWitsmlClient) proxy;
+                    var objectType = ObjectTypes.Attachment;
+                    var xml = WitsmlParser.ToXml(attachments);
+                    var suppMsgOut = string.Empty;
+                    short returnCode = 0;
+
+                    context.LogQuery(Functions.AddToStore, objectType, xml, string.Empty);
+
+                    try
+                    {
+                        returnCode = client.WMLS_AddToStore(objectType, xml, string.Empty, string.Empty, out suppMsgOut);
+
+                        if (returnCode > 0)
+                            Runtime.ShowInfo("Attachment(s) uploaded successfully.");
+                    }
+                    finally
+                    {
+                        context.LogResponse(Functions.AddToStore, objectType, xml, string.Empty, string.Empty, returnCode, suppMsgOut);
+                    }
+                }
+            });
         }
 
         /// <summary>
@@ -836,10 +922,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                             FileName = fileName
                         };
 
-                        if (dialog.ShowDialog(Application.Current.MainWindow).GetValueOrDefault())
-                        {
-                            File.WriteAllBytes(dialog.FileName, attachment.Content);
-                        }
+                        if (!dialog.ShowDialog(Application.Current.MainWindow).GetValueOrDefault())
+                            return;
+
+                        File.WriteAllBytes(dialog.FileName, attachment.Content);
+                        Runtime.ShowInfo("Attachment downloaded successfully.");
                     });
                 });
         }
@@ -877,6 +964,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             NotifyOfPropertyChange(() => CanGetAttachments);
             NotifyOfPropertyChange(() => CanGetAttachment);
+            NotifyOfPropertyChange(() => CanAddAttachment);
             NotifyOfPropertyChange(() => CanGetObjectIds);
             NotifyOfPropertyChange(() => CanGetObjectHeader);
             NotifyOfPropertyChange(() => CanGetObjectDetails);
