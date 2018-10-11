@@ -137,6 +137,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -251,6 +252,7 @@
     <Compile Include="ViewModels\IShellViewModel.cs" />
     <Compile Include="ViewModels\PropertyGridViewModel.cs" />
     <Compile Include="ViewModels\ResourceViewModel.cs" />
+    <Compile Include="ViewModels\RevealablePasswordBoxViewModel.cs" />
     <Compile Include="ViewModels\SelectChannelsViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="ViewModels\TextEditorViewModel.cs" />
@@ -273,6 +275,9 @@
     </Compile>
     <Compile Include="Views\PropertyGridView.xaml.cs">
       <DependentUpon>PropertyGridView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\RevealablePasswordBoxView.xaml.cs">
+      <DependentUpon>RevealablePasswordBoxView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SelectChannelsView.xaml.cs">
       <DependentUpon>SelectChannelsView.xaml</DependentUpon>
@@ -301,6 +306,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Images\Eye32.png" />
+    <Content Include="Images\EyeRevealed32.png" />
     <Content Include="SaveWindowState\LICENSE.txt" />
     <Resource Include="Images\StatusInvalid_16x.png" />
     <Resource Include="Images\StatusOK_16x.png" />
@@ -329,6 +336,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\PropertyGridView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\RevealablePasswordBoxView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
