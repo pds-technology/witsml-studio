@@ -306,8 +306,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Images\Eye32.png" />
-    <Content Include="Images\EyeRevealed32.png" />
+    <Resource Include="Images\Eye32.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\EyeRevealed32.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Content Include="SaveWindowState\LICENSE.txt" />
     <Resource Include="Images\StatusInvalid_16x.png" />
     <Resource Include="Images\StatusOK_16x.png" />
