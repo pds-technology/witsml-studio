@@ -43,8 +43,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         private static readonly string _dialogTitlePrefix = Settings.Default.DialogTitlePrefix;
 
         private readonly string[] _ignoredPropertyChanges = { "name" };
-        private PasswordBox _passwordControl;
-        private PasswordBox _proxyPasswordControl;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConnectionViewModel" /> class.
@@ -284,48 +282,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
 
             return Task.FromResult(IsTestSuccess);
-        }
-
-        /// <summary>
-        /// Called when the password control is loaded.
-        /// </summary>
-        /// <param name="control">The control.</param>
-        public void OnPasswordLoaded(PasswordBox control)
-        {
-            _passwordControl = control;
-            _passwordControl.Password = EditItem.Password;
-        }
-
-        /// <summary>
-        /// Called when the password changed.
-        /// </summary>
-        /// <param name="control">The control.</param>
-        public void OnPasswordChanged(PasswordBox control)
-        {
-            EditItem.Password = control.Password;
-            EditItem.SecurePassword = control.SecurePassword;
-            ResetTestStatus();
-        }
-
-        /// <summary>
-        /// Called when the proxy password control is loaded.
-        /// </summary>
-        /// <param name="control">The control.</param>
-        public void OnProxyPasswordLoaded(PasswordBox control)
-        {
-            _proxyPasswordControl = control;
-            _proxyPasswordControl.Password = EditItem.ProxyPassword;
-        }
-
-        /// <summary>
-        /// Called when the proxy password changed.
-        /// </summary>
-        /// <param name="control">The control.</param>
-        public void OnProxyPasswordChanged(PasswordBox control)
-        {
-            EditItem.ProxyPassword = control.Password;
-            EditItem.SecureProxyPassword = control.SecurePassword;
-            ResetTestStatus();
         }
 
         /// <summary>
