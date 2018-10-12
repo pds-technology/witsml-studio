@@ -69,6 +69,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 new SecurityProtocolItem(SecurityProtocolType.Tls, "TLS 1.0"),
                 new SecurityProtocolItem(SecurityProtocolType.Ssl3, "SSL 3.0")
             };
+
+            RevealablePasswordBox = new RevealablePasswordBoxViewModel();
+            RevealableProxyPasswordBox = new RevealablePasswordBoxViewModel();
         }
 
         /// <summary>
@@ -106,6 +109,24 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Gets or sets the connection details for a connection
         /// </summary>
         public Connection DataItem { get; set; }
+
+        /// <summary>
+        /// Gets or sets the revealable password box.
+        /// </summary>
+        /// <value>
+        /// The revealable password box.
+        /// </value>
+        public RevealablePasswordBoxViewModel RevealablePasswordBox { get; set; }
+
+        /// <summary>
+        /// Gets or sets the revealable proxy password box.
+        /// </summary>
+        /// <value>
+        /// The revealable proxy password box.
+        /// </value>
+        public RevealablePasswordBoxViewModel RevealableProxyPasswordBox { get; set; }
+
+
 
         private Connection _editItem;
 
@@ -332,6 +353,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             // Reset saved SSL protocol
             EditItem.SecurityProtocol = 0;
 
+            EditItem.Password = RevealablePasswordBox.Password;
+            EditItem.ProxyPassword = RevealableProxyPasswordBox.Password;
+
+
             // Get selected SSL protocols
             SecurityProtocols
                 .Where(x => x.IsEnabled && x.IsSelected)
@@ -460,6 +485,15 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             // Reset the test status
             ResetTestStatus();
+        }
+
+        /// <summary>
+        /// Called when initializing.
+        /// </summary>
+        protected override void OnInitialize()
+        {
+           RevealablePasswordBox.Password = DataItem?.Password;
+           RevealableProxyPasswordBox.Password = DataItem?.ProxyPassword;
         }
 
         /// <summary>

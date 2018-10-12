@@ -78,8 +78,7 @@
                         <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.Username, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
 
                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Password:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                        <PasswordBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" PasswordChar="*" VerticalAlignment="Center"
-                                 cal:Message.Attach="[Event Loaded] = [Action OnPasswordLoaded($source)]; [Event PasswordChanged] = [Action OnPasswordChanged($source)]" />
+                        <ContentControl Grid.Row="1" Grid.Column="1" x:Name="RevealablePasswordBox" Margin="5"/>
                     </Grid>
 
                     <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding EditItem.IsAuthenticationBearer, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -128,8 +127,7 @@
                     <TextBox Grid.Row="3" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.ProxyUsername, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
 
                     <TextBlock Grid.Row="4" Grid.Column="0" Text="Password:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                    <PasswordBox Grid.Row="4" Grid.Column="1" Margin="5" Padding="5" PasswordChar="*" VerticalAlignment="Center"
-                                 cal:Message.Attach="[Event Loaded] = [Action OnProxyPasswordLoaded($source)]; [Event PasswordChanged] = [Action OnProxyPasswordChanged($source)]" />
+                    <ContentControl Grid.Row="4" Grid.Column="1" x:Name="RevealableProxyPasswordBox" Margin="5"/>
 
                     <TextBlock Grid.Row="5" Grid.Column="0" Text="" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
                     <CheckBox Grid.Row="5" Grid.Column="1" Margin="5,0,0,0" Content="Use Default Credentials" VerticalAlignment="Center"
