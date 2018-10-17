@@ -15,10 +15,14 @@
             <Setter Property="Margin" Value="5"/>
         </Style>
         <conv:BooleanInverseConverter x:Key="BooleanInverseConverter" />
+        <conv:BooleanToVisibilityConverter x:Key ="BooleanToVisibilityConverter" />
     </Window.Resources>
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom">
-            <TextBlock x:Name="StatusBarText"></TextBlock>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="StatusBarText"></TextBlock>
+                <Button x:Name="CancelExpandAll" Content="Cancel" Margin="50, 0" Visibility="{Binding ExpandAllInProcess, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            </StackPanel>
         </StatusBar>
 
         <Grid Margin="5" DockPanel.Dock="Top">
@@ -52,6 +56,7 @@
                 </TreeView.Resources>
                 <TreeView.ContextMenu>
                     <ContextMenu>
+                        <MenuItem Header="Expand All" cal:Message.Attach="ExpandAll" />
                         <MenuItem Header="Refresh" cal:Message.Attach="RefreshSelected" />
                         <Separator />
                         <MenuItem Header="Refresh All" cal:Message.Attach="RefreshHierarchy" />

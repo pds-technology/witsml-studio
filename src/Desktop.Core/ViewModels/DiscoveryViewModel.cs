@@ -3,23 +3,18 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Avro.Specific;
 using Caliburn.Micro;
 
 using Energistics.Etp;
-using Energistics.Etp.Common;
 using Energistics.Etp.Common.Datatypes;
 using Energistics.Etp.Common.Datatypes.Object;
-using Energistics.Etp.v12;
-using PDS.WITSMLstudio.Desktop.Core;
 using PDS.WITSMLstudio.Desktop.Core.Adapters;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
-using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 using PDS.WITSMLstudio.Framework;
 
 namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
@@ -31,6 +26,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
     public class DiscoveryViewModel : Screen
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(DiscoveryViewModel));
+
+        private CancellationTokenSource _cancellationTokenSource;
+        private AutoResetEvent _messageRespondedEvent;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryViewModel"/> class.
@@ -45,6 +43,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 OnConnectionChanged = OnConnectionChanged
             };
             Resources = new BindableCollection<ResourceViewModel>();
+            _messageRespondedEvent = new AutoResetEvent(false);
         }
 
         /// <summary>
@@ -132,6 +131,25 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
         }
 
+        private bool _expandAllInProcess;
+        /// <summary>
+        /// Gets or sets the expand all in process.
+        /// </summary>
+        /// <value>
+        /// The expand all in process.
+        /// </value>
+        public bool ExpandAllInProcess
+        {
+            get { return _expandAllInProcess; }
+            set
+            {
+                if (value != _expandAllInProcess)
+                {
+                    _expandAllInProcess = value;
+                    NotifyOfPropertyChange(() => ExpandAllInProcess);
+                }
+            }
+        }
         /// <summary>
         /// Gets or sets the selected uris.
         /// </summary>
@@ -161,6 +179,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public void CloseDialog()
         {
+            _cancellationTokenSource?.Cancel();
             Disconnect();
             TryClose(true);
         }
@@ -175,6 +194,101 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             var result = EtpExtender.GetResources(uri);
             return Task.FromResult(result);
+        }
+
+        /// <summary>
+        /// Expands all resources
+        /// </summary>
+        public async void ExpandAll()
+        {
+            Runtime.Invoke(() => StatusBarText = "Expanding All In Process...");
+
+
+            await Task.Factory.StartNew(() =>
+            {
+                _messageRespondedEvent.Reset();
+                _cancellationTokenSource = new CancellationTokenSource();
+                ExpandAllInProcess = true;
+                RefreshHierarchy();
+
+                int index = WaitHandle.WaitAny(new WaitHandle[] { _messageRespondedEvent, _cancellationTokenSource.Token.WaitHandle }, 10000);
+
+                if (_cancellationTokenSource.Token.IsCancellationRequested)
+                {
+                    Runtime.Invoke(() => StatusBarText = "Expanding All Cancelled.");
+                    ExpandAllInProcess = false;
+                    return;
+                }
+                else if (index == WaitHandle.WaitTimeout)
+                {
+                    Runtime.Invoke(() => StatusBarText = "Expanding All Timed Out.");
+                    ExpandAllInProcess = false;
+                    return;
+                }
+
+                var resourceList = Resources.ToList();
+                foreach (var resource in resourceList)
+                {
+                    if (resource.ChildCount > 0)
+                    {
+                        if (!Expand(resource))
+                        {
+                            ExpandAllInProcess = false;
+                            return;
+                        }
+                    }
+                }
+                ExpandAllInProcess = false;
+                Runtime.Invoke(() => StatusBarText = "Expanding All Completed.");
+           });
+        }
+
+        /// <summary>
+        /// Expands the specified resource.
+        /// </summary>
+        /// <param name="resource">The resource.</param>
+        public bool Expand(ResourceViewModel resource)
+        {
+            resource.IsExpanded = true;
+
+            int index = WaitHandle.WaitAny(new WaitHandle[] { _messageRespondedEvent, _cancellationTokenSource.Token.WaitHandle }, 10000);
+
+            if (_cancellationTokenSource.Token.IsCancellationRequested)
+            {
+                Runtime.Invoke(() => StatusBarText = "Expanding All Cancelled.");
+                ExpandAllInProcess = false;
+                return false;
+            }
+            else if (index == WaitHandle.WaitTimeout)
+            {
+                Runtime.Invoke(() => StatusBarText = "Expanding All Timed Out.");
+                ExpandAllInProcess = false;
+                return false;
+            }
+
+            var children = resource.Children.ToList();
+            foreach (var child in children)
+            {
+                if (!child.IsExpanded && child.HasPlaceholder && child.Resource.ChildCount > 0)
+                {
+                    bool succeeded = Expand(child);
+                    if (!succeeded)
+                    {
+                        ExpandAllInProcess = false;
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Cancels the expanding all.
+        /// </summary>
+        public void CancelExpandAll()
+        {
+            _cancellationTokenSource.Cancel();
         }
 
         /// <summary>
@@ -244,6 +358,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 EtpExtender = Client.CreateEtpExtender(requestedProtocols, true);
 
                 EtpExtender.Register(onOpenSession: OnOpenSession,
+                    onCloseSession:CloseEtpClient,
                     onGetResourcesResponse: OnGetResourcesResponse);
 
                 Client.SocketClosed += OnClientSocketClosed;
@@ -253,7 +368,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 Runtime.Invoke(() => StatusBarText = "Error Connecting");
             }
-
         }
 
         /// <summary>
@@ -296,13 +410,19 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             if (string.IsNullOrWhiteSpace(uri))
                 return;
 
-           //  If the message URI equals "/" or the current base URI then treat
+            //  If the message URI equals "/" or the current base URI then treat
             //  it as a root object.
             if (EtpUri.IsRoot(uri))
             {
                 Resources.ForEach(x => x.IsSelected = false);
                 viewModel.IsSelected = true;
                 Resources.Add(viewModel);
+
+                if (header.MessageFlags == 3)
+                {
+                    _messageRespondedEvent.Set();
+                }
+
                 return;
             }
 
@@ -315,7 +435,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             viewModel.IsChecked = CheckedUris.Contains(viewModel.Resource.Uri);
             viewModel.PropertyChanged += ResourcePropertyChanged;
 
-
+            if (header.MessageFlags == 3)
+            {
+                _messageRespondedEvent.Set();
+            }
         }
 
         /// <summary>
