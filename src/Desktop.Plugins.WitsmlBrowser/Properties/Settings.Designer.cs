@@ -40,5 +40,14 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.Properties {
                 return ((string)(this["PluginDisplayName"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DisableIndicatorQueries {
+            get {
+                return ((bool)(this["DisableIndicatorQueries"]));
+            }
+        }
     }
 }

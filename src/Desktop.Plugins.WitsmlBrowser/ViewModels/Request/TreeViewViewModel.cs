@@ -23,6 +23,7 @@ using Caliburn.Micro;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 using PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.Models;
+using PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.Properties;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
 {
@@ -33,7 +34,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
     public sealed class TreeViewViewModel : Conductor<IScreen>.Collection.OneActive, IConnectionAware
     {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(TreeViewViewModel));
-        private readonly string[] _exclude = { MainViewModel.QueryTemplateText, ObjectTypes.Well, ObjectTypes.Wellbore, ObjectTypes.ChangeLog, ObjectTypes.CapServer };
+        private static readonly string[] _exclude = { MainViewModel.QueryTemplateText, ObjectTypes.Well, ObjectTypes.Wellbore, ObjectTypes.ChangeLog, ObjectTypes.CapServer };
+        private static readonly bool _disableIndicatorQueries = Settings.Default.DisableIndicatorQueries;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TreeViewViewModel"/> class.
@@ -46,7 +48,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
             DisplayName = "Hierarchy";
             TreeViewModel = new WitsmlTreeViewModel(runtime)
             {
-                IsContextMenuEnabled = true
+                IsContextMenuEnabled = true,
+                DisableIndicatorQueries = _disableIndicatorQueries
             };
         }
 
