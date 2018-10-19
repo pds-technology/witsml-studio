@@ -69,6 +69,22 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
         }
 
+        private bool _autoPasswordEnabled = true;
+        /// <summary>
+        /// The new button visibility
+        /// </summary>
+        public bool AutoPasswordEnabled
+        {
+            get { return _autoPasswordEnabled; }
+            set
+            {
+                if (_autoPasswordEnabled == value) return;
+                _autoPasswordEnabled = value;
+                NotifyOfPropertyChange(() => AutoPasswordEnabled);
+            }
+        }
+
+
         /// <summary>
         /// Called when [password changed].
         /// </summary>
