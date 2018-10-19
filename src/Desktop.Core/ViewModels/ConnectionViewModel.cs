@@ -68,8 +68,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 new SecurityProtocolItem(SecurityProtocolType.Ssl3, "SSL 3.0")
             };
 
-            RevealablePasswordBox = new RevealablePasswordBoxViewModel { AutoPasswordEnabled = false };
-            RevealableProxyPasswordBox = new RevealablePasswordBoxViewModel { AutoPasswordEnabled = false };
+            RevealablePasswordBox = new RevealablePasswordBoxViewModel();
+            RevealableProxyPasswordBox = new RevealablePasswordBoxViewModel();
         }
 
         /// <summary>

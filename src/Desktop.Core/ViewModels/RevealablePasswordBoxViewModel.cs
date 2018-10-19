@@ -69,7 +69,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
         }
 
-        private bool _autoPasswordEnabled = true;
+        private bool _autoPasswordEnabled = false;
         /// <summary>
         /// The new button visibility
         /// </summary>
