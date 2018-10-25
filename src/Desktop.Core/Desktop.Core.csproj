@@ -217,6 +217,7 @@
     <Compile Include="Models\CustomPropertyDescriptor.cs" />
     <Compile Include="Models\DataObjectWrapper.cs" />
     <Compile Include="Models\EtpProtocolItem.cs" />
+    <Compile Include="Models\FocusExtension.cs" />
     <Compile Include="Models\LogCurveItem.cs" />
     <Compile Include="Models\ReaderWriterLockManager.cs" />
     <Compile Include="Models\RigsMonitor.cs" />
