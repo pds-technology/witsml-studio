@@ -21,7 +21,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using AutoMapper;
 using Caliburn.Micro;
 using Newtonsoft.Json;
@@ -257,6 +256,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public Task<bool> TestConnection()
         {
             ResetTestStatus();
+            EditItem.Password = RevealablePasswordBox.Password;
+            EditItem.ProxyPassword = RevealableProxyPasswordBox.Password;
 
             _log.DebugFormat("Testing a {0} connection", ConnectionType);
 
@@ -308,10 +309,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             // Reset saved SSL protocol
             EditItem.SecurityProtocol = 0;
-
-            EditItem.Password = RevealablePasswordBox.Password;
-            EditItem.ProxyPassword = RevealableProxyPasswordBox.Password;
-
 
             // Get selected SSL protocols
             SecurityProtocols
