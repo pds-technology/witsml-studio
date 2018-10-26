@@ -50,6 +50,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 if (_paswordVisible == value) return;
                 _paswordVisible = value;
+                if (_passwordBox != null)
+                {
+                    _passwordBox.IsTabStop = !_paswordVisible;
+                }
                 NotifyOfPropertyChange(() => PasswordVisible);
             }
         }
