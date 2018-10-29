@@ -25,7 +25,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
     /// Manages the behavior of the Data Load user interface elements.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    public class DataLoadViewModel : Screen
+    public sealed class DataLoadViewModel : Screen
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DataLoadViewModel"/> class.

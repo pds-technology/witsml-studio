@@ -1853,11 +1853,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 {
                     lock (_lock)
                     {
-                        if (Loading)
-                            _tokenSource.Cancel();
+                        if (_tokenSource != null)
+                        {
+                            if (Loading)
+                                _tokenSource.Cancel();
 
-                        _tokenSource?.Dispose();
-                        _tokenSource = null;
+                            _tokenSource.Dispose();
+                            _tokenSource = null;
+                        }
 
                         BindingOperations.DisableCollectionSynchronization(Items);
                         BindingOperations.DisableCollectionSynchronization(DataObjects);

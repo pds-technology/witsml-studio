@@ -51,7 +51,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
     /// An extender for the ETP 1.1 adapter.
     /// </summary>
     /// <seealso cref="PDS.WITSMLstudio.Desktop.Core.Adapters.IEtpExtender" />
-    public class Etp12Extender : IEtpExtender
+    public sealed class Etp12Extender : IEtpExtender
     {
         private readonly List<ChannelStreamingInfo> _channelStreamingInfos;
         private readonly List<NotificationRequestRecord> _notificationRequests;

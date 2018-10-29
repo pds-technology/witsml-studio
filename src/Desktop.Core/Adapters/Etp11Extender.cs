@@ -47,7 +47,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
     /// An extender for the ETP 1.1 adapter.
     /// </summary>
     /// <seealso cref="PDS.WITSMLstudio.Desktop.Core.Adapters.IEtpExtender" />
-    public class Etp11Extender : IEtpExtender
+    public sealed class Etp11Extender : IEtpExtender
     {
         private const string GzipEncoding = "gzip";
         private readonly List<ChannelStreamingInfo> _channelStreamingInfos;

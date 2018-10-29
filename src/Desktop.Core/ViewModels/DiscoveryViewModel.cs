@@ -23,12 +23,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
     /// A view model for a ETP client implementing discovering protocol
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    public class DiscoveryViewModel : Screen
+    public sealed class DiscoveryViewModel : Screen, IDisposable
     {
-        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(DiscoveryViewModel));
-
         private CancellationTokenSource _cancellationTokenSource;
-        private AutoResetEvent _messageRespondedEvent;
+        private readonly AutoResetEvent _messageRespondedEvent;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryViewModel"/> class.
@@ -49,23 +47,16 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Gets the runtime.
         /// </summary>
-        /// <value>
-        /// The runtime.
-        /// </value>
         public IRuntimeService Runtime { get; }
 
         /// <summary>
         /// Gets the connection picker view model.
         /// </summary>
-        /// <value>The connection picker view model.</value>
         public ConnectionPickerViewModel ConnectionPicker { get; }
 
         /// <summary>
         /// Gets or sets the connection.
         /// </summary>
-        /// <value>
-        /// The connection.
-        /// </value>
         public Connection Connection { get; set; }
 
         private bool _isConnected;
@@ -88,7 +79,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
          /// <summary>
         /// Gets or sets the currently active <see cref="EtpClient"/> instance.
         /// </summary>
-        /// <value>The ETP client instance.</value>
         public EtpClient Client { get; set; }
 
         /// <summary>
@@ -99,19 +89,16 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Gets the resources to display in the tree view.
         /// </summary>
-        /// <value>The collection of resources.</value>
         public BindableCollection<ResourceViewModel> Resources { get; }
 
         /// <summary>
         /// Gets the selected resource.
         /// </summary>
-        /// <value>The selected resource.</value>
         public ResourceViewModel SelectedResource => Resources.FindSelected();
 
         /// <summary>
         /// Gets the checked resources.
         /// </summary>
-        /// <value>The checked resources.</value>
         public IEnumerable<ResourceViewModel> CheckedResources => Resources.FindChecked();
 
         private string _statusBarText;
@@ -135,9 +122,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Gets or sets the expand all in process.
         /// </summary>
-        /// <value>
-        /// The expand all in process.
-        /// </value>
         public bool ExpandAllInProcess
         {
             get { return _expandAllInProcess; }
@@ -153,9 +137,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Gets or sets the selected uris.
         /// </summary>
-        /// <value>
-        /// The selected uris.
-        /// </value>
         public ObservableCollection<string> CheckedUris { get; set; }
 
         /// <summary>
@@ -211,7 +192,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 ExpandAllInProcess = true;
                 RefreshHierarchy();
 
-                int index = WaitHandle.WaitAny(new WaitHandle[] { _messageRespondedEvent, _cancellationTokenSource.Token.WaitHandle }, 10000);
+                int index = WaitHandle.WaitAny(new[] { _messageRespondedEvent, _cancellationTokenSource.Token.WaitHandle }, 10000);
 
                 if (_cancellationTokenSource.Token.IsCancellationRequested)
                 {
@@ -251,7 +232,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             resource.IsExpanded = true;
 
-            int index = WaitHandle.WaitAny(new WaitHandle[] { _messageRespondedEvent, _cancellationTokenSource.Token.WaitHandle }, 10000);
+            int index = WaitHandle.WaitAny(new[] { _messageRespondedEvent, _cancellationTokenSource.Token.WaitHandle }, 10000);
 
             if (_cancellationTokenSource.Token.IsCancellationRequested)
             {
@@ -326,6 +307,21 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         }
 
         /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            if (_cancellationTokenSource != null)
+                _cancellationTokenSource.Dispose();
+
+            if (_messageRespondedEvent != null)
+                _messageRespondedEvent.Dispose();
+
+            if (Client != null)
+                Client.Dispose();
+        }
+
+        /// <summary>
         /// Called when the current selected connection is  changed
         /// </summary>
         /// <param name="connection">The connection.</param>
@@ -392,7 +388,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <param name="uri">The URI.</param>
         private void OnGetResourcesResponse(IMessageHeader header, ISpecificRecord message, IResource resource, string uri)
         {
-            int id = Thread.CurrentThread.ManagedThreadId;
+            //int id = Thread.CurrentThread.ManagedThreadId;
             var viewModel = ResourceViewModel.NoData;
 
             // Handle case when "No Data" Acknowledge message was received
@@ -451,6 +447,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             if (e.PropertyName == "IsChecked")
             {
                 var viewModel = sender as ResourceViewModel;
+                if (viewModel == null) return;
+
                 if (viewModel.IsChecked && !CheckedUris.Contains(viewModel.Resource.Uri))
                 {
                     CheckedUris.Add(viewModel.Resource.Uri);
@@ -489,6 +487,5 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 StatusBarText = "Connection Closed";
             });
         }
-
     }
 }
