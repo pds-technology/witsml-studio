@@ -56,6 +56,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             ConnectionType = connectionType;
             ConnectionNames = new string[0];
             IsEtpConnection = connectionType == ConnectionTypes.Etp;
+            IsSoapConnection = connectionType == ConnectionTypes.Witsml;
+
             DisplayName = $"{_dialogTitlePrefix} - {ConnectionType.ToString().ToUpper()} Connection";
             CanTestConnection = true;
 
@@ -93,6 +95,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         /// <value>The collection of security protocols.</value>
         public BindableCollection<SecurityProtocolItem> SecurityProtocols { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the connection type is SOAP.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if the connection type is SOAP; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsSoapConnection { get; }
 
         /// <summary>
         /// Gets a value indicating whether the connection type is ETP.

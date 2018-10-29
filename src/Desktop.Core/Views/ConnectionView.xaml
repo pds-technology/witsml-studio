@@ -17,6 +17,7 @@
         <conv:NullToBooleanConverter x:Key="NullToBooleanConverter" />
         <conv:BooleanInverseConverter x:Key="BooleanInverseConverter" />
         <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <conv:EnumToDescriptionConverter x:Key="EnumToDescriptionConverter" />
         <Style x:Key="DialogButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="Height" Value="30"/>
             <Setter Property="Width" Value="80"/>
@@ -202,6 +203,33 @@
                 </Grid>
             </TabItem>
 
+            <TabItem Header="Compression" Visibility="{Binding IsSoapConnection, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="210" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Client Request Compression Method:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" VerticalAlignment="Center" IsEditable="False"
+                              Text="{Binding EditItem.SoapRequestCompressionMethod, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumToDescriptionConverter}}">
+                        <ComboBoxItem Content="none" />
+                        <ComboBoxItem Content="gzip" />
+                    </ComboBox>
+
+                    <CheckBox Grid.Row="2" Grid.Column="1" Margin="5,0,0,0" Content="Accept Compressed Server Responses" VerticalAlignment="Center"
+                              IsChecked="{Binding EditItem.SoapResponseCompression}" />
+                </Grid>
+            </TabItem>
+            
             <TabItem Header="OpenID" IsEnabled="False" Visibility="Collapsed">
 
                 <Grid Margin="5">

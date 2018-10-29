@@ -54,6 +54,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
             proxy.Proxy = connection.CreateWebProxy();
             proxy.Url = connection.Uri;
             proxy.Timeout *= 5;
+            proxy.AcceptCompressedResponses = connection.SoapAcceptCompressedResponses;
+            proxy.CompressRequests = connection.SoapRequestCompressionMethod == CompressionMethods.Gzip;
 
             connection.SetServerCertificateValidation();
 

@@ -452,16 +452,10 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
             string xmlOut = null;
             short returnCode = 0;
 
-            var clientControlledFunctions = new List<Functions>
-            {
-                Functions.GetCap,
-                Functions.GetBaseMsg
-            };
-
             try
             {
                 // Compute the object type of the incoming xml.
-                if (!clientControlledFunctions.Contains(functionType) && !string.IsNullOrWhiteSpace(xmlIn))
+                if (functionType.RequiresObjectType() && !string.IsNullOrWhiteSpace(xmlIn))
                 {
                     var document = WitsmlParser.Parse(xmlIn);
                     objectType = ObjectTypes.GetObjectTypeFromGroup(document.Root);
@@ -471,6 +465,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
                 {
                     var wmls = (IWitsmlClient) client;
                     string suppMsgOut;
+
+                    if (wmls.CompressRequests && functionType.SupportsRequestCompression())
+                        xmlIn = ClientCompression.GZipCompressAndBase64Encode(xmlIn);
 
                     // Execute the WITSML server function for the given functionType
                     switch (functionType)
@@ -484,10 +481,10 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
                             suppMsgOut = wmls.WMLS_GetBaseMsg(returnCode);
                             break;
                         case Functions.AddToStore:
-                            returnCode = wmls.WMLS_AddToStore(objectType, xmlIn, null, null, out suppMsgOut);
+                            returnCode = wmls.WMLS_AddToStore(objectType, xmlIn, optionsIn, null, out suppMsgOut);
                             break;
                         case Functions.UpdateInStore:
-                            returnCode = wmls.WMLS_UpdateInStore(objectType, xmlIn, null, null, out suppMsgOut);
+                            returnCode = wmls.WMLS_UpdateInStore(objectType, xmlIn, optionsIn, null, out suppMsgOut);
                             break;
                         case Functions.DeleteFromStore:
                             returnCode = wmls.WMLS_DeleteFromStore(objectType, xmlIn, optionsIn, null, out suppMsgOut);
@@ -495,6 +492,13 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
                         default:
                             returnCode = wmls.WMLS_GetFromStore(objectType, xmlIn, optionsIn, null, out xmlOut, out suppMsgOut);
                             break;
+                    }
+
+                    if (returnCode > 0)
+                    {
+                        // Handle servers that compress the response to a compressed request.
+                        if (wmls.CompressRequests)
+                            xmlOut = ClientCompression.SafeDecompress(xmlOut);
                     }
 
                     return await Task.FromResult(new WitsmlResult(objectType, xmlIn, optionsIn, null, xmlOut, suppMsgOut, returnCode));
@@ -530,6 +534,10 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
                     break;
                 case Functions.GetBaseMsg:
                     optionsIn = Model.ErrorCode.GetValueOrDefault().ToString();
+                    break;
+                case Functions.AddToStore:
+                case Functions.UpdateInStore:
+                    optionsIn = Model.Connection.SoapRequestCompressionMethod == CompressionMethods.Gzip ? OptionsIn.CompressionMethod.Gzip : null;
                     break;
                 case Functions.DeleteFromStore:
                     optionsIn = Model.CascadedDelete ? OptionsIn.CascadedDelete.True : null;
@@ -1127,6 +1135,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
 
             if (model.RequestLatestValues.HasValue && model.RequestLatestValues.Value > 0)
                 optionsIn.Add(new OptionsIn.RequestLatestValues(model.RequestLatestValues.Value));
+
+            if (model.Connection.SoapRequestCompressionMethod == CompressionMethods.Gzip)
+                optionsIn.Add(OptionsIn.CompressionMethod.Gzip);
 
             return string.Join(";", optionsIn.Where(o => !string.IsNullOrEmpty(o)));
         }

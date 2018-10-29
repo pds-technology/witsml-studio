@@ -426,7 +426,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
                 }
             }
         }
-
+        
         private bool _isAuthenticationBearer;
 
         /// <summary>
@@ -447,6 +447,44 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
             }
         }
 
+        private CompressionMethods _soapRequestCompressionMethod;
+
+        /// <summary>
+        /// Gets or sets the compression method for SOAP client requests.
+        /// </summary>
+        [DataMember]
+        public CompressionMethods SoapRequestCompressionMethod
+        {
+            get { return _soapRequestCompressionMethod; }
+            set
+            {
+                if (_soapRequestCompressionMethod != value)
+                {
+                    _soapRequestCompressionMethod = value;
+                    NotifyOfPropertyChange(() => SoapRequestCompressionMethod);
+                }
+            }
+        }
+
+        private bool _soapAcceptCompressedResponses;
+
+        /// <summary>
+        /// Gets or sets the compression method for SOAP client requests.
+        /// </summary>
+        [DataMember]
+        public bool SoapAcceptCompressedResponses
+        {
+            get { return _soapAcceptCompressedResponses; }
+            set
+            {
+                if (_soapAcceptCompressedResponses != value)
+                {
+                    _soapAcceptCompressedResponses = value;
+                    NotifyOfPropertyChange(() => SoapAcceptCompressedResponses);
+                }
+            }
+        }
+
         /// <summary>
         /// Returns a <see cref="System.String" /> that represents this instance.
         /// </summary>
@@ -458,7 +496,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
             return $"Uri: {Uri}; Username: {Username}; AuthenticationType: {AuthenticationType}; SecurityProtocol: {SecurityProtocol};" +
                    $" ProxyHost: {ProxyHost}; ProxyPort: {ProxyPort}; ProxyUsername: {ProxyUsername}; ProxyUseDefaultCredentials: {ProxyUseDefaultCredentials};" +
                    (!string.IsNullOrWhiteSpace(SubProtocol) ? $" SubProtocol: {SubProtocol};" : string.Empty) +
-                   (!string.IsNullOrWhiteSpace(EtpEncoding) ? $" EtpEncoding: {EtpEncoding};" : string.Empty);
+                   (!string.IsNullOrWhiteSpace(EtpEncoding) ? $" EtpEncoding: {EtpEncoding};" : string.Empty) +
+                   (!string.IsNullOrWhiteSpace(EtpCompression) ? $" EtpCompression: {EtpCompression};" : string.Empty) +
+                   $" SoapRequestCompressionMethod: {SoapRequestCompressionMethod};" +
+                   $" SoapAcceptCompressedResponses: {SoapAcceptCompressedResponses};";
         }
     }
 }

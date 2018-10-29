@@ -873,21 +873,26 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                     var client = (IWitsmlClient) proxy;
                     var objectType = ObjectTypes.Attachment;
                     var xml = WitsmlParser.ToXml(attachments);
+                    var originalXml = xml;
+                    var optionsIn = string.Empty;
                     var suppMsgOut = string.Empty;
                     short returnCode = 0;
 
-                    context.LogQuery(Functions.AddToStore, objectType, xml, string.Empty);
+                    if (client.CompressRequests)
+                        ClientCompression.Compress(ref xml, ref optionsIn);
+
+                    context.LogQuery(Functions.AddToStore, objectType, originalXml, optionsIn);
 
                     try
                     {
-                        returnCode = client.WMLS_AddToStore(objectType, xml, string.Empty, string.Empty, out suppMsgOut);
+                        returnCode = client.WMLS_AddToStore(objectType, xml, optionsIn, string.Empty, out suppMsgOut);
 
                         if (returnCode > 0)
                             Runtime.ShowInfo("Attachment(s) uploaded successfully.");
                     }
                     finally
                     {
-                        context.LogResponse(Functions.AddToStore, objectType, xml, string.Empty, string.Empty, returnCode, suppMsgOut);
+                        context.LogResponse(Functions.AddToStore, objectType, originalXml, optionsIn, string.Empty, returnCode, suppMsgOut);
                     }
                 }
             });
