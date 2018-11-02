@@ -487,6 +487,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             EtpExtender = server.CreateEtpExtender(Model.RequestedProtocols, false);
 
             EtpExtender.Register(LogObjectDetails,
+                onOpenSession: OnOpenSession,
                 onCloseSession: OnCloseSession,
                 onGetResourcesResponse: OnGetResourcesResponse,
                 onObject: OnObject,
