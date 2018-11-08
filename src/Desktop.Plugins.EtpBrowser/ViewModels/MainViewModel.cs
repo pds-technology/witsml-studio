@@ -985,7 +985,10 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             if (indexMetadata == null || indexData == null) return;
 
-            var mnemonic = indexMetadata["mnemonic"].Value<string>("string");
+            var mnemonicObj = indexMetadata["mnemonic"] as JObject;
+            var mnemonic = mnemonicObj?.Value<string>("string") ??
+                           indexMetadata.Value<string>("mnemonic");
+            
             var indexType = indexMetadata.Value<string>("indexType") ?? indexMetadata.Value<string>("indexKind");
             var scale = indexMetadata.Value<int>("scale");
 
