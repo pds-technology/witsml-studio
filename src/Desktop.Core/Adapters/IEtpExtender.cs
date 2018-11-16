@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Avro.Specific;
 using Energistics.Etp.Common;
 using Energistics.Etp.Common.Datatypes;
@@ -58,7 +59,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         void Register(
             Action<ProtocolEventArgs<ISpecificRecord>> logObjectDetails = null,
             Action<IMessageHeader, ISpecificRecord, IList<ISupportedProtocol>> onOpenSession = null,
-            Action onCloseSession = null,
+            Func<Task> onCloseSession = null,
             Action<IMessageHeader, IList<IChannelMetadataRecord>> onChannelMetadata = null,
             Action<IMessageHeader, IList<IDataItem>> onChannelData = null,
             Action<IMessageHeader, ISpecificRecord, IResource, string> onGetResourcesResponse = null,

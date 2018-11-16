@@ -34,10 +34,10 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
         Models.Simulation Model { get; }
 
         /// <summary>
-        /// Registers the ETP simulator with the specified ETP socket server.
+        /// Registers the ETP simulator with the specified ETP web server.
         /// </summary>
-        /// <param name="server">The server.</param>
-        void Register(IEtpSelfHostedWebServer server);
+        /// <param name="webServer">The web server.</param>
+        void Register(IEtpWebServer webServer);
 
         /// <summary>
         /// Gets the channel metadata.

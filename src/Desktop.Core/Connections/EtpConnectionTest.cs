@@ -81,7 +81,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
                 using (var client = connection.CreateEtpClient(applicationName, applicationVersion))
                 {
                     var protocols = connection.CreateEtpExtender().GetProtocolItems().ToList();
-                    var extender = client.CreateEtpExtender(protocols, true);
+                    var extender = client.CreateEtpExtender(protocols);
                     extender.Register();
 
                     if (!await client.OpenAsync())

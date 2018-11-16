@@ -207,7 +207,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
         /// Called when the selected connection has changed.
         /// </summary>
         /// <param name="connection">The connection.</param>
-        private void OnConnectionChanged(Connection connection)
+        private Task OnConnectionChanged(Connection connection)
         {
             Model.Connection = connection;
 
@@ -221,6 +221,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
                 GetWitsmlVersions();
                 Runtime.ShowBusy(false);
             });
+
+            return Task.FromResult(true);
         }
 
         /// <summary>

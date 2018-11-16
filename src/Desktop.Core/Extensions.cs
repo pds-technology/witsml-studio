@@ -216,7 +216,7 @@ namespace PDS.WITSMLstudio.Desktop.Core
         {
             using (var client = connection.CreateEtpClient(string.Empty, string.Empty))
             {
-                return client.CreateEtpExtender(new EtpProtocolItem[0], true);
+                return client.CreateEtpExtender(new EtpProtocolItem[0]);
             }
         }
 
@@ -225,13 +225,12 @@ namespace PDS.WITSMLstudio.Desktop.Core
         /// </summary>
         /// <param name="session">The ETP session.</param>
         /// <param name="protocolItems">The protocol items.</param>
-        /// <param name="isEtpClient">if set to <c>true</c> the session is an ETP client.</param>
         /// <returns>A new <see cref="IEtpExtender"/> instance.</returns>
-        public static IEtpExtender CreateEtpExtender(this IEtpSession session, IList<EtpProtocolItem> protocolItems, bool isEtpClient)
+        public static IEtpExtender CreateEtpExtender(this IEtpSession session, IList<EtpProtocolItem> protocolItems)
         {
             return session.SupportedVersion == EtpVersion.v11
-                ? new Etp11Extender(session, protocolItems, isEtpClient)
-                : new Etp12Extender(session, protocolItems, isEtpClient) as IEtpExtender;
+                ? new Etp11Extender(session, protocolItems)
+                : new Etp12Extender(session, protocolItems) as IEtpExtender;
         }
 
         /// <summary>

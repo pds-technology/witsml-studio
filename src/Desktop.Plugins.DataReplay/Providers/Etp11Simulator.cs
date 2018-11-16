@@ -38,10 +38,10 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
 
         public Models.Simulation Model { get; }
 
-        public void Register(IEtpSelfHostedWebServer server)
+        public void Register(IEtpWebServer webServer)
         {
-            server.Register(InitChannelStreamingProvider);
-            server.Register(InitDiscoveryProvider);
+            webServer.Register(InitChannelStreamingProvider);
+            webServer.Register(InitDiscoveryProvider);
         }
 
         public IList<IChannelMetadataRecord> GetChannelMetadata(IMessageHeader header)

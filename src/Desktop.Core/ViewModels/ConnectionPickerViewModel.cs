@@ -77,7 +77,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Gets or sets the delegate that will be invoked when the selected connection changes.
         /// </summary>
         /// <value>The delegate that will be invoked.</value>
-        public Action<Connection> OnConnectionChanged { get; set; }
+        public Func<Connection, Task> OnConnectionChanged { get; set; }
 
         private BindableCollection<Connection> _connections;
         /// <summary>

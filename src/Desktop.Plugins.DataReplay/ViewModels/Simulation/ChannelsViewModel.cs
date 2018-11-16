@@ -397,7 +397,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Simulation
             }
         }
 
-        private void OnWitsmlConnectionChanged(Connection connection)
+        private async Task OnWitsmlConnectionChanged(Connection connection)
         {
             Model.WitsmlConnection = connection;
 
@@ -406,7 +406,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Simulation
 
             // Make connection and get version
             Runtime.ShowBusy();
-            Runtime.InvokeAsync(() =>
+            await Runtime.InvokeAsync(() =>
             {
                 Runtime.ShowBusy(false);
                 WitsmlClientProxy = CreateWitsmlClientProxy();
@@ -414,7 +414,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Simulation
             });
         }
 
-        private void OnEtpConnectionChanged(Connection connection)
+        private async Task OnEtpConnectionChanged(Connection connection)
         {
             Model.EtpConnection = connection;
 
@@ -423,7 +423,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Simulation
 
             // Make connection and get version
             Runtime.ShowBusy();
-            Runtime.InvokeAsync(() =>
+            await Runtime.InvokeAsync(() =>
             {
                 Runtime.ShowBusy(false);
                 EtpClientProxy = CreateEtpClientProxy();

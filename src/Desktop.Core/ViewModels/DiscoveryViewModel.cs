@@ -325,10 +325,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Called when the current selected connection is  changed
         /// </summary>
         /// <param name="connection">The connection.</param>
-        private void OnConnectionChanged(Connection connection)
+        private async Task OnConnectionChanged(Connection connection)
         {
             // ToDo: Close current collection and save the selected URIs.
-            CloseEtpClient();
+            await CloseEtpClient();
             Resources.Clear();
             EtpExtender = null;
 
@@ -351,7 +351,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 BindableCollection<EtpProtocolItem> requestedProtocols = new BindableCollection<EtpProtocolItem>();
                 requestedProtocols.Add(new EtpProtocolItem(Energistics.Etp.v11.Protocols.Discovery, "store", true));
 
-                EtpExtender = Client.CreateEtpExtender(requestedProtocols, true);
+                EtpExtender = Client.CreateEtpExtender(requestedProtocols);
 
                 EtpExtender.Register(onOpenSession: OnOpenSession,
                     onCloseSession:CloseEtpClient,
@@ -463,11 +463,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Closes the ETP client.
         /// </summary>
-        private void CloseEtpClient()
+        private async Task CloseEtpClient()
         {
             if (Client == null) return;
 
             Client.SocketClosed -= OnClientSocketClosed;
+            await Client.CloseAsync("Shutting down");
             Client.Dispose();
             Client = null;
 

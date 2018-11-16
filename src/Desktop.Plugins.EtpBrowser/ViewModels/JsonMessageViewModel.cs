@@ -232,7 +232,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public void NewHeader()
         {
             _currentHeader = Parent.Session.Adapter.CreateMessageHeader();
-            _currentHeader.MessageId = (Parent.Session as EtpSession)?.NewMessageId() ?? 0;
 
             OnHeaderChanged();
         }

@@ -179,7 +179,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             Model.RequestedProtocols.AddRange(EtpProtocols.Where(x => x.IsSelected));
             Parent.InitEtpServer();
             CanRequestSession = false;
-            CanStartServer = !Parent.SocketServer?.IsRunning ?? true;
+            CanStartServer = !Parent.SelfHostedWebServer?.IsRunning ?? true;
             CanStopServer = !CanStartServer;
         }
 
@@ -188,7 +188,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void StopServer()
         {
-            Parent.SocketServer?.Stop();
+            Parent.SelfHostedWebServer?.Stop();
             CanStartServer = true;
             CanStopServer = false;
             CanCloseSession = false;
@@ -198,11 +198,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Requests a new ETP session.
         /// </summary>
-        public void RequestSession()
+        public async Task RequestSession()
         {
             Model.RequestedProtocols.Clear();
             Model.RequestedProtocols.AddRange(EtpProtocols.Where(x => x.IsSelected));
-            Parent.OnConnectionChanged();
+            await Parent.OnConnectionChanged();
             CanRequestSession = false;
         }
 
@@ -255,23 +255,23 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             CanRequestSession = false;
             CanCloseSession = true;
             CanStartServer = false;
-            CanStopServer = Parent.SocketServer?.IsRunning ?? false;
+            CanStopServer = Parent.SelfHostedWebServer?.IsRunning ?? false;
         }
 
         public void OnSocketClosed()
         {
             CanCloseSession = false;
-            CanStartServer = !Parent.SocketServer?.IsRunning ?? true;
+            CanStartServer = !Parent.SelfHostedWebServer?.IsRunning ?? true;
             CanStopServer = !CanStartServer;
             CanRequestSession = CanStartServer;
         }
 
-        private void OnConnectionChanged(Connection connection)
+        private async Task OnConnectionChanged(Connection connection)
         {
             Model.Connection = connection;
             Model.Connection.SetServerCertificateValidation();
-            Parent.OnConnectionChanged(false);
-            CanStartServer = !Parent.SocketServer?.IsRunning ?? true;
+            await Parent.OnConnectionChanged(false);
+            CanStartServer = !Parent.SelfHostedWebServer?.IsRunning ?? true;
             CanStopServer = !CanStartServer;
             CanRequestSession = !CanStopServer;
             CanCloseSession = false;
@@ -279,7 +279,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             var protocols = Parent.EtpExtender ??
                             connection.CreateEtpExtender();
 
-            Runtime.InvokeAsync(() =>
+            await Runtime.InvokeAsync(() =>
             {
                 EtpProtocols.Clear();
                 EtpProtocols.AddRange(protocols.GetProtocolItems());

@@ -57,7 +57,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         private readonly ConcurrentDictionary<int, JToken> _channels;
         private DateTimeOffset _dateReceived;
         private IEtpClient _client;
-        private IEtpSession _server;
+        private IEtpServer _server;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainViewModel" /> class.
@@ -153,7 +153,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Gets the ETP socket server instance.
         /// </summary>
-        public IEtpSelfHostedWebServer SocketServer { get; private set; }
+        public IEtpSelfHostedWebServer SelfHostedWebServer { get; private set; }
 
         /// <summary>
         /// Gets the ETP extender instance.
@@ -166,7 +166,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <value>The ETP client instance.</value>
         public IEtpClient Client
         {
-            get { return _client; }
+            get => _client;
             set
             {
                 if (ReferenceEquals(_client, value))
@@ -181,7 +181,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// Gets the currently active <see cref="IEtpSession"/> instance.
         /// </summary>
         /// <value>The ETP client instance.</value>
-        public IEtpSession Session => _client ?? _server;
+        public IEtpSession Session => (IEtpSession)_client ?? _server;
 
         private TextEditorViewModel _details;
 
@@ -393,7 +393,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         /// <param name="reconnect">if set to <c>true</c> automatically reconnect.</param>
         /// <param name="updateTitle">if set to <c>true</c> set the application title.</param>
-        public void OnConnectionChanged(bool reconnect = true, bool updateTitle = true)
+        public async Task OnConnectionChanged(bool reconnect = true, bool updateTitle = true)
         {
             CloseEtpClient();
             Resources.Clear();
@@ -407,7 +407,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
             if (!string.IsNullOrWhiteSpace(Model.Connection.Uri) && reconnect)
             {
-                InitEtpClient();
+                await InitEtpClient();
             }
 
             if (updateTitle)
@@ -419,7 +419,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Initializes the ETP client.
         /// </summary>
-        public void InitEtpClient()
+        public async Task InitEtpClient()
         {
             try
             {
@@ -428,7 +428,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 _log.Debug($"Establishing ETP connection for {Model.Connection}");
 
                 Client = Model.Connection.CreateEtpClient(Model.ApplicationName, Model.ApplicationVersion);
-                EtpExtender = Client.CreateEtpExtender(Model.RequestedProtocols, true);
+                EtpExtender = Client.CreateEtpExtender(Model.RequestedProtocols);
 
                 EtpExtender.Register(LogObjectDetails,
                     onOpenSession: OnOpenSession,
@@ -439,7 +439,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
                 Client.SocketClosed += OnClientSocketClosed;
                 Client.Output = LogClientOutput;
-                Client.OpenAsync();
+                await Client.OpenAsync();
             }
             catch (Exception ex)
             {
@@ -461,10 +461,10 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 LogClientOutput(message, true);
                 _log.Debug(message);
 
-                SocketServer = EtpFactory.CreateSelfHostedWebServer(Model.PortNumber, Model.ApplicationName, Model.ApplicationVersion);
-                SocketServer.SessionConnected += OnServerSessionConnected;
-                SocketServer.SessionClosed += OnServerSessionClosed;
-                SocketServer.Start();
+                SelfHostedWebServer = EtpFactory.CreateSelfHostedWebServer(Model.PortNumber, Model.ApplicationName, Model.ApplicationVersion);
+                SelfHostedWebServer.SessionConnected += OnServerSessionConnected;
+                SelfHostedWebServer.SessionClosed += OnServerSessionClosed;
+                SelfHostedWebServer.Start();
             }
             catch (Exception ex)
             {
@@ -475,7 +475,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
         private void OnServerSessionConnected(object sender, IEtpSession session)
         {
-            var server = session as EtpSession;
+            var server = session as IEtpServer;
             if (server == null) return;
 
             server.Output = LogClientOutput;
@@ -485,7 +485,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             LogClientOutput(message, true);
             _log.Debug(message);
 
-            EtpExtender = server.CreateEtpExtender(Model.RequestedProtocols, false);
+            EtpExtender = server.CreateEtpExtender(Model.RequestedProtocols);
 
             EtpExtender.Register(LogObjectDetails,
                 onOpenSession: OnOpenSession,
@@ -496,16 +496,16 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 onOpenChannel: OnOpenChannel);
         }
 
-        private void OnServerSessionClosed(object sender, IEtpSession session)
+        private async void OnServerSessionClosed(object sender, IEtpSession session)
         {
-            var server = session as EtpSession;
+            var server = session as IEtpServer;
             if (server == null) return;
 
             var message = $"[{server.SessionId}] ETP client disconnected.";
             LogClientOutput(message, true);
             _log.Debug(message);
 
-            OnCloseSession();
+            await OnCloseSession();
 
             if (server == _server)
             {
@@ -532,9 +532,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Called when the ETP session is closed.
         /// </summary>
-        private void OnCloseSession()
+        private async Task OnCloseSession()
         {
-            Runtime.Invoke(() =>
+            await Runtime.InvokeAsync(() =>
             {
                 if (Runtime.Shell != null)
                     Runtime.Shell.StatusBarText = "Connection Closed";
@@ -550,14 +550,14 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         private void CloseEtpServer()
         {
-            if (SocketServer == null) return;
+            if (SelfHostedWebServer == null) return;
 
             OnServerSessionClosed(this, _server);
 
-            SocketServer.SessionConnected -= OnServerSessionConnected;
-            SocketServer.SessionClosed -= OnServerSessionClosed;
-            SocketServer.Dispose();
-            SocketServer = null;
+            SelfHostedWebServer.SessionConnected -= OnServerSessionConnected;
+            SelfHostedWebServer.SessionClosed -= OnServerSessionClosed;
+            SelfHostedWebServer.Dispose();
+            SelfHostedWebServer = null;
         }
 
         /// <summary>
@@ -1046,7 +1046,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 {
                     // NOTE: dispose managed state (managed objects).
                     Client?.Dispose();
-                    SocketServer?.Dispose();
+                    SelfHostedWebServer?.Dispose();
                 }
 
                 // NOTE: free unmanaged resources (unmanaged objects) and override a finalizer below.
