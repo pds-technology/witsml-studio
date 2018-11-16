@@ -340,7 +340,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Simulation
 
         private async Task InitChannelStreaming(CancellationToken token)
         {
-            using (var server = new EtpSocketServer(Model.PortNumber, ((IScreen)Parent).DisplayName, Model.Version))
+            using (var server = EtpFactory.CreateSelfHostedWebServer(Model.PortNumber, ((IScreen)Parent).DisplayName, Model.Version))
             {
                 var simulator = CreateEtpSimulator();
                 simulator.Register(server);

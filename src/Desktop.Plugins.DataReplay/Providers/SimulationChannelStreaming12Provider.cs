@@ -17,6 +17,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,20 +32,20 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
     public class SimulationChannelStreaming12Provider : ChannelStreamingProducerHandler
     {
         private CancellationTokenSource _tokenSource;
+        private int _minMessageInterval = 1000;
 
         public SimulationChannelStreaming12Provider(IEtpSimulator simulator)
         {
             Simulator = simulator;
-            IsSimpleStreamer = true;
         }
 
         public IEtpSimulator Simulator { get; }
 
         public Models.Simulation Simulation => Simulator.Model;
 
-        protected override void HandleStart(IMessageHeader header, Start start)
+        protected override void HandleStartStreaming(IMessageHeader header, StartStreaming startStreaming)
         {
-            base.HandleStart(header, start);
+            base.HandleStartStreaming(header, startStreaming);
 
             var channelMetadata = Simulator.GetChannelMetadata(header)
                 .Cast<ChannelMetadataRecord>()
@@ -55,15 +56,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
             StartSendingChannelData(header);
         }
 
-        protected override void HandleChannelStreamingStart(IMessageHeader header, ChannelStreamingStart channelStreamingStart)
+        protected override void HandleStopStreaming(IMessageHeader header, StopStreaming stopStreaming)
         {
-            base.HandleChannelStreamingStart(header, channelStreamingStart);
-            StartSendingChannelData(header);
-        }
-
-        protected override void HandleChannelStreamingStop(IMessageHeader header, ChannelStreamingStop channelStreamingStop)
-        {
-            base.HandleChannelStreamingStop(header, channelStreamingStop);
+            base.HandleStopStreaming(header, stopStreaming);
             _tokenSource?.Cancel();
         }
 
@@ -89,7 +84,14 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
         {
             while (true)
             {
-                await Task.Delay(MinMessageInterval);
+                try
+                {
+                    await Task.Delay(_minMessageInterval, token);
+                }
+                catch (TaskCanceledException)
+                {
+                    break;
+                }
 
                 if (token.IsCancellationRequested)
                 {
@@ -101,7 +103,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
                         new DataItem
                         {
                             ChannelId = x.ChannelId,
-                            Indexes = new long[0],
+                            Indexes = new List<IndexValue>(),
                             ValueAttributes = new DataAttribute[0],
                             Value = new DataValue
                             {

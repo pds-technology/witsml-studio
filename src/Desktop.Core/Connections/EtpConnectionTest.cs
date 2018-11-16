@@ -84,9 +84,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
                     var extender = client.CreateEtpExtender(protocols, true);
                     extender.Register();
 
-                    var count = 0;
-                    client.Open();
+                    if (!await client.OpenAsync())
+                    {
+                        _log.Error("Error opening web socket connection");
+                        return false;
+                    }
 
+                    var count = 0;
                     while (string.IsNullOrWhiteSpace(client.SessionId) && count < 10)
                     {
                         await Task.Delay(1000);

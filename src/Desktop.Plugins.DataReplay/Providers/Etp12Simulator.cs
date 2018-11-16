@@ -19,7 +19,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Energistics.DataAccess.WITSML141.ReferenceData;
-using Energistics.Etp;
+using Energistics.Etp.Common;
 using Energistics.Etp.Common.Datatypes;
 using Energistics.Etp.Common.Datatypes.ChannelData;
 using Energistics.Etp.v12.Datatypes;
@@ -38,7 +38,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
 
         public Models.Simulation Model { get; }
 
-        public void Register(EtpSocketServer server)
+        public void Register(IEtpSelfHostedWebServer server)
         {
             server.Register(InitChannelStreamingProvider);
             server.Register(InitDiscoveryProvider);
@@ -72,7 +72,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
                 DataType = channelMetadata.DataType,
                 Description = channelMetadata.Description,
                 Uuid = channelMetadata.Uuid,
-                Status = (ChannelStatuses) channelMetadata.Status,
+                Status = (ChannelStatusKind) channelMetadata.Status,
                 Source = channelMetadata.Source,
                 Indexes = new[] { indexMetadata }
                     .OfType<IndexMetadataRecord>()
@@ -94,9 +94,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
                 Scale = scale,
                 IndexKind = Model.LogIndexType == LogIndexType.datetime ||
                             Model.LogIndexType == LogIndexType.elapsedtime
-                    ? ChannelIndexKinds.Time
-                    : ChannelIndexKinds.Depth,
-                Direction = IndexDirections.Increasing,
+                    ? ChannelIndexKind.Time
+                    : ChannelIndexKind.Depth,
+                Direction = IndexDirection.Increasing,
                 CustomData = new Dictionary<string, DataValue>(0)
             };
         }

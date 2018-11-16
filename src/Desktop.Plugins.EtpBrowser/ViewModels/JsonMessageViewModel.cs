@@ -219,7 +219,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
-        /// Called when the <see cref="Energistics.Etp.EtpClient" /> web socket is closed.
+        /// Called when the <see cref="IEtpClient" /> web socket is closed.
         /// </summary>
         public void OnSocketClosed()
         {
@@ -232,14 +232,14 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public void NewHeader()
         {
             _currentHeader = Parent.Session.Adapter.CreateMessageHeader();
-            _currentHeader.MessageId = Parent.Session.NewMessageId();
+            _currentHeader.MessageId = (Parent.Session as EtpSession)?.NewMessageId() ?? 0;
 
             OnHeaderChanged();
         }
 
         private void OnHeaderChanged()
         {
-            Header.SetText(Parent.Session.Serialize(_currentHeader, true));
+            Header.SetText(EtpExtensions.Serialize(_currentHeader, true));
         }
 
         private void OnMessageTypeChanged()
@@ -250,7 +250,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             var type = SelectedMessageType.Value;
             var message = Activator.CreateInstance(type) as ISpecificRecord;
 
-            Message.SetText(Parent.Session.Serialize(message, true));
+            Message.SetText(EtpExtensions.Serialize(message, true));
             UpdateCurrentHeader(message?.Schema);
         }
 

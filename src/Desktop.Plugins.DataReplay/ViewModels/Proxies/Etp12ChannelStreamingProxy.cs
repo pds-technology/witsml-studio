@@ -24,7 +24,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energistics.DataAccess.WITSML141.ReferenceData;
 using Energistics.Etp.Common;
-using Energistics.Etp.Common.Datatypes;
 using Energistics.Etp.v12.Datatypes;
 using Energistics.Etp.v12.Datatypes.ChannelData;
 using Energistics.Etp.v12.Protocol.ChannelStreaming;
@@ -45,12 +44,14 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
         {
             _random = new Random(246);
             Channels = new List<ChannelMetadataRecord>();
-            ChannelStreamingInfo = new List<ChannelStreamingInfo>();
+            //ChannelStreamingInfo = new List<ChannelStreamingInfo>();
+            ChannelStreamingInfo = new Dictionary<long, object>();
         }
 
         public List<ChannelMetadataRecord> Channels { get; }
 
-        public List<ChannelStreamingInfo> ChannelStreamingInfo { get; }
+        //public List<ChannelStreamingInfo> ChannelStreamingInfo { get; }
+        public Dictionary<long, object> ChannelStreamingInfo { get; }
 
         public IEtpSimulator Simulator { get; private set; }
 
@@ -64,15 +65,22 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
             using (Client = Model.EtpConnection.CreateEtpClient(Model.Name, Model.Version))
             {
                 Client.Register<IChannelStreamingProducer, ChannelStreamingProducerHandler>();
-                Client.Handler<IChannelStreamingProducer>().OnStart += OnStart;
-                Client.Handler<IChannelStreamingProducer>().OnChannelDescribe += OnChannelDescribe;
-                Client.Handler<IChannelStreamingProducer>().OnChannelStreamingStart += OnChannelStreamingStart;
-                Client.Handler<IChannelStreamingProducer>().OnChannelStreamingStop += OnChannelStreamingStop;
-                Client.Handler<IChannelStreamingProducer>().IsSimpleStreamer = Model.IsSimpleStreamer;
-                Client.Handler<IChannelStreamingProducer>().DefaultDescribeUri = EtpUri.RootUri;
+                Client.Handler<IChannelStreamingProducer>().OnStartStreaming += OnStartStreaming;
+                Client.Handler<IChannelStreamingProducer>().OnStopStreaming += OnStopStreaming;
+                //Client.Handler<IChannelStreamingProducer>().OnStart += OnStart;
+                //Client.Handler<IChannelStreamingProducer>().OnChannelDescribe += OnChannelDescribe();
+                //Client.Handler<IChannelStreamingProducer>().OnChannelStreamingStart += OnChannelStreamingStart;
+                //Client.Handler<IChannelStreamingProducer>().OnChannelStreamingStop += OnChannelStreamingStop;
+                //Client.Handler<IChannelStreamingProducer>().IsSimpleStreamer = Model.IsSimpleStreamer;
+                //Client.Handler<IChannelStreamingProducer>().DefaultDescribeUri = EtpUri.RootUri;
                 Client.SocketClosed += OnClientSocketClosed;
                 Client.Output = Log;
-                Client.Open();
+
+                if (!await Client.OpenAsync())
+                {
+                    Log("Error opening web socket connection");
+                    return;
+                }
 
                 while (true)
                 {
@@ -102,6 +110,93 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
         {
             TaskRunner.Stop();
         }
+
+        protected virtual void OnStartStreaming(object sender, ProtocolEventArgs<StartStreaming> e)
+        {
+            TaskRunner = new TaskRunner
+            {
+                OnExecute = StreamChannelData,
+                OnError = LogStreamingError
+            };
+
+            var channelMetadata = Simulator.GetChannelMetadata(e.Header)
+                .Cast<ChannelMetadataRecord>()
+                .ToList();
+
+            Channels.Clear();
+            Channels.AddRange(channelMetadata);
+
+            Client.Handler<IChannelStreamingProducer>()
+                .ChannelMetadata(e.Header, channelMetadata);
+
+            TaskRunner.Start();
+        }
+
+        protected virtual void OnStopStreaming(object sender, ProtocolEventArgs<StopStreaming> e)
+        {
+            TaskRunner.Stop();
+        }
+
+        private void StreamChannelData()
+        {
+            if (!Client.IsOpen) return;
+
+            var dataItems = Channels
+                .Select(ToChannelDataItem)
+                .ToList();
+
+            Client.Handler<IChannelStreamingProducer>()
+                .ChannelData(null, dataItems);
+        }
+
+        private DataItem ToChannelDataItem(ChannelMetadataRecord channel)
+        {
+            var indexDateTimeOffset = DateTimeOffset.UtcNow;
+
+            return new DataItem
+            {
+                ChannelId = channel.ChannelId,
+                Indexes = channel.Indexes
+                    .Select(x => ToChannelIndexValue(channel, x, indexDateTimeOffset))
+                    .Select(x => new IndexValue { Item = x })
+                    .ToList(),
+                ValueAttributes = new DataAttribute[0],
+                Value = new DataValue
+                {
+                    Item = ToChannelDataValue(channel, indexDateTimeOffset)
+                }
+            };
+        }
+
+        private object ToChannelIndexValue(ChannelMetadataRecord channel, IndexMetadataRecord index, DateTimeOffset indexDateTimeOffset)
+        {
+            if (index.IndexKind == ChannelIndexKind.Time)
+                return indexDateTimeOffset.ToUnixTimeMicroseconds();
+
+            object indexValue;
+
+            if (ChannelStreamingInfo.ContainsKey(channel.Id))
+            {
+                indexValue = ChannelStreamingInfo[channel.Id];
+
+                if (indexValue is double)
+                {
+                    indexValue = (double) indexValue + Math.Pow(10, index.Scale) * 0.1;
+                }
+            }
+            else
+            {
+                indexValue = 0d;
+            }
+
+            ChannelStreamingInfo[channel.Id] = indexValue;
+
+            return indexValue;
+        }
+
+        #region Old Implementataion
+
+        /*
 
         protected virtual void OnStart(object sender, ProtocolEventArgs<Start> e)
         {
@@ -213,9 +308,13 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
             return (long)value;
         }
 
+        */
+
+        #endregion
+
         private object ToChannelDataValue(ChannelMetadataRecord channel, DateTimeOffset indexDateTimeOffset)
         {
-            object dataValue = null;
+            object dataValue;
             var indexType = channel.Indexes.Select(i => i.IndexKind).FirstOrDefault();
 
             LogDataType logDataType;
@@ -224,42 +323,42 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
             switch (logDataType)
             {
                 case LogDataType.@byte:
-                    {
-                        dataValue = "Y";
-                        break;
-                    }
+                {
+                    dataValue = "Y";
+                    break;
+                }
                 case LogDataType.datetime:
                 {
-                        var dto = indexType == ChannelIndexKinds.Time 
-                            ? indexDateTimeOffset 
-                            : indexDateTimeOffset.AddSeconds(_random.Next(1, 5));
+                    var dto = indexType == ChannelIndexKind.Time 
+                        ? indexDateTimeOffset 
+                        : indexDateTimeOffset.AddSeconds(_random.Next(1, 5));
 
-                        dataValue = dto.ToString("o");
-                        break;
-                    }
+                    dataValue = dto.ToString("o");
+                    break;
+                }
                 case LogDataType.@double:
                 case LogDataType.@float:
-                    {
-                        dataValue = _random.NextDouble().ToString(CultureInfo.InvariantCulture);
-                        break;
-                    }
+                {
+                    dataValue = _random.NextDouble().ToString(CultureInfo.InvariantCulture);
+                    break;
+                }
                 case LogDataType.@int:
                 case LogDataType.@long:
                 case LogDataType.@short:
-                    {
-                        dataValue = _random.Next(11);
-                        break;
-                    }
-                case LogDataType.@string:
-                    {
-                        dataValue = "abc";
-                        break;
-                    }
-                default:
-                    {
-                        dataValue = "null";
-                    }
+                {
+                    dataValue = _random.Next(11);
                     break;
+                }
+                case LogDataType.@string:
+                {
+                    dataValue = "abc";
+                    break;
+                }
+                default:
+                {
+                    dataValue = "null";
+                    break;
+                }
             }
 
             return dataValue;

@@ -53,15 +53,15 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
     /// <seealso cref="PDS.WITSMLstudio.Desktop.Core.Adapters.IEtpExtender" />
     public sealed class Etp12Extender : IEtpExtender
     {
-        private readonly List<ChannelStreamingInfo> _channelStreamingInfos;
-        private readonly List<NotificationRequestRecord> _notificationRequests;
+        //private readonly List<ChannelStreamingInfo> _channelStreamingInfos;
+        private readonly List<SubscriptionInfo> _subscriptionInfos;
         private Action<ProtocolEventArgs<ISpecificRecord>> _logObjectDetails;
         private Action<IMessageHeader, IList<IChannelMetadataRecord>> _onChannelMetadata;
         private Action<IMessageHeader, IList<IDataItem>> _onChannelData;
         private Action<IMessageHeader, ISpecificRecord, IResource, string> _onGetResourcesResponse;
         private Action<IMessageHeader, ISpecificRecord, IDataObject> _onObject;
         private Action<IMessageHeader, ISpecificRecord, IDataObject> _onObjectPart;
-        private Action<IMessageHeader, ISpecificRecord, long, string> _onOpenChannel;
+        private Action<IMessageHeader, ISpecificRecord, IList<IChannelMetadataRecord>> _onOpenChannel;
         private bool _protocolHandlersRegistered;
 
         /// <summary>
@@ -70,14 +70,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="session">The ETP session.</param>
         /// <param name="protocolItems">The protocol items.</param>
         /// <param name="isEtpClient">if set to <c>true</c> the session is an ETP client.</param>
-        public Etp12Extender(EtpSession session, IList<EtpProtocolItem> protocolItems, bool isEtpClient)
+        public Etp12Extender(IEtpSession session, IList<EtpProtocolItem> protocolItems, bool isEtpClient)
         {
             Session = session;
             ProtocolItems = protocolItems;
             IsEtpClient = isEtpClient;
             Protocols = new Etp12Protocols();
-            _channelStreamingInfos = new List<ChannelStreamingInfo>();
-            _notificationRequests = new List<NotificationRequestRecord>();
+            //_channelStreamingInfos = new List<ChannelStreamingInfo>();
+            _subscriptionInfos = new List<SubscriptionInfo>();
         }
 
         /// <summary>
@@ -86,11 +86,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         public IEtpProtocols Protocols { get; }
 
         /// <summary>
-        /// Gets the session.
+        /// Gets the ETP session.
         /// </summary>
-        IEtpSession IEtpExtender.Session => Session;
-
-        private EtpSession Session { get; }
+        public IEtpSession Session { get; }
 
         private IList<EtpProtocolItem> ProtocolItems { get; }
 
@@ -117,7 +115,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             Action<IMessageHeader, ISpecificRecord, IResource, string> onGetResourcesResponse = null,
             Action<IMessageHeader, ISpecificRecord, IDataObject> onObject = null,
             Action<IMessageHeader, ISpecificRecord, IDataObject> onObjectPart = null,
-            Action<IMessageHeader, ISpecificRecord, long, string> onOpenChannel = null)
+            Action<IMessageHeader, ISpecificRecord, IList<IChannelMetadataRecord>> onOpenChannel = null)
         {
             _logObjectDetails = logObjectDetails ?? _logObjectDetails;
             _onChannelMetadata = onChannelMetadata ?? _onChannelMetadata;
@@ -136,8 +134,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
                     RegisterEventHandlers(Session.Handler<ICoreClient>(),
                         x => x.OnOpenSession += (s, e) =>
                         {
-                            _channelStreamingInfos.Clear();
-                            _notificationRequests.Clear();
+                            //_channelStreamingInfos.Clear();
+                            _subscriptionInfos.Clear();
 
                             onOpenSession.Invoke(e.Header, e.Message,
                                 e.Message.SupportedProtocols.Cast<ISupportedProtocol>().ToList());
@@ -220,7 +218,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <returns><c>true</c> if the index is time-based; otherwise, <c>false</c>.</returns>
         public bool IsTimeIndex(IIndexMetadataRecord index)
         {
-            return index?.IndexKind == (int) ChannelIndexKinds.Time;
+            return index?.IndexKind == (int) ChannelIndexKind.Time;
         }
 
         /// <summary>
@@ -230,10 +228,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="minMessageInterval"></param>
         public void Start(int maxDataItems, int minMessageInterval)
         {
-            if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
-
-            Session.Handler<IChannelStreamingConsumer>()
-                .Start(maxDataItems, minMessageInterval);
+            //if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
+            //
+            //Session.Handler<IChannelStreamingConsumer>()
+            //    .Start(maxDataItems, minMessageInterval);
         }
 
         /// <summary>
@@ -242,10 +240,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="uris">The URIs.</param>
         public void ChannelDescribe(IList<string> uris)
         {
-            if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
-
-            Session.Handler<IChannelStreamingConsumer>()
-                .ChannelDescribe(uris);
+            //if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
+            //
+            //Session.Handler<IChannelStreamingConsumer>()
+            //    .ChannelDescribe(uris);
         }
 
         /// <summary>
@@ -255,18 +253,18 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="startIndex">The start index.</param>
         public void ChannelStreamingStart(IList<ChannelMetadataViewModel> channels, object startIndex)
         {
-            if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
-
-            // Prepare ChannelStreamingInfos startIndexes
-            _channelStreamingInfos.Clear();
-
-            // Create a list of ChannelStreamingInfos only for selected, described channels.
-            _channelStreamingInfos.AddRange(channels
-                .Where(c => c.IsChecked)
-                .Select(c => ToChannelStreamingInfo(c.Record, c.ReceiveChangeNotification, startIndex)));
-
-            Session.Handler<IChannelStreamingConsumer>()
-                .ChannelStreamingStart(_channelStreamingInfos);
+            //if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
+            //
+            //// Prepare ChannelStreamingInfos startIndexes
+            //_channelStreamingInfos.Clear();
+            //
+            //// Create a list of ChannelStreamingInfos only for selected, described channels.
+            //_channelStreamingInfos.AddRange(channels
+            //    .Where(c => c.IsChecked)
+            //    .Select(c => ToChannelStreamingInfo(c.Record, c.ReceiveChangeNotification, startIndex)));
+            //
+            //Session.Handler<IChannelStreamingConsumer>()
+            //    .ChannelStreamingStart(_channelStreamingInfos);
         }
 
         /// <summary>
@@ -275,10 +273,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="channelIds"></param>
         public void ChannelStreamingStop(IList<long> channelIds)
         {
-            if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
-
-            Session.Handler<IChannelStreamingConsumer>()
-                .ChannelStreamingStop(channelIds);
+            //if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
+            //
+            //Session.Handler<IChannelStreamingConsumer>()
+            //    .ChannelStreamingStop(channelIds);
         }
 
         /// <summary>
@@ -289,17 +287,17 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="endIndex">The end index.</param>
         public void ChannelRangeRequest(IList<long> channelIds, long startIndex, long endIndex)
         {
-            if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
-
-            var rangeInfo = new ChannelRangeInfo
-            {
-                ChannelId = channelIds,
-                StartIndex = startIndex,
-                EndIndex = endIndex
-            };
-
-            Session.Handler<IChannelStreamingConsumer>()
-                .ChannelRangeRequest(new[] { rangeInfo });
+            //if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
+            //
+            //var rangeInfo = new ChannelRangeInfo
+            //{
+            //    ChannelId = channelIds,
+            //    StartIndex = startIndex,
+            //    EndIndex = endIndex
+            //};
+            //
+            //Session.Handler<IChannelStreamingConsumer>()
+            //    .ChannelRangeRequest(new[] { rangeInfo });
         }
 
         /// <summary>
@@ -308,16 +306,26 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="request">The request.</param>
         /// <param name="uri">The URI.</param>
         /// <param name="id">The channel identifier.</param>
-        /// <param name="uuid">The UUID.</param>
         /// <param name="lastIndex">The last index value.</param>
         /// <param name="infill">if set to <c>true</c> supports infill.</param>
         /// <param name="dataChanges">if set to <c>true</c> supports data changes.</param>
-        public void OpenChannelResponse(IMessageHeader request, string uri, long id, Guid uuid, object lastIndex = null, bool infill = true, bool dataChanges = true)
+        public void OpenChannelResponse(IMessageHeader request, string uri, long id, object lastIndex = null, bool infill = true, bool dataChanges = true)
         {
             if (!Session.IsRegistered<IChannelDataLoadConsumer>()) return;
 
+            var openChannelInfo = new OpenChannelInfo
+            {
+                Id = id,
+                LastIndex = new IndexValue { Item = lastIndex },
+                Infill = infill,
+                DataChanges = dataChanges
+            };
+
+            var channels = new List<OpenChannelInfo> { openChannelInfo };
+            var errors = new List<ErrorInfo>();
+
             Session.Handler<IChannelDataLoadConsumer>()
-                .OpenChannelResponse(request, uri, id, uuid, lastIndex, infill, dataChanges);
+                .OpenChannelResponse(request, channels, errors);
         }
 
         /// <summary>
@@ -405,7 +413,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
                     Name = name,
                     ChildCount = childCount,
                     ContentType = contentType,
-                    ResourceType = resourceType.ToString(),
+                    ResourceType = (ResourceKind) (int) resourceType,
                     CustomData = new Dictionary<string, string>()
                 }
             };
@@ -428,36 +436,37 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         {
             if (!Session.IsRegistered<IStoreNotificationCustomer>()) return;
 
-            var request = new NotificationRequestRecord
+            var request = new SubscriptionInfo
             {
                 Uri = uri,
-                Uuid = uuid,
+                RequestUuid = Guid.Parse(uuid).ToUuid(),
                 StartTime = startTime,
                 IncludeObjectData = includeObjectData,
-                ObjectTypes = objectTypes.ToArray()
+                ContentTypes = objectTypes.ToArray()
             };
 
-            _notificationRequests.Add(request);
+            _subscriptionInfos.Add(request);
 
             Session.Handler<IStoreNotificationCustomer>()
-                .NotificationRequest(request);
+                .SubscribeNotification(request);
         }
 
         /// <summary>
         /// Sends the CancelNotification message with the specified UUID.
         /// </summary>
-        /// <param name="uuid"></param>
+        /// <param name="uuid">The request identifier.</param>
         public void CancelNotification(string uuid)
         {
             if (!Session.IsRegistered<IStoreNotificationCustomer>()) return;
 
-            var request = _notificationRequests.FirstOrDefault(x => x.Uuid.EqualsIgnoreCase(uuid));
+            var requestUuid = Guid.Parse(uuid).ToUuid();
+            var request = _subscriptionInfos.FirstOrDefault(x => x.RequestUuid.Equals(requestUuid));
             if (request == null) return;
 
             Session.Handler<IStoreNotificationCustomer>()
-                .CancelNotification(request.Uuid);
+                .UnsubscribeNotification(request.RequestUuid.ToGuid());
 
-            _notificationRequests.Remove(request);
+            _subscriptionInfos.Remove(request);
         }
 
         /// <summary>
@@ -592,7 +601,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             _logObjectDetails?.Invoke(new ProtocolEventArgs<ISpecificRecord>(e.Header, e.Message));
         }
 
-        private void RegisterProtocolHandlers(EtpSession session, bool isEtpClient)
+        private void RegisterProtocolHandlers(IEtpSession session, bool isEtpClient)
         {
             if (_protocolHandlersRegistered) return;
             _protocolHandlersRegistered = true;
@@ -603,7 +612,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
                 RegisterSupportedProtocolHandlers(session);
         }
 
-        private void RegisterRequestedProtocolHandlers(EtpSession session)
+        private void RegisterRequestedProtocolHandlers(IEtpSession session)
         {
             if (Requesting(Protocols.ChannelStreaming, "producer"))
             {
@@ -633,7 +642,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             {
                 session.Register<IChannelDataLoadConsumer, ChannelDataLoadConsumerHandler>();
                 RegisterEventHandlers(session.Handler<IChannelDataLoadConsumer>(),
-                    x => x.OnOpenChannel += (s, e) => _onOpenChannel?.Invoke(e.Header, e.Message, e.Message.Id, e.Message.Uri));
+                    x => x.OnOpenChannel += (s, e) => _onOpenChannel?.Invoke(e.Header, e.Message, e.Message.Channels.Cast<IChannelMetadataRecord>().ToList()));
             }
             if (Requesting(Protocols.ChannelDataLoad, "consumer"))
             {
@@ -683,7 +692,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             {
                 session.Register<IStoreNotificationCustomer, StoreNotificationCustomerHandler>();
                 RegisterEventHandlers(session.Handler<IStoreNotificationCustomer>(),
-                    x => x.OnChangeNotification += (s, e) => _onObject?.Invoke(e.Header, e.Message, e.Message.Change.DataObject));
+                    x => x.OnObjectChanged += (s, e) => _onObject?.Invoke(e.Header, e.Message, e.Message.Change.DataObject));
             }
             if (Requesting(Protocols.StoreNotification, "customer"))
             {
@@ -761,7 +770,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             }
         }
 
-        private void RegisterSupportedProtocolHandlers(EtpSession session)
+        private void RegisterSupportedProtocolHandlers(IEtpSession session)
         {
             if (Requesting(Protocols.ChannelStreaming, "consumer"))
             {
@@ -791,7 +800,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             {
                 session.Register<IChannelDataLoadConsumer, ChannelDataLoadConsumerHandler>();
                 RegisterEventHandlers(session.Handler<IChannelDataLoadConsumer>(),
-                    x => x.OnOpenChannel += (s, e) => _onOpenChannel?.Invoke(e.Header, e.Message, e.Message.Id, e.Message.Uri));
+                    x => x.OnOpenChannel += (s, e) => _onOpenChannel?.Invoke(e.Header, e.Message, e.Message.Channels.Cast<IChannelMetadataRecord>().ToList()));
             }
             if (Requesting(Protocols.ChannelDataLoad, "producer"))
             {
@@ -833,7 +842,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             {
                 session.Register<IStoreNotificationCustomer, StoreNotificationCustomerHandler>();
                 RegisterEventHandlers(session.Handler<IStoreNotificationCustomer>(),
-                    x => x.OnChangeNotification += (s, e) => _onObject?.Invoke(e.Header, e.Message, e.Message.Change.DataObject));
+                    x => x.OnObjectChanged += (s, e) => _onObject?.Invoke(e.Header, e.Message, e.Message.Change.DataObject));
             }
 
             if (Requesting(Protocols.GrowingObject, "store"))
@@ -895,15 +904,15 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             return ProtocolItems.Any(x => x.Protocol == protocol && x.Role.EqualsIgnoreCase(role));
         }
 
-        private ChannelStreamingInfo ToChannelStreamingInfo(IChannelMetadataRecord channel, bool receiveChangeNotification, object startIndex)
-        {
-            return new ChannelStreamingInfo
-            {
-                ChannelId = channel.ChannelId,
-                StartIndex = new StreamingStartIndex { Item = startIndex },
-                ReceiveChangeNotification = receiveChangeNotification
-            };
-        }
+        //private ChannelStreamingInfo ToChannelStreamingInfo(IChannelMetadataRecord channel, bool receiveChangeNotification, object startIndex)
+        //{
+        //    return new ChannelStreamingInfo
+        //    {
+        //        ChannelId = channel.ChannelId,
+        //        StartIndex = new StreamingStartIndex { Item = startIndex },
+        //        ReceiveChangeNotification = receiveChangeNotification
+        //    };
+        //}
 
         private IDataObject ToDataObject(ObjectPart message)
         {

@@ -318,7 +318,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
-        /// Called when the <see cref="Energistics.Etp.EtpClient" /> web socket is closed.
+        /// Called when the <see cref="IEtpClient" /> web socket is closed.
         /// </summary>
         public void OnSocketClosed()
         {
@@ -451,7 +451,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             var dataObjects = new List<Tuple<ChannelMetadataViewModel, byte[]>>();
 
             // Check if producer is sending index/value pairs
-            if (!dataItems.Take(1).SelectMany(x => x.Indexes).Any())
+            if (!dataItems.Take(1).SelectMany(x => x.Indexes.Cast<object>()).Any())
             {
                 for (int i=0; i<dataItems.Count; i+=2)
                 {
@@ -479,11 +479,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                     var channel = Channels.FirstOrDefault(c => c.Record.ChannelId == x.ChannelId);
                     var channelIndex = channel?.Record.Indexes.Cast<IIndexMetadataRecord>().FirstOrDefault();
                     var isTimeIndex = Parent.EtpExtender.IsTimeIndex(channelIndex);
-                    var indexValue = x.Indexes.FirstOrDefault();
+                    var indexValue = x.Indexes.Cast<object>().FirstOrDefault();
 
                     var indexFormat = isTimeIndex
-                        ? DateTimeExtensions.FromUnixTimeMicroseconds(indexValue).ToString("o")
-                        : $"{indexValue.IndexFromScale(channelIndex?.Scale ?? 3)}";
+                        ? DateTimeExtensions.FromUnixTimeMicroseconds(Convert.ToInt64(indexValue)).ToString("o")
+                        : $"{(indexValue as long?)?.IndexFromScale(channelIndex?.Scale ?? 3) ?? indexValue}";
 
                     if (channel != null && x.Value.Item is byte[])
                     {

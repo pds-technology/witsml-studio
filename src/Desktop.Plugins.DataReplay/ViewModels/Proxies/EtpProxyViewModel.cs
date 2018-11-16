@@ -19,7 +19,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energistics.Etp;
+using Energistics.Etp.Common;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
@@ -43,7 +43,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 
         public Models.Simulation Model { get; protected set; }
 
-        public EtpClient Client { get; protected set; }
+        public IEtpClient Client { get; protected set; }
 
         public TaskRunner TaskRunner { get; protected set; }
 

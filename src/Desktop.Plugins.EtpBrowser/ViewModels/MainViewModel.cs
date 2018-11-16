@@ -28,6 +28,7 @@ using Caliburn.Micro;
 using Energistics.Etp;
 using Energistics.Etp.Common;
 using Energistics.Etp.Common.Datatypes;
+using Energistics.Etp.Common.Datatypes.ChannelData;
 using Energistics.Etp.Common.Datatypes.Object;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -55,8 +56,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
         private readonly ConcurrentDictionary<int, JToken> _channels;
         private DateTimeOffset _dateReceived;
-        private EtpClient _client;
-        private EtpSession _server;
+        private IEtpClient _client;
+        private IEtpSession _server;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainViewModel" /> class.
@@ -152,7 +153,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Gets the ETP socket server instance.
         /// </summary>
-        public EtpSocketServer SocketServer { get; private set; }
+        public IEtpSelfHostedWebServer SocketServer { get; private set; }
 
         /// <summary>
         /// Gets the ETP extender instance.
@@ -160,10 +161,10 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public IEtpExtender EtpExtender { get; private set; }
 
         /// <summary>
-        /// Gets or sets the currently active <see cref="EtpClient"/> instance.
+        /// Gets or sets the currently active <see cref="IEtpClient"/> instance.
         /// </summary>
         /// <value>The ETP client instance.</value>
-        public EtpClient Client
+        public IEtpClient Client
         {
             get { return _client; }
             set
@@ -180,7 +181,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// Gets the currently active <see cref="IEtpSession"/> instance.
         /// </summary>
         /// <value>The ETP client instance.</value>
-        public EtpSession Session => _client ?? _server;
+        public IEtpSession Session => _client ?? _server;
 
         private TextEditorViewModel _details;
 
@@ -438,7 +439,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
                 Client.SocketClosed += OnClientSocketClosed;
                 Client.Output = LogClientOutput;
-                Client.Open();
+                Client.OpenAsync();
             }
             catch (Exception ex)
             {
@@ -460,7 +461,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 LogClientOutput(message, true);
                 _log.Debug(message);
 
-                SocketServer = new EtpSocketServer(Model.PortNumber, Model.ApplicationName, Model.ApplicationVersion);
+                SocketServer = EtpFactory.CreateSelfHostedWebServer(Model.PortNumber, Model.ApplicationName, Model.ApplicationVersion);
                 SocketServer.SessionConnected += OnServerSessionConnected;
                 SocketServer.SessionClosed += OnServerSessionClosed;
                 SocketServer.Start();
@@ -574,7 +575,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
-        /// Called when the <see cref="EtpClient"/> socket is closed.
+        /// Called when the <see cref="IEtpClient"/> socket is closed.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
@@ -641,19 +642,19 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         /// <param name="header">The header.</param>
         /// <param name="message">The message.</param>
-        /// <param name="channelId">The channel identifier.</param>
-        /// <param name="uri">The URI.</param>
-        private void OnOpenChannel(IMessageHeader header, ISpecificRecord message, long channelId, string uri)
+        /// <param name="channels">The channels.</param>
+        private void OnOpenChannel(IMessageHeader header, ISpecificRecord message, IList<IChannelMetadataRecord> channels)
         {
             var dataLoadSettings = Model.DataLoad;
-            object lastIndex;
 
-            if (dataLoadSettings.IsTimeIndex)
-                lastIndex = new DateTimeOffset(dataLoadSettings.LastTimeIndex).ToUnixTimeMicroseconds();
-            else
-                lastIndex = dataLoadSettings.LastDepthIndex;
+            var lastIndex = dataLoadSettings.IsTimeIndex
+                ? new DateTimeOffset(dataLoadSettings.LastTimeIndex).ToUnixTimeMicroseconds()
+                : (object) dataLoadSettings.LastDepthIndex;
 
-            EtpExtender.OpenChannelResponse(header, uri, channelId, Guid.NewGuid(), lastIndex, dataLoadSettings.IsInfill, dataLoadSettings.IsDataChange);
+            foreach (var channel in channels)
+            {
+                EtpExtender.OpenChannelResponse(header, channel.ChannelUri, channel.ChannelId, lastIndex, dataLoadSettings.IsInfill, dataLoadSettings.IsDataChange);
+            }
         }
 
         /// <summary>
@@ -730,8 +731,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             Details.SetText(string.Format(
                 "// Header:{2}{0}{2}{2}// Body:{2}{1}{2}",
-                Session.Serialize(e.Header, true),
-                Session.Serialize(e.Message, true),
+                EtpExtensions.Serialize(e.Header, true),
+                EtpExtensions.Serialize(e.Message, true),
                 Environment.NewLine));
         }
 
@@ -745,9 +746,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             Details.SetText(string.Format(
                 "// Header:{3}{0}{3}{3}// Body:{3}{1}{3}{3}// Context:{3}{2}{3}",
-                Session.Serialize(e.Header, true),
-                Session.Serialize(e.Message, true),
-                Session.Serialize(e.Context, true),
+                EtpExtensions.Serialize(e.Header, true),
+                EtpExtensions.Serialize(e.Message, true),
+                EtpExtensions.Serialize(e.Context, true),
                 Environment.NewLine));
         }
 

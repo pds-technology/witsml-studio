@@ -94,14 +94,14 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
 
         private Resource New(string uuid, string uri, ResourceTypes resourceType, string contentType, string name, int count = -1)
         {
-            return new Resource()
+            return new Resource
             {
                 Uuid = uuid,
                 Uri = uri,
                 Name = name,
                 ChildCount = count,
                 ContentType = contentType,
-                ResourceType = resourceType.ToString(),
+                ResourceType = (ResourceKind)(int)resourceType,
                 CustomData = new Dictionary<string, string>()
             };
         }

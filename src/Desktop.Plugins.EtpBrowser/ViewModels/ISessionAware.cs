@@ -23,7 +23,7 @@ using PDS.WITSMLstudio.Desktop.Core.Connections;
 namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 {
     /// <summary>
-    /// Defines methods that can be implemented to receive <see cref="Energistics.Etp.EtpClient"/> status notifications.
+    /// Defines methods that can be implemented to receive <see cref="Energistics.Etp.Common.IEtpClient"/> status notifications.
     /// </summary>
     public interface ISessionAware
     {
@@ -40,7 +40,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         void OnSessionOpened(IList<ISupportedProtocol> supportedProtocols);
 
         /// <summary>
-        /// Called when the <see cref="Energistics.Etp.EtpClient"/> web socket is closed.
+        /// Called when the <see cref="Energistics.Etp.Common.IEtpClient"/> web socket is closed.
         /// </summary>
         void OnSocketClosed();
     }

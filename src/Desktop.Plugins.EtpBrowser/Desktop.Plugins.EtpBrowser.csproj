@@ -58,11 +58,11 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="ETP.DevKit, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\ETP.DevKit.1.2.0-dev18\lib\net452\ETP.DevKit.dll</HintPath>
+      <HintPath>$(SolutionDir)\packages\ETP.DevKit.1.2.0-dev28\lib\net452\ETP.DevKit.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ETP.Messages, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\ETP.1.6.0-dev12\lib\net40\ETP.Messages.dll</HintPath>
+      <HintPath>$(SolutionDir)\packages\ETP.1.6.0-dev18\lib\net40\ETP.Messages.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ICSharpCode.AvalonEdit, Version=5.0.1.0, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
@@ -75,6 +75,10 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SuperSocket.ClientEngine, Version=0.10.0.0, Culture=neutral, PublicKeyToken=ee9af13f57f00acc, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\SuperSocket.ClientEngine.Core.0.10.0\lib\net45\SuperSocket.ClientEngine.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SuperSocket.Common, Version=1.6.0.4, Culture=neutral, PublicKeyToken=6c80000676988ebb, processorArchitecture=MSIL">
@@ -109,8 +113,8 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="WebSocket4Net, Version=0.14.1.0, Culture=neutral, PublicKeyToken=eb4e154b696bf72a, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\WebSocket4Net.0.14.1\lib\net45\WebSocket4Net.dll</HintPath>
+    <Reference Include="WebSocket4Net, Version=0.15.2.11, Culture=neutral, PublicKeyToken=eb4e154b696bf72a, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\WebSocket4Net.0.15.2\lib\net45\WebSocket4Net.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="WindowsBase" />

@@ -66,7 +66,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="session">The ETP session.</param>
         /// <param name="protocolItems">The protocol items.</param>
         /// <param name="isEtpClient">if set to <c>true</c> the session is an ETP client.</param>
-        public Etp11Extender(EtpSession session, IList<EtpProtocolItem> protocolItems, bool isEtpClient)
+        public Etp11Extender(IEtpSession session, IList<EtpProtocolItem> protocolItems, bool isEtpClient)
         {
             Session = session;
             ProtocolItems = protocolItems;
@@ -82,11 +82,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         public IEtpProtocols Protocols { get; }
 
         /// <summary>
-        /// Gets the session.
+        /// Gets the ETP session.
         /// </summary>
-        IEtpSession IEtpExtender.Session => Session;
-
-        private EtpSession Session { get; }
+        public IEtpSession Session { get; }
 
         private IList<EtpProtocolItem> ProtocolItems { get; }
 
@@ -113,7 +111,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             Action<IMessageHeader, ISpecificRecord, IResource, string> onGetResourcesResponse = null,
             Action<IMessageHeader, ISpecificRecord, IDataObject> onObject = null,
             Action<IMessageHeader, ISpecificRecord, IDataObject> onObjectPart = null,
-            Action<IMessageHeader, ISpecificRecord, long, string> onOpenChannel = null)
+            Action<IMessageHeader, ISpecificRecord, IList<IChannelMetadataRecord>> onOpenChannel = null)
         {
             _logObjectDetails = logObjectDetails ?? _logObjectDetails;
             _onChannelMetadata = onChannelMetadata ?? _onChannelMetadata;
@@ -287,11 +285,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="request">The request.</param>
         /// <param name="uri">The URI.</param>
         /// <param name="id">The channel identifier.</param>
-        /// <param name="uuid">The UUID.</param>
         /// <param name="lastIndex">The last index value.</param>
         /// <param name="infill">if set to <c>true</c> supports infill.</param>
         /// <param name="dataChanges">if set to <c>true</c> supports data changes.</param>
-        public void OpenChannelResponse(IMessageHeader request, string uri, long id, Guid uuid, object lastIndex = null, bool infill = true, bool dataChanges = true)
+        public void OpenChannelResponse(IMessageHeader request, string uri, long id, object lastIndex = null, bool infill = true, bool dataChanges = true)
         {
         }
 
@@ -556,7 +553,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             _logObjectDetails?.Invoke(new ProtocolEventArgs<ISpecificRecord>(e.Header, e.Message));
         }
 
-        private void RegisterProtocolHandlers(EtpSession session, bool isEtpClient)
+        private void RegisterProtocolHandlers(IEtpSession session, bool isEtpClient)
         {
             if (_protocolHandlersRegistered) return;
             _protocolHandlersRegistered = true;
@@ -567,7 +564,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
                 RegisterSupportedProtocolHandlers(session);
         }
 
-        private void RegisterRequestedProtocolHandlers(EtpSession session)
+        private void RegisterRequestedProtocolHandlers(IEtpSession session)
         {
             if (Requesting(Protocols.ChannelStreaming, "producer"))
             {
@@ -664,7 +661,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             }
         }
 
-        private void RegisterSupportedProtocolHandlers(EtpSession session)
+        private void RegisterSupportedProtocolHandlers(IEtpSession session)
         {
             if (Requesting(Protocols.ChannelStreaming, "consumer"))
             {

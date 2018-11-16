@@ -22,7 +22,7 @@ using Energistics.DataAccess;
 using System.Net;
 using Energistics.Etp;
 using Energistics.Etp.Common;
-using PDS.WITSMLstudio.Framework;
+using Energistics.Etp.Common.Datatypes;
 
 namespace PDS.WITSMLstudio.Desktop.Core.Connections
 {
@@ -118,15 +118,15 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
         /// <param name="connection">The connection.</param>
         /// <param name="applicationName">Name of the application.</param>
         /// <param name="applicationVersion">The application version.</param>
-        /// <returns>An <see cref="Energistics.Etp.EtpClient"/> instance.</returns>
-        public static EtpClient CreateEtpClient(this Connection connection, string applicationName, string applicationVersion)
+        /// <returns>An <see cref="Energistics.Etp.Common.IEtpClient"/> instance.</returns>
+        public static IEtpClient CreateEtpClient(this Connection connection, string applicationName, string applicationVersion)
         {
             var headers = connection.GetAuthorizationHeader();
 
             connection.UpdateEtpSettings(headers);
             connection.SetServerCertificateValidation();
 
-            var client = new EtpClient(connection.Uri, applicationName, applicationVersion, connection.SubProtocol, headers);
+            var client = EtpFactory.CreateClient(connection.Uri, applicationName, applicationVersion, connection.SubProtocol, headers);
 
             if (!string.IsNullOrWhiteSpace(connection.ProxyHost))
             {

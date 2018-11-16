@@ -95,7 +95,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Simulation
                 try
                 {
                     Model.Name = DisplayName;
-                    var json = EtpExtensions.Serialize(null, Model, true);
+                    var json = EtpExtensions.Serialize(Model, true);
                     File.WriteAllText(dialog.FileName, json);
                 }
                 catch (Exception ex)

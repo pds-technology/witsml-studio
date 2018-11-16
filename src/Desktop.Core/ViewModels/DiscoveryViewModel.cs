@@ -7,8 +7,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avro.Specific;
 using Caliburn.Micro;
-
 using Energistics.Etp;
+using Energistics.Etp.Common;
 using Energistics.Etp.Common.Datatypes;
 using Energistics.Etp.Common.Datatypes.Object;
 using PDS.WITSMLstudio.Desktop.Core.Adapters;
@@ -77,9 +77,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         }
 
          /// <summary>
-        /// Gets or sets the currently active <see cref="EtpClient"/> instance.
+        /// Gets or sets the currently active <see cref="IEtpClient"/> instance.
         /// </summary>
-        public EtpClient Client { get; set; }
+        public IEtpClient Client { get; set; }
 
         /// <summary>
         /// Gets the ETP extender instance.
@@ -358,7 +358,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                     onGetResourcesResponse: OnGetResourcesResponse);
 
                 Client.SocketClosed += OnClientSocketClosed;
-                Client.Open();
+                Client.OpenAsync();
             }
             catch (Exception)
             {
@@ -475,7 +475,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         }
 
         /// <summary>
-        /// Called when the <see cref="EtpClient"/> socket is closed.
+        /// Called when the <see cref="IEtpClient"/> socket is closed.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>

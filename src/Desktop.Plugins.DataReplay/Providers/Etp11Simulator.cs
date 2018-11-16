@@ -19,7 +19,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Energistics.DataAccess.WITSML141.ReferenceData;
-using Energistics.Etp;
+using Energistics.Etp.Common;
 using Energistics.Etp.Common.Datatypes;
 using Energistics.Etp.Common.Datatypes.ChannelData;
 using Energistics.Etp.v11.Datatypes;
@@ -38,7 +38,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
 
         public Models.Simulation Model { get; }
 
-        public void Register(EtpSocketServer server)
+        public void Register(IEtpSelfHostedWebServer server)
         {
             server.Register(InitChannelStreamingProvider);
             server.Register(InitDiscoveryProvider);

@@ -17,7 +17,7 @@
 //-----------------------------------------------------------------------
 
 using System.Collections.Generic;
-using Energistics.Etp;
+using Energistics.Etp.Common;
 using Energistics.Etp.Common.Datatypes;
 using Energistics.Etp.Common.Datatypes.ChannelData;
 
@@ -37,7 +37,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
         /// Registers the ETP simulator with the specified ETP socket server.
         /// </summary>
         /// <param name="server">The server.</param>
-        void Register(EtpSocketServer server);
+        void Register(IEtpSelfHostedWebServer server);
 
         /// <summary>
         /// Gets the channel metadata.

@@ -64,7 +64,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             Action<IMessageHeader, ISpecificRecord, IResource, string> onGetResourcesResponse = null,
             Action<IMessageHeader, ISpecificRecord, IDataObject> onObject = null,
             Action<IMessageHeader, ISpecificRecord, IDataObject> onObjectPart = null,
-            Action<IMessageHeader, ISpecificRecord, long, string> onOpenChannel = null);
+            Action<IMessageHeader, ISpecificRecord, IList<IChannelMetadataRecord>> onOpenChannel = null);
 
         /// <summary>
         /// Sends the CloseSession message.
@@ -124,11 +124,10 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="request">The request.</param>
         /// <param name="uri">The URI.</param>
         /// <param name="id">The channel identifier.</param>
-        /// <param name="uuid">The UUID.</param>
         /// <param name="lastIndex">The last index value.</param>
         /// <param name="infill">if set to <c>true</c> supports infill.</param>
         /// <param name="dataChanges">if set to <c>true</c> supports data changes.</param>
-        void OpenChannelResponse(IMessageHeader request, string uri, long id, Guid uuid, object lastIndex = null, bool infill = true, bool dataChanges = true);
+        void OpenChannelResponse(IMessageHeader request, string uri, long id, object lastIndex = null, bool infill = true, bool dataChanges = true);
 
         /// <summary>
         /// Sends the GetResources message with the specified URI.

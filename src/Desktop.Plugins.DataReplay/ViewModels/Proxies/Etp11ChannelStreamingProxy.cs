@@ -72,7 +72,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
                 Client.Handler<IChannelStreamingProducer>().DefaultDescribeUri = EtpUri.RootUri;
                 Client.SocketClosed += OnClientSocketClosed;
                 Client.Output = Log;
-                Client.Open();
+
+                if (!await Client.OpenAsync())
+                {
+                    Log("Error opening web socket connection");
+                    return;
+                }
 
                 while (true)
                 {
@@ -215,7 +220,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 
         private object ToChannelDataValue(ChannelMetadataRecord channel, DateTimeOffset indexDateTimeOffset)
         {
-            object dataValue = null;
+            object dataValue;
             var indexType = channel.Indexes.Select(i => i.IndexType).FirstOrDefault();
 
             LogDataType logDataType;
@@ -224,42 +229,42 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
             switch (logDataType)
             {
                 case LogDataType.@byte:
-                    {
-                        dataValue = "Y";
-                        break;
-                    }
+                {
+                    dataValue = "Y";
+                    break;
+                }
                 case LogDataType.datetime:
                 {
-                        var dto = indexType == ChannelIndexTypes.Time 
-                            ? indexDateTimeOffset 
-                            : indexDateTimeOffset.AddSeconds(_random.Next(1, 5));
+                    var dto = indexType == ChannelIndexTypes.Time 
+                        ? indexDateTimeOffset 
+                        : indexDateTimeOffset.AddSeconds(_random.Next(1, 5));
 
-                        dataValue = dto.ToString("o");
-                        break;
-                    }
+                    dataValue = dto.ToString("o");
+                    break;
+                }
                 case LogDataType.@double:
                 case LogDataType.@float:
-                    {
-                        dataValue = _random.NextDouble().ToString(CultureInfo.InvariantCulture);
-                        break;
-                    }
+                {
+                    dataValue = _random.NextDouble().ToString(CultureInfo.InvariantCulture);
+                    break;
+                }
                 case LogDataType.@int:
                 case LogDataType.@long:
                 case LogDataType.@short:
-                    {
-                        dataValue = _random.Next(11);
-                        break;
-                    }
-                case LogDataType.@string:
-                    {
-                        dataValue = "abc";
-                        break;
-                    }
-                default:
-                    {
-                        dataValue = "null";
-                    }
+                {
+                    dataValue = _random.Next(11);
                     break;
+                }
+                case LogDataType.@string:
+                {
+                    dataValue = "abc";
+                    break;
+                }
+                default:
+                {
+                    dataValue = "null";
+                    break;
+                }
             }
 
             return dataValue;

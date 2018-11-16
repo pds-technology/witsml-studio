@@ -372,7 +372,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
-        /// Called when the <see cref="Energistics.Etp.EtpClient" /> web socket is closed.
+        /// Called when the <see cref="Energistics.Etp.Common.IEtpClient" /> web socket is closed.
         /// </summary>
         public void OnSocketClosed()
         {

@@ -25,6 +25,7 @@ using System.Windows.Media;
 using Caliburn.Micro;
 using Energistics.DataAccess;
 using Energistics.Etp.Common;
+using Energistics.Etp.Common.Datatypes;
 using IDataObject = Energistics.DataAccess.IDataObject;
 using Witsml131 = Energistics.DataAccess.WITSML131;
 using Witsml141 = Energistics.DataAccess.WITSML141;
@@ -226,9 +227,9 @@ namespace PDS.WITSMLstudio.Desktop.Core
         /// <param name="protocolItems">The protocol items.</param>
         /// <param name="isEtpClient">if set to <c>true</c> the session is an ETP client.</param>
         /// <returns>A new <see cref="IEtpExtender"/> instance.</returns>
-        public static IEtpExtender CreateEtpExtender(this EtpSession session, IList<EtpProtocolItem> protocolItems, bool isEtpClient)
+        public static IEtpExtender CreateEtpExtender(this IEtpSession session, IList<EtpProtocolItem> protocolItems, bool isEtpClient)
         {
-            return session.Adapter is Energistics.Etp.v11.Etp11Adapter
+            return session.SupportedVersion == EtpVersion.v11
                 ? new Etp11Extender(session, protocolItems, isEtpClient)
                 : new Etp12Extender(session, protocolItems, isEtpClient) as IEtpExtender;
         }

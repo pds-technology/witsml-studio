@@ -188,7 +188,6 @@
                     <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" VerticalAlignment="Center" IsEditable="True"
                               Text="{Binding EditItem.SubProtocol, UpdateSourceTrigger=PropertyChanged}">
                         <ComboBoxItem Content="energistics-tp" />
-                        <ComboBoxItem Content="etp11.energistics.org" />
                         <ComboBoxItem Content="etp12.energistics.org" />
                     </ComboBox>
 

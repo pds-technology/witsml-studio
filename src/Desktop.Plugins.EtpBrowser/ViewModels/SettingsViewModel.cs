@@ -299,7 +299,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
                 Parent.LogDetailMessage(
                     "ETP Versions:",
-                    Parent.Session.Serialize(versions, true));
+                    EtpExtensions.Serialize(versions, true));
 
                 return Task.FromResult(true);
             }
@@ -328,7 +328,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
                 Parent.LogDetailMessage(
                     "Server Capabilites:",
-                    Parent.Session.Serialize(capabilities, true));
+                    EtpExtensions.Serialize(capabilities, true));
 
                 return Task.FromResult(true);
             }
