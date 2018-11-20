@@ -166,7 +166,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <value>The ETP client instance.</value>
         public IEtpClient Client
         {
-            get => _client;
+            get { return _client; }
             set
             {
                 if (ReferenceEquals(_client, value))
