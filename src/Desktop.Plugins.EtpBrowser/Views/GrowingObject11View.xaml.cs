@@ -23,12 +23,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Views
     /// <summary>
     /// Interaction logic for GrowingObjectView.xaml
     /// </summary>
-    public partial class GrowingObjectView : UserControl
+    public partial class GrowingObject11View : UserControl
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="GrowingObjectView"/> class.
+        /// Initializes a new instance of the <see cref="GrowingObject11View"/> class.
         /// </summary>
-        public GrowingObjectView()
+        public GrowingObject11View()
         {
             InitializeComponent();
         }

@@ -68,9 +68,9 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="10,0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <CheckBox Content="Real-Time Data" Margin="10,5" VerticalAlignment="Center" IsChecked="True" IsEnabled="False"/>
-                    <CheckBox Content="Infill Real-Time Data" Margin="10,5" VerticalAlignment="Center" IsChecked="{Binding Model.DataLoad.IsInfill}"/>
-                    <CheckBox Content="Channel Data Changes" Margin="10,5" VerticalAlignment="Center" IsChecked="{Binding Model.DataLoad.IsDataChange}"/>
+                    <CheckBox Content="Real-Time Data" Margin="15,5" VerticalAlignment="Center" IsChecked="True" IsEnabled="False"/>
+                    <CheckBox Content="Infill Data" Margin="15,5" VerticalAlignment="Center" IsChecked="{Binding Model.DataLoad.IsInfill}"/>
+                    <CheckBox Content="Channel Data Changes" Margin="15,5" VerticalAlignment="Center" IsChecked="{Binding Model.DataLoad.IsDataChange}"/>
                 </StackPanel>
             </Grid>
         </GroupBox>

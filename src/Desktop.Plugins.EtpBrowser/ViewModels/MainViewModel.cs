@@ -55,6 +55,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         private static readonly char[] _whiteSpace = Enumerable.Range(0, 20).Select(Convert.ToChar).ToArray();
 
         private readonly ConcurrentDictionary<int, JToken> _channels;
+        private readonly List<IScreen> _protocolTabs;
         private DateTimeOffset _dateReceived;
         private IEtpClient _client;
         private IEtpServer _server;
@@ -71,6 +72,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             DisplayName = _pluginDisplayName;
             Resources = new BindableCollection<ResourceViewModel>();
             _channels = new ConcurrentDictionary<int, JToken>();
+            _protocolTabs = new List<IScreen>();
 
             Model = new Models.EtpSettings()
             {
@@ -328,14 +330,16 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         protected override void OnInitialize()
         {
             base.OnInitialize();
-            ActivateItem(new SettingsViewModel(Runtime));
-            Items.Add(new StreamingViewModel(Runtime));
-            Items.Add(new HierarchyViewModel(Runtime));
-            Items.Add(new StoreViewModel(Runtime));
-            Items.Add(new StoreNotificationViewModel(Runtime));
-            Items.Add(new GrowingObjectViewModel(Runtime));
-            Items.Add(new DataLoadViewModel(Runtime));
-            Items.Add(new JsonMessageViewModel(Runtime));
+            _protocolTabs.Add(new SettingsViewModel(Runtime));
+            _protocolTabs.Add(new Streaming11ViewModel(Runtime));
+            _protocolTabs.Add(new HierarchyViewModel(Runtime));
+            _protocolTabs.Add(new StoreViewModel(Runtime));
+            _protocolTabs.Add(new StoreNotificationViewModel(Runtime));
+            _protocolTabs.Add(new GrowingObject11ViewModel(Runtime));
+            _protocolTabs.Add(new DataLoadViewModel(Runtime));
+            _protocolTabs.Add(new JsonMessageViewModel(Runtime));
+            _protocolTabs.ForEach(Items.Add);
+            ActivateItem(Items.First());
         }
 
         /// <summary>
@@ -402,8 +406,19 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             EtpExtender = null;
 
             // notify child view models
-            Items.OfType<ISessionAware>()
-                .ForEach(x => x.OnConnectionChanged(Model.Connection));
+            foreach (var screen in _protocolTabs)
+            {
+                var tab = screen as ISessionAware;
+                tab?.OnConnectionChanged(Model.Connection);
+
+                Items.Remove(screen);
+
+                if (tab?.SupportedVersions == null ||
+                    tab.SupportedVersions.ContainsIgnoreCase(Model.Connection.SubProtocol))
+                {
+                    Items.Add(tab);
+                }
+            }
 
             if (!string.IsNullOrWhiteSpace(Model.Connection.Uri) && reconnect)
             {

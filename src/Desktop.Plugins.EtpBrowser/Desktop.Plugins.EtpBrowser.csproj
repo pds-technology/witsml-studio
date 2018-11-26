@@ -161,7 +161,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="ViewModels\DataLoadViewModel.cs" />
-    <Compile Include="ViewModels\GrowingObjectViewModel.cs" />
+    <Compile Include="ViewModels\GrowingObject11ViewModel.cs" />
     <Compile Include="ViewModels\HierarchyViewModel.cs" />
     <Compile Include="ViewModels\ISessionAware.cs" />
     <Compile Include="ViewModels\JsonMessageViewModel.cs" />
@@ -169,12 +169,12 @@
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\StoreNotificationViewModel.cs" />
     <Compile Include="ViewModels\StoreViewModel.cs" />
-    <Compile Include="ViewModels\StreamingViewModel.cs" />
+    <Compile Include="ViewModels\Streaming11ViewModel.cs" />
     <Compile Include="Views\DataLoadView.xaml.cs">
       <DependentUpon>DataLoadView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\GrowingObjectView.xaml.cs">
-      <DependentUpon>GrowingObjectView.xaml</DependentUpon>
+    <Compile Include="Views\GrowingObject11View.xaml.cs">
+      <DependentUpon>GrowingObject11View.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\HierarchyView.xaml.cs">
       <DependentUpon>HierarchyView.xaml</DependentUpon>
@@ -194,8 +194,8 @@
     <Compile Include="Views\StoreView.xaml.cs">
       <DependentUpon>StoreView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\StreamingView.xaml.cs">
-      <DependentUpon>StreamingView.xaml</DependentUpon>
+    <Compile Include="Views\Streaming11View.xaml.cs">
+      <DependentUpon>Streaming11View.xaml</DependentUpon>
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -240,7 +240,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\GrowingObjectView.xaml">
+    <Page Include="Views\GrowingObject11View.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -268,7 +268,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\StreamingView.xaml">
+    <Page Include="Views\Streaming11View.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

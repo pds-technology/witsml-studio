@@ -23,6 +23,7 @@ using System.Runtime.Serialization;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Caliburn.Micro;
+using Energistics.Etp.Common;
 using Energistics.Etp.Common.Datatypes;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
@@ -43,7 +44,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Gets the runtime service.
         /// </summary>
-        /// <value>The runtime.</value>
         public IRuntimeService Runtime { get; }
 
         /// <summary>
@@ -54,8 +54,28 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Gets the model.
         /// </summary>
-        /// <value>The model.</value>
         public Models.EtpSettings Model => Parent.Model;
+
+        /// <summary>
+        /// Gets a collection of supported ETP versions.
+        /// </summary>
+        public string[] SupportedVersions { get; }
+
+        private bool _isEtp11;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the current connection is configured for ETP v1.1.
+        /// </summary>
+        public bool IsEtp11
+        {
+            get { return _isEtp11; }
+            set
+            {
+                if (_isEtp11 == value) return;
+                _isEtp11 = value;
+                NotifyOfPropertyChange(() => IsEtp11);
+            }
+        }
 
         private bool _canExecute;
 
@@ -166,6 +186,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <param name="connection">The connection.</param>
         public void OnConnectionChanged(Connection connection)
         {
+            IsEtp11 = connection.SubProtocol.EqualsIgnoreCase(EtpSettings.Etp11SubProtocol);
         }
 
         /// <summary>

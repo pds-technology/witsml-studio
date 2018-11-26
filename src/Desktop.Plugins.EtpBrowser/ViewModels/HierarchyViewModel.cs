@@ -59,6 +59,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public Models.EtpSettings Model => Parent.Model;
 
         /// <summary>
+        /// Gets a collection of supported ETP versions.
+        /// </summary>
+        public string[] SupportedVersions { get; }
+
+        /// <summary>
         /// Gets the runtime service.
         /// </summary>
         /// <value>The runtime service.</value>
@@ -282,7 +287,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         public void CopyUriToStreaming()
         {
-            var viewModel = Parent.Items.OfType<StreamingViewModel>().FirstOrDefault();
+            var viewModel = Parent.Items.OfType<Streaming11ViewModel>().FirstOrDefault();
             if (viewModel == null) return;
 
             // Get list of checked resources

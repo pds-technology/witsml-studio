@@ -59,25 +59,22 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Gets the runtime service.
         /// </summary>
-        /// <value>The runtime.</value>
         public IRuntimeService Runtime { get; }
 
         /// <summary>
         /// Gets or Sets the Parent <see cref="T:Caliburn.Micro.IConductor" />
         /// </summary>
-        public new MainViewModel Parent
-        {
-            get { return (MainViewModel)base.Parent; }
-        }
+        public new MainViewModel Parent => (MainViewModel)base.Parent;
 
         /// <summary>
         /// Gets the model.
         /// </summary>
-        /// <value>The model.</value>
-        public Models.EtpSettings Model
-        {
-            get { return Parent.Model; }
-        }
+        public Models.EtpSettings Model => Parent.Model;
+
+        /// <summary>
+        /// Gets a collection of supported ETP versions.
+        /// </summary>
+        public string[] SupportedVersions { get; }
 
         private TextEditorViewModel _data;
 

@@ -75,6 +75,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public IRuntimeService Runtime { get; }
 
         /// <summary>
+        /// Gets a collection of supported ETP versions.
+        /// </summary>
+        public string[] SupportedVersions { get; }
+
+        /// <summary>
         /// Gets the connection picker view model.
         /// </summary>
         /// <value>The connection picker view model.</value>

@@ -16,7 +16,11 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System.Collections.Generic;
 using Caliburn.Micro;
+using Energistics.Etp.Common;
+using Energistics.Etp.Common.Datatypes;
+using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
@@ -25,7 +29,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
     /// Manages the behavior of the Data Load user interface elements.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    public sealed class DataLoadViewModel : Screen
+    public sealed class DataLoadViewModel : Screen, ISessionAware
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DataLoadViewModel"/> class.
@@ -35,6 +39,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             Runtime = runtime;
             DisplayName = "Data Load";
+            SupportedVersions = new[] {EtpSettings.Etp12SubProtocol};
         }
 
         /// <summary>
@@ -44,18 +49,43 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public IRuntimeService Runtime { get; }
 
         /// <summary>
-        /// Gets or Sets the Parent <see cref="T:Caliburn.Micro.IConductor" />
+        /// Gets or Sets the Parent <see cref="IConductor" />
         /// </summary>
-        public new MainViewModel Parent
-        {
-            get { return (MainViewModel)base.Parent; }
-        }
+        public new MainViewModel Parent => (MainViewModel)base.Parent;
 
         /// <summary>
         /// Gets the model.
         /// </summary>
         /// <value>The model.</value>
         public Models.EtpSettings Model => Parent.Model;
+
+        /// <summary>
+        /// Gets a collection of supported ETP versions.
+        /// </summary>
+        public string[] SupportedVersions { get; }
+
+        /// <summary>
+        /// Called when the selected connection has changed.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        public void OnConnectionChanged(Connection connection)
+        {
+        }
+
+        /// <summary>
+        /// Called when the OpenSession message is recieved.
+        /// </summary>
+        /// <param name="supportedProtocols">The supported protocols.</param>
+        public void OnSessionOpened(IList<ISupportedProtocol> supportedProtocols)
+        {
+        }
+
+        /// <summary>
+        /// Called when the <see cref="Energistics.Etp.Common.IEtpClient" /> web socket is closed.
+        /// </summary>
+        public void OnSocketClosed()
+        {
+        }
 
         /// <summary>
         /// Sets the type of the index.

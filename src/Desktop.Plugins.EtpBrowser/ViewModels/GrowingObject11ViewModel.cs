@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using Caliburn.Micro;
+using Energistics.Etp.Common;
 using Energistics.Etp.Common.Datatypes;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
@@ -31,14 +32,14 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
     /// Manages the behavior of the Growing Object user interface elements.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    public sealed class GrowingObjectViewModel : Screen, ISessionAware
+    public sealed class GrowingObject11ViewModel : Screen, ISessionAware
     {
-        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(GrowingObjectViewModel));
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(typeof(GrowingObject11ViewModel));
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GrowingObjectViewModel"/> class.
+        /// Initializes a new instance of the <see cref="GrowingObject11ViewModel"/> class.
         /// </summary>
-        public GrowingObjectViewModel(IRuntimeService runtime)
+        public GrowingObject11ViewModel(IRuntimeService runtime)
         {
             Runtime = runtime;
             DisplayName = "Growing Object";
@@ -47,6 +48,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 IsPrettyPrintAllowed = true
             };
             //Data.Document.Changed += OnDataObjectChanged;
+            SupportedVersions = new[] {EtpSettings.Etp11SubProtocol};
             ResetDataEditorBorderColor();
         }
 
@@ -57,15 +59,19 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public IRuntimeService Runtime { get; }
 
         /// <summary>
-        /// Gets or Sets the Parent <see cref="T:Caliburn.Micro.IConductor" />
+        /// Gets or Sets the Parent <see cref="IConductor" />
         /// </summary>
         public new MainViewModel Parent => (MainViewModel) base.Parent;
 
         /// <summary>
         /// Gets the model.
         /// </summary>
-        /// <value>The model.</value>
         public Models.EtpSettings Model => Parent.Model;
+
+        /// <summary>
+        /// Gets a collection of supported ETP versions.
+        /// </summary>
+        public string[] SupportedVersions { get; }
 
         private TextEditorViewModel _data;
         /// <summary>

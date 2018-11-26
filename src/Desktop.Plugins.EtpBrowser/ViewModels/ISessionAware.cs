@@ -17,6 +17,7 @@
 //-----------------------------------------------------------------------
 
 using System.Collections.Generic;
+using Caliburn.Micro;
 using Energistics.Etp.Common.Datatypes;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 
@@ -25,8 +26,13 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
     /// <summary>
     /// Defines methods that can be implemented to receive <see cref="Energistics.Etp.Common.IEtpClient"/> status notifications.
     /// </summary>
-    public interface ISessionAware
+    public interface ISessionAware : IScreen
     {
+        /// <summary>
+        /// Gets a collection of supported ETP versions.
+        /// </summary>
+        string[] SupportedVersions { get; }
+
         /// <summary>
         /// Called when the selected connection has changed.
         /// </summary>

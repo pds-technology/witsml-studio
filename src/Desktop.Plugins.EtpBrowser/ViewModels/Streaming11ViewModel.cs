@@ -37,19 +37,20 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
     /// Manages the behavior of the Streaming user interface elements.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    public sealed class StreamingViewModel : Screen, ISessionAware
+    public sealed class Streaming11ViewModel : Screen, ISessionAware
     {
         private const string UnscaledIndexMessage = "Unscaled index values are required";
         private const string ErrorSettingIndexMessage = "Error setting indexes for range request";
         private const string NoChannelsSelectedMessage = "No channels selected for {0}";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StreamingViewModel"/> class.
+        /// Initializes a new instance of the <see cref="Streaming11ViewModel"/> class.
         /// </summary>
-        public StreamingViewModel(IRuntimeService runtime)
+        public Streaming11ViewModel(IRuntimeService runtime)
         {
             Runtime = runtime;
             DisplayName = "Streaming";
+            SupportedVersions = new[] {EtpSettings.Etp11SubProtocol};
             Channels = new BindableCollection<ChannelMetadataViewModel>();
             ToggleChannelCommand = new DelegateCommand(x => ToggleSelectedChannel());
         }
@@ -70,6 +71,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         /// <value>The runtime service.</value>
         public IRuntimeService Runtime { get; }
+
+        /// <summary>
+        /// Gets a collection of supported ETP versions.
+        /// </summary>
+        public string[] SupportedVersions { get; }
 
         /// <summary>
         /// Gets the collection of channel metadata.

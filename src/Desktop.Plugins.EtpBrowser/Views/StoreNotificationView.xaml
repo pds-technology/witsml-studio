@@ -11,6 +11,7 @@
 
     <UserControl.Resources>
         <conv:NullToBooleanConverter x:Key="NullToBooleanConverter" />
+        <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
 
     <Grid>
@@ -58,9 +59,19 @@
 
         <Grid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" IsEnabled="{Binding CanExecute}">
             <StackPanel Orientation="Horizontal">
-                <Button x:Name="SendRequest" Content="Request" Width="70" Margin="5,0,0,5" IsEnabled="{Binding Model.StoreNotification.Uri, Converter={StaticResource NullToBooleanConverter}}" />
-                <Button x:Name="SendCancel" Content="Cancel" Width="70" Margin="5,0,0,5" IsEnabled="{Binding Model.StoreNotification.Uuid, Converter={StaticResource NullToBooleanConverter}}" />
-                <Button x:Name="ClearInputs" Content="Clear" Width="70" Margin="5,0,0,5" />
+                <Button x:Name="SendRequest" Width="80" Margin="5,0,0,5" IsEnabled="{Binding Model.StoreNotification.Uri, Converter={StaticResource NullToBooleanConverter}}">
+                    <StackPanel>
+                        <TextBlock Text="Request" Visibility="{Binding IsEtp11, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <TextBlock Text="Subscribe" Visibility="{Binding IsEtp11, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=true}" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="SendCancel" Width="80" Margin="5,0,0,5" IsEnabled="{Binding Model.StoreNotification.Uuid, Converter={StaticResource NullToBooleanConverter}}">
+                    <Grid>
+                        <TextBlock Text="Cancel" Visibility="{Binding IsEtp11, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <TextBlock Text="Unsubscribe" Visibility="{Binding IsEtp11, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=true}" />
+                    </Grid>
+                </Button>
+                <Button x:Name="ClearInputs" Content="Clear" Width="80" Margin="5,0,0,5" />
             </StackPanel>
         </Grid>
     </Grid>
