@@ -126,7 +126,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
             connection.UpdateEtpSettings(headers);
             connection.SetServerCertificateValidation();
 
-            var client = EtpFactory.CreateClient(connection.Uri, applicationName, applicationVersion, connection.SubProtocol, headers);
+            var client = EtpFactory.CreateClient(connection.WebSocketType, connection.Uri, applicationName, applicationVersion, connection.SubProtocol, headers);
 
             if (!string.IsNullOrWhiteSpace(connection.ProxyHost))
             {

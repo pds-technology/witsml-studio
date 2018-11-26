@@ -176,6 +176,7 @@
                         <RowDefinition Height="40" />
                         <RowDefinition Height="40" />
                         <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
@@ -184,18 +185,28 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Sub-Protocol:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                    <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" VerticalAlignment="Center" IsEditable="True"
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Client Library:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" VerticalAlignment="Center" IsEditable="False"
+                              ItemsSource="{Binding WebSocketTypes}" SelectedItem="{Binding EditItem.WebSocketType}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource EnumToDescriptionConverter}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Sub-Protocol:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" VerticalAlignment="Center" IsEditable="True"
                               Text="{Binding EditItem.SubProtocol, UpdateSourceTrigger=PropertyChanged}">
                         <ComboBoxItem Content="energistics-tp" />
                         <ComboBoxItem Content="etp12.energistics.org" />
                     </ComboBox>
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Encoding:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                    <TextBox Grid.Row="2" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.EtpEncoding, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Encoding:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <TextBox Grid.Row="3" Grid.Column="1" Margin="5" Padding="5" Text="{Binding EditItem.EtpEncoding, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
 
-                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Compression:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                    <ComboBox Grid.Row="3" Grid.Column="1" Margin="5" Padding="5" VerticalAlignment="Center" IsEditable="True"
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Compression:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <ComboBox Grid.Row="4" Grid.Column="1" Margin="5" Padding="5" VerticalAlignment="Center" IsEditable="True"
                               Text="{Binding EditItem.EtpCompression, UpdateSourceTrigger=PropertyChanged}">
                         <ComboBoxItem Content="gzip" />
                     </ComboBox>

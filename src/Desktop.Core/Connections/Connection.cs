@@ -21,6 +21,7 @@ using System.Runtime.Serialization;
 using System.Security;
 using Caliburn.Micro;
 using Energistics.Etp.Common;
+using Energistics.Etp.Common.Datatypes;
 
 namespace PDS.WITSMLstudio.Desktop.Core.Connections
 {
@@ -312,6 +313,23 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
             }
         }
 
+        private WebSocketType _webSocketType;
+
+        /// <summary>
+        /// Gets or sets the type of the web socket.
+        /// </summary>
+        [DataMember]
+        public WebSocketType WebSocketType
+        {
+            get { return _webSocketType; }
+            set
+            {
+                if (_webSocketType == value) return;
+                _webSocketType = value;
+                NotifyOfPropertyChange(() => WebSocketType);
+            }
+        }
+
         private string _subProtocol;
 
         /// <summary>
@@ -495,6 +513,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Connections
         {
             return $"Uri: {Uri}; Username: {Username}; AuthenticationType: {AuthenticationType}; SecurityProtocol: {SecurityProtocol};" +
                    $" ProxyHost: {ProxyHost}; ProxyPort: {ProxyPort}; ProxyUsername: {ProxyUsername}; ProxyUseDefaultCredentials: {ProxyUseDefaultCredentials};" +
+                   $" WebSocketType: {WebSocketType};" +
                    (!string.IsNullOrWhiteSpace(SubProtocol) ? $" SubProtocol: {SubProtocol};" : string.Empty) +
                    (!string.IsNullOrWhiteSpace(EtpEncoding) ? $" EtpEncoding: {EtpEncoding};" : string.Empty) +
                    (!string.IsNullOrWhiteSpace(EtpCompression) ? $" EtpCompression: {EtpCompression};" : string.Empty) +

@@ -16,6 +16,7 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -23,6 +24,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using AutoMapper;
 using Caliburn.Micro;
+using Energistics.Etp.Common.Datatypes;
 using Newtonsoft.Json;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
@@ -61,6 +63,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             DisplayName = $"{_dialogTitlePrefix} - {ConnectionType.ToString().ToUpper()} Connection";
             CanTestConnection = true;
 
+            WebSocketTypes = new BindableCollection<WebSocketType>(Enum.GetValues(typeof(WebSocketType)).OfType<WebSocketType>());
+
             SecurityProtocols = new BindableCollection<SecurityProtocolItem>
             {
                 new SecurityProtocolItem(SecurityProtocolType.Tls12, "TLS 1.2"),
@@ -95,6 +99,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         /// <value>The collection of security protocols.</value>
         public BindableCollection<SecurityProtocolItem> SecurityProtocols { get; }
+
+        /// <summary>
+        /// Gets the collection of supported web socket types.
+        /// </summary>
+        public BindableCollection<WebSocketType> WebSocketTypes { get; }
 
         /// <summary>
         /// Gets a value indicating whether the connection type is SOAP.
