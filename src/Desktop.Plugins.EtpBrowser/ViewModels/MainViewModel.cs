@@ -991,13 +991,16 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             // Check if there is an embedded item attribute
             indexData = indexData["item"] ?? indexData;
 
-            // Only process long index value types
-            if (!indexData.HasValues || indexData["long"] == null) return;
+            if (!indexData.HasValues) return;
 
-            FormatIndex(indexMetadata, indexData, indexData.Value<long>("long"));
+            if (indexData["long"] != null)
+                FormatIndex(indexMetadata, indexData, indexData.Value<long>("long"));
+
+            if (indexData["double"] != null)
+                FormatIndex(indexMetadata, indexData, indexData.Value<double>("double"));
         }
 
-        private void FormatIndex(JToken indexMetadata, JToken indexData, long indexValue)
+        private void FormatIndex(JToken indexMetadata, JToken indexData, object indexValue)
         {
             if (indexMetadata == null || indexData == null) return;
 
@@ -1006,18 +1009,18 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                            indexMetadata.Value<string>("mnemonic");
             
             var indexType = indexMetadata.Value<string>("indexType") ?? indexMetadata.Value<string>("indexKind");
-            var scale = indexMetadata.Value<int>("scale");
+            var scale = indexMetadata.Value<int?>("scale");
 
             if ("Time".EqualsIgnoreCase(indexType))
             {
-                var timeIndex = DateTimeExtensions.FromUnixTimeMicroseconds(indexValue);
+                var timeIndex = DateTimeExtensions.FromUnixTimeMicroseconds((long)indexValue);
                 var elapsedTime = _dateReceived.Subtract(timeIndex);
                 indexData[$"_{mnemonic}"] = JToken.FromObject(timeIndex.ToString("o"));
                 indexData["_ElapsedTime"] = elapsedTime;
             }
             else
             {
-                var value = indexValue.IndexFromScale(scale) as object;
+                var value = scale.HasValue ? ((long)indexValue).IndexFromScale(scale.Value) : indexValue;
                 indexData[$"_{mnemonic}"] = JToken.FromObject(value);
             }
         }
@@ -1033,16 +1036,16 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             if (resource == null) return;
 
             var lastChangedObj = resource["lastChanged"] as JObject;
-            var lastChanged = lastChangedObj?.Value<long>("long") ??
-                              resource.Value<long>("lastChanged");
+            var lastChanged = lastChangedObj?.Value<long?>("long") ??
+                              resource.Value<long?>("lastChanged");
 
-            if (lastChanged < 1) return;
+            if (!lastChanged.HasValue || lastChanged < 1) return;
 
             var customData = resource["customData"] as JObject;
             if (customData == null) return;
 
             customData["_lastChanged"] = DateTimeExtensions
-                .FromUnixTimeMicroseconds(lastChanged)
+                .FromUnixTimeMicroseconds(lastChanged.Value)
                 .ToString("o");
         }
 
