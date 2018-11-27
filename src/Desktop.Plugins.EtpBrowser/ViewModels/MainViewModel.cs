@@ -332,6 +332,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             base.OnInitialize();
             _protocolTabs.Add(new SettingsViewModel(Runtime));
             _protocolTabs.Add(new Streaming11ViewModel(Runtime));
+            _protocolTabs.Add(new Streaming12ViewModel(Runtime));
             _protocolTabs.Add(new HierarchyViewModel(Runtime));
             _protocolTabs.Add(new StoreViewModel(Runtime));
             _protocolTabs.Add(new StoreNotificationViewModel(Runtime));

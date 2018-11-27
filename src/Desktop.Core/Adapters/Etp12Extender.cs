@@ -298,6 +298,28 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         }
 
         /// <summary>
+        /// Sends the StartStreaming message.
+        /// </summary>
+        public void StartStreaming()
+        {
+            if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
+
+            Session.Handler<IChannelStreamingConsumer>()
+                .StartStreaming();
+        }
+
+        /// <summary>
+        /// Sends the StopStreaming message.
+        /// </summary>
+        public void StopStreaming()
+        {
+            if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
+
+            Session.Handler<IChannelStreamingConsumer>()
+                .StopStreaming();
+        }
+
+        /// <summary>
         /// Sends the OpenChannelResponse message with the specified paramters.
         /// </summary>
         /// <param name="request">The request.</param>

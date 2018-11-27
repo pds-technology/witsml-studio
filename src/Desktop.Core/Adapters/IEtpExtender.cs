@@ -120,6 +120,16 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         void ChannelRangeRequest(IList<long> channelIds, long startIndex, long endIndex);
 
         /// <summary>
+        /// Sends the StartStreaming message.
+        /// </summary>
+        void StartStreaming();
+
+        /// <summary>
+        /// Sends the StopStreaming message.
+        /// </summary>
+        void StopStreaming();
+
+        /// <summary>
         /// Sends the OpenChannelResponse message with the specified paramters.
         /// </summary>
         /// <param name="request">The request.</param>

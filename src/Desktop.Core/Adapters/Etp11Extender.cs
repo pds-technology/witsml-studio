@@ -277,6 +277,20 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         }
 
         /// <summary>
+        /// Sends the StartStreaming message.
+        /// </summary>
+        public void StartStreaming()
+        {
+        }
+
+        /// <summary>
+        /// Sends the StopStreaming message.
+        /// </summary>
+        public void StopStreaming()
+        {
+        }
+
+        /// <summary>
         /// Sends the OpenChannelResponse message with the specified paramters.
         /// </summary>
         /// <param name="request">The request.</param>
