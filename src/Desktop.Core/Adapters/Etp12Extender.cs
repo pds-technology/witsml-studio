@@ -33,6 +33,7 @@ using Energistics.Etp.v12.Datatypes.Object;
 using Energistics.Etp.v12.Protocol.ChannelDataFrame;
 using Energistics.Etp.v12.Protocol.ChannelDataLoad;
 using Energistics.Etp.v12.Protocol.ChannelStreaming;
+using Energistics.Etp.v12.Protocol.ChannelSubscribe;
 using Energistics.Etp.v12.Protocol.Core;
 using Energistics.Etp.v12.Protocol.Discovery;
 using Energistics.Etp.v12.Protocol.DiscoveryQuery;
@@ -54,7 +55,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
     /// <seealso cref="PDS.WITSMLstudio.Desktop.Core.Adapters.IEtpExtender" />
     public sealed class Etp12Extender : IEtpExtender
     {
-        //private readonly List<ChannelStreamingInfo> _channelStreamingInfos;
+        private readonly List<ChannelSubscribeInfo> _channelSubscribeInfos;
         private readonly List<SubscriptionInfo> _subscriptionInfos;
         private Action<ProtocolEventArgs<ISpecificRecord>> _logObjectDetails;
         private Action<IMessageHeader, IList<IChannelMetadataRecord>> _onChannelMetadata;
@@ -75,7 +76,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             Session = session;
             ProtocolItems = protocolItems;
             Protocols = new Etp12Protocols();
-            //_channelStreamingInfos = new List<ChannelStreamingInfo>();
+            _channelSubscribeInfos = new List<ChannelSubscribeInfo>();
             _subscriptionInfos = new List<SubscriptionInfo>();
         }
 
@@ -204,6 +205,8 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
 
             //yield return new EtpProtocolItem(Energistics.Etp.v12.Protocols.WitsmlSoap, "store", isEnabled: false);
             //yield return new EtpProtocolItem(Energistics.Etp.v12.Protocols.WitsmlSoap, "customer", isEnabled: false);
+            yield return new EtpProtocolItem(Energistics.Etp.v12.Protocols.ChannelSubscribe, "consumer");
+            yield return new EtpProtocolItem(Energistics.Etp.v12.Protocols.ChannelSubscribe, "producer");
             yield return new EtpProtocolItem(Energistics.Etp.v12.Protocols.ChannelDataLoad, "consumer");
             yield return new EtpProtocolItem(Energistics.Etp.v12.Protocols.ChannelDataLoad, "producer");
         }
@@ -225,10 +228,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="minMessageInterval"></param>
         public void Start(int maxDataItems, int minMessageInterval)
         {
-            //if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
-            //
-            //Session.Handler<IChannelStreamingConsumer>()
-            //    .Start(maxDataItems, minMessageInterval);
         }
 
         /// <summary>
@@ -237,10 +236,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="uris">The URIs.</param>
         public void ChannelDescribe(IList<string> uris)
         {
-            //if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
-            //
-            //Session.Handler<IChannelStreamingConsumer>()
-            //    .ChannelDescribe(uris);
         }
 
         /// <summary>
@@ -250,18 +245,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="startIndex">The start index.</param>
         public void ChannelStreamingStart(IList<ChannelMetadataViewModel> channels, object startIndex)
         {
-            //if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
-            //
-            //// Prepare ChannelStreamingInfos startIndexes
-            //_channelStreamingInfos.Clear();
-            //
-            //// Create a list of ChannelStreamingInfos only for selected, described channels.
-            //_channelStreamingInfos.AddRange(channels
-            //    .Where(c => c.IsChecked)
-            //    .Select(c => ToChannelStreamingInfo(c.Record, c.ReceiveChangeNotification, startIndex)));
-            //
-            //Session.Handler<IChannelStreamingConsumer>()
-            //    .ChannelStreamingStart(_channelStreamingInfos);
         }
 
         /// <summary>
@@ -270,10 +253,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="channelIds"></param>
         public void ChannelStreamingStop(IList<long> channelIds)
         {
-            //if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
-            //
-            //Session.Handler<IChannelStreamingConsumer>()
-            //    .ChannelStreamingStop(channelIds);
         }
 
         /// <summary>
@@ -284,17 +263,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         /// <param name="endIndex">The end index.</param>
         public void ChannelRangeRequest(IList<long> channelIds, long startIndex, long endIndex)
         {
-            //if (!Session.IsRegistered<IChannelStreamingConsumer>()) return;
-            //
-            //var rangeInfo = new ChannelRangeInfo
-            //{
-            //    ChannelId = channelIds,
-            //    StartIndex = startIndex,
-            //    EndIndex = endIndex
-            //};
-            //
-            //Session.Handler<IChannelStreamingConsumer>()
-            //    .ChannelRangeRequest(new[] { rangeInfo });
         }
 
         /// <summary>
@@ -317,6 +285,94 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
 
             Session.Handler<IChannelStreamingConsumer>()
                 .StopStreaming();
+        }
+
+        /// <summary>
+        /// Sends the GetChannelMetadata message with the specified parameters.
+        /// </summary>
+        /// <param name="uris">The URIs.</param>
+        public void GetChannelMetadata(IList<string> uris)
+        {
+            if (!Session.IsRegistered<IChannelSubscribeConsumer>()) return;
+
+            Session.Handler<IChannelSubscribeConsumer>()
+                .GetChannelMetadata(uris);
+        }
+
+        /// <summary>
+        /// Sends the SubscribeChannels message with the specified parameters.
+        /// </summary>
+        /// <param name="channels">The channels.</param>
+        /// <param name="lastIndex">The start index.</param>
+        /// <param name="infill">if set to <c>true</c> include infill data.</param>
+        /// <param name="dataChanges">if set to <c>true</c> include data changes.</param>
+        public void SubscribeChannels(IList<ChannelMetadataViewModel> channels, object lastIndex = null, bool infill = true, bool dataChanges = true)
+        {
+            if (!Session.IsRegistered<IChannelSubscribeConsumer>()) return;
+
+            // Prepare ChannelSubscribeInfos
+            _channelSubscribeInfos.Clear();
+
+            // Create a list of ChannelSubscribeInfos only for selected channels.
+            _channelSubscribeInfos.AddRange(channels
+                .Where(c => c.IsChecked)
+                .Select(c => ToChannelSubscribeInfo(c.Record, lastIndex, infill, dataChanges)));
+
+            Session.Handler<IChannelSubscribeConsumer>()
+                .SubscribeChannels(_channelSubscribeInfos);
+        }
+
+        /// <summary>
+        /// Sends the UnsubscribeChannels message with the specified parameters.
+        /// </summary>
+        /// <param name="channelIds"></param>
+        public void UnsubscribeChannels(IList<long> channelIds)
+        {
+            if (!Session.IsRegistered<IChannelSubscribeConsumer>()) return;
+
+            Session.Handler<IChannelSubscribeConsumer>()
+                .UnsubscribeChannels(channelIds);
+        }
+
+        /// <summary>
+        /// Sends the GetRange message with the specified parameters.
+        /// </summary>
+        /// <param name="requestUuid">The request identifier.</param>
+        /// <param name="channelIds">The channel ids.</param>
+        /// <param name="startIndex">The start index.</param>
+        /// <param name="endIndex">The end index.</param>
+        /// <param name="uom">The unit of measure.</param>
+        /// <param name="depthDatum">The depth datum.</param>
+        public void GetRange(Guid requestUuid, IList<long> channelIds, object startIndex, object endIndex, string uom = null, string depthDatum = null)
+        {
+            if (!Session.IsRegistered<IChannelSubscribeConsumer>()) return;
+
+            var rangeInfo = new ChannelRangeInfo
+            {
+                ChannelId = channelIds,
+                Interval = new IndexInterval
+                {
+                    StartIndex = new IndexValue { Item = startIndex },
+                    EndIndex = new IndexValue { Item = endIndex },
+                    Uom = uom,
+                    DepthDatum = depthDatum
+                }
+            };
+
+            Session.Handler<IChannelSubscribeConsumer>()
+                .GetRange(requestUuid, new[] { rangeInfo });
+        }
+
+        /// <summary>
+        /// Sends the CancelGetRange message with the specified parameters.
+        /// </summary>
+        /// <param name="requestUuid">The request UUID.</param>
+        public void CancelGetRange(Guid requestUuid)
+        {
+            if (!Session.IsRegistered<IChannelSubscribeConsumer>()) return;
+
+            Session.Handler<IChannelSubscribeConsumer>()
+                .CancelGetRange(requestUuid);
         }
 
         /// <summary>
@@ -646,6 +702,19 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
                 RegisterEventHandlers(Session.Handler<IChannelStreamingProducer>());
             }
 
+            if (Requesting(Protocols.ChannelSubscribe, "producer"))
+            {
+                Session.Register<IChannelSubscribeConsumer, ChannelSubscribeConsumerHandler>();
+                RegisterEventHandlers(Session.Handler<IChannelSubscribeConsumer>(),
+                    x => x.OnGetChannelMetadataResponse += (s, e) => _onChannelMetadata?.Invoke(e.Header, e.Message.Metadata.Cast<IChannelMetadataRecord>().ToList()),
+                    x => x.OnRealtimeData += (s, e) => _onChannelData?.Invoke(e.Header, e.Message.Data.Cast<IDataItem>().ToList()));
+            }
+            if (Requesting(Protocols.ChannelSubscribe, "consumer"))
+            {
+                Session.Register<IChannelSubscribeProducer, ChannelSubscribeProducerHandler>();
+                RegisterEventHandlers(Session.Handler<IChannelSubscribeProducer>());
+            }
+
             if (Requesting(Protocols.ChannelDataFrame, "producer"))
             {
                 Session.Register<IChannelDataFrameConsumer, ChannelDataFrameConsumerHandler>();
@@ -804,6 +873,19 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
                 RegisterEventHandlers(Session.Handler<IChannelStreamingProducer>());
             }
 
+            if (Requesting(Protocols.ChannelSubscribe, "consumer"))
+            {
+                Session.Register<IChannelSubscribeConsumer, ChannelSubscribeConsumerHandler>();
+                RegisterEventHandlers(Session.Handler<IChannelSubscribeConsumer>(),
+                    x => x.OnGetChannelMetadataResponse += (s, e) => _onChannelMetadata?.Invoke(e.Header, e.Message.Metadata.Cast<IChannelMetadataRecord>().ToList()),
+                    x => x.OnRealtimeData += (s, e) => _onChannelData?.Invoke(e.Header, e.Message.Data.Cast<IDataItem>().ToList()));
+            }
+            if (Requesting(Protocols.ChannelSubscribe, "producer"))
+            {
+                Session.Register<IChannelSubscribeProducer, ChannelSubscribeProducerHandler>();
+                RegisterEventHandlers(Session.Handler<IChannelSubscribeProducer>());
+            }
+
             if (Requesting(Protocols.ChannelDataFrame, "consumer"))
             {
                 Session.Register<IChannelDataFrameConsumer, ChannelDataFrameConsumerHandler>();
@@ -923,15 +1005,16 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             return ProtocolItems.Any(x => x.Protocol == protocol && x.Role.EqualsIgnoreCase(role));
         }
 
-        //private ChannelStreamingInfo ToChannelStreamingInfo(IChannelMetadataRecord channel, bool receiveChangeNotification, object startIndex)
-        //{
-        //    return new ChannelStreamingInfo
-        //    {
-        //        ChannelId = channel.ChannelId,
-        //        StartIndex = new StreamingStartIndex { Item = startIndex },
-        //        ReceiveChangeNotification = receiveChangeNotification
-        //    };
-        //}
+        private ChannelSubscribeInfo ToChannelSubscribeInfo(IChannelMetadataRecord channel, object lastIndex = null, bool infill = true, bool dataChanges = true)
+        {
+            return new ChannelSubscribeInfo
+            {
+                ChannelId = channel.ChannelId,
+                LastIndex = new IndexValue { Item = lastIndex },
+                Infill = infill,
+                DataChanges = dataChanges
+            };
+        }
 
         private IDataObject ToDataObject(ObjectPart message)
         {

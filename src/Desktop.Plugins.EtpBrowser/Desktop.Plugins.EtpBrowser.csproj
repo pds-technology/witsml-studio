@@ -169,6 +169,7 @@
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\StoreNotificationViewModel.cs" />
     <Compile Include="ViewModels\StoreViewModel.cs" />
+    <Compile Include="ViewModels\SubscribeViewModel.cs" />
     <Compile Include="ViewModels\Streaming11ViewModel.cs" />
     <Compile Include="ViewModels\Streaming12ViewModel.cs" />
     <Compile Include="ViewModels\StreamingViewModelBase.cs" />
@@ -195,6 +196,9 @@
     </Compile>
     <Compile Include="Views\StoreView.xaml.cs">
       <DependentUpon>StoreView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SubscribeView.xaml.cs">
+      <DependentUpon>SubscribeView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Streaming11View.xaml.cs">
       <DependentUpon>Streaming11View.xaml</DependentUpon>
@@ -272,6 +276,10 @@
     <Page Include="Views\StoreView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SubscribeView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Streaming11View.xaml">
       <SubType>Designer</SubType>

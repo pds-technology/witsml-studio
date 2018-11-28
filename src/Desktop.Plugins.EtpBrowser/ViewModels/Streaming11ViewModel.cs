@@ -18,13 +18,9 @@
 
 using System;
 using System.Linq;
-using System.Windows.Controls;
-using System.Windows.Input;
 using Energistics.Etp.Common;
 using Energistics.Etp.Common.Datatypes.ChannelData;
-using PDS.WITSMLstudio.Desktop.Core.Commands;
 using PDS.WITSMLstudio.Framework;
-using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
@@ -45,75 +41,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public Streaming11ViewModel(IRuntimeService runtime) : base(runtime)
         {
             SupportedVersions = new[] {EtpSettings.Etp11SubProtocol};
-            ToggleChannelCommand = new DelegateCommand(x => ToggleSelectedChannel());
-        }
-
-        /// <summary>
-        /// Gets the toggle channel command.
-        /// </summary>
-        public ICommand ToggleChannelCommand { get; }
-
-        private ChannelMetadataViewModel _selectedChannel;
-
-        /// <summary>
-        /// Gets or sets the selected channel.
-        /// </summary>
-        public ChannelMetadataViewModel SelectedChannel
-        {
-            get { return _selectedChannel; }
-            set
-            {
-                if (ReferenceEquals(_selectedChannel, value)) return;
-                _selectedChannel = value;
-                NotifyOfPropertyChange(() => SelectedChannel);
-            }
-        }
-
-        /// <summary>
-        /// Toggles the selected channel.
-        /// </summary>
-        public void ToggleSelectedChannel()
-        {
-            if (SelectedChannel == null) return;
-            SelectedChannel.IsChecked = !SelectedChannel.IsChecked;
-        }
-
-        /// <summary>
-        /// Sets the type of channel streaming.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        public void SetStreamingType(string type)
-        {
-            Model.Streaming.StreamingType = type;
-        }
-
-        /// <summary>
-        /// Adds the URI to the collection of URIs.
-        /// </summary>
-        public void AddUri()
-        {
-            var uri = Model.Streaming.Uri;
-
-            if (string.IsNullOrWhiteSpace(uri) || Model.Streaming.Uris.Contains(uri))
-                return;
-
-            Model.Streaming.Uris.Add(uri);
-            Model.Streaming.Uri = string.Empty;
-        }
-
-        /// <summary>
-        /// Handles the KeyUp event for the ListBox control.
-        /// </summary>
-        /// <param name="control">The control.</param>
-        /// <param name="e">The <see cref="KeyEventArgs"/> instance containing the event data.</param>
-        public void OnKeyUp(ListBox control, KeyEventArgs e)
-        {
-            var index = control.SelectedIndex;
-
-            if (e.Key == Key.Delete && index > -1)
-            {
-                Model.Streaming.Uris.RemoveAt(index);
-            }
         }
 
         /// <summary>
@@ -261,18 +188,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             catch (Exception ex)
             {
                 Runtime.ShowError(ErrorSettingIndexMessage, ex);
-            }
-        }
-
-        /// <summary>
-        /// Called when checkbox in ID column of channels datagrid is checked or unchecked.
-        /// </summary>
-        /// <param name="isSelected">if set to <c>true</c> if all channels should be selected, <c>false</c> if channels should be unselected.</param>
-        public void OnChannelSelection(bool isSelected)
-        {
-            foreach (var channelMetadataViewModel in Channels)
-            {
-                channelMetadataViewModel.IsChecked = isSelected;
             }
         }
 

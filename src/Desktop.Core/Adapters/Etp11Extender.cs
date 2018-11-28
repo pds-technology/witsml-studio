@@ -291,6 +291,54 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         }
 
         /// <summary>
+        /// Sends the GetChannelMetadata message with the specified parameters.
+        /// </summary>
+        /// <param name="uris">The URIs.</param>
+        public void GetChannelMetadata(IList<string> uris)
+        {
+        }
+
+        /// <summary>
+        /// Sends the SubscribeChannels message with the specified parameters.
+        /// </summary>
+        /// <param name="channels">The channels.</param>
+        /// <param name="lastIndex">The start index.</param>
+        /// <param name="infill">if set to <c>true</c> include infill data.</param>
+        /// <param name="dataChanges">if set to <c>true</c> include data changes.</param>
+        public void SubscribeChannels(IList<ChannelMetadataViewModel> channels, object lastIndex = null, bool infill = true, bool dataChanges = true)
+        {
+        }
+
+        /// <summary>
+        /// Sends the UnsubscribeChannels message with the specified parameters.
+        /// </summary>
+        /// <param name="channelIds"></param>
+        public void UnsubscribeChannels(IList<long> channelIds)
+        {
+        }
+
+        /// <summary>
+        /// Sends the GetRange message with the specified parameters.
+        /// </summary>
+        /// <param name="requestUuid">The request identifier.</param>
+        /// <param name="channelIds">The channel ids.</param>
+        /// <param name="startIndex">The start index.</param>
+        /// <param name="endIndex">The end index.</param>
+        /// <param name="uom">The unit of measure.</param>
+        /// <param name="depthDatum">The depth datum.</param>
+        public void GetRange(Guid requestUuid, IList<long> channelIds, object startIndex, object endIndex, string uom = null, string depthDatum = null)
+        {
+        }
+
+        /// <summary>
+        /// Sends the CancelGetRange message with the specified parameters.
+        /// </summary>
+        /// <param name="requestUuid">The request UUID.</param>
+        public void CancelGetRange(Guid requestUuid)
+        {
+        }
+
+        /// <summary>
         /// Sends the OpenChannelResponse message with the specified paramters.
         /// </summary>
         /// <param name="request">The request.</param>
