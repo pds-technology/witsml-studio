@@ -898,6 +898,14 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                     var indexValue = values.Value<long>(i);
                     FormatIndex(index, customData, indexValue);
                 }
+
+                // Check if user wants to display byte arrays
+                var dataItemValue = dataItem["value"] as JObject;
+
+                if (!Model.DisplayByteArrays && dataItemValue != null && $"{dataItemValue["item"]}".StartsWith(@"\"))
+                {
+                    dataItemValue["item"] = @"\u001F...";
+                }
             }
         }
 
@@ -1034,6 +1042,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             if (dataObject == null) return;
             FormatResource(dataObject["resource"] as JObject);
 
+            // Check if user wants to display byte arrays
             if (!Model.DisplayByteArrays && dataObject["data"] != null)
                 dataObject["data"] = @"\u001F...";
         }
