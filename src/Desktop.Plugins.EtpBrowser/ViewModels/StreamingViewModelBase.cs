@@ -150,6 +150,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                 units,
                 Environment.NewLine));
 
+            // Check if user wants to see decoded byte arrays
+            if (!Model.DecodeByteArrays) return;
+
             var crlf = Environment.NewLine + Environment.NewLine;
 
             var dataObjects = string.Join(crlf, channels
@@ -216,6 +219,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                     dataValues,
                     Environment.NewLine));
             }
+
+            // Check if user wants to see decoded byte arrays
+            if (!Model.DecodeByteArrays) return;
 
             foreach (var tuple in dataObjects)
             {

@@ -708,6 +708,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
             LogObjectDetails(e);
 
+            // Check if user wants to see decoded byte arrays
+            if (!Model.DecodeByteArrays) return;
+
             var data = dataObject
                 .GetString()
                 .Trim(_whiteSpace);
@@ -1030,6 +1033,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             if (dataObject == null) return;
             FormatResource(dataObject["resource"] as JObject);
+
+            if (!Model.DisplayByteArrays && dataObject["data"] != null)
+                dataObject["data"] = @"\u001F...";
         }
 
         private void FormatResource(JObject resource)

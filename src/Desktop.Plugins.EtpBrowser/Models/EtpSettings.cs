@@ -62,6 +62,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
             RequestedProtocols = new BindableCollection<EtpProtocolItem>();
             BaseUri = EtpUri.RootUri;
             IsEtpClient = true;
+            DecodeByteArrays = true;
             PortNumber = 9000;
         }
 
@@ -192,6 +193,38 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
                 if (_isEtpClient == value) return;
                 _isEtpClient = value;
                 NotifyOfPropertyChange(() => IsEtpClient);
+            }
+        }
+
+        private bool _decodeByteArrays;
+        /// <summary>
+        /// Gets or sets a value indicating whether to decode byte arrays.
+        /// </summary>
+        [DataMember]
+        public bool DecodeByteArrays
+        {
+            get { return _decodeByteArrays; }
+            set
+            {
+                if (_decodeByteArrays == value) return;
+                _decodeByteArrays = value;
+                NotifyOfPropertyChange(() => DecodeByteArrays);
+            }
+        }
+
+        private bool _displayByteArrays;
+        /// <summary>
+        /// Gets or sets a value indicating whether to display byte arrays.
+        /// </summary>
+        [DataMember]
+        public bool DisplayByteArrays
+        {
+            get { return _displayByteArrays; }
+            set
+            {
+                if (_displayByteArrays == value) return;
+                _displayByteArrays = value;
+                NotifyOfPropertyChange(() => DisplayByteArrays);
             }
         }
 
