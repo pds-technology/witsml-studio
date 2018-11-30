@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Navigation;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using PDS.WITSMLstudio.Desktop.Core.Models;
+using PDS.WITSMLstudio.Connections;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 

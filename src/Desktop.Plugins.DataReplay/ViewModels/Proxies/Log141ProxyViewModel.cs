@@ -34,7 +34,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 {
     public class Log141ProxyViewModel : WitsmlProxyViewModel
     {
-        public Log141ProxyViewModel(IRuntimeService runtime, Core.Connections.Connection connection) : base(connection, WMLSVersion.WITSML141)
+        public Log141ProxyViewModel(IRuntimeService runtime, Connections.Connection connection) : base(connection, WMLSVersion.WITSML141)
         {
             Runtime = runtime;
             Generator = new Log141Generator();

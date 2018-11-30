@@ -31,10 +31,10 @@ using Witsml131 = Energistics.DataAccess.WITSML131;
 using Witsml141 = Energistics.DataAccess.WITSML141;
 using Energistics.Etp.Common.Datatypes.Object;
 using log4net.Appender;
+using PDS.WITSMLstudio.Connections;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Data.Logs;
 using PDS.WITSMLstudio.Desktop.Core.Adapters;
-using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 

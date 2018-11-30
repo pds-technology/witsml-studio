@@ -20,7 +20,7 @@ using System;
 using System.Runtime.Serialization;
 using Caliburn.Micro;
 using Energistics.Etp.Common.Datatypes;
-using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Properties;
 using PDS.WITSMLstudio.Framework;

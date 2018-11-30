@@ -25,7 +25,7 @@ using System.Windows.Input;
 using Caliburn.Micro;
 using Energistics.Etp.Common;
 using Energistics.Etp.Common.Datatypes;
-using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Framework;
 

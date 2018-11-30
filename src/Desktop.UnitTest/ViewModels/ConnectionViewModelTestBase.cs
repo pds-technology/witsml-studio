@@ -16,10 +16,9 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
-using System;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Properties;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;

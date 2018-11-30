@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using Energistics.DataAccess;
 using Energistics.DataAccess.WITSML141;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PDS.WITSMLstudio.Connections;
 using PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
@@ -71,7 +72,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser
 
             // Create the view model and initialize data to add a well to the store
             var vm = new MainViewModel(_runtime);
-            vm.Model.Connection = new Core.Connections.Connection() { Uri = _validWitsmlUri };
+            vm.Model.Connection = new Connection { Uri = _validWitsmlUri };
             vm.Proxy.Url = vm.Model.Connection.Uri;
 
             var xmlIn = string.Format(
@@ -97,7 +98,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser
 
             // Create the view model and initialize data to add a well to the store
             var vm = new MainViewModel(_runtime);
-            vm.Model.Connection = new Core.Connections.Connection() { Uri = _validWitsmlUri };
+            vm.Model.Connection = new Connection { Uri = _validWitsmlUri };
             vm.Proxy.Url = vm.Model.Connection.Uri;
             vm.Model.ReturnElementType = OptionsIn.ReturnElements.All;
 
@@ -133,7 +134,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser
         public async Task MainViewModel_SubmitQuery_Can_GetCap()
         {
             var vm = new MainViewModel(_runtime);
-            vm.Model.Connection = new Core.Connections.Connection() { Uri = _validWitsmlUri };
+            vm.Model.Connection = new Connection { Uri = _validWitsmlUri };
             vm.Proxy.Url = vm.Model.Connection.Uri;
             vm.Model.WitsmlVersion = OptionsIn.DataVersion.Version141.Value;
 

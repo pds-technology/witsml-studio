@@ -17,6 +17,7 @@
 //-----------------------------------------------------------------------
 
 using System.Threading.Tasks;
+using PDS.WITSMLstudio.Connections;
 
 namespace PDS.WITSMLstudio.Desktop.Core.Connections
 {

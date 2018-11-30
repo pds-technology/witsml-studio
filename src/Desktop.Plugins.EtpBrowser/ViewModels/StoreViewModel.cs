@@ -26,8 +26,8 @@ using Energistics.DataAccess;
 using Energistics.DataAccess.WITSML200;
 using Energistics.Etp.Common.Datatypes;
 using ICSharpCode.AvalonEdit.Document;
+using PDS.WITSMLstudio.Connections;
 using PDS.WITSMLstudio.Framework;
-using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 

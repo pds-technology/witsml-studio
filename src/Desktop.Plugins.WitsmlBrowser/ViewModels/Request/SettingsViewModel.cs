@@ -19,13 +19,13 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
 using Energistics.DataAccess;
-using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
-using System.Threading.Tasks;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
 {

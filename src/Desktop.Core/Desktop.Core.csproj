@@ -189,10 +189,6 @@
     <Compile Include="Commands\ScrollCommands.cs" />
     <Compile Include="Commands\InputCommands.cs" />
     <Compile Include="Commands\KeyCommands.cs" />
-    <Compile Include="Connections\AuthenticationTypes.cs" />
-    <Compile Include="Connections\Connection.cs" />
-    <Compile Include="Connections\ConnectionExtensions.cs" />
-    <Compile Include="Connections\ConnectionTypes.cs" />
     <Compile Include="Connections\EtpConnectionTest.cs" />
     <Compile Include="Connections\IConnectionTest.cs" />
     <Compile Include="Connections\JwtConnectionTest.cs" />

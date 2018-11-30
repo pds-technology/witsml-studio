@@ -32,13 +32,13 @@ using Energistics.Etp.Common.Datatypes.ChannelData;
 using Energistics.Etp.Common.Datatypes.Object;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using PDS.WITSMLstudio.Connections;
 using PDS.WITSMLstudio.Desktop.Core;
 using PDS.WITSMLstudio.Desktop.Core.Adapters;
-using PDS.WITSMLstudio.Framework;
-using PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Properties;
-using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
+using PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Properties;
+using PDS.WITSMLstudio.Framework;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 {

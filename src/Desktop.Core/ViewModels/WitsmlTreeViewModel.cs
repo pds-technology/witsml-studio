@@ -37,12 +37,12 @@ using Witsml141 = Energistics.DataAccess.WITSML141;
 using Energistics.Etp.Common.Datatypes;
 using Microsoft.Win32;
 using PDS.WITSMLstudio.Adapters;
+using PDS.WITSMLstudio.Connections;
+using PDS.WITSMLstudio.Desktop.Core.Models;
+using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Linq;
 using PDS.WITSMLstudio.Query;
-using PDS.WITSMLstudio.Desktop.Core.Connections;
-using PDS.WITSMLstudio.Desktop.Core.Models;
-using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
 namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 {

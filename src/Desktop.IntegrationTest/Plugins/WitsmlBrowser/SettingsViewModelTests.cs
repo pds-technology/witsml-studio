@@ -18,7 +18,7 @@
 
 using Energistics.DataAccess;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Connections;
 using PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
@@ -52,7 +52,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser
         public void SettingsViewModel_GetVersions_Can_Get_Supported_Versions()
         {
             WITSMLWebServiceConnection proxy = new WITSMLWebServiceConnection(_validWitsmlUri, WMLSVersion.WITSML141);
-            Connection connection = new Connection() { Uri = _validWitsmlUri };
+            Connection connection = new Connection { Uri = _validWitsmlUri };
 
             var versions = _settingsViewModel.GetVersions(proxy, connection);
             Assert.IsTrue(!string.IsNullOrEmpty(versions));

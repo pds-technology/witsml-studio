@@ -18,7 +18,7 @@
 
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Connections;
 
 namespace PDS.WITSMLstudio.Desktop.ViewModels
 {

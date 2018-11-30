@@ -26,6 +26,7 @@ using AutoMapper;
 using Caliburn.Micro;
 using Energistics.Etp.Common.Datatypes;
 using Newtonsoft.Json;
+using PDS.WITSMLstudio.Connections;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Models;

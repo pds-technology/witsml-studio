@@ -29,8 +29,8 @@ using Energistics.Etp.v11.Datatypes;
 using Energistics.Etp.v11.Datatypes.ChannelData;
 using Energistics.Etp.v11.Protocol.ChannelStreaming;
 using Energistics.Etp.v11.Protocol.Core;
+using PDS.WITSMLstudio.Connections;
 using PDS.WITSMLstudio.Framework;
-using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers;
 

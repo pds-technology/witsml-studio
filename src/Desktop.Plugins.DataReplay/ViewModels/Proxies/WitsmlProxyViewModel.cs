@@ -19,7 +19,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Energistics.DataAccess;
-using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Connections;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies

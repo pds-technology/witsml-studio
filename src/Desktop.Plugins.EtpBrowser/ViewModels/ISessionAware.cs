@@ -19,7 +19,7 @@
 using System.Collections.Generic;
 using Caliburn.Micro;
 using Energistics.Etp.Common.Datatypes;
-using PDS.WITSMLstudio.Desktop.Core.Connections;
+using PDS.WITSMLstudio.Connections;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 {

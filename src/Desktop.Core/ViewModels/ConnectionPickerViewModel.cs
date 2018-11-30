@@ -25,8 +25,8 @@ using System.Windows.Data;
 using System.Windows.Input;
 using Caliburn.Micro;
 using Newtonsoft.Json;
+using PDS.WITSMLstudio.Connections;
 using PDS.WITSMLstudio.Framework;
-using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Properties;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
