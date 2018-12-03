@@ -385,11 +385,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             {
                 if (string.IsNullOrWhiteSpace(SubTitle))
                 {
-                    Runtime.Shell?.SetBreadcrumb(DisplayName, item.DisplayName);
+                    Runtime.Shell?.SetBreadcrumb(DisplayName, item?.DisplayName);
                 }
                 else
                 {
-                    Runtime.Shell?.SetBreadcrumb(DisplayName, SubTitle, item.DisplayName);
+                    Runtime.Shell?.SetBreadcrumb(DisplayName, SubTitle, item?.DisplayName);
                 }
             });
         }
@@ -415,12 +415,17 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
                 Items.Remove(screen);
 
-                if (tab?.SupportedVersions == null ||
+                if (tab == null) continue;
+
+                if (tab.SupportedVersions == null ||
                     tab.SupportedVersions.ContainsIgnoreCase(Model.Connection.SubProtocol))
                 {
                     Items.Add(tab);
+                    tab.Refresh();
                 }
             }
+
+            Refresh();
 
             if (!string.IsNullOrWhiteSpace(Model.Connection.Uri) && reconnect)
             {
