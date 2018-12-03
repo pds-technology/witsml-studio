@@ -461,21 +461,15 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         }
 
         /// <summary>
-        /// Called when initializing.
-        /// </summary>
-        protected override void OnInitialize()
-        {
-           RevealablePasswordBox.Password = DataItem?.Password;
-           RevealableProxyPasswordBox.Password = DataItem?.ProxyPassword;
-        }
-
-        /// <summary>
         /// When the screen is activated the EditItem is initialized.
         /// </summary>
         protected override void OnActivate()
         {
             base.OnActivate();
             InitializeEditItem();
+
+            RevealablePasswordBox.Password = EditItem?.Password;
+            RevealableProxyPasswordBox.Password = EditItem?.ProxyPassword;
         }
 
         /// <summary>
