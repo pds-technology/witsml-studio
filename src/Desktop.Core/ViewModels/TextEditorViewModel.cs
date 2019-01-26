@@ -385,8 +385,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             Runtime.Invoke(() =>
             {
-                var formattedText = Format(text);              
-                Document.Text = formattedText;
+                var formattedText = Format(text);
+
+                // Don't update the Document if it's already updating.  This will throw an exception.
+                if (!Document.IsInUpdate)
+                    Document.Text = formattedText;
+
                 FlushToFile(formattedText);
 
             }, DispatcherPriority.Send);
