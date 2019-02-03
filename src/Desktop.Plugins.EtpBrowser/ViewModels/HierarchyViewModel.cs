@@ -102,6 +102,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             //Parent.OnConnectionChanged(true, false);
             Parent.Resources.Clear();
 
+            if (Parent.EtpExtender == null) return;
+
             if (Model.DiscoveryFunction == Functions.FindResources)
             {
                 Parent.FindResources(Model?.BaseUri);
