@@ -444,7 +444,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
                     if (!IsNameMatch(Model.Store?.Name, nameElement.Value))
                         if (fromXml)
                             Model.Store.Name = nameElement.Value;
-                        else nameElement.Value = Model.Store.Name;
+                        else if (Model.Store.Name != null)          // Value cannot be assigned null so check for it.
+                            nameElement.Value = Model.Store.Name;
                 }
 
                 uri = GetUriFromXml(element, version, objectType)?.Uri;

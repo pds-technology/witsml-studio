@@ -75,7 +75,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             };
 
             RevealablePasswordBox = new RevealablePasswordBoxViewModel();
-            RevealableProxyPasswordBox = new RevealablePasswordBoxViewModel();
+            RevealableProxyPasswordBox = new RevealablePasswordBoxViewModel { Revealable = false };
         }
 
         /// <summary>

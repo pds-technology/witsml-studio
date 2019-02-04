@@ -205,7 +205,6 @@
     <Compile Include="Converters\StringToVisibilityConverter.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Models\ChannelMetadataViewModel.cs" />
-    <Compile Include="Models\CoreModelExtensions.cs" />
     <Compile Include="Models\CustomPropertyDescriptor.cs" />
     <Compile Include="Models\DataObjectWrapper.cs" />
     <Compile Include="Models\EtpProtocolItem.cs" />

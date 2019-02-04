@@ -25,7 +25,9 @@
                            IsReadOnly="{Binding IsReadOnly}"
                            WordWrap="{Binding IsWordWrapEnabled}"
                            SyntaxHighlighting="{Binding Syntax}"
-                           cal:Message.Attach="[Event ContextMenuOpening] = [Action RefreshContextMenu($source)]; [Event TextChanged] = [Action ScrollToBottom($source)]">
+                           cal:Message.Attach="[Event Loaded] = [Action TextEditorLoaded($source)];
+                                               [Event ContextMenuOpening] = [Action RefreshContextMenu($source)];
+                                               [Event TextChanged] = [Action ScrollToBottom($source)]">
             <avalon:TextEditor.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Cut" cal:Message.Attach="Cut" />

@@ -26,6 +26,7 @@ using Caliburn.Micro;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Highlighting;
+using ICSharpCode.AvalonEdit.Search;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 
 namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
@@ -384,8 +385,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         {
             Runtime.Invoke(() =>
             {
-                var formattedText = Format(text);              
-                Document.Text = formattedText;
+                var formattedText = Format(text);
+
+                // Don't update the Document if it's already updating.  This will throw an exception.
+                if (!Document.IsInUpdate)
+                    Document.Text = formattedText;
+
                 FlushToFile(formattedText);
 
             }, DispatcherPriority.Send);
@@ -463,6 +468,15 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public void Clear()
         {
             Runtime.Invoke(() => Document.Text = string.Empty);
+        }
+
+        /// <summary>
+        /// Called when the text editor is loaded.
+        /// </summary>
+        /// <param name="control">The control.</param>
+        public void TextEditorLoaded(TextEditor control)
+        {
+            SearchPanel.Install(control);
         }
 
         /// <summary>

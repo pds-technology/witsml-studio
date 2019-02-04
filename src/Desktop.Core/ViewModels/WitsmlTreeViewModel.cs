@@ -1074,7 +1074,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public void RefreshHierarchy()
         {
             Clear();
-            LoadWells();
+
+            if(Context != null)
+                LoadWells();
         }
 
         /// <summary>
