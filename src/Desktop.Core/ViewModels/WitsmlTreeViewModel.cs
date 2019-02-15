@@ -994,7 +994,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             foreach (ITreeViewContextMenuManipulator manipulator in WitsmlTreeViewContextManipulators)
             {
-                manipulator.Process(_hierarchy.ContextMenu, Context, selectedResource);
+                try
+                {
+                    manipulator.Process(_hierarchy.ContextMenu, Context, selectedResource);
+                }
+                catch (Exception ex)
+                {
+                    _log.Error(ex);
+                }
             }
 
             OnSelectedItemChanged?.Invoke(selectedResource);
