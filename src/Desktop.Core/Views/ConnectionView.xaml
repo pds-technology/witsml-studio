@@ -236,7 +236,7 @@
                     </ComboBox>
 
                     <CheckBox Grid.Row="2" Grid.Column="1" Margin="5,0,0,0" Content="Accept Compressed Server Responses" VerticalAlignment="Center"
-                              IsChecked="{Binding EditItem.SoapResponseCompression}" />
+                              IsChecked="{Binding EditItem.SoapAcceptCompressedResponses}" />
                 </Grid>
             </TabItem>
             
