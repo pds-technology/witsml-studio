@@ -250,7 +250,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             var children = resource.Children.ToList();
             foreach (var child in children)
             {
-                if (!child.IsExpanded && child.HasPlaceholder && child.Resource.ChildCount > 0)
+                if (!child.IsExpanded && child.HasPlaceholder && child.Resource.TargetCount > 0)
                 {
                     bool succeeded = Expand(child);
                     if (!succeeded)

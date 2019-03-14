@@ -61,7 +61,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             DataContext = dataContext;
             IsVisible = true;
 
-            if (resource.ChildCount != 0)
+            if (resource.TargetCount != 0)
             {
                 Children.Add(Placeholder);
             }
@@ -119,7 +119,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Gets the display name.
         /// </summary>
         /// <value>The display name.</value>
-        public string DisplayName => Resource.ChildCount > 0 ? $"{Resource.Name} ({Resource.ChildCount})" : Resource.Name;
+        public string DisplayName => Resource.TargetCount > 0 ? $"{Resource.Name} ({Resource.TargetCount})" : Resource.Name;
 
         /// <summary>
         /// Gets a value indicating whether this instance has a placeholder element.
@@ -157,12 +157,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// </summary>
         public int ChildCount
         {
-            get { return Resource.ChildCount.GetValueOrDefault(-1); }
+            get { return Resource.TargetCount.GetValueOrDefault(-1); }
             set
             {
                 if (value == _childCount) return;
                 _childCount = value;
-                Resource.ChildCount = value;
+                Resource.TargetCount = value;
                 NotifyOfPropertyChange(() => ChildCount);
                 NotifyOfPropertyChange(() => DisplayName);
             }
