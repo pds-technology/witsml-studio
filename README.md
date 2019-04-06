@@ -1,3 +1,6 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/995qfnd3kgedxghe?svg=true)](https://ci.appveyor.com/project/PDS/witsml-studio)
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/18118/badge.svg)](https://scan.coverity.com/projects/pds-technology-witsml-studio)
+
 ## PDS WITSMLstudio Desktop
 
 **Quick Links:**&nbsp;
@@ -40,7 +43,7 @@ Unit tests for the WITSML Browser and core functionality.
 ### Copyright and License
 Copyright &copy; 2018 PDS Americas LLC
 
-Released under the PDS Open Source WITSML™ Product License Agreement
+Released under the PDS Open Source WITSMLâ„¢ Product License Agreement
 http://www.pds.group/WITSMLstudio/OpenSource/ProductLicenseAgreement
 
 ---
