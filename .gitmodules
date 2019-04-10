@@ -1,4 +1,4 @@
 [submodule "ext/witsml"]
 	path = ext/witsml
 	url = ../witsml
-	branch = etp1.2
+	branch = master
