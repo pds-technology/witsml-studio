@@ -37,9 +37,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
 
         public Models.Simulation Simulation => Simulator.Model;
 
-        protected override void HandleGetResources(ProtocolEventArgs<GetResources, IList<Resource>> args)
+        protected override void HandleGetTreeResources(ProtocolEventArgs<GetTreeResources, IList<Resource>> args)
         {
-            if (EtpUri.IsRoot(args.Message.Uri))
+            if (EtpUri.IsRoot(args.Message.Context.Uri))
             {
                 args.Context.Add(New(
                     Guid.NewGuid().ToString(),
@@ -48,7 +48,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
                     resourceType: ResourceTypes.UriProtocol,
                     name: "WITSML 1.4.1.1 Store"));
             }
-            else if (args.Message.Uri == EtpUris.Witsml141)
+            else if (args.Message.Context.Uri == EtpUris.Witsml141)
             {
                 args.Context.Add(New(
                     Simulation.WellUid,
@@ -57,7 +57,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
                     resourceType: ResourceTypes.DataObject,
                     name: Simulation.WellName));
             }
-            else if (string.Format("{0}/well({1})", EtpUris.Witsml141, Simulation.WellUid).EqualsIgnoreCase(args.Message.Uri))
+            else if (string.Format("{0}/well({1})", EtpUris.Witsml141, Simulation.WellUid).EqualsIgnoreCase(args.Message.Context.Uri))
             {
                 args.Context.Add(New(
                     Simulation.WellboreUid,
@@ -66,7 +66,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
                     resourceType: ResourceTypes.DataObject,
                     name: Simulation.WellboreName));
             }
-            else if (string.Format("{0}/well({1})/wellbore({2})", EtpUris.Witsml141, Simulation.WellUid, Simulation.WellboreUid).EqualsIgnoreCase(args.Message.Uri))
+            else if (string.Format("{0}/well({1})/wellbore({2})", EtpUris.Witsml141, Simulation.WellUid, Simulation.WellboreUid).EqualsIgnoreCase(args.Message.Context.Uri))
             {
                 args.Context.Add(New(
                     Simulation.LogUid,
@@ -75,7 +75,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
                     resourceType: ResourceTypes.DataObject,
                     name: Simulation.LogName));
             }
-            else if (string.Format("{0}/well({1})/wellbore({2})/log({3})", EtpUris.Witsml141, Simulation.WellUid, Simulation.WellboreUid, Simulation.LogUid).EqualsIgnoreCase(args.Message.Uri))
+            else if (string.Format("{0}/well({1})/wellbore({2})/log({3})", EtpUris.Witsml141, Simulation.WellUid, Simulation.WellboreUid, Simulation.LogUid).EqualsIgnoreCase(args.Message.Context.Uri))
             {
                 foreach (var channel in Simulation.Channels)
                 {
@@ -99,7 +99,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Providers
                 Uuid = uuid,
                 Uri = uri,
                 Name = name,
-                ChildCount = count,
+                TargetCount = count,
                 ContentType = contentType,
                 ResourceType = (ResourceKind)(int)resourceType,
                 CustomData = new Dictionary<string, string>()

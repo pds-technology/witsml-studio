@@ -178,7 +178,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
                 if (CanExecute && !string.IsNullOrWhiteSpace(resource?.Resource?.Uri))
                 {
-                    return resource.Resource.ChildCount != 0 ||
+                    return resource.Resource.TargetCount != 0 ||
                            ResourceTypes.Folder.ToString().EqualsIgnoreCase(resource.Resource.ResourceType);
                 }
 

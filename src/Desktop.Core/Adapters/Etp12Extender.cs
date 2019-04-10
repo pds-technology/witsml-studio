@@ -349,7 +349,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
 
             var rangeInfo = new ChannelRangeInfo
             {
-                ChannelId = channelIds,
+                ChannelIds = channelIds,
                 Interval = new IndexInterval
                 {
                     StartIndex = new IndexValue { Item = startIndex },
@@ -412,8 +412,15 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         {
             if (!Session.IsRegistered<IDiscoveryCustomer>()) return 0;
 
+            var context = new ContextInfo
+            {
+                Uri = uri,
+                Depth = 0,
+                ContentTypes = new List<string>()
+            };
+
             return Session.Handler<IDiscoveryCustomer>()
-                .GetResources(uri);
+                .GetTreeResources(context);
         }
 
         /// <summary>
@@ -450,7 +457,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             if (!Session.IsRegistered<IStoreCustomer>()) return;
 
             Session.Handler<IStoreCustomer>()
-                .GetObject(uri);
+                .GetDataObjects(new [] { uri });
         }
 
         /// <summary>
@@ -462,7 +469,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             if (!Session.IsRegistered<IStoreCustomer>()) return;
 
             Session.Handler<IStoreCustomer>()
-                .DeleteObject(uri);
+                .DeleteDataObjects(new [] { uri });
         }
 
         /// <summary>
@@ -486,7 +493,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
                     Uri = uri,
                     Uuid = uuid,
                     Name = name,
-                    ChildCount = childCount,
+                    TargetCount = childCount,
                     ContentType = contentType,
                     ResourceType = (ResourceKind) (int) resourceType,
                     CustomData = new Dictionary<string, string>()
@@ -496,7 +503,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             dataObject.SetString(xml, false);
 
             Session.Handler<IStoreCustomer>()
-                .PutObject(dataObject);
+                .PutDataObjects(new[] { dataObject });
         }
 
         /// <summary>
@@ -513,11 +520,15 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
 
             var request = new SubscriptionInfo
             {
-                Uri = uri,
+                Context = new ContextInfo
+                {
+                    Uri = uri,
+                    Depth = 0,
+                    ContentTypes = objectTypes.ToArray()
+                },
                 RequestUuid = Guid.Parse(uuid).ToUuid(),
                 StartTime = startTime,
                 IncludeObjectData = includeObjectData,
-                ContentTypes = objectTypes.ToArray()
             };
 
             _subscriptionInfos.Add(request);
@@ -742,20 +753,28 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             {
                 Session.Register<IDiscoveryCustomer, DiscoveryCustomerHandler>();
                 RegisterEventHandlers(Session.Handler<IDiscoveryCustomer>(),
-                    x => x.OnGetResourcesResponse += (s, e) => _onGetResourcesResponse?.Invoke(e.Header, e.Message, e.Message.Resource, e.Context));
+                    x => x.OnGetResourcesResponse += (s, e) =>
+                    {
+                        foreach (var resource in e.Message.Resources)
+                            _onGetResourcesResponse?.Invoke(e.Header, e.Message, resource, e.Context);
+                    });
             }
             if (Requesting(Protocols.Discovery, "customer"))
             {
                 Session.Register<IDiscoveryStore, DiscoveryStoreHandler>();
                 RegisterEventHandlers(Session.Handler<IDiscoveryStore>(),
-                    x => x.OnGetResources += OnGetResources);
+                    x => x.OnGetTreeResources += OnGetTreeResources);
             }
 
             if (Requesting(Protocols.DiscoveryQuery, "store"))
             {
                 Session.Register<IDiscoveryQueryCustomer, DiscoveryQueryCustomerHandler>();
                 RegisterEventHandlers(Session.Handler<IDiscoveryQueryCustomer>(),
-                    x => x.OnFindResourcesResponse += (s, e) => _onGetResourcesResponse?.Invoke(e.Header, e.Message, e.Message.Resource, e.Context));
+                    x => x.OnFindResourcesResponse += (s, e) =>
+                    {
+                        foreach (var resource in e.Message.Resources)
+                            _onGetResourcesResponse?.Invoke(e.Header, e.Message, resource, e.Context);
+                    });
             }
             if (Requesting(Protocols.DiscoveryQuery, "customer"))
             {
@@ -768,7 +787,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             {
                 Session.Register<IStoreCustomer, StoreCustomerHandler>();
                 RegisterEventHandlers(Session.Handler<IStoreCustomer>(),
-                    x => x.OnObject += (s, e) => _onObject?.Invoke(e.Header, e.Message, e.Message.DataObject));
+                    x => x.OnGetDataObjectsResponse += (s, e) =>
+                    {
+                        foreach (var dataObject in e.Message.DataObjects)
+                            _onObject?.Invoke(e.Header, e.Message, dataObject);
+                    });
             }
             if (Requesting(Protocols.Store, "customer"))
             {
@@ -792,7 +815,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             {
                 Session.Register<IStoreQueryCustomer, StoreQueryCustomerHandler>();
                 RegisterEventHandlers(Session.Handler<IStoreQueryCustomer>(),
-                    x => x.OnFindObjectsResponse += (s, e) => _onObject?.Invoke(e.Header, e.Message, e.Message.DataObject));
+                    x => x.OnFindObjectsResponse += (s, e) =>
+                    {
+                        foreach (var dataObject in e.Message.DataObjects)
+                            _onObject?.Invoke(e.Header, e.Message, dataObject);
+                    });
             }
             if (Requesting(Protocols.StoreQuery, "customer"))
             {
@@ -804,7 +831,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             {
                 Session.Register<IGrowingObjectCustomer, GrowingObjectCustomerHandler>();
                 RegisterEventHandlers(Session.Handler<IGrowingObjectCustomer>(),
-                    x => x.OnObjectPart += (s, e) => _onObjectPart?.Invoke(e.Header, e.Message, ToDataObject(e.Message)));
+                    x => x.OnGetPartsResponse += (s, e) => _onObjectPart?.Invoke(e.Header, e.Message, ToDataObject(e.Message.ObjectPart)));
             }
             if (Requesting(Protocols.GrowingObject, "customer"))
             {
@@ -827,7 +854,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             {
                 Session.Register<IGrowingObjectQueryCustomer, GrowingObjectQueryCustomerHandler>();
                 RegisterEventHandlers(Session.Handler<IGrowingObjectQueryCustomer>(),
-                    x => x.OnFindPartsResponse += (s, e) => _onObjectPart?.Invoke(e.Header, e.Message, ToDataObject(e.Message)));
+                    x => x.OnFindPartsResponse += (s, e) =>
+                    {
+                        foreach (var objectPart in e.Message.ObjectParts)
+                            _onObjectPart?.Invoke(e.Header, e.Message, ToDataObject(objectPart));
+                    });
             }
             if (Requesting(Protocols.GrowingObjectQuery, "customer"))
             {
@@ -913,13 +944,17 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             {
                 Session.Register<IDiscoveryStore, DiscoveryStoreHandler>();
                 RegisterEventHandlers(Session.Handler<IDiscoveryStore>(),
-                    x => x.OnGetResources += OnGetResources);
+                    x => x.OnGetTreeResources += OnGetTreeResources);
             }
             if (Requesting(Protocols.Discovery, "customer"))
             {
                 Session.Register<IDiscoveryCustomer, DiscoveryCustomerHandler>();
                 RegisterEventHandlers(Session.Handler<IDiscoveryCustomer>(),
-                    x => x.OnGetResourcesResponse += (s, e) => _onGetResourcesResponse?.Invoke(e.Header, e.Message, e.Message.Resource, e.Context));
+                    x => x.OnGetResourcesResponse += (s, e) =>
+                    {
+                        foreach (var resource in e.Message.Resources)
+                            _onGetResourcesResponse?.Invoke(e.Header, e.Message, resource, e.Context);
+                    });
             }
 
             if (Requesting(Protocols.Store, "store"))
@@ -931,7 +966,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             {
                 Session.Register<IStoreCustomer, StoreCustomerHandler>();
                 RegisterEventHandlers(Session.Handler<IStoreCustomer>(),
-                    x => x.OnObject += (s, e) => _onObject?.Invoke(e.Header, e.Message, e.Message.DataObject));
+                    x => x.OnGetDataObjectsResponse += (s, e) =>
+                    {
+                        foreach (var dataObject in e.Message.DataObjects)
+                            _onObject?.Invoke(e.Header, e.Message, dataObject);
+                    });
             }
 
             if (Requesting(Protocols.StoreNotification, "store"))
@@ -955,7 +994,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             {
                 Session.Register<IGrowingObjectCustomer, GrowingObjectCustomerHandler>();
                 RegisterEventHandlers(Session.Handler<IGrowingObjectCustomer>(),
-                    x => x.OnObjectPart += (s, e) => _onObjectPart?.Invoke(e.Header, e.Message, ToDataObject(e.Message)));
+                    x => x.OnGetPartsResponse += (s, e) => _onObjectPart?.Invoke(e.Header, e.Message, ToDataObject(e.Message.ObjectPart)));
             }
 
             if (Requesting(Protocols.DataArray, "store"))
@@ -981,7 +1020,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             }
         }
 
-        private void OnGetResources(object sender, ProtocolEventArgs<GetResources, IList<Resource>> e)
+        private void OnGetTreeResources(object sender, ProtocolEventArgs<GetTreeResources, IList<Resource>> e)
         {
         }
 
@@ -1017,20 +1056,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         }
 
         private IDataObject ToDataObject(ObjectPart message)
-        {
-            var dataObject = new DataObject
-            {
-                Data = message.Data,
-                Resource = new Resource
-                {
-                    Uri = EtpUri.RootUri
-                }
-            };
-
-            return dataObject;
-        }
-
-        private IDataObject ToDataObject(FindPartsResponse message)
         {
             var dataObject = new DataObject
             {
