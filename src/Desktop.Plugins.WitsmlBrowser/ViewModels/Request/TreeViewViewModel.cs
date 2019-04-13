@@ -49,7 +49,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels.Request
             TreeViewModel = new WitsmlTreeViewModel(runtime)
             {
                 IsContextMenuEnabled = true,
-                DisableIndicatorQueries = _disableIndicatorQueries
+                DisableIndicatorQueries = _disableIndicatorQueries,
+                WitsmlTreeViewContextManipulators = runtime.Container.ResolveAll<ITreeViewContextMenuManipulator>()
             };
         }
 

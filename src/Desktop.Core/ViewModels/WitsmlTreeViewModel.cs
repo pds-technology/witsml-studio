@@ -19,6 +19,7 @@
 using System;
 using Action = System.Action;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -122,6 +123,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Gets or sets the delegate to invoke when the selected item is changed.
         /// </summary>
         public Action<ResourceViewModel> OnSelectedItemChanged { get; set; }
+
+        /// <summary>
+        /// contains a list of ITreeViewContextMenuManipulator implementors that can do things to the context menu when it is refreshed
+        /// this allows plugins that implement this interface to modify the contents of the context menu dynamically
+        /// </summary>
+        public IEnumerable<ITreeViewContextMenuManipulator> WitsmlTreeViewContextManipulators { get; set; }
 
         /// <summary>
         /// Gets or sets the on load children completed action.
@@ -983,11 +990,21 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             OnRefreshContextMenu?.Invoke(); // TODO: OnRefreshContextMenu is only being used by the Excel Plugin.  
                                             // TODO:... It could be changed to use OnSelectedItemChange so this can be removed.
 
-            if (OnSelectedItemChanged == null) return;
-
             var selectedResource = Items.FindSelectedSynchronized();
 
-            OnSelectedItemChanged(selectedResource);
+            foreach (ITreeViewContextMenuManipulator manipulator in WitsmlTreeViewContextManipulators)
+            {
+                try
+                {
+                    manipulator.Process(_hierarchy.ContextMenu, Context, selectedResource);
+                }
+                catch (Exception ex)
+                {
+                    _log.Error(ex);
+                }
+            }
+
+            OnSelectedItemChanged?.Invoke(selectedResource);
         }
 
         /// <summary>
