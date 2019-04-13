@@ -243,6 +243,7 @@
     <Compile Include="ViewModels\IndicatorViewModel.cs" />
     <Compile Include="ViewModels\IPluginViewModel.cs" />
     <Compile Include="ViewModels\IShellViewModel.cs" />
+    <Compile Include="ViewModels\ITreeViewContextMenuManipulator.cs" />
     <Compile Include="ViewModels\PropertyGridViewModel.cs" />
     <Compile Include="ViewModels\ResourceViewModel.cs" />
     <Compile Include="ViewModels\RevealablePasswordBoxViewModel.cs" />
