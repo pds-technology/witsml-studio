@@ -16,6 +16,7 @@
 // limitations under the License.
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -35,12 +36,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
     /// Manages the behavior of the tree view user interface elements.
     /// </summary>
     /// <seealso cref="Caliburn.Micro.Screen" />
-    public sealed class HierarchyViewModel : Screen, ISessionAware
+    public abstract class HierarchyViewModelBase : Screen, ISessionAware
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="HierarchyViewModel"/> class.
+        /// Initializes a new instance of the <see cref="HierarchyViewModelBase"/> class.
         /// </summary>
-        public HierarchyViewModel(IRuntimeService runtime)
+        protected HierarchyViewModelBase(IRuntimeService runtime)
         {
             Runtime = runtime;
             DisplayName = "Discovery";
@@ -61,7 +62,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Gets a collection of supported ETP versions.
         /// </summary>
-        public string[] SupportedVersions { get; }
+        public string[] SupportedVersions { get; protected set; }
 
         /// <summary>
         /// Gets the runtime service.
@@ -75,7 +76,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public ICommand GetBaseUriCommand { get; }
 
         private bool _canExecute;
-
         /// <summary>
         /// Gets or sets a value indicating whether the Discovery protocol messages can be executed.
         /// </summary>
@@ -104,14 +104,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
             if (Parent.EtpExtender == null) return;
 
-            if (Model.DiscoveryFunction == Functions.FindResources)
-            {
-                Parent.FindResources(Model?.BaseUri);
-            }
-            else
-            {
-                Parent.GetResources(Model?.BaseUri);
-            }
+            Parent.GetResources(Model?.BaseUri);
         }
 
         /// <summary>
@@ -139,10 +132,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// Determines whether the DeleteObject message can be sent for the selected resource.
         /// </summary>
         /// <returns><c>true</c> if the selected resource's level is greater than 1; otherwise, <c>false</c>.</returns>
-        public bool CanDeleteObject
-        {
-            get { return CanGetObject; }
-        }
+        public bool CanDeleteObject => CanGetObject;
 
         /// <summary>
         /// Deletes the selected resource using the Store protocol.
@@ -167,9 +157,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Gets a value indicating whether this selected node can be refreshed.
         /// </summary>
-        /// <value>
-        /// <c>true</c> if this instance can be refreshed; otherwise, <c>false</c>.
-        /// </value>
+        /// <value><c>true</c> if this instance can be refreshed; otherwise, <c>false</c>.</value>
         public bool CanRefreshSelected
         {
             get
@@ -209,6 +197,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             NotifyOfPropertyChange(() => CanDeleteObject);
             NotifyOfPropertyChange(() => CanCopyUriToStreaming);
             NotifyOfPropertyChange(() => CanRefreshSelected);
+            NotifyOfPropertyChange(() => CanCopyUuidToClipboard);
             NotifyOfPropertyChange(() => CanCopyUriToClipboard);
             NotifyOfPropertyChange(() => CanCopyUriToStore);
         }
@@ -216,9 +205,27 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Gets a value indicating whether this instance can copy URI to clipboard.
         /// </summary>
-        /// <value>
-        /// <c>true</c> if this instance can copy URI to clipboard; otherwise, <c>false</c>.
-        /// </value>
+        /// <value><c>true</c> if this instance can copy URI to clipboard; otherwise, <c>false</c>.</value>
+        public bool CanCopyUuidToClipboard => CanGetObject;
+
+        /// <summary>
+        /// Copies the UUID to clipboard.
+        /// </summary>
+        public void CopyUuidToClipboard()
+        {
+            var resource = Parent.SelectedResource;
+
+            if (resource?.Resource == null)
+                return;
+
+            var uri = new EtpUri(resource.Resource.Uri);
+            Clipboard.SetText(uri.ObjectId);
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance can copy URI to clipboard.
+        /// </summary>
+        /// <value><c>true</c> if this instance can copy URI to clipboard; otherwise, <c>false</c>.</value>
         public bool CanCopyUriToClipboard => CanGetObject;
 
         /// <summary>
@@ -237,9 +244,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Gets a value indicating whether this instance can copy URI to store.
         /// </summary>
-        /// <value>
-        /// <c>true</c> if this instance can copy URI to store; otherwise, <c>false</c>.
-        /// </value>
+        /// <value><c>true</c> if this instance can copy URI to store; otherwise, <c>false</c>.</value>
         public bool CanCopyUriToStore => CanGetObject;
 
         /// <summary>
@@ -287,30 +292,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Copies the URI to streaming.
         /// </summary>
-        public void CopyUriToStreaming()
-        {
-            var viewModel = Parent.Items.OfType<Streaming11ViewModel>().FirstOrDefault();
-            if (viewModel == null) return;
-
-            // Get list of checked resources
-            var checkedResources = Parent.CheckedResources.ToList();
-            if (checkedResources.Count < 1)
-            {
-                // Use selected resource of none are checked
-                var selectedResource = Parent.SelectedResource;
-                if (selectedResource != null)
-                {
-                    checkedResources.Add(selectedResource);
-                }
-            }
-
-            foreach (var resource in checkedResources)
-            {
-                Model.Streaming.Uri = resource.Resource.Uri;
-                viewModel.AddUri();
-                Parent.ActivateItem(viewModel);
-            }
-        }
+        public abstract void CopyUriToStreaming();
 
         /// <summary>
         /// Determines whether the NotificationRequest message can be sent for the selected resource.
@@ -361,22 +343,20 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// Called when the selected connection has changed.
         /// </summary>
         /// <param name="connection">The connection.</param>
-        public void OnConnectionChanged(Connection connection)
+        public virtual void OnConnectionChanged(Connection connection)
         {
+            Runtime.InvokeAsync(() =>
+            {
+                RefreshFunctionList();
+                Refresh();
+            });
         }
 
         /// <summary>
         /// Called when the OpenSession message is recieved.
         /// </summary>
         /// <param name="supportedProtocols">The supported protocols.</param>
-        public void OnSessionOpened(IList<ISupportedProtocol> supportedProtocols)
-        {
-            if (supportedProtocols.All(x => x.Protocol != Parent.EtpExtender.Protocols.Discovery && x.Protocol != Parent.EtpExtender.Protocols.DiscoveryQuery))
-                return;
-            
-            CanExecute = true;
-            RefreshContextMenu();
-        }
+        public abstract void OnSessionOpened(IList<ISupportedProtocol> supportedProtocols);
 
         /// <summary>
         /// Called when the <see cref="Energistics.Etp.Common.IEtpClient" /> web socket is closed.
@@ -385,6 +365,49 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             CanExecute = false;
             RefreshContextMenu();
+        }
+
+        /// <summary>
+        /// Called when an attached view's Loaded event fires.
+        /// </summary>
+        /// <param name="view"></param>
+        protected override void OnViewLoaded(object view)
+        {
+            base.OnViewLoaded(view);
+            RefreshFunctionList();
+        }
+
+        /// <summary>
+        /// Refreshes the function list.
+        /// </summary>
+        protected abstract void RefreshFunctionList();
+
+        /// <summary>
+        /// Copies the URI to streaming.
+        /// </summary>
+        protected void CopyUriToStreaming<T>(Action<T> addUriCallback) where T : IScreen
+        {
+            var viewModel = Parent.Items.OfType<T>().FirstOrDefault();
+            if (viewModel == null) return;
+
+            // Get list of checked resources
+            var checkedResources = Parent.CheckedResources.ToList();
+            if (checkedResources.Count < 1)
+            {
+                // Use selected resource of none are checked
+                var selectedResource = Parent.SelectedResource;
+                if (selectedResource != null)
+                {
+                    checkedResources.Add(selectedResource);
+                }
+            }
+
+            foreach (var resource in checkedResources)
+            {
+                Model.Streaming.Uri = resource.Resource.Uri;
+                addUriCallback?.Invoke(viewModel);
+                Parent.ActivateItem(viewModel);
+            }
         }
     }
 }

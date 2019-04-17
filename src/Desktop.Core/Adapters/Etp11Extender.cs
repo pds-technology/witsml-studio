@@ -365,6 +365,32 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
         }
 
         /// <summary>
+        /// Sends the GetTreeResources message with the specified URI.
+        /// </summary>
+        /// <param name="uri">The URI.</param>
+        /// <param name="depth">The depth.</param>
+        /// <param name="contentTypes">The content types.</param>
+        /// <returns>The message identifier.</returns>
+        public long GetTreeResources(string uri, int depth = 1, params string[] contentTypes)
+        {
+            return 0;
+        }
+
+        /// <summary>
+        /// Sends the GetGraphResources message with the specified URI.
+        /// </summary>
+        /// <param name="uri">The URI.</param>
+        /// <param name="scope">The scope.</param>
+        /// <param name="groupByType">if set to <c>true</c> group by type.</param>
+        /// <param name="depth">The depth.</param>
+        /// <param name="contentTypes">The content types.</param>
+        /// <returns>The message identifier.</returns>
+        public long GetGraphResources(string uri, GraphScopes scope, bool groupByType = false, int depth = 1, params string[] contentTypes)
+        {
+            return 0;
+        }
+
+        /// <summary>
         /// Sends the FindResources message with the specified URI.
         /// </summary>
         /// <param name="uri">The URI.</param>

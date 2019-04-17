@@ -415,12 +415,60 @@ namespace PDS.WITSMLstudio.Desktop.Core.Adapters
             var context = new ContextInfo
             {
                 Uri = uri,
-                Depth = 0,
+                Depth = 1,
                 ContentTypes = new List<string>()
             };
 
             return Session.Handler<IDiscoveryCustomer>()
                 .GetTreeResources(context);
+        }
+
+        /// <summary>
+        /// Sends the GetTreeResources message with the specified URI.
+        /// </summary>
+        /// <param name="uri">The URI.</param>
+        /// <param name="depth">The depth.</param>
+        /// <param name="contentTypes">The content types.</param>
+        /// <returns>The message identifier.</returns>
+        public long GetTreeResources(string uri, int depth = 1, params string[] contentTypes)
+        {
+            if (!Session.IsRegistered<IDiscoveryCustomer>()) return 0;
+
+            var context = new ContextInfo
+            {
+                Uri = uri,
+                Depth = depth,
+                ContentTypes = contentTypes
+            };
+
+            return Session.Handler<IDiscoveryCustomer>()
+                .GetTreeResources(context);
+        }
+
+        /// <summary>
+        /// Sends the GetGraphResources message with the specified URI.
+        /// </summary>
+        /// <param name="uri">The URI.</param>
+        /// <param name="scope">The scope.</param>
+        /// <param name="groupByType">if set to <c>true</c> group by type.</param>
+        /// <param name="depth">The depth.</param>
+        /// <param name="contentTypes">The content types.</param>
+        /// <returns>The message identifier.</returns>
+        public long GetGraphResources(string uri, GraphScopes scope, bool groupByType = false, int depth = 1, params string[] contentTypes)
+        {
+            if (!Session.IsRegistered<IDiscoveryCustomer>()) return 0;
+
+            var context = new ContextInfo
+            {
+                Uri = uri,
+                Depth = 1,
+                ContentTypes = new List<string>()
+            };
+
+            var scopeKind = (ContextScopeKind) (int) scope;
+
+            return Session.Handler<IDiscoveryCustomer>()
+                .GetGraphResources(context, scopeKind, groupByType);
         }
 
         /// <summary>

@@ -21,6 +21,7 @@ using System.Runtime.Serialization;
 using Caliburn.Micro;
 using Energistics.Etp.Common.Datatypes;
 using PDS.WITSMLstudio.Connections;
+using PDS.WITSMLstudio.Desktop.Core.Adapters;
 using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Properties;
 using PDS.WITSMLstudio.Framework;
@@ -64,6 +65,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
             IsEtpClient = true;
             DecodeByteArrays = true;
             PortNumber = 9000;
+            DiscoveryDepth = 1;
         }
 
         private Connection _connection;
@@ -297,6 +299,60 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Models
                 {
                     _baseUri = value;
                     NotifyOfPropertyChange(() => BaseUri);
+                }
+            }
+        }
+
+        private bool _groupByType;
+        /// <summary>
+        /// Gets or sets a value indicating whether resources should be grouped by type.
+        /// </summary>
+        [DataMember]
+        public bool GroupByType
+        {
+            get { return _groupByType; }
+            set
+            {
+                if (_groupByType == value) return;
+                _groupByType = value;
+                NotifyOfPropertyChange(() => GroupByType);
+            }
+        }
+
+        private int _discoveryDepth;
+        /// <summary>
+        /// Gets or sets the discovery depth.
+        /// </summary>
+        /// <value>The discovery depth.</value>
+        [DataMember]
+        public int DiscoveryDepth
+        {
+            get { return _discoveryDepth; }
+            set
+            {
+                if (!Equals(_discoveryDepth, value))
+                {
+                    _discoveryDepth = value;
+                    NotifyOfPropertyChange(() => DiscoveryDepth);
+                }
+            }
+        }
+
+        private GraphScopes _discoveryScope;
+        /// <summary>
+        /// Gets or sets the ETP discovery scope.
+        /// </summary>
+        /// <value>The ETP discovery scope.</value>
+        [DataMember]
+        public GraphScopes DiscoveryScope
+        {
+            get { return _discoveryScope; }
+            set
+            {
+                if (!Equals(_discoveryScope, value))
+                {
+                    _discoveryScope = value;
+                    NotifyOfPropertyChange(() => DiscoveryScope);
                 }
             }
         }

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Views.HierarchyView"
+﻿<UserControl x:Class="PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Views.Hierarchy11View"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -53,6 +53,7 @@
                     <MenuItem Header="Get Object" cal:Message.Attach="GetObject" />
                     <MenuItem Header="Delete Object" cal:Message.Attach="DeleteObject" />
                     <Separator />
+                    <MenuItem Header="Copy UUID" cal:Message.Attach="CopyUuidToClipboard"/>
                     <MenuItem Header="Copy URI" cal:Message.Attach="CopyUriToClipboard"/>
                     <MenuItem Header="Copy URI to Store" cal:Message.Attach="CopyUriToStore" />
                     <MenuItem Header="Copy URI to Streaming" cal:Message.Attach="CopyUriToStreaming" />
