@@ -135,6 +135,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         public bool CanDeleteObject => CanGetObject;
 
         /// <summary>
+        /// Gets a value indicating whether this instance can export object.
+        /// </summary>
+        public bool CanExportObject => CanGetObject;
+        
+        /// <summary>
         /// Deletes the selected resource using the Store protocol.
         /// </summary>
         public void DeleteObject()
@@ -143,6 +148,15 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             {
                 Parent.DeleteObject();
             }
+        }
+
+        /// <summary>
+        /// Gets the object.
+        /// </summary>
+        public void ExportObject()
+        {
+            Parent.ExportFile = true;
+            Parent.GetObject();
         }
 
         /// <summary>
@@ -195,6 +209,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             NotifyOfPropertyChange(() => CanGetObject);
             NotifyOfPropertyChange(() => CanDeleteObject);
+            NotifyOfPropertyChange(() => CanExportObject);
             NotifyOfPropertyChange(() => CanCopyUriToStreaming);
             NotifyOfPropertyChange(() => CanRefreshSelected);
             NotifyOfPropertyChange(() => CanCopyUuidToClipboard);

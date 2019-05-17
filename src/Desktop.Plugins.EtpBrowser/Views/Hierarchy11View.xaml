@@ -52,6 +52,7 @@
                 <ContextMenu>
                     <MenuItem Header="Get Object" cal:Message.Attach="GetObject" />
                     <MenuItem Header="Delete Object" cal:Message.Attach="DeleteObject" />
+                    <MenuItem Header="Export Object" cal:Message.Attach="ExportObject" />
                     <Separator />
                     <MenuItem Header="Copy UUID" cal:Message.Attach="CopyUuidToClipboard"/>
                     <MenuItem Header="Copy URI" cal:Message.Attach="CopyUriToClipboard"/>

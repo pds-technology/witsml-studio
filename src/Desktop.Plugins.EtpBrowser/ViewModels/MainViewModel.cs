@@ -190,6 +190,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <value>The ETP client instance.</value>
         public IEtpSession Session => (IEtpSession)_client ?? _server;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether to export file.
+        /// </summary>
+        public bool ExportFile { get; set; }
+
         private TextEditorViewModel _details;
 
         /// <summary>
@@ -745,6 +750,13 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <param name="dataObject">The data object.</param>
         private void OnObject(IMessageHeader header, ISpecificRecord message, IDataObject dataObject)
         {
+            if (ExportFile)
+            {
+                var name = dataObject.Resource?.Name;
+                var xml = dataObject.GetString();
+                this.ShowExportDialog(name, xml);
+            }
+
             LogDataObject(new ProtocolEventArgs<ISpecificRecord>(header, message), dataObject);
         }
 
@@ -812,6 +824,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <param name="e">The <see cref="ProtocolEventArgs{T}"/> instance containing the event data.</param>
         private void LogObjectDetails<T>(ProtocolEventArgs<T> e) where T : ISpecificRecord
         {
+            ExportFile = false; // Set Export File to false
+
             Details.SetText(string.Format(
                 "// Header:{2}{0}{2}{2}// Body:{2}{1}{2}",
                 EtpExtensions.Serialize(e.Header, true),
