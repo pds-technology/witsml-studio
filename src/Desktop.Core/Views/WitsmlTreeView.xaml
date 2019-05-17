@@ -149,6 +149,9 @@
                         <MenuItem Header="Custom Options In" ToolTip="{Binding ExtraOptionsIn}" cal:Message.Attach="GetObjectDetailsWithExtraOptionsIn"/>
                     </MenuItem>
 
+                    <MenuItem Header="Export" cal:Message.Attach="ExportWithGetObjectDetails" 
+                              Visibility="{Binding ShowOnlyRefreshMenuOptions, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=true}"/>
+
                     <MenuItem Header="Refresh" cal:Message.Attach="RefreshSelected" />
                     <!--<MenuItem Header="Delete" cal:Message.Attach="DeleteObject" IsEnabled="False" />-->
 

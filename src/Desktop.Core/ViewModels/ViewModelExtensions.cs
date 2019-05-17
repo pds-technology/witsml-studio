@@ -18,6 +18,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using Caliburn.Micro;
+using Microsoft.Win32;
 using PDS.WITSMLstudio.Desktop.Core.Models;
 
 namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
@@ -131,6 +134,39 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public static IEnumerable<ResourceViewModel> FindChecked(this IList<ResourceViewModel> resources)
         {
             return resources.FindAll(x => x.IsChecked);
+        }
+
+        /// <summary>
+        /// Shows the export dialog.
+        /// </summary>
+        /// <param name="screen">The screen.</param>
+        /// <param name="name">Name of the object.</param>
+        /// <param name="xml">The XML.</param>
+        public static void ShowExportDialog(this IScreen screen, string name, string xml)
+        {
+            if (string.IsNullOrWhiteSpace(xml))
+                return;
+
+            var dialog = new SaveFileDialog
+            {
+                Title = "Save File...",
+                AddExtension = true,
+                FileName = name,
+                DefaultExt = ".xml",
+                Filter = "XML files(.xml)|*.xml|all Files(*.*)|*.*",
+                OverwritePrompt = true,
+                CheckPathExists = true
+            };
+
+            if (!dialog.ShowDialog().GetValueOrDefault()) return;
+            var fileName = dialog.FileName;
+
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                return;
+            }
+
+            File.WriteAllText(fileName, xml);
         }
     }
 }

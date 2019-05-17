@@ -582,6 +582,11 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public bool CanGetObjectDetailsWithReturnElementsAll => CanGetObjectIds;
 
         /// <summary>
+        /// Gets a value indicating whether this instance can export with get object details.
+        /// </summary>
+        public bool CanExportWithGetObjectDetails => CanGetObjectIds;
+
+        /// <summary>
         /// Determines whether a GetFromStore request can be sent for the selected item.
         /// </summary>
         /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
@@ -752,7 +757,28 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 GetObjectDetails(optionsIn.ToArray());
             }
         }
+        
+        /// <summary>
+        /// Exports the get object details with return elements all.
+        /// </summary>
+        public void ExportWithGetObjectDetails()
+        {
+            GetObjectDetails(OptionsIn.ReturnElements.All)
+                .ContinueWith(ExportToFile);
+        }
 
+        private async void ExportToFile(Task<IDataObject> result)
+        {
+            var dataObject = await result;
+            if (dataObject == null)
+                return;
+
+            var name = dataObject.Name;
+            var collection = dataObject.CreateCollection();
+            var xml = WitsmlParser.ToXml(collection);
+            this.ShowExportDialog(name, xml);
+        }
+        
         /// <summary>
         /// Determines whether a GetFromStore request can be sent for the selected item.
         /// </summary>
@@ -978,6 +1004,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithRequestLatest);
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithExtraOptionsIn);
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithAllOptions);
+            NotifyOfPropertyChange(() => CanExportWithGetObjectDetails);
             NotifyOfPropertyChange(() => CanRefreshSelected);
             //NotifyOfPropertyChange(() => CanDeleteObject);
             OnRefreshContextMenu?.Invoke(); // TODO: OnRefreshContextMenu is only being used by the Excel Plugin.  
