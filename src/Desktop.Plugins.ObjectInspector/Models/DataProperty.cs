@@ -40,7 +40,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// <exception cref="ArgumentNullException"><paramref name="dataProperty"/> is null.</exception>
         /// <exception cref="ArgumentException"><paramref name="dataProperty"/> is not a (nested) data property on an Energistics Data Object.</exception>
         public DataProperty(PropertyInfo dataProperty)
-            : this(dataProperty, string.Empty, new HashSet<Type>())
+            : this(dataProperty, new HashSet<Tuple<string, Type>>())
         {
         }
 
@@ -48,36 +48,24 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// Initializes a new <see cref="DataProperty"/> from the specified property and the XML path to the property.
         /// </summary>
         /// <param name="property">The property to initialize from</param>
-        /// <param name="parentXmlPath">The XML path to the property</param>
-        /// <param name="visitedTypes">The set of visited types to prevent stack overflow exceptions.</param>
+        /// <param name="hierarchy">The property hierarchy</param>
         /// <exception cref="ArgumentNullException"><paramref name="property"/> is null.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="parentXmlPath"/> is null.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="hierarchy"/> is null.</exception>
         /// <exception cref="ArgumentException"><paramref name="property"/> is not a (nested) data property on an Energistics Data Object.</exception>
-        public DataProperty(PropertyInfo property, string parentXmlPath, HashSet<Type> visitedTypes)
+        protected DataProperty(PropertyInfo property, HashSet<Tuple<string, Type>> hierarchy)
         {
             property.NotNull(nameof(property));
-            parentXmlPath.NotNull(nameof(parentXmlPath));
-            if (!IsDataProperty(property))
+            hierarchy.NotNull(nameof(hierarchy));
+            if (!EnergisticsHelper.IsDataProperty(property))
                 throw new ArgumentException($"{property.Name} is not a (nested) data property on an Energistics Data Object", nameof(property));
 
             Property = property;
 
-            if (parentXmlPath == string.Empty)
-                XmlPath = XmlName;
-            else
-                XmlPath = parentXmlPath + @"\" + XmlName;
+            hierarchy.Add(new Tuple<string, Type>(XmlName, property.PropertyType));
 
-            ChildProperties = CreateChildProperties(PropertyType, XmlPath, visitedTypes);
-        }
+            XmlPath = string.Join(@"\", hierarchy.Select(x => x.Item1));
 
-        /// <summary>
-        /// Determines whether the specified property is a (nested) data property on an Energistics Data Object.
-        /// </summary>
-        /// <param name="property">The property to check.</param>
-        /// <returns>True if the property is a (nested) data property on an Energistics Data Object; false otherwise.</returns>
-        public static bool IsDataProperty(PropertyInfo property)
-        {
-            return property.GetCustomAttribute<XmlElementAttribute>() != null || property.GetCustomAttribute<XmlAttributeAttribute>() != null;
+            ChildProperties = CreateChildPropertiesCore(PropertyType, hierarchy);
         }
 
         /// <summary>
@@ -89,38 +77,44 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// The list of nested properties if this is a complex type; an empty list otherwise.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="type"/> or <paramref name="parentXmlPath"/> are null.</exception>
-        public static IReadOnlyCollection<DataProperty> CreateChildProperties(Type type, string parentXmlPath)
+        public static IReadOnlyCollection<DataProperty> CreateChildProperties(Type type)
         {
-            return CreateChildProperties(type, parentXmlPath, new HashSet<Type>());
+            return CreateChildPropertiesCore(type, new HashSet<Tuple<string, Type>>());
         }
 
         /// <summary>
         /// Gets the child data properties for the specified type.
         /// </summary>
         /// <param name="type">The type to create the child properties for.</param>
-        /// <param name="parentXmlPath">The parent XML path.</param>
-        /// <param name="visitedTypes">The set of visited types to prevent stack overflow exceptions.</param>
+        /// <param name="hierarchy">The property hierarchy</param>
         /// <returns>
         /// The list of nested properties if this is a complex type; an empty list otherwise.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="type"/> or <paramref name="parentXmlPath"/> are null.</exception>
-        public static IReadOnlyCollection<DataProperty> CreateChildProperties(Type type, string parentXmlPath, HashSet<Type> visitedTypes)
+        /// <exception cref="ArgumentNullException"><paramref name="type"/> or <paramref name="hierarchy"/> are null.</exception>
+        protected static IReadOnlyCollection<DataProperty> CreateChildPropertiesCore(Type type, HashSet<Tuple<string, Type>> hierarchy)
         {
             type.NotNull(nameof(type));
-            parentXmlPath.NotNull(nameof(parentXmlPath));
+            hierarchy.NotNull(nameof(hierarchy));
 
             if (type?.GetCustomAttribute<XmlTypeAttribute>() == null)
                 return new List<DataProperty>();
 
             var types = EnergisticsHelper.GetTypeAndAllDerivedTypes(type);
 
-            types.ForEach(t => visitedTypes.Add(t));
+            var childProperties = new List<DataProperty>();
+            var properties = types.SelectMany(t => t.GetProperties()).Where(EnergisticsHelper.IsDataProperty);
 
-            // Avoid recursive references
-            var properties = types.SelectMany(t => t.GetProperties()).Where(IsDataProperty)
-                .Where(t => !visitedTypes.Contains(t.PropertyType));
+            foreach (var p in properties)
+            {
+                var tuple = new Tuple<string, Type>(EnergisticsHelper.GetXmlName(p), p.PropertyType);
+                if (hierarchy.Contains(tuple)) // Avoid recursive references
+                    continue;
 
-            return properties.Select(p => new DataProperty(p, parentXmlPath, visitedTypes)).ToList();
+                childProperties.Add(new DataProperty(p, hierarchy));
+                hierarchy.Remove(tuple); // Remove newly added property.
+            }
+
+            return childProperties;
         }
 
         /// <summary>
@@ -160,12 +154,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// <summary>
         /// Whether or not the property is an attribute.
         /// </summary>
-        public bool IsAttribute => Property.GetCustomAttribute<XmlAttributeAttribute>() != null;
+        public bool IsAttribute => EnergisticsHelper.IsAttribute(Property);
 
         /// <summary>
         /// Whether or not the property is an element.
         /// </summary>
-        public bool IsElement => Property.GetCustomAttribute<XmlElementAttribute>() != null;
+        public bool IsElement => EnergisticsHelper.IsElement(Property);
 
         /// <summary>
         /// Gets the name of the property.
@@ -175,16 +169,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// <summary>
         /// Gets the XML name of the property.
         /// </summary>
-        public string XmlName
-        {
-            get
-            {
-                if (IsAttribute)
-                    return Property.GetCustomAttribute<XmlAttributeAttribute>().AttributeName;
-
-                return Property.GetCustomAttribute<XmlElementAttribute>().ElementName;
-            }
-        }
+        public string XmlName => EnergisticsHelper.GetXmlName(Property);
 
         /// <summary>
         /// Gets the XML type of the property.

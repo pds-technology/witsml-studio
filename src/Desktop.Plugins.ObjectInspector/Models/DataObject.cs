@@ -44,7 +44,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
                 throw new ArgumentException($"{dataObjectType.Name} is not an Energistics Data Object", nameof(dataObjectType));
 
             DataObjectType = dataObjectType;
-            DataProperties = DataProperty.CreateChildProperties(dataObjectType, string.Empty);
+            DataProperties = DataProperty.CreateChildProperties(dataObjectType);
         }
 
         /// <summary>

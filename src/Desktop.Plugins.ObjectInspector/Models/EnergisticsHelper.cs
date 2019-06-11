@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Xml.Serialization;
 using Energistics.DataAccess.Reflection;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
@@ -53,6 +54,49 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
             var isEdo = edo != null && edo.StandardFamily == standardFamily && edo.DataSchemaVersion == dataSchemaVersion;
 
             return isEdo;
+        }
+
+        /// <summary>
+        /// Determines whether the specified property is a (nested) data property on an Energistics Data Object.
+        /// </summary>
+        /// <param name="property">The property to check.</param>
+        /// <returns>True if the property is a (nested) data property on an Energistics Data Object; false otherwise.</returns>
+        public static bool IsDataProperty(PropertyInfo property)
+        {
+            return property.GetCustomAttribute<XmlElementAttribute>() != null || property.GetCustomAttribute<XmlAttributeAttribute>() != null;
+        }
+
+        /// <summary>
+        /// Whether or not the property is an attribute.
+        /// </summary>
+        /// <param name="property">The property to check.</param>
+        /// <returns>True if the property is an attribute; false otherwise.</returns>
+        public static bool IsAttribute(PropertyInfo property)
+        {
+            return property.GetCustomAttribute<XmlAttributeAttribute>() != null;
+        }
+
+        /// <summary>
+        /// Whether or not the property is an element.
+        /// </summary>
+        /// <param name="property">The property to check.</param>
+        /// <returns>True if the property is an element; false otherwise.</returns>
+        public static bool IsElement(PropertyInfo property)
+        {
+            return property.GetCustomAttribute<XmlElementAttribute>() != null;
+        }
+
+        /// <summary>
+        /// Gets the XML name of the property.
+        /// </summary>
+        /// <param name="property">The property to check.</param>
+        /// <returns>The name of the property.</returns>
+        public static string GetXmlName(PropertyInfo property)
+        {
+            if (IsAttribute(property))
+                return property.GetCustomAttribute<XmlAttributeAttribute>().AttributeName;
+
+            return property.GetCustomAttribute<XmlElementAttribute>().ElementName;
         }
 
         /// <summary>
