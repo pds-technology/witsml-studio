@@ -41,6 +41,21 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         }
 
         /// <summary>
+        /// Checks if a type is an Energistics Data Object.
+        /// </summary>
+        /// <param name="type">The type to check.</param>
+        /// <param name="standardFamily">The standard family.</param>
+        /// <param name="dataSchemaVersion">The data schema version.</param>
+        /// <returns></returns>
+        public static bool IsDataObjectType(Type type, StandardFamily standardFamily, Version dataSchemaVersion)
+        {
+            var edo = type.GetCustomAttribute<EnergisticsDataObjectAttribute>();
+            var isEdo = edo != null && edo.StandardFamily == standardFamily && edo.DataSchemaVersion == dataSchemaVersion;
+
+            return isEdo;
+        }
+
+        /// <summary>
         /// Gets the list of all types in the DevKit that are Energistics Data Objects in the specified standard family and data schema version.
         /// </summary>
         /// <param name="standardFamily">The specified standard family.</param>
@@ -50,11 +65,25 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         {
             Assembly devKit = Assembly.GetAssembly(typeof(StandardFamily));
 
-            return devKit.GetTypes().Where(t =>
-                {
-                    var edo = t.GetCustomAttribute<EnergisticsDataObjectAttribute>();
-                    return edo != null && edo.StandardFamily == standardFamily && edo.DataSchemaVersion == dataSchemaVersion;
-                });
+            return devKit.GetTypes().Where(t => IsDataObjectType(t, standardFamily, dataSchemaVersion));
+        }
+
+        /// <summary>
+        /// Gets a type and all oo is derived types.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The type and all of its derived types.</returns>
+        public static IEnumerable<Type> GetTypeAndAllDerivedTypes(Type type)
+        {
+            Assembly devKit = Assembly.GetAssembly(type);
+            var list = new List<Type> { type };
+
+            foreach (var derivedType in devKit.GetTypes().Where(t => t.BaseType == type))
+            {
+                list.AddRange(GetTypeAndAllDerivedTypes(derivedType));
+            }
+
+            return list.Distinct();
         }
     }
 }

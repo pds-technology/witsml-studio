@@ -40,7 +40,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// <exception cref="ArgumentNullException"><paramref name="dataProperty"/> is null.</exception>
         /// <exception cref="ArgumentException"><paramref name="dataProperty"/> is not a (nested) data property on an Energistics Data Object.</exception>
         public DataProperty(PropertyInfo dataProperty)
-            : this(dataProperty, string.Empty)
+            : this(dataProperty, string.Empty, new HashSet<Type>())
         {
         }
 
@@ -49,10 +49,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// </summary>
         /// <param name="property">The property to initialize from</param>
         /// <param name="parentXmlPath">The XML path to the property</param>
+        /// <param name="visitedTypes">The set of visited types to prevent stack overflow exceptions.</param>
         /// <exception cref="ArgumentNullException"><paramref name="property"/> is null.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="parentXmlPath"/> is null.</exception>
         /// <exception cref="ArgumentException"><paramref name="property"/> is not a (nested) data property on an Energistics Data Object.</exception>
-        public DataProperty(PropertyInfo property, string parentXmlPath)
+        public DataProperty(PropertyInfo property, string parentXmlPath, HashSet<Type> visitedTypes)
         {
             property.NotNull(nameof(property));
             parentXmlPath.NotNull(nameof(parentXmlPath));
@@ -66,7 +67,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
             else
                 XmlPath = parentXmlPath + @"\" + XmlName;
 
-            ChildProperties = CreateChildProperties(PropertyType, XmlPath);
+            ChildProperties = CreateChildProperties(PropertyType, XmlPath, visitedTypes);
         }
 
         /// <summary>
@@ -90,17 +91,36 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// <exception cref="ArgumentNullException"><paramref name="type"/> or <paramref name="parentXmlPath"/> are null.</exception>
         public static IReadOnlyCollection<DataProperty> CreateChildProperties(Type type, string parentXmlPath)
         {
+            return CreateChildProperties(type, parentXmlPath, new HashSet<Type>());
+        }
+
+        /// <summary>
+        /// Gets the child data properties for the specified type.
+        /// </summary>
+        /// <param name="type">The type to create the child properties for.</param>
+        /// <param name="parentXmlPath">The parent XML path.</param>
+        /// <param name="visitedTypes">The set of visited types to prevent stack overflow exceptions.</param>
+        /// <returns>
+        /// The list of nested properties if this is a complex type; an empty list otherwise.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="type"/> or <paramref name="parentXmlPath"/> are null.</exception>
+        public static IReadOnlyCollection<DataProperty> CreateChildProperties(Type type, string parentXmlPath, HashSet<Type> visitedTypes)
+        {
             type.NotNull(nameof(type));
             parentXmlPath.NotNull(nameof(parentXmlPath));
 
             if (type?.GetCustomAttribute<XmlTypeAttribute>() == null)
                 return new List<DataProperty>();
 
-            // Avoid recursive references
-            var properties = type.GetProperties().Where(IsDataProperty)
-                .Where(t => t.PropertyType != type);
+            var types = EnergisticsHelper.GetTypeAndAllDerivedTypes(type);
 
-            return properties.Select(p => new DataProperty(p, parentXmlPath)).ToList();
+            types.ForEach(t => visitedTypes.Add(t));
+
+            // Avoid recursive references
+            var properties = types.SelectMany(t => t.GetProperties()).Where(IsDataProperty)
+                .Where(t => !visitedTypes.Contains(t.PropertyType));
+
+            return properties.Select(p => new DataProperty(p, parentXmlPath, visitedTypes)).ToList();
         }
 
         /// <summary>
