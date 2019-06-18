@@ -162,7 +162,9 @@
     </Compile>
     <Compile Include="ViewModels\DataLoadViewModel.cs" />
     <Compile Include="ViewModels\GrowingObject11ViewModel.cs" />
-    <Compile Include="ViewModels\HierarchyViewModel.cs" />
+    <Compile Include="ViewModels\HierarchyViewModelBase.cs" />
+    <Compile Include="ViewModels\Hierarchy12ViewModel.cs" />
+    <Compile Include="ViewModels\Hierarchy11ViewModel.cs" />
     <Compile Include="ViewModels\ISessionAware.cs" />
     <Compile Include="ViewModels\JsonMessageViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
@@ -179,8 +181,11 @@
     <Compile Include="Views\GrowingObject11View.xaml.cs">
       <DependentUpon>GrowingObject11View.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\HierarchyView.xaml.cs">
-      <DependentUpon>HierarchyView.xaml</DependentUpon>
+    <Compile Include="Views\Hierarchy12View.xaml.cs">
+      <DependentUpon>Hierarchy12View.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Hierarchy11View.xaml.cs">
+      <DependentUpon>Hierarchy11View.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\JsonMessageView.xaml.cs">
       <DependentUpon>JsonMessageView.xaml</DependentUpon>
@@ -253,7 +258,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\HierarchyView.xaml">
+    <Page Include="Views\Hierarchy12View.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Hierarchy11View.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

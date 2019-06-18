@@ -21,14 +21,14 @@ using System.Windows.Controls;
 namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.Views
 {
     /// <summary>
-    /// Interaction logic for HierarchyView.xaml
+    /// Interaction logic for Hierarchy11View.xaml
     /// </summary>
-    public partial class HierarchyView : UserControl
+    public partial class Hierarchy11View : UserControl
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="HierarchyView"/> class.
+        /// Initializes a new instance of the <see cref="Hierarchy11View"/> class.
         /// </summary>
-        public HierarchyView()
+        public Hierarchy11View()
         {
             InitializeComponent();
         }

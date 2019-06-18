@@ -98,9 +98,14 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         }
 
         /// <summary>
+        /// Gets the available ETP Discovery scopes.
+        /// </summary>
+        public IEnumerable<GraphScopes> DiscoveryScopes => Enum.GetValues(typeof(GraphScopes)).Cast<GraphScopes>();
+
+        /// <summary>
         /// Gets the available ETP discovery functions.
         /// </summary>
-        public IEnumerable<Functions> DiscoveryFunctions => new[] { Functions.GetResources, Functions.FindResources };
+        public IEnumerable<Functions> DiscoveryFunctions { get; set; }
 
         /// <summary>
         /// Gets the available ETP store functions.
@@ -250,7 +255,59 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <returns>The message identifier.</returns>
         public Task<long> GetResources(string uri, ResourceViewModel parent = null)
         {
-            var result = EtpExtender.GetResources(uri);
+            var contentTypes = new string[0];
+            long messageId;
+
+            if (Model == null)
+            {
+                messageId = EtpExtender.GetResources(uri);
+            }
+            else if (Model.DiscoveryFunction == Functions.FindResources)
+            {
+                messageId = EtpExtender.FindResources(uri);
+            }
+            else if (Model.DiscoveryFunction == Functions.GetTreeResources)
+            {
+                messageId = EtpExtender.GetTreeResources(uri, Model.DiscoveryDepth, contentTypes);
+            }
+            else if (Model.DiscoveryFunction == Functions.GetGraphResources)
+            {
+                messageId = EtpExtender.GetGraphResources(uri, Model.DiscoveryScope, Model.GroupByType, Model.DiscoveryDepth, contentTypes);
+            }
+            else
+            {
+                messageId = EtpExtender.GetResources(uri);
+            }
+
+            return Task.FromResult(messageId);
+        }
+
+        /// <summary>
+        /// Gets the tree resources using the Discovery protocol.
+        /// </summary>
+        /// <param name="uri">The URI.</param>
+        /// <param name="depth">The depth.</param>
+        /// <param name="parent">The parent.</param>
+        /// <returns>The message identifier.</returns>
+        public Task<long> GetTreeResources(string uri, int? depth, ResourceViewModel parent = null)
+        {
+            var contentTypes = new string[0];
+            var result = EtpExtender.GetTreeResources(uri, depth ?? 0, contentTypes);
+            return Task.FromResult(result);
+        }
+
+        /// <summary>
+        /// Gets the graph resources using the Discovery protocol.
+        /// </summary>
+        /// <param name="uri">The URI.</param>
+        /// <param name="depth">The depth.</param>
+        /// <param name="scope">The scope.</param>
+        /// <param name="parent">The parent.</param>
+        /// <returns>The message identifier.</returns>
+        public Task<long> GetGraphResources(string uri, int? depth, GraphScopes? scope, ResourceViewModel parent = null)
+        {
+            var contentTypes = new string[0];
+            var result = EtpExtender.GetGraphResources(uri, scope ?? 0, false, depth ?? 0, contentTypes);
             return Task.FromResult(result);
         }
 
@@ -333,7 +390,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             _protocolTabs.Add(new SettingsViewModel(Runtime));
             _protocolTabs.Add(new Streaming11ViewModel(Runtime));
             _protocolTabs.Add(new Streaming12ViewModel(Runtime));
-            _protocolTabs.Add(new HierarchyViewModel(Runtime));
+            _protocolTabs.Add(new Hierarchy11ViewModel(Runtime));
+            _protocolTabs.Add(new Hierarchy12ViewModel(Runtime));
             _protocolTabs.Add(new StoreViewModel(Runtime));
             _protocolTabs.Add(new StoreNotificationViewModel(Runtime));
             _protocolTabs.Add(new GrowingObject11ViewModel(Runtime));

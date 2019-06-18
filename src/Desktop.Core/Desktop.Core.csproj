@@ -183,6 +183,7 @@
     </Compile>
     <Compile Include="Adapters\Etp12Extender.cs" />
     <Compile Include="Adapters\Etp11Extender.cs" />
+    <Compile Include="Adapters\GraphScopes.cs" />
     <Compile Include="Adapters\IEtpExtender.cs" />
     <Compile Include="Behaviors\DropDownButtonBehavior.cs" />
     <Compile Include="Commands\DelegateCommand.cs" />
