@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Serialization;
+using Energistics.DataAccess;
 using Energistics.DataAccess.Reflection;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
@@ -36,9 +37,14 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// <returns>All types for Energistics Data Objects</returns>
         public static IEnumerable<Type> GetAllDataObjectTypes()
         {
-            var devKit = Assembly.GetAssembly(typeof(StandardFamily));
+            var witsml = Assembly.GetAssembly(typeof(IWitsmlDataObject));
+            var prodml = Assembly.GetAssembly(typeof(IProdmlDataObject));
+            var resqml = Assembly.GetAssembly(typeof(IResqmlDataObject));
 
-            return devKit.GetTypes().Where(t => t.GetCustomAttribute<EnergisticsDataObjectAttribute>() != null);
+            return
+                witsml.GetTypes().Where(t => t.GetCustomAttribute<EnergisticsDataObjectAttribute>() != null).Concat(
+                prodml.GetTypes().Where(t => t.GetCustomAttribute<EnergisticsDataObjectAttribute>() != null).Concat(
+                resqml.GetTypes().Where(t => t.GetCustomAttribute<EnergisticsDataObjectAttribute>() != null)));
         }
 
         /// <summary>
@@ -107,9 +113,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// <returns></returns>
         public static IEnumerable<Type> GetAllDataObjectTypes(StandardFamily standardFamily, Version dataSchemaVersion)
         {
-            Assembly devKit = Assembly.GetAssembly(typeof(StandardFamily));
-
-            return devKit.GetTypes().Where(t => IsDataObjectType(t, standardFamily, dataSchemaVersion));
+            return GetAllDataObjectTypes().Where(t => IsDataObjectType(t, standardFamily, dataSchemaVersion));
         }
 
         /// <summary>

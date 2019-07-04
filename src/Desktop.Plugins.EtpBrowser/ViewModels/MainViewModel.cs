@@ -797,8 +797,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             if (isJson)
             {
                 var objectType = OptionsIn.DataVersion.Version200.Equals(uri.Version)
-                    ? ObjectTypes.GetObjectType(uri.ObjectType, uri.Version)
-                    : ObjectTypes.GetObjectGroupType(uri.ObjectType, uri.Version);
+                    ? ObjectTypes.GetObjectType(uri.ObjectType, uri.Family, uri.Version)
+                    : ObjectTypes.GetObjectGroupType(uri.ObjectType, uri.Family, uri.Version);
 
                 var instance = EtpExtensions.Deserialize(objectType, data);
                 data = EtpExtensions.Serialize(instance, true);

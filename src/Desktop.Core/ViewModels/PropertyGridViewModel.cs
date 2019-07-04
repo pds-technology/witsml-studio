@@ -84,8 +84,9 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <param name="errorHandler">The error handler.</param>
         public void SetCurrentObject(string objectType, string xml, string version, bool bindDataGrid, bool keepGridData, bool retrieveObjectSelection, Action<WitsmlException> errorHandler)
         {
-            var dataType = ObjectTypes.GetObjectGroupType(objectType, version);
             var document = WitsmlParser.Parse(xml);
+            var family = ObjectTypes.GetFamily(document.Root);
+            var dataType = ObjectTypes.GetObjectGroupType(objectType, family, version);
             var dataObject = WitsmlParser.Parse(dataType, document.Root);
             var collection = dataObject as IEnergisticsCollection;
 

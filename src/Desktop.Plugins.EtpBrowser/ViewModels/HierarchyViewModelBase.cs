@@ -57,7 +57,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// Gets the model.
         /// </summary>
         /// <value>The model.</value>
-        public Models.EtpSettings Model => Parent.Model;
+        public Models.EtpSettings Model => Parent?.Model;
 
         /// <summary>
         /// Gets a collection of supported ETP versions.
