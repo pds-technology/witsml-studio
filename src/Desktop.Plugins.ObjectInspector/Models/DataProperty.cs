@@ -23,6 +23,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Serialization;
+using Energistics.DataAccess.Reflection;
 using Energistics.DataAccess.Validation;
 using PDS.WITSMLstudio.Framework;
 
@@ -65,7 +66,16 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
 
             XmlPath = string.Join(@"\", hierarchy.Select(x => x.Item1));
 
-            ChildProperties = CreateChildPropertiesCore(PropertyType, hierarchy);
+            var name = property.Name;
+            var propertyNamespace = property.PropertyType.GetCustomAttribute<XmlTypeAttribute>()?.Namespace ?? string.Empty;
+
+            // Do not recurse properties that are themselves DataObjects or are from namespaces outside Energistics (e.g. CRS definitions)
+            if (EnergisticsHelper.IsDataObjectType(property.PropertyType))
+                ChildProperties = new List<DataProperty>();
+            else if (!propertyNamespace.ContainsIgnoreCase("resqml") && !propertyNamespace.ContainsIgnoreCase("witsml") && !propertyNamespace.ContainsIgnoreCase("prodml") && !propertyNamespace.ContainsIgnoreCase("energistics"))
+                ChildProperties = new List<DataProperty>();
+            else
+                ChildProperties = CreateChildPropertiesCore(PropertyType, hierarchy);
         }
 
         /// <summary>
@@ -79,7 +89,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// <exception cref="ArgumentNullException"><paramref name="type"/> or <paramref name="parentXmlPath"/> are null.</exception>
         public static IReadOnlyCollection<DataProperty> CreateChildProperties(Type type)
         {
-            return CreateChildPropertiesCore(type, new HashSet<Tuple<string, Type>>());
+            return CreateChildPropertiesCore(type, new HashSet<Tuple<string, Type>>
+            {
+                new Tuple<string, Type>(type.Name, type)
+            }
+            );
         }
 
         /// <summary>
@@ -174,8 +188,17 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// <summary>
         /// Gets the XML type of the property.
         /// </summary>
-        public string XmlType => PropertyType.GetCustomAttribute<XmlTypeAttribute>()?.TypeName;
-
+        public string XmlType
+        {
+            get
+            {
+                return
+                    Property.GetCustomAttribute<EnergisticsDataTypeAttribute>()?.DataType ??
+                    Property.GetCustomAttribute<XmlAttributeAttribute>()?.DataType ??
+                    Property.GetCustomAttribute<XmlElementAttribute>()?.DataType ??
+                    PropertyType.GetCustomAttribute<XmlTypeAttribute>()?.TypeName;
+            }
+        }
         /// <summary>
         /// Whether or not the property is required.
         /// </summary>

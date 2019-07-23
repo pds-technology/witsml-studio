@@ -48,7 +48,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         }
 
         /// <summary>
-        /// Checks if a type is an Energistics Data Object.
+        /// Checks if a type is an Energistics Data Object in the specific family version.
         /// </summary>
         /// <param name="type">The type to check.</param>
         /// <param name="standardFamily">The standard family.</param>
@@ -60,6 +60,20 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
             var isEdo = edo != null && edo.StandardFamily == standardFamily && edo.DataSchemaVersion == dataSchemaVersion;
 
             return isEdo;
+        }
+
+        /// <summary>
+        /// Checks if a type is an Energistics Data Object.
+        /// </summary>
+        /// <param name="type">The type to check.</param>
+        /// <param name="standardFamily">The standard family.</param>
+        /// <param name="dataSchemaVersion">The data schema version.</param>
+        /// <returns></returns>
+        public static bool IsDataObjectType(Type type)
+        {
+            var edo = type.GetCustomAttribute<EnergisticsDataObjectAttribute>();
+
+            return edo != null;
         }
 
         /// <summary>
