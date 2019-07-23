@@ -41,7 +41,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// <exception cref="ArgumentNullException"><paramref name="dataProperty"/> is null.</exception>
         /// <exception cref="ArgumentException"><paramref name="dataProperty"/> is not a (nested) data property on an Energistics Data Object.</exception>
         public DataProperty(PropertyInfo dataProperty)
-            : this(dataProperty, new HashSet<Tuple<string, Type>>())
+            : this(dataProperty, string.Empty, new HashSet<Tuple<string, Type>>(), true)
         {
         }
 
@@ -49,47 +49,66 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// Initializes a new <see cref="DataProperty"/> from the specified property and the XML path to the property.
         /// </summary>
         /// <param name="property">The property to initialize from</param>
+        /// <param name="parentXmlPath">The parent XML path</param>
         /// <param name="hierarchy">The property hierarchy</param>
+        /// <param name="recurse">Whether or not to recurse child properties.</param>
         /// <exception cref="ArgumentNullException"><paramref name="property"/> is null.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="hierarchy"/> is null.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="parentXmlPath"/> is null.</exception>
         /// <exception cref="ArgumentException"><paramref name="property"/> is not a (nested) data property on an Energistics Data Object.</exception>
-        protected DataProperty(PropertyInfo property, HashSet<Tuple<string, Type>> hierarchy)
+        protected DataProperty(PropertyInfo property, string parentXmlPath, HashSet<Tuple<string, Type>> hierarchy, bool recurse)
         {
             property.NotNull(nameof(property));
+            parentXmlPath.NotNull(nameof(parentXmlPath));
             hierarchy.NotNull(nameof(hierarchy));
             if (!EnergisticsHelper.IsDataProperty(property))
                 throw new ArgumentException($"{property.Name} is not a (nested) data property on an Energistics Data Object", nameof(property));
 
             Property = property;
 
-            hierarchy.Add(new Tuple<string, Type>(XmlName, property.PropertyType));
-
-            XmlPath = string.Join(@"\", hierarchy.Select(x => x.Item1));
+            XmlPath = parentXmlPath;
+            if (EnergisticsHelper.IsArray(property))
+            {
+                XmlName = property.GetCustomAttribute<XmlArrayAttribute>().ElementName;
+                hierarchy.Add(new Tuple<string, Type>(XmlName, property.PropertyType));
+                XmlPath += "/" + XmlName;
+            }
+            if (EnergisticsHelper.IsArrayItem(property))
+            {
+                XmlName = property.GetCustomAttribute<XmlArrayItemAttribute>().ElementName;
+                hierarchy.Add(new Tuple<string, Type>(XmlName, PropertyType));
+                XmlPath += "/" + XmlName;
+            }
+            else if (!EnergisticsHelper.IsArray(property))
+            {
+                XmlName = EnergisticsHelper.GetXmlName(property);
+                hierarchy.Add(new Tuple<string, Type>(XmlName, PropertyType));
+                XmlPath += "/" + XmlName;
+            }
 
             var name = property.Name;
             var propertyNamespace = property.PropertyType.GetCustomAttribute<XmlTypeAttribute>()?.Namespace ?? string.Empty;
 
             // Do not recurse properties that are themselves DataObjects or are from namespaces outside Energistics (e.g. CRS definitions)
-            if (EnergisticsHelper.IsDataObjectType(property.PropertyType))
+            if (!recurse || EnergisticsHelper.IsDataObjectType(property.PropertyType))
                 ChildProperties = new List<DataProperty>();
-            else if (!propertyNamespace.ContainsIgnoreCase("resqml") && !propertyNamespace.ContainsIgnoreCase("witsml") && !propertyNamespace.ContainsIgnoreCase("prodml") && !propertyNamespace.ContainsIgnoreCase("energistics"))
+            else if (!string.IsNullOrEmpty(propertyNamespace) && !propertyNamespace.ContainsIgnoreCase("resqml") && !propertyNamespace.ContainsIgnoreCase("witsml") && !propertyNamespace.ContainsIgnoreCase("prodml") && !propertyNamespace.ContainsIgnoreCase("energistics"))
                 ChildProperties = new List<DataProperty>();
             else
-                ChildProperties = CreateChildPropertiesCore(PropertyType, hierarchy);
+                ChildProperties = CreateChildPropertiesCore(PropertyType, XmlPath, hierarchy);
         }
 
         /// <summary>
         /// Gets the child data properties for the specified type.
         /// </summary>
         /// <param name="type">The type to create the child properties for.</param>
-        /// <param name="parentXmlPath">The parent XML path.</param>
         /// <returns>
         /// The list of nested properties if this is a complex type; an empty list otherwise.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="type"/> or <paramref name="parentXmlPath"/> are null.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="type"/> is null.</exception>
         public static IReadOnlyCollection<DataProperty> CreateChildProperties(Type type)
         {
-            return CreateChildPropertiesCore(type, new HashSet<Tuple<string, Type>>
+            return CreateChildPropertiesCore(type, type.Name, new HashSet <Tuple<string, Type>>
             {
                 new Tuple<string, Type>(type.Name, type)
             }
@@ -100,14 +119,16 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// Gets the child data properties for the specified type.
         /// </summary>
         /// <param name="type">The type to create the child properties for.</param>
+        /// <param name="parentXmlPath">The parent XML path</param>
         /// <param name="hierarchy">The property hierarchy</param>
         /// <returns>
         /// The list of nested properties if this is a complex type; an empty list otherwise.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="type"/> or <paramref name="hierarchy"/> are null.</exception>
-        protected static IReadOnlyCollection<DataProperty> CreateChildPropertiesCore(Type type, HashSet<Tuple<string, Type>> hierarchy)
+        /// <exception cref="ArgumentNullException"><paramref name="type"/> or <paramref name="parentXmlPath"/> or <paramref name="hierarchy"/> are null.</exception>
+        protected static IReadOnlyCollection<DataProperty> CreateChildPropertiesCore(Type type, string parentXmlPath, HashSet<Tuple<string, Type>> hierarchy)
         {
             type.NotNull(nameof(type));
+            parentXmlPath.NotNull(nameof(parentXmlPath));
             hierarchy.NotNull(nameof(hierarchy));
 
             if (type?.GetCustomAttribute<XmlTypeAttribute>() == null)
@@ -121,10 +142,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
             foreach (var p in properties)
             {
                 var tuple = new Tuple<string, Type>(EnergisticsHelper.GetXmlName(p), p.PropertyType);
-                if (hierarchy.Contains(tuple)) // Avoid recursive references
-                    continue;
+                bool recurse = hierarchy.Add(tuple);
 
-                childProperties.Add(new DataProperty(p, hierarchy));
+                childProperties.Add(new DataProperty(p, parentXmlPath, hierarchy, recurse));
                 hierarchy.Remove(tuple); // Remove newly added property.
             }
 
@@ -176,6 +196,16 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         public bool IsElement => EnergisticsHelper.IsElement(Property);
 
         /// <summary>
+        /// Whether or not the property is an array.
+        /// </summary>
+        public bool IsArray => EnergisticsHelper.IsArray(Property);
+
+        /// <summary>
+        /// Whether or not the property is an array item.
+        /// </summary>
+        public bool IsArrayItem => EnergisticsHelper.IsArrayItem(Property);
+
+        /// <summary>
         /// Gets the name of the property.
         /// </summary>
         public string Name => Property.Name;
@@ -183,7 +213,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// <summary>
         /// Gets the XML name of the property.
         /// </summary>
-        public string XmlName => EnergisticsHelper.GetXmlName(Property);
+        public string XmlName { get; private  set; }
 
         /// <summary>
         /// Gets the XML type of the property.
@@ -194,9 +224,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
             {
                 return
                     Property.GetCustomAttribute<EnergisticsDataTypeAttribute>()?.DataType ??
+                    PropertyType.GetCustomAttribute<XmlTypeAttribute>()?.TypeName ??
                     Property.GetCustomAttribute<XmlAttributeAttribute>()?.DataType ??
-                    Property.GetCustomAttribute<XmlElementAttribute>()?.DataType ??
-                    PropertyType.GetCustomAttribute<XmlTypeAttribute>()?.TypeName;
+                    Property.GetCustomAttribute<XmlElementAttribute>()?.DataType;
             }
         }
         /// <summary>
@@ -209,6 +239,55 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// </summary>
         public bool IsRecurring => Property.GetCustomAttribute<RecurringElementAttribute>() != null;
 
+        public bool IsReference
+        {
+            get
+            {
+                if (XmlType == "AziRef") return false;
+                if (XmlType == "wellKnownNameStruct") return false;
+                if (XmlType == "refWellDatum") return false;
+                if (XmlType.EndsWith("Uom")) return false;
+                if (XmlType.EndsWith("Measure")) return false;
+                if (Name == "SourceName") return false;
+                if (Name == "DataSource") return false;
+                if (Name == "Name") return false;
+                if (Name == "NameFormation" || Name == "NameTag" || Name == "NameVendor") return false;
+                if (Name == "DryBlendName" || Name == "NameAdd" || Name == "NameCementedString" || Name == "NameWorkString" || Name == "NameCementString") return false;
+                if (Name == "SourceWater") return false;
+                if (Name == "Description") return false;
+                if (Name == "ReferencePoint") return false;
+                if (Name == "Original") return false;
+                if (Name == "Location") return false;
+                if (Name == "MeasuredDepth") return false;
+                if (Name == "Elevation") return false;
+                if (Name == "Type") return false;
+                if (Name == "MDToolReference") return false;
+                if (Name == "CoreReference") return false;
+                if (Name == "EngineerName") return false;
+                if (Name == "RefractiveIndex") return false;
+                if (Name == "NameContact") return false;
+                if (Name == "CoreReferenceLog") return false;
+                if (Name == "NameSurveyCompany" || Name == "NameTool") return false;
+                if (Name == "SourceNuclear") return false;
+                if (Name == "NameLegal") return false;
+                if (Name == "FileName") return false;
+                if (Name == "NameType") return false;
+                if (Name == "LogSectionName") return false;
+                if (Name == "IndexReference") return false;
+                if (Name == "CurveName") return false;
+                if (Name == "Uid" || Name == "Uuid") return false;
+                if (XmlPath.ContainsIgnoreCase("extensionNameValue")) return false;
+
+                return
+                    XmlType.Contains("ref") ||
+                    XmlType.Contains("Ref") ||
+                    XmlType.StartsWith("uid") ||
+                    XmlPath.ContainsIgnoreCase("source") ||
+                    XmlPath.ContainsIgnoreCase("parent") ||
+                    XmlPath.ContainsIgnoreCase("reference") ||
+                    Name.ContainsIgnoreCase("name");
+            }
+        }
         /// <summary>
         /// The maximum string length, if applicable.
         /// </summary>

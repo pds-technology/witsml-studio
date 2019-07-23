@@ -17,6 +17,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Text;
 using Caliburn.Micro;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
@@ -92,5 +93,26 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.ViewModels
         /// </summary>
         /// <value>The runtime.</value>
         public IRuntimeService Runtime { get; }
+
+        public bool CanExport => DataObjects != null && DataObjects.Count > 0;
+
+        public void Export()
+        {
+            var filename = FamilyVersion.StandardFamily.ToString() + FamilyVersion.DataSchemaVersion.ToString() + ".csv";
+
+            var sb = new StringBuilder();
+            sb.AppendLine(
+                "XML Path,Name,XML Type,Attribute,Required,Recurring,String Length,Regular Expression,Description,Type Description");
+            foreach (var obj in DataObjects)
+            {
+                foreach (var p in obj.NestedDataProperties)
+                {
+                    sb.AppendLine(
+                        $@"""{p.XmlPath}"",""{p.XmlName}"",""{p.XmlType}"",""{p.IsAttribute}"",""{p.IsRequired}"",""{p.IsRecurring}"",""{p.StringLength}"",""{p.RegularExpression}"",""{p.Description}"",""{p.TypeDescription}""");
+                }
+            }
+
+            System.IO.File.WriteAllText(filename, sb.ToString());
+        }
     }
 }

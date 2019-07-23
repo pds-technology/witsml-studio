@@ -15,6 +15,7 @@
                 <DataGridCheckBoxColumn Header="Attribute" Binding="{Binding IsAttribute, Mode=OneWay}"/>
                 <DataGridCheckBoxColumn Header="Required" Binding="{Binding IsRequired, Mode=OneWay}"/>
                 <DataGridCheckBoxColumn Header="Recurring" Binding="{Binding IsRecurring, Mode=OneWay}"/>
+                <DataGridCheckBoxColumn Header="Reference" Binding="{Binding IsReference, Mode=OneWay}"/>
                 <DataGridTextColumn Header="String Length" Binding="{Binding StringLength}"/>
                 <DataGridTextColumn Header="Regular Expression" Binding="{Binding RegularExpression}"/>
                 <DataGridTextColumn Header="Description" Binding="{Binding Description}"/>
