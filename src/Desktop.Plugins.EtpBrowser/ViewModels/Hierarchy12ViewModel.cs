@@ -64,8 +64,10 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// </summary>
         protected override void RefreshFunctionList()
         {
-            Parent.DiscoveryFunctions = new[] { Functions.GetTreeResources, Functions.GetGraphResources, Functions.FindResources };
-            Model.DiscoveryFunction = Functions.GetTreeResources;
+            if (Parent != null)
+                Parent.DiscoveryFunctions = new[] { Functions.GetTreeResources, Functions.GetGraphResources, Functions.FindResources };
+            if (Model != null)
+                Model.DiscoveryFunction = Functions.GetTreeResources;
         }
     }
 }

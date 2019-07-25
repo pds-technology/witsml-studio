@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Serialization;
+using Energistics.DataAccess;
 using Energistics.DataAccess.Reflection;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
@@ -36,13 +37,18 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// <returns>All types for Energistics Data Objects</returns>
         public static IEnumerable<Type> GetAllDataObjectTypes()
         {
-            var devKit = Assembly.GetAssembly(typeof(StandardFamily));
+            var witsml = Assembly.GetAssembly(typeof(IWitsmlDataObject));
+            var prodml = Assembly.GetAssembly(typeof(IProdmlDataObject));
+            var resqml = Assembly.GetAssembly(typeof(IResqmlDataObject));
 
-            return devKit.GetTypes().Where(t => t.GetCustomAttribute<EnergisticsDataObjectAttribute>() != null);
+            return
+                witsml.GetTypes().Where(t => t.GetCustomAttribute<EnergisticsDataObjectAttribute>() != null).Concat(
+                prodml.GetTypes().Where(t => t.GetCustomAttribute<EnergisticsDataObjectAttribute>() != null).Concat(
+                resqml.GetTypes().Where(t => t.GetCustomAttribute<EnergisticsDataObjectAttribute>() != null)));
         }
 
         /// <summary>
-        /// Checks if a type is an Energistics Data Object.
+        /// Checks if a type is an Energistics Data Object in the specific family version.
         /// </summary>
         /// <param name="type">The type to check.</param>
         /// <param name="standardFamily">The standard family.</param>
@@ -57,13 +63,27 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         }
 
         /// <summary>
+        /// Checks if a type is an Energistics Data Object.
+        /// </summary>
+        /// <param name="type">The type to check.</param>
+        /// <param name="standardFamily">The standard family.</param>
+        /// <param name="dataSchemaVersion">The data schema version.</param>
+        /// <returns></returns>
+        public static bool IsDataObjectType(Type type)
+        {
+            var edo = type.GetCustomAttribute<EnergisticsDataObjectAttribute>();
+
+            return edo != null;
+        }
+
+        /// <summary>
         /// Determines whether the specified property is a (nested) data property on an Energistics Data Object.
         /// </summary>
         /// <param name="property">The property to check.</param>
         /// <returns>True if the property is a (nested) data property on an Energistics Data Object; false otherwise.</returns>
         public static bool IsDataProperty(PropertyInfo property)
         {
-            return property.GetCustomAttribute<XmlElementAttribute>() != null || property.GetCustomAttribute<XmlAttributeAttribute>() != null;
+            return property.GetCustomAttribute<EnergisticsDataTypeAttribute>() != null;
         }
 
         /// <summary>
@@ -87,6 +107,26 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         }
 
         /// <summary>
+        /// Whether or not the property is an array.
+        /// </summary>
+        /// <param name="property">The property to check.</param>
+        /// <returns>True if the property is an array; false otherwise.</returns>
+        public static bool IsArray(PropertyInfo property)
+        {
+            return property.GetCustomAttribute<XmlArrayAttribute>() != null;
+        }
+
+        /// <summary>
+        /// Whether or not the property is an array item.
+        /// </summary>
+        /// <param name="property">The property to check.</param>
+        /// <returns>True if the property is an array item; false otherwise.</returns>
+        public static bool IsArrayItem(PropertyInfo property)
+        {
+            return property.GetCustomAttribute<XmlArrayItemAttribute>() != null;
+        }
+
+        /// <summary>
         /// Gets the XML name of the property.
         /// </summary>
         /// <param name="property">The property to check.</param>
@@ -96,8 +136,14 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
             if (IsAttribute(property))
                 return property.GetCustomAttribute<XmlAttributeAttribute>().AttributeName;
 
-            return property.GetCustomAttribute<XmlElementAttribute>().ElementName;
-        }
+            if (IsElement(property))
+                return property.GetCustomAttribute<XmlElementAttribute>().ElementName;
+
+            if (IsArray(property))
+                return property.GetCustomAttribute<XmlArrayAttribute>().ElementName;
+
+            return string.Empty;
+        }   
 
         /// <summary>
         /// Gets the list of all types in the DevKit that are Energistics Data Objects in the specified standard family and data schema version.
@@ -107,9 +153,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// <returns></returns>
         public static IEnumerable<Type> GetAllDataObjectTypes(StandardFamily standardFamily, Version dataSchemaVersion)
         {
-            Assembly devKit = Assembly.GetAssembly(typeof(StandardFamily));
-
-            return devKit.GetTypes().Where(t => IsDataObjectType(t, standardFamily, dataSchemaVersion));
+            return GetAllDataObjectTypes().Where(t => IsDataObjectType(t, standardFamily, dataSchemaVersion));
         }
 
         /// <summary>

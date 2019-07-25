@@ -7,7 +7,12 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <ListView Name="DataObjects" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Button Grid.Row="0" x:Name="Export" Margin="5" Content="Export All" Width="120" HorizontalAlignment="Right" />
+        <ListView  Grid.Row="1" Name="DataObjects" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>

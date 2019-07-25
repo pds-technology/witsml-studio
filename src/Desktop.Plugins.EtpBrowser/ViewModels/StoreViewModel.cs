@@ -69,7 +69,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         /// <summary>
         /// Gets the model.
         /// </summary>
-        public Models.EtpSettings Model => Parent.Model;
+        public Models.EtpSettings Model => Parent?.Model;
 
         /// <summary>
         /// Gets a collection of supported ETP versions.
@@ -261,7 +261,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
         {
             get
             {
-                switch (Model.StoreFunction)
+                switch (Model?.StoreFunction)
                 {
                     case Functions.PutObject:
                         return true;
@@ -536,8 +536,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
 
         private static EtpUri? GetUriFromXml(XElement element, string version, string objectType)
         {
-            var type = ObjectTypes.GetObjectGroupType(objectType, version) ??
-                       ObjectTypes.GetObjectType(objectType, version);
+            var family = ObjectTypes.GetFamily(element);
+            var type = ObjectTypes.GetObjectGroupType(objectType, family, version) ??
+                       ObjectTypes.GetObjectType(objectType, family, version);
 
             var entity = WitsmlParser.Parse(type, element?.Document?.Root, false);
             var collection = entity as IEnergisticsCollection;
