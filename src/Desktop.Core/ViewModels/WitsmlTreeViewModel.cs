@@ -590,19 +590,38 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Determines whether a GetFromStore request can be sent for the selected item.
         /// </summary>
         /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
-        public bool CanGetObjectDetailsWithMaxDataRows => CanGetObjectHeader && MaxDataRows.HasValue;
+        public bool CanGetObjectDetailsAllWithMaxDataRows => CanGetObjectHeader && MaxDataRows.HasValue;
 
         /// <summary>
         /// Determines whether a GetFromStore request can be sent for the selected item.
         /// </summary>
         /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
-        public bool CanGetObjectDetailsWithRequestLatest => CanGetObjectHeader && RequestLatestValues.HasValue;
+        public bool CanGetObjectDetailsAllWithRequestLatest => CanGetObjectHeader && RequestLatestValues.HasValue;
 
         /// <summary>
         /// Determines whether a GetFromStore request can be sent for the selected item.
         /// </summary>
         /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
-        public bool CanGetObjectDetailsWithAllOptions
+        public bool CanGetObjectDetailsAllWithAllOptions
+            => CanGetObjectHeader && (MaxDataRows.HasValue || RequestLatestValues.HasValue);
+
+        /// <summary>
+        /// Determines whether a GetFromStore request can be sent for the selected item.
+        /// </summary>
+        /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
+        public bool CanGetObjectDetailsDataOnlyWithMaxDataRows => CanGetObjectHeader && MaxDataRows.HasValue;
+
+        /// <summary>
+        /// Determines whether a GetFromStore request can be sent for the selected item.
+        /// </summary>
+        /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
+        public bool CanGetObjectDetailsDataOnlyWithRequestLatest => CanGetObjectHeader && RequestLatestValues.HasValue;
+
+        /// <summary>
+        /// Determines whether a GetFromStore request can be sent for the selected item.
+        /// </summary>
+        /// <returns><c>true</c> if the selected item is not a folder; otherwise, <c>false</c>.</returns>
+        public bool CanGetObjectDetailsDataOnlyWithAllOptions
             => CanGetObjectHeader && (MaxDataRows.HasValue || RequestLatestValues.HasValue);
 
         /// <summary>
@@ -616,7 +635,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Gets the selected item's tooltip.
         /// </summary>
         /// <value>The tooltip</value>
-        public string ObjectDetailsWithMaxDataRowsTooltip => MaxDataRows.HasValue
+        public string ObjectDetailsAllWithMaxDataRowsTooltip => MaxDataRows.HasValue
             ? $"returnElements=all;maxReturnNodes={MaxDataRows.Value}"
             : "returnElements=all";
 
@@ -624,7 +643,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Gets the selected item's tooltip.
         /// </summary>
         /// <value>The tooltip</value>
-        public string ObjectDetailsWithRequestLatestTooltip => RequestLatestValues.HasValue
+        public string ObjectDetailsAllWithRequestLatestTooltip => RequestLatestValues.HasValue
             ? $"returnElements=all;requestLatestValues={RequestLatestValues.Value}"
             : "returnElements=all";
 
@@ -632,7 +651,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// Gets the selected item's tooltip.
         /// </summary>
         /// <value>The tooltip</value>
-        public string ObjectDetailsWithAllOptionsTooltip
+        public string ObjectDetailsAllWithAllOptionsTooltip
         {
             get
             {
@@ -647,16 +666,56 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         }
 
         /// <summary>
+        /// Gets the selected item's tooltip.
+        /// </summary>
+        /// <value>The tooltip</value>
+        public string ObjectDetailsDataOnlyWithMaxDataRowsTooltip => MaxDataRows.HasValue
+            ? $"returnElements=data-only;maxReturnNodes={MaxDataRows.Value}"
+            : "returnElements=data-only";
+
+        /// <summary>
+        /// Gets the selected item's tooltip.
+        /// </summary>
+        /// <value>The tooltip</value>
+        public string ObjectDetailsDataOnlyWithRequestLatestTooltip => RequestLatestValues.HasValue
+            ? $"returnElements=data-only;requestLatestValues={RequestLatestValues.Value}"
+            : "returnElements=data-only";
+
+        /// <summary>
+        /// Gets the selected item's tooltip.
+        /// </summary>
+        /// <value>The tooltip</value>
+        public string ObjectDetailsDataOnlyWithAllOptionsTooltip
+        {
+            get
+            {
+                var tooltip = new StringBuilder("returnElements=data-only;");
+                if (MaxDataRows.HasValue)
+                    tooltip.Append($"maxReturnNodes={MaxDataRows.Value};");
+                if (RequestLatestValues.HasValue)
+                    tooltip.Append($"requestLatestValues={RequestLatestValues.Value};");
+
+                return tooltip.ToString();
+            }
+        }
+
+        /// <summary>
         /// Updates the properties.
         /// </summary>
         public void UpdateGetObjectDetailsProperties()
         {
-            NotifyOfPropertyChange(() => CanGetObjectDetailsWithMaxDataRows);
-            NotifyOfPropertyChange(() => CanGetObjectDetailsWithRequestLatest);
-            NotifyOfPropertyChange(() => CanGetObjectDetailsWithAllOptions);
-            NotifyOfPropertyChange(() => ObjectDetailsWithMaxDataRowsTooltip);
-            NotifyOfPropertyChange(() => ObjectDetailsWithRequestLatestTooltip);
-            NotifyOfPropertyChange(() => ObjectDetailsWithAllOptionsTooltip);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsAllWithMaxDataRows);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsAllWithRequestLatest);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsAllWithAllOptions);
+            NotifyOfPropertyChange(() => ObjectDetailsAllWithMaxDataRowsTooltip);
+            NotifyOfPropertyChange(() => ObjectDetailsAllWithRequestLatestTooltip);
+            NotifyOfPropertyChange(() => ObjectDetailsAllWithAllOptionsTooltip);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsDataOnlyWithMaxDataRows);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsDataOnlyWithRequestLatest);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsDataOnlyWithAllOptions);
+            NotifyOfPropertyChange(() => ObjectDetailsDataOnlyWithMaxDataRowsTooltip);
+            NotifyOfPropertyChange(() => ObjectDetailsDataOnlyWithRequestLatestTooltip);
+            NotifyOfPropertyChange(() => ObjectDetailsDataOnlyWithAllOptionsTooltip);
         }
 
         /// <summary>
@@ -699,7 +758,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Gets the selected item's details using a GetFromStore request.
         /// </summary>
-        public void GetObjectDetailsWithMaxDataRows()
+        public void GetObjectDetailsAllWithMaxDataRows()
         {
             if (CanGetObjectHeader && MaxDataRows.HasValue)
                 GetObjectDetails(OptionsIn.ReturnElements.All, OptionsIn.MaxReturnNodes.Eq(MaxDataRows.Value));
@@ -708,7 +767,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Gets the selected item's details using a GetFromStore request.
         /// </summary>
-        public void GetObjectDetailsWithRequestLatest()
+        public void GetObjectDetailsAllWithRequestLatest()
         {
             if (CanGetObjectHeader && RequestLatestValues.HasValue)
                 GetObjectDetails(OptionsIn.ReturnElements.All, OptionsIn.RequestLatestValues.Eq(RequestLatestValues.Value));
@@ -717,11 +776,55 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         /// <summary>
         /// Gets the selected item's details using a GetFromStore request.
         /// </summary>
-        public void GetObjectDetailsWithAllOptions()
+        public void GetObjectDetailsAllWithAllOptions()
         {
             if (CanGetObjectHeader)
             {
                 var optionsIn = new List<OptionsIn> { OptionsIn.ReturnElements.All };
+
+                if (MaxDataRows.HasValue)
+                    optionsIn.Add(OptionsIn.MaxReturnNodes.Eq(MaxDataRows.Value));
+                if (RequestLatestValues.HasValue)
+                    optionsIn.Add(OptionsIn.RequestLatestValues.Eq(RequestLatestValues.Value));
+
+                GetObjectDetails(optionsIn.ToArray());
+            }
+        }
+
+        /// <summary>
+        /// Gets the selected item's details using a GetFromStore request.
+        /// </summary>
+        public void GetObjectDetailsWithReturnElementsDataOnly()
+        {
+            GetObjectDetails(OptionsIn.ReturnElements.DataOnly);
+        }
+
+        /// <summary>
+        /// Gets the selected item's details using a GetFromStore request.
+        /// </summary>
+        public void GetObjectDetailsDataOnlyWithMaxDataRows()
+        {
+            if (CanGetObjectHeader && MaxDataRows.HasValue)
+                GetObjectDetails(OptionsIn.ReturnElements.DataOnly, OptionsIn.MaxReturnNodes.Eq(MaxDataRows.Value));
+        }
+
+        /// <summary>
+        /// Gets the selected item's details using a GetFromStore request.
+        /// </summary>
+        public void GetObjectDetailsDataOnlyWithRequestLatest()
+        {
+            if (CanGetObjectHeader && RequestLatestValues.HasValue)
+                GetObjectDetails(OptionsIn.ReturnElements.DataOnly, OptionsIn.RequestLatestValues.Eq(RequestLatestValues.Value));
+        }
+
+        /// <summary>
+        /// Gets the selected item's details using a GetFromStore request.
+        /// </summary>
+        public void GetObjectDetailsDataOnlyWithAllOptions()
+        {
+            if (CanGetObjectHeader)
+            {
+                var optionsIn = new List<OptionsIn> { OptionsIn.ReturnElements.DataOnly };
 
                 if (MaxDataRows.HasValue)
                     optionsIn.Add(OptionsIn.MaxReturnNodes.Eq(MaxDataRows.Value));
@@ -930,36 +1033,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
         public void DownloadAttachment()
         {
             GetObjectDetailsWithReturnElementsAll()
-                .ContinueWith(x =>
-                {
-                    var attachment = x.Result as Witsml141.Attachment;
-                    if (attachment == null) return;
-
-                    var fileName = attachment.FileName ?? attachment.Name.Replace(" ", "-");
-                    var fileType = attachment.FileType ?? ObjectTypes.Unknown;
-
-                    var extension = !fileType.StartsWith(".")
-                        ? MimeTypes.MimeTypeMap.GetExtension(fileType, false)
-                        : fileType;
-
-                    Runtime.InvokeAsync(() =>
-                    {
-                        var dialog = new SaveFileDialog
-                        {
-                            Title = "Save Attachment...",
-                            Filter = $"{fileType}|*{extension}|All Files|*.*",
-                            DefaultExt = extension,
-                            AddExtension = true,
-                            FileName = fileName
-                        };
-
-                        if (!dialog.ShowDialog(Application.Current.MainWindow).GetValueOrDefault())
-                            return;
-
-                        File.WriteAllBytes(dialog.FileName, attachment.Content);
-                        Runtime.ShowInfo("Attachment downloaded successfully.");
-                    });
-                });
+                .ContinueWith(SaveAttachment);
         }
 
         /// <summary>
@@ -1000,10 +1074,13 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             NotifyOfPropertyChange(() => CanGetObjectHeader);
             NotifyOfPropertyChange(() => CanGetObjectDetails);
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithReturnElementsAll);
-            NotifyOfPropertyChange(() => CanGetObjectDetailsWithMaxDataRows);
-            NotifyOfPropertyChange(() => CanGetObjectDetailsWithRequestLatest);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsAllWithMaxDataRows);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsAllWithRequestLatest);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsDataOnlyWithMaxDataRows);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsDataOnlyWithRequestLatest);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsDataOnlyWithAllOptions);
             NotifyOfPropertyChange(() => CanGetObjectDetailsWithExtraOptionsIn);
-            NotifyOfPropertyChange(() => CanGetObjectDetailsWithAllOptions);
+            NotifyOfPropertyChange(() => CanGetObjectDetailsAllWithAllOptions);
             NotifyOfPropertyChange(() => CanExportWithGetObjectDetails);
             NotifyOfPropertyChange(() => CanRefreshSelected);
             //NotifyOfPropertyChange(() => CanDeleteObject);
@@ -1153,6 +1230,41 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             }
 
             base.OnDeactivate(close);
+        }
+
+        /// <summary>
+        /// Saves the objects.
+        /// </summary>
+        /// <param name="x">The x.</param>
+        private void SaveAttachment(Task<IDataObject> x)
+        {
+            var attachment = x.Result as Witsml141.Attachment;
+            if (attachment == null) return;
+
+            var fileName = attachment.FileName ?? attachment.Name.Replace(" ", "-");
+            var fileType = attachment.FileType ?? ObjectTypes.Unknown;
+
+            var extension = !fileType.StartsWith(".")
+                ? MimeTypes.MimeTypeMap.GetExtension(fileType, false)
+                : fileType;
+
+            Runtime.InvokeAsync(() =>
+            {
+                var dialog = new SaveFileDialog
+                {
+                    Title = "Save Attachment...",
+                    Filter = $"{fileType}|*{extension}|All Files|*.*",
+                    DefaultExt = extension,
+                    AddExtension = true,
+                    FileName = fileName
+                };
+
+                if (!dialog.ShowDialog(Application.Current.MainWindow).GetValueOrDefault())
+                    return;
+
+                File.WriteAllBytes(dialog.FileName, attachment.Content);
+                Runtime.ShowInfo("Attachment downloaded successfully.");
+            });
         }
 
         /// <summary>

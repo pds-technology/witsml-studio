@@ -131,21 +131,50 @@
                             </MultiBinding>
                         </MenuItem.Visibility>
 
-                        <MenuItem Header="Return Elements = all" ToolTip="returnElements=all" cal:Message.Attach="GetObjectDetailsWithReturnElementsAll"/>
-                        <MenuItem ToolTip="{Binding ObjectDetailsWithRequestLatestTooltip}" cal:Message.Attach="GetObjectDetailsWithRequestLatest">
-                            <MenuItem.HeaderTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="+ Latest "/>
-                                        <TextBlock Text="n " FontStyle="Italic"/>
-                                        <TextBlock Text="Values"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </MenuItem.HeaderTemplate>
+                        <MenuItem Header="All">
+
+                            <MenuItem Header="Return Elements = all" ToolTip="returnElements=all" cal:Message.Attach="GetObjectDetailsWithReturnElementsAll"/>
+
+                            <MenuItem ToolTip="{Binding ObjectDetailsAllWithRequestLatestTooltip}" cal:Message.Attach="GetObjectDetailsAllWithRequestLatest">
+                                <MenuItem.HeaderTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="+ Latest "/>
+                                            <TextBlock Text="n " FontStyle="Italic"/>
+                                            <TextBlock Text="Values"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </MenuItem.HeaderTemplate>
+                            </MenuItem>
+
+                            <MenuItem Header="+ Max Data Rows" ToolTip="{Binding ObjectDetailsAllWithMaxDataRowsTooltip}" cal:Message.Attach="GetObjectDetailsAllWithMaxDataRows"/>
+
+                            <MenuItem Header="All: All of the Above" ToolTip="{Binding ObjectDetailsAllWithAllOptionsTooltip}" cal:Message.Attach="GetObjectDetailsAllWithAllOptions"/>
+
                         </MenuItem>
 
-                        <MenuItem Header="+ Max Data Rows" ToolTip="{Binding ObjectDetailsWithMaxDataRowsTooltip}" cal:Message.Attach="GetObjectDetailsWithMaxDataRows"/>
-                        <MenuItem Header="All of the Above" ToolTip="{Binding ObjectDetailsWithAllOptionsTooltip}" cal:Message.Attach="GetObjectDetailsWithAllOptions"/>
+                        <MenuItem Header="Data Only">
+
+                            <MenuItem Header="Return Elements = data-only" ToolTip="returnElements=data-only" cal:Message.Attach="GetObjectDetailsWithReturnElementsDataOnly"/>
+
+                            <MenuItem ToolTip="{Binding ObjectDetailsDataOnlyWithRequestLatestTooltip}" cal:Message.Attach="GetObjectDetailsDataOnlyWithRequestLatest">
+                                <MenuItem.HeaderTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="+ Latest "/>
+                                            <TextBlock Text="n " FontStyle="Italic"/>
+                                            <TextBlock Text="Values"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </MenuItem.HeaderTemplate>
+                            </MenuItem>
+
+                            <MenuItem Header="+ Max Data Rows" ToolTip="{Binding ObjectDetailsDataOnlyWithMaxDataRowsTooltip}" cal:Message.Attach="GetObjectDetailsDataOnlyWithMaxDataRows"/>
+
+                            <MenuItem Header="Data-Only: All of the Above" ToolTip="{Binding ObjectDetailsDataOnlyWithAllOptionsTooltip}" cal:Message.Attach="GetObjectDetailsDataOnlyWithAllOptions"/>
+
+                        </MenuItem>
+
                         <MenuItem Header="Custom Options In" ToolTip="{Binding ExtraOptionsIn}" cal:Message.Attach="GetObjectDetailsWithExtraOptionsIn"/>
                     </MenuItem>
 
