@@ -601,12 +601,19 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 return;
             }
 
-            var textLength = Document.Text.Length;
+            var textLength = Document.TextLength;
             if (textLength <= TruncateSize) return;
 
-            var truncatedText = Document.Text.Substring(textLength - TruncateSize);
-            var firstNewLine = truncatedText.IndexOf(Environment.NewLine, StringComparison.InvariantCultureIgnoreCase);
-            Document.Text = firstNewLine > 0 ? truncatedText.Substring(firstNewLine + Environment.NewLine.Length) : truncatedText;
+            var startIndex = textLength - TruncateSize;
+            var line = Document.GetLineByOffset(startIndex);
+            var offset = line.Offset;
+            var endOffset = offset + line.TotalLength;
+            var column = startIndex - offset;
+            var truncateLength = (column > 0 && endOffset < textLength)
+                ? endOffset
+                : startIndex;
+
+            Document.Remove(0, truncateLength);
         }
 
         /// <summary>
