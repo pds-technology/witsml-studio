@@ -457,8 +457,16 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
                 // Compute the object type of the incoming xml.
                 if (functionType.RequiresObjectType() && !string.IsNullOrWhiteSpace(xmlIn))
                 {
-                    var document = WitsmlParser.Parse(xmlIn);
-                    objectType = ObjectTypes.GetObjectTypeFromGroup(document.Root);
+                    try
+                    {
+                        var document = WitsmlParser.Parse(xmlIn);
+                        objectType = ObjectTypes.GetObjectTypeFromGroup(document.Root);
+                    }
+                    catch (WitsmlException ex)
+                    {
+                        returnCode = (short) ex.ErrorCode;
+                        throw;
+                    }
                 }
 
                 using (var client = Proxy.CreateClientProxy().WithUserAgent())
