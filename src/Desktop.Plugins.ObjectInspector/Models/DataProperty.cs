@@ -282,10 +282,13 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
                 if (Name == "FileNameType") return false;
                 if (Name == "Str10Reference" || Name == "ExtNameValues") return false;
                 if (Name == "Code") return false;
+                if (Name == "EquipmentName" || Name == "CatalogName" || Name == "BrandName" || Name == "NameService") return false;
+                if (Name == "TimeSeriesParentage" || Name == "HasOverlap") return false;
                 if (XmlPath.ContainsIgnoreCase("extensionNameValue")) return false;
                 if (XmlPath.ContainsIgnoreCase("ReferencePoint")) return false;
                 if (XmlPath.StartsWith("EpcExternalPartReference")) return false;
                 if (XmlPath.ContainsIgnoreCase("FootageNS") || XmlPath.ContainsIgnoreCase("FootageEW")) return false;
+                if (XmlPath.ContainsIgnoreCase("ParentString") && !XmlPath.EndsWith("ParentString")) return false;
 
                 return
                     (PropertyType.BaseType != null && PropertyType.BaseType.Name.Contains("Abstract") && PropertyType.BaseType.Name.Contains("Object")) ||
