@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Caliburn.Micro;
 using PDS.WITSMLstudio.Framework;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
@@ -34,6 +35,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.ViewModels
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(typeof(DataPropertiesViewModel));
 
         private DataObject _dataObject;
+        private bool _showAttributes = true;
+        private bool _showElements = true;
+        private bool _showRequired = true;
+        private bool _showRecurring = true;
+        private bool _showReferences = true;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataPropertiesViewModel"/> class.
@@ -65,9 +71,95 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.ViewModels
         }
 
         /// <summary>
+        /// Whether or not to show attribute properties
+        /// </summary>
+        public bool ShowAttributes
+        {
+            get { return _showAttributes; }
+            set
+            {
+                if (_showAttributes == value) return;
+                _showAttributes = value;
+
+                NotifyOfPropertyChange(() => ShowAttributes);
+                NotifyOfPropertyChange(() => DataProperties);
+            }
+        }
+
+        /// <summary>
+        /// Whether or not to show element properties
+        /// </summary>
+        public bool ShowElements
+        {
+            get { return _showElements; }
+            set
+            {
+                if (_showElements == value) return;
+                _showElements = value;
+
+                NotifyOfPropertyChange(() => ShowElements);
+                NotifyOfPropertyChange(() => DataProperties);
+            }
+        }
+
+        /// <summary>
+        /// Whether or not to show required properties
+        /// </summary>
+        public bool ShowRequired
+        {
+            get { return _showRequired; }
+            set
+            {
+                if (_showRequired == value) return;
+                _showRequired = value;
+
+                NotifyOfPropertyChange(() => ShowRequired);
+                NotifyOfPropertyChange(() => DataProperties);
+            }
+        }
+
+        /// <summary>
+        /// Whether or not to show recurring properties
+        /// </summary>
+        public bool ShowRecurring
+        {
+            get { return _showRecurring; }
+            set
+            {
+                if (_showRecurring == value) return;
+                _showRecurring = value;
+
+                NotifyOfPropertyChange(() => ShowRecurring);
+                NotifyOfPropertyChange(() => DataProperties);
+            }
+        }
+
+        /// <summary>
+        /// Whether or not to show reference properties
+        /// </summary>
+        public bool ShowReferences
+        {
+            get { return _showReferences; }
+            set
+            {
+                if (_showReferences == value) return;
+                _showReferences = value;
+
+                NotifyOfPropertyChange(() => ShowReferences);
+                NotifyOfPropertyChange(() => DataProperties);
+            }
+        }
+
+        /// <summary>
         /// All (nested) data properties of the Energistics Data Object
         /// </summary>
-        public IReadOnlyCollection<DataProperty> DataProperties => DataObject?.NestedDataProperties;
+        public IEnumerable<DataProperty> DataProperties => DataObject?.NestedDataProperties.Where(x =>
+            (ShowAttributes && x.IsAttribute) ||
+            (ShowElements && !x.IsAttribute) ||
+            (ShowRequired && x.IsRequired) ||
+            (ShowRecurring && x.IsRecurring) ||
+            (ShowReferences && x.IsReference)
+        );
          
         /// <summary>
         /// Gets the runtime service.

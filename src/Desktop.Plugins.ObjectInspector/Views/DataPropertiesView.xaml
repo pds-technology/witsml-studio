@@ -5,9 +5,29 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="600">
     <Grid>
-        <DataGrid Name="DataProperties" IsReadOnly="True" AutoGenerateColumns="False">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <GroupBox Header="Filters" Grid.Row="0" Margin="5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <CheckBox Grid.Column="0" Content="Attributes"  IsChecked="{Binding ShowAttributes}"/>
+                <CheckBox Grid.Column="1" Content="Elements"    IsChecked="{Binding ShowElements}"/>
+                <CheckBox Grid.Column="2" Content="Required"    IsChecked="{Binding ShowRequired}"/>
+                <CheckBox Grid.Column="3" Content="Recurring"   IsChecked="{Binding ShowRecurring}"/>
+                <CheckBox Grid.Column="4" Content="References"  IsChecked="{Binding ShowReferences}"/>
+            </Grid>
+        </GroupBox>
+        <DataGrid Grid.Row="1" Name="DataProperties" IsReadOnly="True" AutoGenerateColumns="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="XML Path" Binding="{Binding XmlPath}"/>
                 <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>

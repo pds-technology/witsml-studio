@@ -163,8 +163,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         {
             get
             {
+                var distinctDescendants = new HashSet<string>();
                 var descendants = new List<DataProperty>();
-                GetDescendants(descendants);
+                GetDescendants(descendants, distinctDescendants);
 
                 return descendants;
             }
@@ -271,16 +272,32 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
                 if (Name == "IndexReference") return false;
                 if (Name == "CurveName") return false;
                 if (Name == "Uid" || Name == "Uuid") return false;
+                if (Name == "AnchorName") return false;
+                if (Name == "LocalAuthorityCrsName") return false;
+                if (Name == "PolicyName" || Name == "RuleName") return false;
+                if (Name == "ContentType" || Name == "Title" || Name == "UuidAuthority" || Name == "Uri" || Name == "VersionString") return false;
+                if (Name == "AxisName" || Name == "LoggingCompanyName" || Name == "ToolName") return false;
+                if (Name == "CustomerName" || Name == "FormationName" || Name == "OpenHoleName" || Name == "WaterSource" || Name == "StepName" || Name == "LithName" || Name == "NetPayName") return false;
+                if (Name == "Source") return false;
+                if (Name == "FileNameType") return false;
+                if (Name == "Str10Reference" || Name == "ExtNameValues") return false;
+                if (Name == "Code") return false;
                 if (XmlPath.ContainsIgnoreCase("extensionNameValue")) return false;
+                if (XmlPath.ContainsIgnoreCase("ReferencePoint")) return false;
+                if (XmlPath.StartsWith("EpcExternalPartReference")) return false;
+                if (XmlPath.ContainsIgnoreCase("FootageNS") || XmlPath.ContainsIgnoreCase("FootageEW")) return false;
 
                 return
+                    (PropertyType.BaseType != null && PropertyType.BaseType.Name.Contains("Abstract") && PropertyType.BaseType.Name.Contains("Object")) ||
                     XmlType.Contains("ref") ||
                     XmlType.Contains("Ref") ||
                     XmlType.StartsWith("uid") ||
                     XmlPath.ContainsIgnoreCase("source") ||
                     XmlPath.ContainsIgnoreCase("parent") ||
                     XmlPath.ContainsIgnoreCase("reference") ||
-                    Name.ContainsIgnoreCase("name");
+                    Name.ContainsIgnoreCase("name") ||
+                    Name == "Tubular" || Name == "Rig" || Name == "Term" || Name == "UseErrorTermSet" ||
+                    Name.ContainsIgnoreCase("refid");
             }
         }
         /// <summary>
@@ -307,12 +324,15 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// Adds all descendants of this property to the input collection.
         /// </summary>
         /// <param name="descendants">The descendants.</param>
-        private void GetDescendants(ICollection<DataProperty> descendants)
+        /// <param name="distinctDescendants">The distinct descendants.</param>
+        private void GetDescendants(ICollection<DataProperty> descendants, HashSet<string> distinctDescendants)
         {
             foreach (var child in ChildProperties)
             {
-                descendants.Add(child);
-                child.GetDescendants(descendants);
+                if (distinctDescendants.Add(child.XmlPath))
+                    descendants.Add(child);
+
+                child.GetDescendants(descendants, distinctDescendants);
             }
         }
 
