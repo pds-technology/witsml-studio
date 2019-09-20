@@ -41,7 +41,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// <exception cref="ArgumentNullException"><paramref name="dataProperty"/> is null.</exception>
         /// <exception cref="ArgumentException"><paramref name="dataProperty"/> is not a (nested) data property on an Energistics Data Object.</exception>
         public DataProperty(Type parentType, PropertyInfo dataProperty)
-            : this(parentType, dataProperty, string.Empty, new HashSet<Tuple<Type, string, Type>>(), true)
+            : this(parentType, dataProperty, string.Empty, new HashSet<Tuple<Type, string, Type>>())
         {
         }
 
@@ -51,12 +51,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// <param name="property">The property to initialize from</param>
         /// <param name="parentXmlPath">The parent XML path</param>
         /// <param name="hierarchy">The property hierarchy</param>
-        /// <param name="recurse">Whether or not to recurse child properties.</param>
         /// <exception cref="ArgumentNullException"><paramref name="property"/> is null.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="hierarchy"/> is null.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="parentXmlPath"/> is null.</exception>
         /// <exception cref="ArgumentException"><paramref name="property"/> is not a (nested) data property on an Energistics Data Object.</exception>
-        protected DataProperty(Type parentType, PropertyInfo property, string parentXmlPath, HashSet<Tuple<Type, string, Type>> hierarchy, bool recurse)
+        protected DataProperty(Type parentType, PropertyInfo property, string parentXmlPath, HashSet<Tuple<Type, string, Type>> hierarchy)
         {
             property.NotNull(nameof(property));
             parentXmlPath.NotNull(nameof(parentXmlPath));
@@ -66,23 +65,37 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
 
             Property = property;
 
+            var recurse = true;
+            var addedTypes = new List<Tuple<Type, string, Type>>(2);
             XmlPath = parentXmlPath;
             if (EnergisticsHelper.IsArray(property))
             {
                 XmlName = property.GetCustomAttribute<XmlArrayAttribute>().ElementName;
-                hierarchy.Add(new Tuple<Type, string, Type>(parentType, XmlName, property.PropertyType));
+                var t = new Tuple<Type, string, Type>(parentType, XmlName, property.PropertyType);
+                if (hierarchy.Add(t))
+                    addedTypes.Add(t);
+                else
+                    recurse = false;
                 XmlPath += "/" + XmlName;
             }
             if (EnergisticsHelper.IsArrayItem(property))
             {
                 XmlName = property.GetCustomAttribute<XmlArrayItemAttribute>().ElementName;
-                hierarchy.Add(new Tuple<Type, string, Type>(parentType, XmlName, PropertyType));
+                var t = new Tuple<Type, string, Type>(parentType, XmlName, PropertyType);
+                if (hierarchy.Add(t))
+                    addedTypes.Add(t);
+                else
+                    recurse = false;
                 XmlPath += "/" + XmlName;
             }
             else if (!EnergisticsHelper.IsArray(property))
             {
                 XmlName = EnergisticsHelper.GetXmlName(property);
-                hierarchy.Add(new Tuple<Type, string, Type>(parentType, XmlName, PropertyType));
+                var t = new Tuple<Type, string, Type>(parentType, XmlName, PropertyType);
+                if (hierarchy.Add(t))
+                    addedTypes.Add(t);
+                else
+                    recurse = false;
                 XmlPath += "/" + XmlName;
             }
 
@@ -95,6 +108,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
                 ChildProperties = new List<DataProperty>();
             else
                 ChildProperties = CreateChildPropertiesCore(PropertyType, XmlPath, hierarchy);
+
+            foreach (var t in addedTypes)
+                hierarchy.Remove(t);
         }
 
         /// <summary>
@@ -132,15 +148,15 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
             var types = EnergisticsHelper.GetTypeAndAllDerivedTypes(parentType);
 
             var childProperties = new List<DataProperty>();
-            var properties = types.SelectMany(t => t.GetProperties()).Where(EnergisticsHelper.IsDataProperty);
 
-            foreach (var p in properties)
+            foreach (var t in types)
             {
-                var tuple = new Tuple<Type, string, Type>(parentType, EnergisticsHelper.GetXmlName(p), p.PropertyType);
-                bool recurse = hierarchy.Add(tuple);
+                var properties = t.GetProperties().Where(EnergisticsHelper.IsDataProperty);
 
-                childProperties.Add(new DataProperty(parentType, p, parentXmlPath, hierarchy, recurse));
-                hierarchy.Remove(tuple); // Remove newly added property.
+                foreach (var p in properties)
+                {
+                    childProperties.Add(new DataProperty(t, p, parentXmlPath, hierarchy));
+                }
             }
 
             return childProperties;
@@ -179,7 +195,11 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// <summary>
         /// The type of the data property
         /// </summary>
-        public Type PropertyType => Property.PropertyType.IsGenericType ? Property.PropertyType.GenericTypeArguments.First() : Property.PropertyType;
+        public Type PropertyType => Property.PropertyType.IsGenericType
+                        ? Property.PropertyType.GenericTypeArguments.First()
+                        : Property.PropertyType.IsArray
+                        ? Property.PropertyType.GetElementType()
+                        : Property.PropertyType;
 
         /// <summary>
         /// Whether or not the property is an attribute.

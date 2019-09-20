@@ -41,7 +41,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
             familyVersion.NotNull(nameof(familyVersion));
 
             FamilyVersion = familyVersion;
-            var dataObjectTypes = EnergisticsHelper.GetAllDataObjectTypes(familyVersion.StandardFamily, familyVersion.DataSchemaVersion);
+            var dataObjectTypes = EnergisticsHelper.GetAllDataObjectTypes(familyVersion.StandardFamily, familyVersion.DataSchemaVersion).Where(dt => !dt.IsAbstract);
             _dataObjects = dataObjectTypes.Select(dt => new DataObject(dt)).OrderBy(edo => edo.Name).ToList();
         }
 
