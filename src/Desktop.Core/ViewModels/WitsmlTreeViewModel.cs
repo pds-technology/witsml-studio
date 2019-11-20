@@ -1500,12 +1500,12 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
                 }
             });
 
-            // If query was unable to find wellbores do not atempt data objects
+            // If query was unable to find wellbores do not attempt data objects
             if (wellbores == null)
                 return;
 
-            // Do not trust server to filter out non growing objects
-            wellbores.RemoveAll(x => !x.GetObjectGrowingStatus().GetValueOrDefault());
+            // Do not trust server to filter out non active objects
+            wellbores.RemoveAll(x => !x.GetWellboreStatus().GetValueOrDefault());
 
             var access = new Action(() =>
             {
