@@ -68,10 +68,10 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>0A89F4736588310990E1191BC7FB249A7EC2C124</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>773F1218A1E795C10F48768F023A65732ECE9EA7</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>PetrotechnicalDataSystems.pfx</ManifestKeyFile>
+    <ManifestKeyFile>Petrotechnical Data Systems BV.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -200,11 +200,11 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <None Include="packages.config" />
-    <None Include="Samples\SmartSensorTimeSimulation20.json" />
-    <Resource Include="WitsmlStudio.ico" />
-    <None Include="PetrotechnicalDataSystems.pfx">
+    <None Include="Petrotechnical Data Systems BV.pfx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Samples\SmartSensorTimeSimulation20.json" />
+    <Resource Include="WitsmlStudio.ico" />
     <None Include="Samples\SmartSensorDepthSimulation20.json" />
     <None Include="Samples\SmartSensorTimeSimulation1311.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
