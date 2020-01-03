@@ -71,8 +71,7 @@
     <ManifestCertificateThumbprint>773F1218A1E795C10F48768F023A65732ECE9EA7</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>
-    </ManifestKeyFile>
+    <ManifestKeyFile>Petrotechnical Data Systems BV.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
