@@ -279,6 +279,14 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             EditItem.Password = RevealablePasswordBox.Password;
             EditItem.ProxyPassword = RevealableProxyPasswordBox.Password;
 
+            // Reset saved SSL protocol
+            EditItem.SecurityProtocol = 0;
+
+            // Get selected SSL protocols
+            SecurityProtocols
+                .Where(x => x.IsEnabled && x.IsSelected)
+                .ForEach(x => EditItem.SecurityProtocol |= x.Protocol);
+
             _log.DebugFormat("Testing a {0} connection", ConnectionType);
 
             // Resolve a connection test specific to the current ConnectionType
@@ -326,14 +334,6 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             {
                 return;
             }
-
-            // Reset saved SSL protocol
-            EditItem.SecurityProtocol = 0;
-
-            // Get selected SSL protocols
-            SecurityProtocols
-                .Where(x => x.IsEnabled && x.IsSelected)
-                .ForEach(x => EditItem.SecurityProtocol |= x.Protocol);
 
             TestConnection()
                 .ContinueWith(x =>
