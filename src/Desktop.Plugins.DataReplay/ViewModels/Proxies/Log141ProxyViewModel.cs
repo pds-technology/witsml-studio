@@ -126,7 +126,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
                 CurveDescription = string.IsNullOrWhiteSpace(channel.Description)
                     ? channel.ChannelName
                     : channel.Description,
-                TypeLogData = LogDataType.@double
+                TypeLogData = (LogDataType)Enum.Parse(typeof(LogDataType), channel.DataType)
             };
         }
 
