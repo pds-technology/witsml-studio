@@ -513,11 +513,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             var etpUri = GetEtpUriFromInputUri();
             if (etpUri.IsValid)
             {
-                etpUri.GetObjectIds().ForEach(x =>
-                {
-                    if (etpUri.ObjectType == x.ObjectType && !IsUuidMatch(Model.Store.Uuid, x.ObjectId))
-                        Model.Store.Uuid = x.ObjectId;
-                });
+                var segment = etpUri.GetObjectIds().LastOrDefault();
+                if (etpUri.ObjectType == segment.ObjectType && !IsUuidMatch(Model.Store.Uuid, segment.ObjectId))
+                    Model.Store.Uuid = segment.ObjectId;
             }
         }
 
@@ -526,11 +524,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.EtpBrowser.ViewModels
             var etpUri = GetEtpUriFromInputUri();
             if (etpUri.IsValid)
             {
-                etpUri.GetObjectIds().ForEach(x =>
-                {
-                    if (etpUri.ObjectType == x.ObjectType && !IsUuidMatch(Model.Store.Uuid, x.ObjectId))
-                        Model.Store.Uri = new EtpUri(etpUri.Parent.Uri).Append(x.ObjectType, Model.Store.Uuid);
-                });
+                var segment = etpUri.GetObjectIds().LastOrDefault();
+                if (etpUri.ObjectType == segment.ObjectType && !IsUuidMatch(Model.Store.Uuid, segment.ObjectId))
+                    Model.Store.Uri = new EtpUri(etpUri.Parent.Uri).Append(segment.ObjectType, Model.Store.Uuid);
             }
         }
 
