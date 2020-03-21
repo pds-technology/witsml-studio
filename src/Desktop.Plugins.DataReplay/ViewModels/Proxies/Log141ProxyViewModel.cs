@@ -17,6 +17,9 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,6 +32,7 @@ using PDS.WITSMLstudio.Data.Logs;
 using PDS.WITSMLstudio.Desktop.Core;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
 using PDS.WITSMLstudio.Desktop.Core.ViewModels;
+using PDS.WITSMLstudio.Framework;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 {
@@ -44,76 +48,142 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 
         public Log141Generator Generator { get; }
 
+        private Models.Simulation Model { get; set; }
+
         private TextEditorViewModel _messages;
 
         private int _counter;
 
-        public override async Task Start(Models.Simulation model, CancellationToken token, TextEditorViewModel messages, int interval = 5000)
+        public override async Task Start(Models.Simulation model, CancellationToken token, TextEditorViewModel messages, int interval = 5000, double? increment = null)
         {
             _messages = messages;
             _counter = 0;
+            Model = model;
 
             var generator = new Log141Generator();
             var index = 0d;
 
-            var logList = new Log()
+            var log = GetLogToUpdate();
+            if (log == null)
             {
-                UidWell = model.WellUid,
-                NameWell = model.WellName,
-                UidWellbore = model.WellboreUid,
-                NameWellbore = model.WellboreName,
-                Uid = model.LogUid,
-                Name = model.LogName,
-                IndexType = model.LogIndexType
+                Runtime.Invoke(() => Runtime.ShowError("Log not found."));
+                return;
             }
-            .AsList();
+
+            if (log.IndexType != LogIndexType.datetime && log.EndIndex != null)
+                index = log.EndIndex.Value;
+
+            var depthIncrement = increment ?? 0.1;
+            if (log.Direction.HasValue && log.Direction == LogIndexDirection.decreasing)
+                depthIncrement *= -1;
+
+            var logCurveInfo = model.Channels.Select(ToLogCurveInfo).ToList();
+
+            var previousTimestamp = (DateTimeOffset.UtcNow - TimeSpan.FromMinutes(model.DateTimeIndexOffsetInMinutes) - TimeSpan.FromMilliseconds(interval)).TruncateToSeconds();
+            var timeIncrement = TimeSpan.FromMilliseconds(increment ?? 1000);
 
             while (true)
             {
+                var swOuter = new Stopwatch();
+                swOuter.Start();
+
                 if (token.IsCancellationRequested)
                 {
                     break;
                 }
                 _counter++;
-                var result = Connection.Read(new LogList { Log = logList }, OptionsIn.ReturnElements.HeaderOnly);
 
-                if (!result.Log.Any())
+                var currentTimestamp = (DateTimeOffset.UtcNow - TimeSpan.FromMinutes(model.DateTimeIndexOffsetInMinutes)).TruncateToSeconds();
+
+                var rows = (int)(currentTimestamp - previousTimestamp).TotalSeconds;
+
+                // Clear any previously existing log data.
+                List<string> indexes;
+                if (log.IndexType == LogIndexType.datetime)
+                    indexes = generator.GenerateDateTimeIndexes(rows, previousTimestamp, timeIncrement);
+                else
                 {
-                    Runtime.Invoke(() => Runtime.ShowError("Log not found."));
-                    break;
+                    indexes = generator.GenerateNumericIndexes(rows, index, depthIncrement);
+                    index += depthIncrement * rows;
                 }
 
-                var log = result.Log[0];
+                var logData = generator.GenerateLogData(logCurveInfo, indexes, Model.GenerateNulls);
 
-                if (log.IndexType != LogIndexType.datetime && log.EndIndex != null)
-                    index = log.EndIndex.Value;
+                // Create minimal log object
+                var update = new LogList
+                {
+                    Log = new List<Log>
+                    {
+                        new Log
+                        {
+                            Uid = Model.LogUid,
+                            UidWell = Model.WellUid,
+                            UidWellbore = Model.WellboreUid,
+                            IndexType = log.IndexType,
+                            LogData = new List<LogData>() { logData }
+                        }
+                    }
+                };
 
-                log.Direction = LogIndexDirection.increasing;
-                log.IndexCurve = model.Channels.Select(x => x.ChannelName).FirstOrDefault();
-                log.LogCurveInfo = model.Channels.Select(ToLogCurveInfo).ToList();
-
-                index = generator.GenerateLogData(log, startIndex: index, interval: 0.1);
-
-                result.Log[0].LogData[0].MnemonicList = ToList(result.Log[0], x => x.Mnemonic.Value);
-                result.Log[0].LogData[0].UnitList = ToList(result.Log[0], x => x.Unit);
+                var swInner = new Stopwatch();
 
                 try
                 {
-                    Connection.Update(result);
-                    Log($"Update #{_counter} was sucessful");
+                    swInner.Start();
+                    Connection.Update(update);
+                    swInner.Stop();
+                    swOuter.Stop();
+                    Log($"Update #{_counter} was successful. Added {rows} rows. Time taken : {swOuter.ElapsedMilliseconds} ms. UpdateInStore time : {swInner.ElapsedMilliseconds} ms.");
                 }
                 catch (Exception ex)
                 {
-                    Log(ex.Message);
+                    swInner.Stop();
+                    swOuter.Stop();
+                    Log($"Update #{_counter} was unsuccessful. Time taken : {swOuter.ElapsedMilliseconds} ms. UpdateInStore time : {swInner.ElapsedMilliseconds} ms.\n{ex.Message}");
                 }
 
-                await Task.Delay(interval);
+                previousTimestamp = currentTimestamp;
+
+                // Compensate for the time it took to send the update in store
+                var delayInterval = swOuter.ElapsedMilliseconds > interval
+                    ? 0 
+                    : interval - swOuter.ElapsedMilliseconds;
+
+                try
+                {
+                    await Task.Delay((int) delayInterval, token);
+                }
+                catch (TaskCanceledException)
+                {
+                    break;
+                }
             }
         }
 
-        private string ToList(Log log, Func<LogCurveInfo, string> func)
+        /// <summary>
+        /// Gets the log to update.
+        /// </summary>
+        /// <returns>The log to update if it is found.  Null otherwise.</returns>
+        private Log GetLogToUpdate()
         {
-            return string.Join(",", log.LogCurveInfo.Select(func));
+            var logList = new Log()
+                {
+                    UidWell = Model.WellUid,
+                    NameWell = Model.WellName,
+                    UidWellbore = Model.WellboreUid,
+                    NameWellbore = Model.WellboreName,
+                    Uid = Model.LogUid,
+                    Name = Model.LogName,
+                    IndexType = Model.LogIndexType
+                }
+                .AsList();
+
+            var result = Connection.Read(new LogList { Log = logList }, OptionsIn.ReturnElements.HeaderOnly);
+
+            if (!result.Log.Any())
+                return null;
+
+            return result.Log[0];
         }
 
         private LogCurveInfo ToLogCurveInfo(IChannelMetadataRecord channel)
@@ -130,11 +200,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
             };
         }
 
-        private void Log(string message, params object[] values)
-        {
-            Log(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff - ") + string.Format(message, values));
-        }
-
         private void Log(string message)
         {
             if (string.IsNullOrWhiteSpace(message))
@@ -142,6 +207,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 
             _messages.Append(string.Concat(
                 message.IsJsonString() ? string.Empty : "// ",
+                DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff - "),
                 message,
                 Environment.NewLine));
         }

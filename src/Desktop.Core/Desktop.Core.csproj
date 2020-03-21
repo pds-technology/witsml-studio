@@ -190,6 +190,7 @@
     <Compile Include="Connections\JwtConnectionTest.cs" />
     <Compile Include="Connections\WitsmlConnectionTest.cs" />
     <Compile Include="Converters\BooleanInverseConverter.cs" />
+    <Compile Include="Converters\EnumToNameConverter.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\BooleanToVisibilityMultiConverter.cs" />
     <Compile Include="Converters\EnumBooleanConverter.cs" />

@@ -84,6 +84,22 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Models
             }
         }
 
+        private double _increment;
+        [DataMember]
+        public double Increment
+        {
+            get { return _increment; }
+
+            set
+            {
+                if (_increment != value)
+                {
+                    _increment = value;
+                    NotifyOfPropertyChange(() => Increment);
+                }
+            }
+        }
+
         private Connection _witsmlConnection;
         [DataMember]
         public Connection WitsmlConnection
@@ -335,6 +351,36 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.Models
                 {
                     _isSimpleStreamer = value;
                     NotifyOfPropertyChange(() => IsSimpleStreamer);
+                }
+            }
+        }
+
+        private int _dateTimeIndexOffsetInMinutes;
+        [DataMember]
+        public int DateTimeIndexOffsetInMinutes
+        {
+            get { return _dateTimeIndexOffsetInMinutes; }
+            set
+            {
+                if (_dateTimeIndexOffsetInMinutes != value)
+                {
+                    _dateTimeIndexOffsetInMinutes = value;
+                    NotifyOfPropertyChange(() => DateTimeIndexOffsetInMinutes);
+                }
+            }
+        }
+
+        private bool _generateNulls;
+        [DataMember]
+        public bool GenerateNulls
+        {
+            get { return _generateNulls; }
+            set
+            {
+                if (_generateNulls != value)
+                {
+                    _generateNulls = value;
+                    NotifyOfPropertyChange(() => GenerateNulls);
                 }
             }
         }

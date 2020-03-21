@@ -36,6 +36,6 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.DataReplay.ViewModels.Proxies
 
         public WMLSVersion Version { get; private set; }
 
-        public abstract Task Start(Models.Simulation model, CancellationToken token, TextEditorViewModel messages, int interval = 5000);
+        public abstract Task Start(Models.Simulation model, CancellationToken token, TextEditorViewModel messages, int interval = 5000, double? increment = null);
     }
 }
