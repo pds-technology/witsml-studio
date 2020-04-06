@@ -10,6 +10,14 @@ $existsPathPattern = @"
 Exists\('(\d|\w|\s|\.|\\)*packages
 "@
 
+$formatPathPattern = @"
+Format\('\$\(ErrorText\)', '(\d|\w|\s|\.|\\)*packages
+"@
+
+$analyzerPathPattern = @"
+<Analyzer Include="(\d|\w|\s|\.|\\)*packages
+"@
+
 ls (Split-Path $PSScriptRoot -Parent) -Recurse -include *.csproj, *.sln, *.fsproj, *.vbproj |
   foreach {
     $content = cat $_.FullName | Out-String
@@ -17,7 +25,9 @@ ls (Split-Path $PSScriptRoot -Parent) -Recurse -include *.csproj, *.sln, *.fspro
 
     $content = $content -replace $hintPathPattern, "<HintPath>`$(SolutionDir)\packages"
     $content = $content -replace $importPathPattern, "<Import Project=""`$(SolutionDir)\packages"
+    $content = $content -replace $analyzerPathPattern, "<Analyzer Include=""`$(SolutionDir)\packages"
     $content = $content -replace $existsPathPattern, "Exists('`$(SolutionDir)\packages"
+    $content = $content -replace $formatPathPattern, "Format('`$(ErrorText)', '`$(SolutionDir)\packages"
 
     if ($origContent -ne $content)
     {	
