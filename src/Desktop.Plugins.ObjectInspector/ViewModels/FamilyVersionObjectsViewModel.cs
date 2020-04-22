@@ -102,13 +102,13 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.ViewModels
 
             var sb = new StringBuilder();
             sb.AppendLine(
-                "XML Path,Name,XML Type,Attribute,Required,Recurring,Reference,String Length,Regular Expression,Description,Type Description");
+                "Object,XML Path,Name,Parent XML Type,XML Type,Attribute,Required,Recurring,Reference,String Length,Regular Expression,Description,Type Description");
             foreach (var obj in DataObjects)
             {
                 foreach (var p in obj.NestedDataProperties)
                 {
                     sb.AppendLine(
-                        $@"""{p.XmlPath}"",""{p.XmlName}"",""{p.XmlType}"",""{p.IsAttribute}"",""{p.IsRequired}"",""{p.IsRecurring}"",""{p.IsReference}"",""{p.StringLength}"",""{p.RegularExpression}"",""{p.Description}"",""{p.TypeDescription}""");
+                        $@"""{obj.Name}"",""{p.XmlPath}"",""{p.XmlName}"",""{p.ParentXmlType}"",""{p.XmlType}"",""{p.IsAttribute}"",""{p.IsRequired}"",""{p.IsRecurring}"",""{p.IsReference}"",""{p.StringLength}"",""{p.RegularExpression}"",""{p.Description}"",""{p.TypeDescription}""");
                 }
             }
 

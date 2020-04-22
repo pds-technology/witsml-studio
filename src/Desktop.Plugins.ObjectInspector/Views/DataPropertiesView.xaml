@@ -31,6 +31,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="XML Path" Binding="{Binding XmlPath}"/>
                 <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                <DataGridTextColumn Header="Parent XML Type" Binding="{Binding ParentXmlType}"/>
                 <DataGridTextColumn Header="XML Type" Binding="{Binding XmlType}"/>
                 <DataGridCheckBoxColumn Header="Attribute" Binding="{Binding IsAttribute, Mode=OneWay}"/>
                 <DataGridCheckBoxColumn Header="Required" Binding="{Binding IsRequired, Mode=OneWay}"/>

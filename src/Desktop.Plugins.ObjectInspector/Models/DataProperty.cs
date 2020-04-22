@@ -63,6 +63,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
             if (!EnergisticsHelper.IsDataProperty(property))
                 throw new ArgumentException($"{property.Name} is not a (nested) data property on an Energistics Data Object", nameof(property));
 
+            ParentType = parentType;
             Property = property;
 
             var recurse = true;
@@ -163,6 +164,22 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         }
 
         /// <summary>
+        /// Gets the parent type containing this property.
+        /// </summary>
+        public Type ParentType { get; }
+
+        /// <summary>
+        /// Gets the XML type of the parent.
+        /// </summary>
+        public string ParentXmlType
+        {
+            get
+            {
+                return ParentType.GetCustomAttribute<XmlTypeAttribute>()?.TypeName ?? string.Empty;
+            }
+        }
+
+        /// <summary>
         /// The data property.
         /// </summary>
         public PropertyInfo Property { get; }
@@ -179,9 +196,8 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         {
             get
             {
-                var distinctDescendants = new HashSet<string>();
                 var descendants = new List<DataProperty>();
-                GetDescendants(descendants, distinctDescendants);
+                GetDescendants(descendants);
 
                 return descendants;
             }
@@ -245,6 +261,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
                     Property.GetCustomAttribute<XmlElementAttribute>()?.DataType;
             }
         }
+
         /// <summary>
         /// Whether or not the property is required.
         /// </summary>
@@ -347,15 +364,12 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
         /// Adds all descendants of this property to the input collection.
         /// </summary>
         /// <param name="descendants">The descendants.</param>
-        /// <param name="distinctDescendants">The distinct descendants.</param>
-        private void GetDescendants(ICollection<DataProperty> descendants, HashSet<string> distinctDescendants)
+        private void GetDescendants(ICollection<DataProperty> descendants)
         {
             foreach (var child in ChildProperties)
             {
-                if (distinctDescendants.Add(child.XmlPath))
-                    descendants.Add(child);
-
-                child.GetDescendants(descendants, distinctDescendants);
+                descendants.Add(child);
+                child.GetDescendants(descendants);
             }
         }
 
