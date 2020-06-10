@@ -869,7 +869,9 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
             var xml = XDocument.Parse(capServers);
             var dataObjects = new List<string>();
 
-            xml.Descendants().Where(x => x.Name.LocalName == "function" && x.Attributes("name").FirstOrDefault()?.Value == "WMLS_GetFromStore")
+            xml.Descendants().Where(x => x.Name.LocalName == "function" &&
+                (x.Attributes("name").FirstOrDefault()?.Value == "WMLS_GetFromStore" ||
+                x.Attributes("name").FirstOrDefault()?.Value == "GetFromStore"))
                 .Descendants()
                 .Where(x => x.Name.LocalName == "dataObject")
                 .ForEach(x =>
