@@ -224,11 +224,11 @@
                     </Grid.RowDefinitions>
 
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="210" />
+                        <ColumnDefinition Width="150" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Client Request Compression Method:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Compression for Requests:" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" />
                     <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" VerticalAlignment="Center" IsEditable="False"
                               Text="{Binding EditItem.SoapRequestCompressionMethod, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumToDescriptionConverter}}">
                         <ComboBoxItem Content="none" />
