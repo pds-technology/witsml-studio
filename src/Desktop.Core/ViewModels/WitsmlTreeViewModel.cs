@@ -1096,15 +1096,18 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
             var selectedResource = Items.FindSelectedSynchronized();
 
-            foreach (ITreeViewContextMenuManipulator manipulator in WitsmlTreeViewContextManipulators)
+            if (WitsmlTreeViewContextManipulators != null)
             {
-                try
+                foreach (ITreeViewContextMenuManipulator manipulator in WitsmlTreeViewContextManipulators)
                 {
-                    manipulator.Process(_hierarchy.ContextMenu, Context, selectedResource);
-                }
-                catch (Exception ex)
-                {
-                    _log.Error(ex);
+                    try
+                    {
+                        manipulator.Process(_hierarchy.ContextMenu, Context, selectedResource);
+                    }
+                    catch (Exception ex)
+                    {
+                        _log.Error(ex);
+                    }
                 }
             }
 
@@ -1343,11 +1346,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
             else
                 pattern = Regex.Escape(pattern);
 
-            lock (_lock)
-            {
-                if (RigsMonitor != null)
-                    wellUids = RigsMonitor.GetWellUids(SelectedRigName);
-            }
+            wellUids = RigsMonitor?.GetWellUids(SelectedRigName);
 
             var access = new Action(() =>
             {
