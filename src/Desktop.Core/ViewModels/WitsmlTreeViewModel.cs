@@ -1818,7 +1818,7 @@ namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 
         private EtpUri GetLogCurveInfoUri(EtpUri logUri, LogCurveInfo logCurveInfo)
         {
-            var encodedMnemonic = WebUtility.UrlEncode(logCurveInfo.Mnemonic);
+            var encodedMnemonic = WebUtility.UrlEncode(logCurveInfo.Mnemonic).Replace("(", "%28").Replace(")", "%29");
             return logUri.Append(ObjectTypes.LogCurveInfo, encodedMnemonic);
         }
 
