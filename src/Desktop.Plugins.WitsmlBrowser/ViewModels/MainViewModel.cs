@@ -892,7 +892,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.WitsmlBrowser.ViewModels
             if (DataObject == null || DataObject == QueryTemplateText)
                 return;
 
-            var template = QueryTemplates.GetTemplate(DataObject, "WITSML", Model.WitsmlVersion, Model.ReturnElementType);
+            var template = QueryTemplates.GetTemplate(DataObject, ObjectFamilies.Witsml, Model.WitsmlVersion, Model.ReturnElementType);
             XmlQuery.SetText(template.ToString(SaveOptions.OmitDuplicateNamespaces));
 
             // Reset drop down list

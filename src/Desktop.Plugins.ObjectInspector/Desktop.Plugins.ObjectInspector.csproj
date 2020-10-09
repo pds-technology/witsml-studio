@@ -154,6 +154,10 @@
       <Project>{3f3d2683-6036-4c06-911d-2db5c1682d91}</Project>
       <Name>DataAccess</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\ext\witsml\src\Core\Core.csproj">
+      <Project>{0ef1d73f-e7a0-40b0-803b-7ce4b6b27112}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\ext\witsml\src\Framework\Framework.csproj">
       <Project>{fae228aa-4917-4b02-b239-0a24df883898}</Project>
       <Name>Framework</Name>

@@ -25,6 +25,7 @@ using System.Reflection;
 using System.Xml.Serialization;
 using Energistics.DataAccess.Reflection;
 using Energistics.DataAccess.Validation;
+using PDS.WITSMLstudio;
 using PDS.WITSMLstudio.Framework;
 
 namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
@@ -105,7 +106,7 @@ namespace PDS.WITSMLstudio.Desktop.Plugins.ObjectInspector.Models
             // Do not recurse properties that are themselves DataObjects or are from namespaces outside Energistics (e.g. CRS definitions)
             if (!recurse || EnergisticsHelper.IsDataObjectType(property.PropertyType))
                 ChildProperties = new List<DataProperty>();
-            else if (!string.IsNullOrEmpty(propertyNamespace) && !propertyNamespace.ContainsIgnoreCase("resqml") && !propertyNamespace.ContainsIgnoreCase("witsml") && !propertyNamespace.ContainsIgnoreCase("prodml") && !propertyNamespace.ContainsIgnoreCase("energistics"))
+            else if (!string.IsNullOrEmpty(propertyNamespace) && !propertyNamespace.ContainsIgnoreCase(ObjectFamilies.Resqml) && !propertyNamespace.ContainsIgnoreCase(ObjectFamilies.Witsml) && !propertyNamespace.ContainsIgnoreCase(ObjectFamilies.Prodml) && !propertyNamespace.ContainsIgnoreCase("energistics"))
                 ChildProperties = new List<DataProperty>();
             else
                 ChildProperties = CreateChildPropertiesCore(PropertyType, XmlPath, hierarchy);
