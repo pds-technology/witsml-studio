@@ -22,7 +22,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
-using AutoMapper;
 using Caliburn.Micro;
 using Energistics.Etp.Common.Datatypes;
 using Newtonsoft.Json;
@@ -32,6 +31,7 @@ using PDS.WITSMLstudio.Desktop.Core.Connections;
 using PDS.WITSMLstudio.Desktop.Core.Models;
 using PDS.WITSMLstudio.Desktop.Core.Properties;
 using PDS.WITSMLstudio.Desktop.Core.Runtime;
+using AutoMapper;
 
 namespace PDS.WITSMLstudio.Desktop.Core.ViewModels
 {
