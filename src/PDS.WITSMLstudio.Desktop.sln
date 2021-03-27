@@ -76,6 +76,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Store.Web", "..\ext\witsml\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Store", "..\ext\witsml\src\Store\Store.csproj", "{9E51075C-D571-42F5-A311-0589231DBA9C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Framework.Web", "..\ext\witsml\src\Framework.Web\Framework.Web.csproj", "{90A1FD9F-6A85-4AD2-8523-1360034DCD76}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -182,6 +184,10 @@ Global
 		{9E51075C-D571-42F5-A311-0589231DBA9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E51075C-D571-42F5-A311-0589231DBA9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E51075C-D571-42F5-A311-0589231DBA9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90A1FD9F-6A85-4AD2-8523-1360034DCD76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90A1FD9F-6A85-4AD2-8523-1360034DCD76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90A1FD9F-6A85-4AD2-8523-1360034DCD76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90A1FD9F-6A85-4AD2-8523-1360034DCD76}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -210,6 +216,7 @@ Global
 		{987B6304-B4A6-4D57-ACC3-7209175286A6} = {D1BEE84A-E1A1-413D-949A-406B4809BCF4}
 		{347D0962-B422-4ACB-97AA-4BB78854A282} = {D1BEE84A-E1A1-413D-949A-406B4809BCF4}
 		{5FF377F4-56C5-49D9-BA0A-1955A33C4902} = {D1BEE84A-E1A1-413D-949A-406B4809BCF4}
+		{90A1FD9F-6A85-4AD2-8523-1360034DCD76} = {2B7ADB7E-EF7C-4FBD-ADFB-CA0EF611F82C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B2B8135B-B697-4041-AE0F-158360104F8C}
